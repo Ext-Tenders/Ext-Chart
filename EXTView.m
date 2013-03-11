@@ -8,7 +8,6 @@
 
 #import "EXTView.h"
 #import "EXTPair.h"
-#import "EXTPage.h"
 #import "EXTDocument.h"
 #import "EXTScrollView.h"
 #import "EXTGrid.h"
@@ -174,7 +173,7 @@ static NSColor *highlightRectColor = nil;
 		EXTPair* upperRightCoord = [self convertToGridCoordinates:upperRightPoint];
 		
 //		NSArray* pages = [[self delegate] pages];
-        [[self delegate] drawPageNumber:pageInView ll:lowerLeftCoord ur:upperRightCoord withSpacing:gridSpacing];
+        [delegate drawPageNumber:pageInView ll:lowerLeftCoord ur:upperRightCoord withSpacing:gridSpacing];
 //		EXTPage* page0 = [pages objectAtIndex:pageInView];
 //		if (page0 != nil)
 //			[page0 drawFrom:lowerLeftCoord To:upperRightCoord WithSpacing:gridSpacing];
@@ -227,34 +226,38 @@ static NSColor *highlightRectColor = nil;
 }
 
 #pragma mark *** paging ***
+
+// TODO: this gets called when the Compute Homology button is pressed. this
+// should still have an action --- it should recalculate the filtration or sth.
 - (IBAction)computeHomology: (id)sender {
 //	NSMutableArray *pages = [delegate pages];
-	EXTPage *currentPage = [pages objectAtIndex:pageInView];
-	EXTPage *computedPage = [currentPage computeHomology];
-	if (pageInView == [pages count]-1)
-		[pages addObject:computedPage];
-	else 
-		[pages replaceObjectAtIndex:pageInView+1 withObject:computedPage];
+//	EXTPage *currentPage = [pages objectAtIndex:pageInView];
+//	EXTPage *computedPage = [currentPage computeHomology];
+//	if (pageInView == [pages count]-1)
+//		[pages addObject:computedPage];
+//	else
+//		[pages replaceObjectAtIndex:pageInView+1 withObject:computedPage];
 }
 
-// the way the next functino is written, if you add a differential on the E_r page, all of the later differentials are invalidated.  
-
-- (IBAction)nextPage:(id)sender{
-	EXTPage *nextPage;
-	EXTPage *currentPage = [pages objectAtIndex:pageInView];
-	if (pageInView == [pages count] - 1) {
-		nextPage = [currentPage computeHomology];
-		[currentPage setModified:NO];
-		[nextPage setWhichPage:pageInView + 1];
-		[pages addObject:nextPage];
-	} else {
-		if ([currentPage modified]) {
-			nextPage = [currentPage computeHomology];
-			[nextPage setModified:YES];
-			[currentPage setModified:NO];
-			[pages replaceObjectAtIndex:pageInView +1 withObject:nextPage];  
-		}
-	};
+// this get called when we move to the next page in the display. it's
+// responsible for checking whether the page is dirty and, if so, calling the
+// relevant updating algorithms.
+- (IBAction)nextPage:(id)sender {
+//	EXTPage *nextPage;
+//	EXTPage *currentPage = [pages objectAtIndex:pageInView];
+//	if (pageInView == [pages count] - 1) {
+//		nextPage = [currentPage computeHomology];
+//		[currentPage setModified:NO];
+//		[nextPage setWhichPage:pageInView + 1];
+//		[pages addObject:nextPage];
+//	} else {
+//		if ([currentPage modified]) {
+//			nextPage = [currentPage computeHomology];
+//			[nextPage setModified:YES];
+//			[currentPage setModified:NO];
+//			[pages replaceObjectAtIndex:pageInView +1 withObject:nextPage];
+//		}
+//	};
 	[self setPageInView:(pageInView + 1)];
 }
 
@@ -410,8 +413,10 @@ static NSColor *highlightRectColor = nil;
 		[self moveArtBoardWithEvent:theEvent];
 	} else if (currentTool) 
 	{
-		[currentTool addSelfToSequence:[self pages] onPageNumber:pageInView 
-							   atPoint:[_grid convertToGridCoordinates:locationPoint]];
+        // TODO: reenable clicks.  the idea is that both terms and differentials
+        // present the same 'insertable' interface, which is called here.
+        
+//		[currentTool addSelfToSequence:[self pages] onPageNumber:pageInView atPoint:[_grid convertToGridCoordinates:locationPoint]];
 		[self setNeedsDisplayInRect:NSInsetRect([highlightPath bounds], -1, -1)];
 	}
 }
@@ -448,7 +453,11 @@ static NSColor *highlightRectColor = nil;
 			int r = arc4random()%10;
 			if (r < 1) {
 				EXTPair* loc = [EXTPair pairWithA:i AndB:j];
-				EXTTerm* term = [EXTTerm termWithPage:0 AndLocation:loc];
+                EXTTerm* term = [EXTTerm newTerm:loc andNames:[[NSMutableArray alloc]initWithObjects:@"", nil]];
+                
+                // TODO: this is wrong.
+                //
+                // TODO: also, isn't this also in EXTPage...???
 				[[pageZero termsArray]setObject:term forKey:loc];
 			}
 		}

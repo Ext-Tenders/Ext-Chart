@@ -8,7 +8,6 @@
 
 #import "EXTDocument.h"
 #import "EXTView.h"
-#import "EXTPage.h"
 #import "EXTGrid.h"
 #import "EXTArtBoard.h"
 #import "EXTterm.h"
@@ -75,19 +74,20 @@
 // since the frame extends past the bounds rectangle, we need observe the drawingRect in order to know what to refresh when the artBoard changes
 	
 	[theArtBoard addObserver: extview forKeyPath:EXTArtBoardDrawingRectKey options:(NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld) context:nil];
-	[theGrid addObserver: extview forKeyPath:EXTGridAnyKey options:0 context:nil];
+	[theGrid addObserver:extview forKeyPath:EXTGridAnyKey options:0 context:nil];
 
 //	[self setEmphasisGridSpacing:8];		
 }
 
-#pragma mark ***document saving and loading***
+#pragma mark ***document saving and loading / TODO: THESE ARE DISABLED ***
 
 - (NSData *)dataOfType:(NSString *)typeName error:(NSError **)outError
 {
     if ( outError != NULL ) {
 		*outError = [NSError errorWithDomain:NSOSStatusErrorDomain code:unimpErr userInfo:NULL];
 	}
-	return[NSKeyedArchiver archivedDataWithRootObject:[self pages]];
+//	return[NSKeyedArchiver archivedDataWithRootObject:[self pages]];
+    return nil;
 }
 
 - (BOOL)readFromData:(NSData *)data ofType:(NSString *)typeName error:(NSError **)outError
@@ -99,7 +99,7 @@
 	NSArray* arr = [NSKeyedUnarchiver unarchiveObjectWithData:data];
 	NSMutableArray* marr = [arr mutableCopy];
 	
-	[self setPages:marr];
+//	[self setPages:marr];
 	[marr release];
     return YES;
 }

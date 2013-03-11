@@ -9,7 +9,7 @@
 
 #import <Cocoa/Cocoa.h>
 #import "EXTView.h"
-@class EXTPage, EXTGrid, EXTArtBoard;
+@class EXTGrid, EXTArtBoard;
 
 @interface EXTDocument : NSDocument
 {
@@ -43,7 +43,6 @@
 @property(retain) NSMutableArray *terms;
 @property(retain) NSMutableArray *differentials;
 
--(void)drawPageNumber: (NSUInteger) pageNumber;
 -(void)drawPagesUpTo: (NSUInteger) pageNumber;
 -(void) drawPageNumber:(NSUInteger)pageNumber ll:(EXTPair*)lowerLeftCoord ur:(EXTPair*)upperRightCoord withSpacing:(CGFloat)gridSpacing;
 //- (NSUInteger) maxPage;

@@ -11,13 +11,10 @@
 		1DDD582C0DA1D0D100B32029 /* EXTDocument.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1DDD58280DA1D0D100B32029 /* EXTDocument.xib */; };
 		1DDD582D0DA1D0D100B32029 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1DDD582A0DA1D0D100B32029 /* MainMenu.xib */; };
 		315BC80F140430B7007D49CA /* EXTToolPaletteController.m in Sources */ = {isa = PBXBuildFile; fileRef = 315BC80E140430B7007D49CA /* EXTToolPaletteController.m */; };
-		315F54291413B5F600A211D0 /* EXTnewDifferential.m in Sources */ = {isa = PBXBuildFile; fileRef = 315F54281413B5F600A211D0 /* EXTnewDifferential.m */; };
-		317707B713D78076003475A2 /* EXTPage.m in Sources */ = {isa = PBXBuildFile; fileRef = 317707B613D78076003475A2 /* EXTPage.m */; };
 		317707C413D784B0003475A2 /* EXTGrid.m in Sources */ = {isa = PBXBuildFile; fileRef = 317707C313D784B0003475A2 /* EXTGrid.m */; };
 		317707E113D7893A003475A2 /* EXTView.m in Sources */ = {isa = PBXBuildFile; fileRef = 317707E013D7893A003475A2 /* EXTView.m */; };
 		3187BA2713DC6C6C00C26803 /* EXTScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3187BA2413DC6C6C00C26803 /* EXTScrollView.m */; };
 		318EC0691409385F005D21D4 /* to do list.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 318EC0681409385F005D21D4 /* to do list.rtf */; };
-		3190C4191411B94F00ABB8E6 /* EXTZ2VectorSpace.m in Sources */ = {isa = PBXBuildFile; fileRef = 3190C4181411B94F00ABB8E6 /* EXTZ2VectorSpace.m */; };
 		31C77B8D13E43E3100E9DBFC /* Preferences.xib in Resources */ = {isa = PBXBuildFile; fileRef = 31C77B8C13E43E3100E9DBFC /* Preferences.xib */; };
 		31C77BA113E63E8F00E9DBFC /* EXTDocSettings.xib in Resources */ = {isa = PBXBuildFile; fileRef = 31C77BA013E63E8F00E9DBFC /* EXTDocSettings.xib */; };
 		31C77BA813E63F6800E9DBFC /* EXTAppController.m in Sources */ = {isa = PBXBuildFile; fileRef = 31C77BA713E63F6800E9DBFC /* EXTAppController.m */; };
@@ -26,9 +23,7 @@
 		31D403C013DA04D8006A8C06 /* EXTdifferential.m in Sources */ = {isa = PBXBuildFile; fileRef = 31D403BF13DA04D8006A8C06 /* EXTdifferential.m */; };
 		31D5D2E513F6933B00F1B2F9 /* EXTArtBoard.m in Sources */ = {isa = PBXBuildFile; fileRef = 31D5D2E413F6933B00F1B2F9 /* EXTArtBoard.m */; };
 		31EEEF65140430380035BE7A /* EXTToolPalette.xib in Resources */ = {isa = PBXBuildFile; fileRef = 31EEEF64140430380035BE7A /* EXTToolPalette.xib */; };
-		31FF82D61411884600EA4E15 /* EXTFilteredModule.m in Sources */ = {isa = PBXBuildFile; fileRef = 31FF82D51411884600EA4E15 /* EXTFilteredModule.m */; };
-		31FF82DB1411886C00EA4E15 /* EXTModule.m in Sources */ = {isa = PBXBuildFile; fileRef = 31FF82DA1411886C00EA4E15 /* EXTModule.m */; };
-		31FF82E01411892100EA4E15 /* EXTMorphism.m in Sources */ = {isa = PBXBuildFile; fileRef = 31FF82DF1411892100EA4E15 /* EXTMorphism.m */; };
+		38DDAA7B16EDA8990001841D /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 38DDAA7A16EDA8990001841D /* README.md */; };
 		8D15AC2C0486D014006FF6A4 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 2A37F4B9FDCFA73011CA2CEA /* Credits.rtf */; };
 		8D15AC2F0486D014006FF6A4 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165FFE840EACC02AAC07 /* InfoPlist.strings */; };
 		8D15AC310486D014006FF6A4 /* EXTDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A37F4ACFDCFA73011CA2CEA /* EXTDocument.m */; settings = {ATTRIBUTES = (); }; };
@@ -53,10 +48,6 @@
 		2A37F4C5FDCFA73011CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		315BC80D140430B7007D49CA /* EXTToolPaletteController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTToolPaletteController.h; sourceTree = "<group>"; };
 		315BC80E140430B7007D49CA /* EXTToolPaletteController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTToolPaletteController.m; sourceTree = "<group>"; };
-		315F54271413B5F600A211D0 /* EXTnewDifferential.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTnewDifferential.h; sourceTree = "<group>"; };
-		315F54281413B5F600A211D0 /* EXTnewDifferential.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTnewDifferential.m; sourceTree = "<group>"; };
-		317707B513D78076003475A2 /* EXTPage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTPage.h; sourceTree = "<group>"; };
-		317707B613D78076003475A2 /* EXTPage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTPage.m; sourceTree = "<group>"; };
 		317707C213D784B0003475A2 /* EXTGrid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTGrid.h; sourceTree = "<group>"; };
 		317707C313D784B0003475A2 /* EXTGrid.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTGrid.m; sourceTree = "<group>"; };
 		317707DF13D7893A003475A2 /* EXTView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTView.h; sourceTree = "<group>"; };
@@ -64,8 +55,6 @@
 		3187BA2313DC6C6C00C26803 /* EXTScrollView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTScrollView.h; sourceTree = "<group>"; };
 		3187BA2413DC6C6C00C26803 /* EXTScrollView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTScrollView.m; sourceTree = "<group>"; };
 		318EC0681409385F005D21D4 /* to do list.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; path = "to do list.rtf"; sourceTree = "<group>"; };
-		3190C4171411B94F00ABB8E6 /* EXTZ2VectorSpace.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTZ2VectorSpace.h; sourceTree = "<group>"; };
-		3190C4181411B94F00ABB8E6 /* EXTZ2VectorSpace.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTZ2VectorSpace.m; sourceTree = "<group>"; };
 		31C77B8C13E43E3100E9DBFC /* Preferences.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = Preferences.xib; sourceTree = "<group>"; };
 		31C77BA013E63E8F00E9DBFC /* EXTDocSettings.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = EXTDocSettings.xib; sourceTree = "<group>"; };
 		31C77BA613E63F6800E9DBFC /* EXTAppController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTAppController.h; sourceTree = "<group>"; };
@@ -79,12 +68,7 @@
 		31D5D2E313F6933B00F1B2F9 /* EXTArtBoard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTArtBoard.h; sourceTree = "<group>"; };
 		31D5D2E413F6933B00F1B2F9 /* EXTArtBoard.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTArtBoard.m; sourceTree = "<group>"; };
 		31EEEF64140430380035BE7A /* EXTToolPalette.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = EXTToolPalette.xib; sourceTree = "<group>"; };
-		31FF82D41411884600EA4E15 /* EXTFilteredModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTFilteredModule.h; sourceTree = "<group>"; };
-		31FF82D51411884600EA4E15 /* EXTFilteredModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTFilteredModule.m; sourceTree = "<group>"; };
-		31FF82D91411886C00EA4E15 /* EXTModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTModule.h; sourceTree = "<group>"; };
-		31FF82DA1411886C00EA4E15 /* EXTModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTModule.m; sourceTree = "<group>"; };
-		31FF82DE1411892100EA4E15 /* EXTMorphism.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTMorphism.h; sourceTree = "<group>"; };
-		31FF82DF1411892100EA4E15 /* EXTMorphism.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTMorphism.m; sourceTree = "<group>"; };
+		38DDAA7A16EDA8990001841D /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.md; sourceTree = "<group>"; };
 		8D15AC360486D014006FF6A4 /* Ext_Chart-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Ext_Chart-Info.plist"; sourceTree = "<group>"; };
 		8D15AC370486D014006FF6A4 /* Ext Chart.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Ext Chart.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -154,8 +138,6 @@
 				31D403BA13DA0476006A8C06 /* EXTterm.m */,
 				31D403BE13DA04D8006A8C06 /* EXTdifferential.h */,
 				31D403BF13DA04D8006A8C06 /* EXTdifferential.m */,
-				317707B513D78076003475A2 /* EXTPage.h */,
-				317707B613D78076003475A2 /* EXTPage.m */,
 				2A37F4AEFDCFA73011CA2CEA /* EXTDocument.h */,
 				2A37F4ACFDCFA73011CA2CEA /* EXTDocument.m */,
 				317707C213D784B0003475A2 /* EXTGrid.h */,
@@ -168,6 +150,7 @@
 				31C77BB513E647A000E9DBFC /* EXTsettingPanelController.m */,
 				315BC80D140430B7007D49CA /* EXTToolPaletteController.h */,
 				315BC80E140430B7007D49CA /* EXTToolPaletteController.m */,
+				38DDAA7A16EDA8990001841D /* README.md */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -208,16 +191,6 @@
 		3190C40A1411B50900ABB8E6 /* module and differential */ = {
 			isa = PBXGroup;
 			children = (
-				31FF82DE1411892100EA4E15 /* EXTMorphism.h */,
-				31FF82DF1411892100EA4E15 /* EXTMorphism.m */,
-				31FF82D91411886C00EA4E15 /* EXTModule.h */,
-				31FF82DA1411886C00EA4E15 /* EXTModule.m */,
-				31FF82D51411884600EA4E15 /* EXTFilteredModule.m */,
-				31FF82D41411884600EA4E15 /* EXTFilteredModule.h */,
-				3190C4171411B94F00ABB8E6 /* EXTZ2VectorSpace.h */,
-				3190C4181411B94F00ABB8E6 /* EXTZ2VectorSpace.m */,
-				315F54271413B5F600A211D0 /* EXTnewDifferential.h */,
-				315F54281413B5F600A211D0 /* EXTnewDifferential.m */,
 			);
 			name = "module and differential";
 			sourceTree = "<group>";
@@ -284,6 +257,7 @@
 				31C77BA113E63E8F00E9DBFC /* EXTDocSettings.xib in Resources */,
 				31EEEF65140430380035BE7A /* EXTToolPalette.xib in Resources */,
 				318EC0691409385F005D21D4 /* to do list.rtf in Resources */,
+				38DDAA7B16EDA8990001841D /* README.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -296,7 +270,6 @@
 			files = (
 				8D15AC310486D014006FF6A4 /* EXTDocument.m in Sources */,
 				8D15AC320486D014006FF6A4 /* main.m in Sources */,
-				317707B713D78076003475A2 /* EXTPage.m in Sources */,
 				317707C413D784B0003475A2 /* EXTGrid.m in Sources */,
 				317707E113D7893A003475A2 /* EXTView.m in Sources */,
 				31D403BB13DA0476006A8C06 /* EXTterm.m in Sources */,
@@ -307,11 +280,6 @@
 				31C77BB613E647A000E9DBFC /* EXTsettingPanelController.m in Sources */,
 				31D5D2E513F6933B00F1B2F9 /* EXTArtBoard.m in Sources */,
 				315BC80F140430B7007D49CA /* EXTToolPaletteController.m in Sources */,
-				31FF82D61411884600EA4E15 /* EXTFilteredModule.m in Sources */,
-				31FF82DB1411886C00EA4E15 /* EXTModule.m in Sources */,
-				31FF82E01411892100EA4E15 /* EXTMorphism.m in Sources */,
-				3190C4191411B94F00ABB8E6 /* EXTZ2VectorSpace.m in Sources */,
-				315F54291413B5F600A211D0 /* EXTnewDifferential.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

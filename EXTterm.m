@@ -9,7 +9,7 @@
 #import "EXTTerm.h"
 #import "EXTPair.h"
 #import "EXTGrid.h"
-#import "EXTPage.h"
+#import "EXTDOcument.h"
 
 @implementation EXTTerm
 
@@ -87,17 +87,12 @@
 
 #pragma mark ***EXTTool class methods***
 
-// XXX: this shouldn't be here; the page / drawer / whatever should just grab
-// all the classes it can, then draw them.  it's not EXTTerm's concern.
-
-+ (void)addSelfToSequence:(NSMutableArray *)pageSequence onPageNumber:(NSUInteger)pageNo atPoint:(NSPoint)point{
-	EXTPair	*pointPair = [EXTPair pairWithA:point.x AndB:point.y];
-	EXTPage *thePage;
-	for (thePage in pageSequence){
-		EXTTerm *term = [EXTTerm newTerm:pointPair andNames:[[NSMutableArray alloc]initWithObjects: nil]];
-		[[thePage termsArray]setObject:term forKey:pointPair];	
-	}	
-	// go back to the E_1 term and put the object in there, and all subsequent pages!
+- (void)addSelfToSS:(EXTDocument *)theDocument {
+    NSMutableArray *terms = [theDocument terms];
+    
+    // if we're not already added, add us.
+    if (![terms containsObject:self])
+        [[theDocument terms] addObject:self];
 }
 
 + (NSBezierPath *) makeHighlightPathAtPoint: (NSPoint)point onGrid:(EXTGrid *)theGrid onPage:(NSInteger)thePage{

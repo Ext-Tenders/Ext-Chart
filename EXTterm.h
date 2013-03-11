@@ -7,11 +7,11 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import "EXTDocument.h"
 
 // forward prototypes for classes in other headers.
 @class EXTPair;
 @class EXTGrid;
-@class EXTPage;
 
 // this class models a cell in the spectral sequence.  it needs to keep track of
 // many things, including not just its position but also its cycle/boundary
@@ -51,5 +51,5 @@
     // TODO: this drawing code must be offloaded into some other module!!
     -(void)drawWithSpacing:(CGFloat)spacing;
     + (NSBezierPath *)makeHighlightPathAtPoint:(NSPoint)point onGrid:(EXTGrid *)theGrid onPage:(NSInteger)page;
-    + (void)addSelfToSequence:(NSMutableArray *)pageSequence onPageNumber:(NSUInteger)pageNo atPoint:(NSPoint)point;
+    - (void)addSelfToSS:(EXTDocument*)theDocument;
 @end

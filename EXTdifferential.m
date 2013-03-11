@@ -9,8 +9,7 @@
 #import "EXTdifferential.h"
 #import "EXTPair.h"
 #import "EXTGrid.h"
-#import "EXTPage.h"
-
+#import "EXTTerm.h"
 
 @implementation EXTdifferential
 
@@ -104,16 +103,16 @@
 
 + (void)addSelfToSequence:(NSMutableArray *)pageSequence onPageNumber:(NSUInteger)pageNo atPoint:(NSPoint)point{
 	
-	EXTPage *extPage = [pageSequence objectAtIndex:pageNo];	
-	EXTPair	*sourcePosition = [EXTPair pairWithA:point.x AndB:point.y];
-	EXTPair	*targetPosition = [EXTPair pairWithA:(point.x-1) AndB:(point.y+pageNo)];
-	EXTTerm *source = [[extPage termsArray] objectForKey:sourcePosition];
-	EXTTerm *target = [[extPage termsArray] objectForKey:targetPosition];
-	if (source && target) {
-		EXTdifferential* differential = [[EXTdifferential alloc] initWithPage:pageNo Start:sourcePosition AndEnd:targetPosition];
-		[[extPage differentialsArray] setObject:differential forKey:sourcePosition];
-   		[extPage setModified:YES];
-	}
+//	EXTPage *extPage = [pageSequence objectAtIndex:pageNo];
+//	EXTPair	*sourcePosition = [EXTPair pairWithA:point.x AndB:point.y];
+//	EXTPair	*targetPosition = [EXTPair pairWithA:(point.x-1) AndB:(point.y+pageNo)];
+//	EXTTerm *source = [[extPage termsArray] objectForKey:sourcePosition];
+//	EXTTerm *target = [[extPage termsArray] objectForKey:targetPosition];
+//	if (source && target) {
+//		EXTdifferential* differential = [[EXTdifferential alloc] initWithPage:pageNo Start:sourcePosition AndEnd:targetPosition];
+//		[[extPage differentialsArray] setObject:differential forKey:sourcePosition];
+// 		[extPage setModified:YES];
+//	}
 }
 
 #pragma mark *** tools for calculation homology (must be overridden in subclasses) ***

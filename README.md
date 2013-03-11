@@ -1,0 +1,1 @@
+This project is presently in a bad state.  Don't look carefully at it.
