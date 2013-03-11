@@ -1,0 +1,436 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 45;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		093AEADD13E10759003E9F58 /* EXTPair.m in Sources */ = {isa = PBXBuildFile; fileRef = 093AEADC13E10759003E9F58 /* EXTPair.m */; };
+		1DDD582C0DA1D0D100B32029 /* EXTDocument.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1DDD58280DA1D0D100B32029 /* EXTDocument.xib */; };
+		1DDD582D0DA1D0D100B32029 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1DDD582A0DA1D0D100B32029 /* MainMenu.xib */; };
+		315BC80F140430B7007D49CA /* EXTToolPaletteController.m in Sources */ = {isa = PBXBuildFile; fileRef = 315BC80E140430B7007D49CA /* EXTToolPaletteController.m */; };
+		315F54291413B5F600A211D0 /* EXTnewDifferential.m in Sources */ = {isa = PBXBuildFile; fileRef = 315F54281413B5F600A211D0 /* EXTnewDifferential.m */; };
+		317707B713D78076003475A2 /* EXTPage.m in Sources */ = {isa = PBXBuildFile; fileRef = 317707B613D78076003475A2 /* EXTPage.m */; };
+		317707C413D784B0003475A2 /* EXTGrid.m in Sources */ = {isa = PBXBuildFile; fileRef = 317707C313D784B0003475A2 /* EXTGrid.m */; };
+		317707E113D7893A003475A2 /* EXTView.m in Sources */ = {isa = PBXBuildFile; fileRef = 317707E013D7893A003475A2 /* EXTView.m */; };
+		3187BA2713DC6C6C00C26803 /* EXTScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3187BA2413DC6C6C00C26803 /* EXTScrollView.m */; };
+		318EC0691409385F005D21D4 /* to do list.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 318EC0681409385F005D21D4 /* to do list.rtf */; };
+		3190C4191411B94F00ABB8E6 /* EXTZ2VectorSpace.m in Sources */ = {isa = PBXBuildFile; fileRef = 3190C4181411B94F00ABB8E6 /* EXTZ2VectorSpace.m */; };
+		31C77B8D13E43E3100E9DBFC /* Preferences.xib in Resources */ = {isa = PBXBuildFile; fileRef = 31C77B8C13E43E3100E9DBFC /* Preferences.xib */; };
+		31C77BA113E63E8F00E9DBFC /* EXTDocSettings.xib in Resources */ = {isa = PBXBuildFile; fileRef = 31C77BA013E63E8F00E9DBFC /* EXTDocSettings.xib */; };
+		31C77BA813E63F6800E9DBFC /* EXTAppController.m in Sources */ = {isa = PBXBuildFile; fileRef = 31C77BA713E63F6800E9DBFC /* EXTAppController.m */; };
+		31C77BB613E647A000E9DBFC /* EXTsettingPanelController.m in Sources */ = {isa = PBXBuildFile; fileRef = 31C77BB513E647A000E9DBFC /* EXTsettingPanelController.m */; };
+		31D403BB13DA0476006A8C06 /* EXTterm.m in Sources */ = {isa = PBXBuildFile; fileRef = 31D403BA13DA0476006A8C06 /* EXTterm.m */; };
+		31D403C013DA04D8006A8C06 /* EXTdifferential.m in Sources */ = {isa = PBXBuildFile; fileRef = 31D403BF13DA04D8006A8C06 /* EXTdifferential.m */; };
+		31D5D2E513F6933B00F1B2F9 /* EXTArtBoard.m in Sources */ = {isa = PBXBuildFile; fileRef = 31D5D2E413F6933B00F1B2F9 /* EXTArtBoard.m */; };
+		31EEEF65140430380035BE7A /* EXTToolPalette.xib in Resources */ = {isa = PBXBuildFile; fileRef = 31EEEF64140430380035BE7A /* EXTToolPalette.xib */; };
+		31FF82D61411884600EA4E15 /* EXTFilteredModule.m in Sources */ = {isa = PBXBuildFile; fileRef = 31FF82D51411884600EA4E15 /* EXTFilteredModule.m */; };
+		31FF82DB1411886C00EA4E15 /* EXTModule.m in Sources */ = {isa = PBXBuildFile; fileRef = 31FF82DA1411886C00EA4E15 /* EXTModule.m */; };
+		31FF82E01411892100EA4E15 /* EXTMorphism.m in Sources */ = {isa = PBXBuildFile; fileRef = 31FF82DF1411892100EA4E15 /* EXTMorphism.m */; };
+		8D15AC2C0486D014006FF6A4 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 2A37F4B9FDCFA73011CA2CEA /* Credits.rtf */; };
+		8D15AC2F0486D014006FF6A4 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165FFE840EACC02AAC07 /* InfoPlist.strings */; };
+		8D15AC310486D014006FF6A4 /* EXTDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A37F4ACFDCFA73011CA2CEA /* EXTDocument.m */; settings = {ATTRIBUTES = (); }; };
+		8D15AC320486D014006FF6A4 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A37F4B0FDCFA73011CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
+		8D15AC340486D014006FF6A4 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A7FEA54F5311CA2CBB /* Cocoa.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		089C1660FE840EACC02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		093AEADB13E10759003E9F58 /* EXTPair.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTPair.h; sourceTree = "<group>"; };
+		093AEADC13E10759003E9F58 /* EXTPair.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTPair.m; sourceTree = "<group>"; };
+		1058C7A7FEA54F5311CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
+		13E42FBA07B3F13500E4EEF1 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
+		1DDD58290DA1D0D100B32029 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/EXTDocument.xib; sourceTree = "<group>"; };
+		1DDD582B0DA1D0D100B32029 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/MainMenu.xib; sourceTree = "<group>"; };
+		2564AD2C0F5327BB00F57823 /* Ext_Chart_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Ext_Chart_Prefix.pch; sourceTree = "<group>"; };
+		2A37F4ACFDCFA73011CA2CEA /* EXTDocument.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTDocument.m; sourceTree = "<group>"; };
+		2A37F4AEFDCFA73011CA2CEA /* EXTDocument.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTDocument.h; sourceTree = "<group>"; };
+		2A37F4B0FDCFA73011CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		2A37F4BAFDCFA73011CA2CEA /* English */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = English; path = English.lproj/Credits.rtf; sourceTree = "<group>"; };
+		2A37F4C4FDCFA73011CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
+		2A37F4C5FDCFA73011CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
+		315BC80D140430B7007D49CA /* EXTToolPaletteController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTToolPaletteController.h; sourceTree = "<group>"; };
+		315BC80E140430B7007D49CA /* EXTToolPaletteController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTToolPaletteController.m; sourceTree = "<group>"; };
+		315F54271413B5F600A211D0 /* EXTnewDifferential.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTnewDifferential.h; sourceTree = "<group>"; };
+		315F54281413B5F600A211D0 /* EXTnewDifferential.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTnewDifferential.m; sourceTree = "<group>"; };
+		317707B513D78076003475A2 /* EXTPage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTPage.h; sourceTree = "<group>"; };
+		317707B613D78076003475A2 /* EXTPage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTPage.m; sourceTree = "<group>"; };
+		317707C213D784B0003475A2 /* EXTGrid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTGrid.h; sourceTree = "<group>"; };
+		317707C313D784B0003475A2 /* EXTGrid.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTGrid.m; sourceTree = "<group>"; };
+		317707DF13D7893A003475A2 /* EXTView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTView.h; sourceTree = "<group>"; };
+		317707E013D7893A003475A2 /* EXTView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTView.m; sourceTree = "<group>"; };
+		3187BA2313DC6C6C00C26803 /* EXTScrollView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTScrollView.h; sourceTree = "<group>"; };
+		3187BA2413DC6C6C00C26803 /* EXTScrollView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTScrollView.m; sourceTree = "<group>"; };
+		318EC0681409385F005D21D4 /* to do list.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; path = "to do list.rtf"; sourceTree = "<group>"; };
+		3190C4171411B94F00ABB8E6 /* EXTZ2VectorSpace.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTZ2VectorSpace.h; sourceTree = "<group>"; };
+		3190C4181411B94F00ABB8E6 /* EXTZ2VectorSpace.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTZ2VectorSpace.m; sourceTree = "<group>"; };
+		31C77B8C13E43E3100E9DBFC /* Preferences.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = Preferences.xib; sourceTree = "<group>"; };
+		31C77BA013E63E8F00E9DBFC /* EXTDocSettings.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = EXTDocSettings.xib; sourceTree = "<group>"; };
+		31C77BA613E63F6800E9DBFC /* EXTAppController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTAppController.h; sourceTree = "<group>"; };
+		31C77BA713E63F6800E9DBFC /* EXTAppController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTAppController.m; sourceTree = "<group>"; };
+		31C77BB413E647A000E9DBFC /* EXTsettingPanelController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTsettingPanelController.h; sourceTree = "<group>"; };
+		31C77BB513E647A000E9DBFC /* EXTsettingPanelController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTsettingPanelController.m; sourceTree = "<group>"; };
+		31D403B913DA0476006A8C06 /* EXTterm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTterm.h; sourceTree = "<group>"; };
+		31D403BA13DA0476006A8C06 /* EXTterm.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTterm.m; sourceTree = "<group>"; };
+		31D403BE13DA04D8006A8C06 /* EXTdifferential.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTdifferential.h; sourceTree = "<group>"; };
+		31D403BF13DA04D8006A8C06 /* EXTdifferential.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTdifferential.m; sourceTree = "<group>"; };
+		31D5D2E313F6933B00F1B2F9 /* EXTArtBoard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTArtBoard.h; sourceTree = "<group>"; };
+		31D5D2E413F6933B00F1B2F9 /* EXTArtBoard.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTArtBoard.m; sourceTree = "<group>"; };
+		31EEEF64140430380035BE7A /* EXTToolPalette.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = EXTToolPalette.xib; sourceTree = "<group>"; };
+		31FF82D41411884600EA4E15 /* EXTFilteredModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTFilteredModule.h; sourceTree = "<group>"; };
+		31FF82D51411884600EA4E15 /* EXTFilteredModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTFilteredModule.m; sourceTree = "<group>"; };
+		31FF82D91411886C00EA4E15 /* EXTModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTModule.h; sourceTree = "<group>"; };
+		31FF82DA1411886C00EA4E15 /* EXTModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTModule.m; sourceTree = "<group>"; };
+		31FF82DE1411892100EA4E15 /* EXTMorphism.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTMorphism.h; sourceTree = "<group>"; };
+		31FF82DF1411892100EA4E15 /* EXTMorphism.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTMorphism.m; sourceTree = "<group>"; };
+		8D15AC360486D014006FF6A4 /* Ext_Chart-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Ext_Chart-Info.plist"; sourceTree = "<group>"; };
+		8D15AC370486D014006FF6A4 /* Ext Chart.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Ext Chart.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		8D15AC330486D014006FF6A4 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8D15AC340486D014006FF6A4 /* Cocoa.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		1058C7A6FEA54F5311CA2CBB /* Linked Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				1058C7A7FEA54F5311CA2CBB /* Cocoa.framework */,
+			);
+			name = "Linked Frameworks";
+			sourceTree = "<group>";
+		};
+		1058C7A8FEA54F5311CA2CBB /* Other Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				2A37F4C4FDCFA73011CA2CEA /* AppKit.framework */,
+				13E42FBA07B3F13500E4EEF1 /* CoreData.framework */,
+				2A37F4C5FDCFA73011CA2CEA /* Foundation.framework */,
+			);
+			name = "Other Frameworks";
+			sourceTree = "<group>";
+		};
+		19C28FB0FE9D524F11CA2CBB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				8D15AC370486D014006FF6A4 /* Ext Chart.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		2A37F4AAFDCFA73011CA2CEA /* Ext Chart */ = {
+			isa = PBXGroup;
+			children = (
+				2A37F4ABFDCFA73011CA2CEA /* Classes */,
+				2A37F4AFFDCFA73011CA2CEA /* Other Sources */,
+				2A37F4B8FDCFA73011CA2CEA /* Resources */,
+				2A37F4C3FDCFA73011CA2CEA /* Frameworks */,
+				19C28FB0FE9D524F11CA2CBB /* Products */,
+			);
+			name = "Ext Chart";
+			sourceTree = "<group>";
+		};
+		2A37F4ABFDCFA73011CA2CEA /* Classes */ = {
+			isa = PBXGroup;
+			children = (
+				3190C40A1411B50900ABB8E6 /* module and differential */,
+				318EC0681409385F005D21D4 /* to do list.rtf */,
+				31D5D2E313F6933B00F1B2F9 /* EXTArtBoard.h */,
+				31D5D2E413F6933B00F1B2F9 /* EXTArtBoard.m */,
+				093AEADB13E10759003E9F58 /* EXTPair.h */,
+				093AEADC13E10759003E9F58 /* EXTPair.m */,
+				3187BA2313DC6C6C00C26803 /* EXTScrollView.h */,
+				3187BA2413DC6C6C00C26803 /* EXTScrollView.m */,
+				31D403B913DA0476006A8C06 /* EXTterm.h */,
+				31D403BA13DA0476006A8C06 /* EXTterm.m */,
+				31D403BE13DA04D8006A8C06 /* EXTdifferential.h */,
+				31D403BF13DA04D8006A8C06 /* EXTdifferential.m */,
+				317707B513D78076003475A2 /* EXTPage.h */,
+				317707B613D78076003475A2 /* EXTPage.m */,
+				2A37F4AEFDCFA73011CA2CEA /* EXTDocument.h */,
+				2A37F4ACFDCFA73011CA2CEA /* EXTDocument.m */,
+				317707C213D784B0003475A2 /* EXTGrid.h */,
+				317707C313D784B0003475A2 /* EXTGrid.m */,
+				317707DF13D7893A003475A2 /* EXTView.h */,
+				317707E013D7893A003475A2 /* EXTView.m */,
+				31C77BA613E63F6800E9DBFC /* EXTAppController.h */,
+				31C77BA713E63F6800E9DBFC /* EXTAppController.m */,
+				31C77BB413E647A000E9DBFC /* EXTsettingPanelController.h */,
+				31C77BB513E647A000E9DBFC /* EXTsettingPanelController.m */,
+				315BC80D140430B7007D49CA /* EXTToolPaletteController.h */,
+				315BC80E140430B7007D49CA /* EXTToolPaletteController.m */,
+			);
+			name = Classes;
+			sourceTree = "<group>";
+		};
+		2A37F4AFFDCFA73011CA2CEA /* Other Sources */ = {
+			isa = PBXGroup;
+			children = (
+				2564AD2C0F5327BB00F57823 /* Ext_Chart_Prefix.pch */,
+				2A37F4B0FDCFA73011CA2CEA /* main.m */,
+			);
+			name = "Other Sources";
+			sourceTree = "<group>";
+		};
+		2A37F4B8FDCFA73011CA2CEA /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				2A37F4B9FDCFA73011CA2CEA /* Credits.rtf */,
+				8D15AC360486D014006FF6A4 /* Ext_Chart-Info.plist */,
+				089C165FFE840EACC02AAC07 /* InfoPlist.strings */,
+				1DDD58280DA1D0D100B32029 /* EXTDocument.xib */,
+				1DDD582A0DA1D0D100B32029 /* MainMenu.xib */,
+				31C77B8C13E43E3100E9DBFC /* Preferences.xib */,
+				31C77BA013E63E8F00E9DBFC /* EXTDocSettings.xib */,
+				31EEEF64140430380035BE7A /* EXTToolPalette.xib */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
+		2A37F4C3FDCFA73011CA2CEA /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				1058C7A6FEA54F5311CA2CBB /* Linked Frameworks */,
+				1058C7A8FEA54F5311CA2CBB /* Other Frameworks */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		3190C40A1411B50900ABB8E6 /* module and differential */ = {
+			isa = PBXGroup;
+			children = (
+				31FF82DE1411892100EA4E15 /* EXTMorphism.h */,
+				31FF82DF1411892100EA4E15 /* EXTMorphism.m */,
+				31FF82D91411886C00EA4E15 /* EXTModule.h */,
+				31FF82DA1411886C00EA4E15 /* EXTModule.m */,
+				31FF82D51411884600EA4E15 /* EXTFilteredModule.m */,
+				31FF82D41411884600EA4E15 /* EXTFilteredModule.h */,
+				3190C4171411B94F00ABB8E6 /* EXTZ2VectorSpace.h */,
+				3190C4181411B94F00ABB8E6 /* EXTZ2VectorSpace.m */,
+				315F54271413B5F600A211D0 /* EXTnewDifferential.h */,
+				315F54281413B5F600A211D0 /* EXTnewDifferential.m */,
+			);
+			name = "module and differential";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		8D15AC270486D014006FF6A4 /* Ext Chart */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C05733C708A9546B00998B17 /* Build configuration list for PBXNativeTarget "Ext Chart" */;
+			buildPhases = (
+				8D15AC2B0486D014006FF6A4 /* Resources */,
+				8D15AC300486D014006FF6A4 /* Sources */,
+				8D15AC330486D014006FF6A4 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Ext Chart";
+			productInstallPath = "$(HOME)/Applications";
+			productName = "Ext Chart";
+			productReference = 8D15AC370486D014006FF6A4 /* Ext Chart.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		2A37F4A9FDCFA73011CA2CEA /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				ORGANIZATIONNAME = HLProducts;
+			};
+			buildConfigurationList = C05733CB08A9546B00998B17 /* Build configuration list for PBXProject "Ext Chart" */;
+			compatibilityVersion = "Xcode 3.1";
+			developmentRegion = English;
+			hasScannedForEncodings = 1;
+			knownRegions = (
+				English,
+				Japanese,
+				French,
+				German,
+			);
+			mainGroup = 2A37F4AAFDCFA73011CA2CEA /* Ext Chart */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				8D15AC270486D014006FF6A4 /* Ext Chart */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		8D15AC2B0486D014006FF6A4 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8D15AC2C0486D014006FF6A4 /* Credits.rtf in Resources */,
+				8D15AC2F0486D014006FF6A4 /* InfoPlist.strings in Resources */,
+				1DDD582C0DA1D0D100B32029 /* EXTDocument.xib in Resources */,
+				1DDD582D0DA1D0D100B32029 /* MainMenu.xib in Resources */,
+				31C77B8D13E43E3100E9DBFC /* Preferences.xib in Resources */,
+				31C77BA113E63E8F00E9DBFC /* EXTDocSettings.xib in Resources */,
+				31EEEF65140430380035BE7A /* EXTToolPalette.xib in Resources */,
+				318EC0691409385F005D21D4 /* to do list.rtf in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		8D15AC300486D014006FF6A4 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8D15AC310486D014006FF6A4 /* EXTDocument.m in Sources */,
+				8D15AC320486D014006FF6A4 /* main.m in Sources */,
+				317707B713D78076003475A2 /* EXTPage.m in Sources */,
+				317707C413D784B0003475A2 /* EXTGrid.m in Sources */,
+				317707E113D7893A003475A2 /* EXTView.m in Sources */,
+				31D403BB13DA0476006A8C06 /* EXTterm.m in Sources */,
+				31D403C013DA04D8006A8C06 /* EXTdifferential.m in Sources */,
+				3187BA2713DC6C6C00C26803 /* EXTScrollView.m in Sources */,
+				093AEADD13E10759003E9F58 /* EXTPair.m in Sources */,
+				31C77BA813E63F6800E9DBFC /* EXTAppController.m in Sources */,
+				31C77BB613E647A000E9DBFC /* EXTsettingPanelController.m in Sources */,
+				31D5D2E513F6933B00F1B2F9 /* EXTArtBoard.m in Sources */,
+				315BC80F140430B7007D49CA /* EXTToolPaletteController.m in Sources */,
+				31FF82D61411884600EA4E15 /* EXTFilteredModule.m in Sources */,
+				31FF82DB1411886C00EA4E15 /* EXTModule.m in Sources */,
+				31FF82E01411892100EA4E15 /* EXTMorphism.m in Sources */,
+				3190C4191411B94F00ABB8E6 /* EXTZ2VectorSpace.m in Sources */,
+				315F54291413B5F600A211D0 /* EXTnewDifferential.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		089C165FFE840EACC02AAC07 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				089C1660FE840EACC02AAC07 /* English */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		1DDD58280DA1D0D100B32029 /* EXTDocument.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				1DDD58290DA1D0D100B32029 /* English */,
+			);
+			name = EXTDocument.xib;
+			sourceTree = "<group>";
+		};
+		1DDD582A0DA1D0D100B32029 /* MainMenu.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				1DDD582B0DA1D0D100B32029 /* English */,
+			);
+			name = MainMenu.xib;
+			sourceTree = "<group>";
+		};
+		2A37F4B9FDCFA73011CA2CEA /* Credits.rtf */ = {
+			isa = PBXVariantGroup;
+			children = (
+				2A37F4BAFDCFA73011CA2CEA /* English */,
+			);
+			name = Credits.rtf;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		C05733C808A9546B00998B17 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = Ext_Chart_Prefix.pch;
+				INFOPLIST_FILE = "Ext_Chart-Info.plist";
+				INSTALL_PATH = "$(HOME)/Applications";
+				PRODUCT_NAME = "Ext Chart";
+			};
+			name = Debug;
+		};
+		C05733C908A9546B00998B17 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_MODEL_TUNING = G5;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = Ext_Chart_Prefix.pch;
+				INFOPLIST_FILE = "Ext_Chart-Info.plist";
+				INSTALL_PATH = "$(HOME)/Applications";
+				PRODUCT_NAME = "Ext Chart";
+			};
+			name = Release;
+		};
+		C05733CC08A9546B00998B17 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PREBINDING = NO;
+				SDKROOT = "";
+			};
+			name = Debug;
+		};
+		C05733CD08A9546B00998B17 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				PREBINDING = NO;
+				SDKROOT = "";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		C05733C708A9546B00998B17 /* Build configuration list for PBXNativeTarget "Ext Chart" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C05733C808A9546B00998B17 /* Debug */,
+				C05733C908A9546B00998B17 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C05733CB08A9546B00998B17 /* Build configuration list for PBXProject "Ext Chart" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C05733CC08A9546B00998B17 /* Debug */,
+				C05733CD08A9546B00998B17 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 2A37F4A9FDCFA73011CA2CEA /* Project object */;
+}
