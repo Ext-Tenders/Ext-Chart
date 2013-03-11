@@ -14,8 +14,8 @@
 }
 @property int a;
 @property int b;
-- (id) initWithA:(int)aa AndB:(int)bb;
-+ (id) pairWithA:(int)aa AndB:(int)bb;
+- (id) initWithA:(int)aa B:(int)bb;
++ (id) pairWithA:(int)aa B:(int)bb;
 - (NSPoint) makePoint;
 -(NSString *) description;
 

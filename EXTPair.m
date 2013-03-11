@@ -13,7 +13,7 @@
 @synthesize a;
 @synthesize b;
 
-- (id) initWithA:(int)aa AndB:(int)bb {
+- (id) initWithA:(int)aa B:(int)bb {
 	if (self = [super init]) {
 		[self setA:aa];
 		[self setB:bb];
@@ -21,8 +21,8 @@
 	return self;
 }
 
-+ (id) pairWithA:(int)aa AndB:(int)bb {
-	EXTPair* pair = [[EXTPair alloc]initWithA:aa AndB:bb];
++ (id) pairWithA:(int)aa B:(int)bb {
+	EXTPair* pair = [[EXTPair alloc]initWithA:aa B:bb];
 	return [pair autorelease];
 }
 

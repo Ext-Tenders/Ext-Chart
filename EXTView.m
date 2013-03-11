@@ -105,7 +105,7 @@ static NSColor *highlightRectColor = nil;
 - (EXTPair*) convertToGridCoordinates:(NSPoint)pixelLoc {
 	int px = pixelLoc.x, py = pixelLoc.y;
 	int nx = floor(px/gridSpacing), ny = floor(py/gridSpacing);
-	return [EXTPair pairWithA:nx AndB:ny];
+	return [EXTPair pairWithA:nx B:ny];
 }
 
 // convert (p, q) coordinates to pixel coordinates
@@ -452,7 +452,7 @@ static NSColor *highlightRectColor = nil;
 		for(int j = 0; j < 5*8; j++) {
 			int r = arc4random()%10;
 			if (r < 1) {
-				EXTPair* loc = [EXTPair pairWithA:i AndB:j];
+				EXTPair* loc = [EXTPair pairWithA:i B:j];
                 EXTTerm* term = [EXTTerm newTerm:loc andNames:[[NSMutableArray alloc]initWithObjects:@"", nil]];
                 
                 // TODO: this is wrong.

@@ -31,6 +31,14 @@
         
         terms = [[NSMutableArray alloc] init];
         differentials = [[NSMutableArray alloc] init];
+        
+        NSLog(@"generating some EXTTerms.");
+        for(int i = 0; i < 10; i++) {
+            EXTPair *location = [EXTPair pairWithA:(arc4random()%10) B:(arc4random()%10)];
+            EXTTerm *term = [EXTTerm newTerm:location
+                    andNames:[[NSMutableArray alloc]initWithObjects:@"x",nil]];
+            [terms addObject:term];
+        }
 
         //
         //		//NSLog(@"generating random pages..");
