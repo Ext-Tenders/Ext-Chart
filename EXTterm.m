@@ -109,4 +109,14 @@
     return [names count];
 }
 
++(id) dealWithClick:(NSPoint)location document:(EXTDocument*)document {
+    EXTPair	*pointPair = [EXTPair pairWithA:location.x B:location.y];
+    EXTTerm *term = [EXTTerm newTerm:pointPair
+                            andNames:[[NSMutableArray alloc] init]];
+
+    [[document terms] addObject:term];
+    
+    return term;
+}
+
 @end

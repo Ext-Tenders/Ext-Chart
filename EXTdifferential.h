@@ -7,6 +7,7 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import "EXTDocument.h"
 @class EXTPair;
 @class EXTGrid;
 @class EXTPage;
@@ -34,6 +35,8 @@
 + (EXTPair*) getStartFrom:(EXTPair*)end OnPage:(int)page;
 + (id) differentialWithPage:(int)whichPage AndStart:(EXTPair*) startLocation;
 - (void)drawWithSpacing:(CGFloat)spacing;
+
++(id) dealWithClick:(NSPoint)location document:(EXTDocument*)document;
 
 #pragma mark *** tools for calculation homology (must be overridden in subclasses) ***
 

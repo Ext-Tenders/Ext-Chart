@@ -415,15 +415,10 @@ static NSColor *highlightRectColor = nil;
         // present the same 'insertable' interface, which is called here.
         
         NSPoint point = [_grid convertToGridCoordinates:locationPoint];
-        EXTPair	*pointPair = [EXTPair pairWithA:point.x B:point.y];
         
-        // XXX: this is broken for differentials.  change "newTerm" to some
-        // other message name.
-        NSLog(@"Trying to add term: %d, %d", [pointPair a], [pointPair b]);
-        [[delegate terms] addObject:[currentTool newTerm:pointPair
-                    andNames:[[NSMutableArray alloc] init]]];
+        [currentTool dealWithClick:point document:delegate];
 
-		[self setNeedsDisplayInRect:NSInsetRect([highlightPath bounds], -1, -1)];
+		[self setNeedsDisplayInRect:NSInsetRect([highlightPath bounds],-1,-1)];
 	}
 }
 		
