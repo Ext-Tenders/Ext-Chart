@@ -23,7 +23,7 @@ enum EXTToolType {
 
 }
 
-+ (id) tooPaletteControllerId;
++ (id) toolPaletteControllerId;
 - (IBAction) toolSelectionDidChange:(id)sender;
 - (Class)currentToolClass;
 

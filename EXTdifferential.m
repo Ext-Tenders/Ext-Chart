@@ -64,14 +64,14 @@
 	int a = [start a], b = [start b];
 	a -= 1;
 	b += page;
-	return [EXTPair pairWithA:a AndB:b];
+	return [EXTPair pairWithA:a B:b];
 }
 
 + (EXTPair*) getStartFrom:(EXTPair*)end OnPage:(int)page {
 	int a = [end a], b = [end b];
 	a += 1;
 	b -= page;
-	return [EXTPair pairWithA:a AndB:b];
+	return [EXTPair pairWithA:a B:b];
 }
 
 - (void) drawWithSpacing:(CGFloat)spacing{

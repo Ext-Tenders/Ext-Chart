@@ -15,7 +15,7 @@
 
 // there's a subtlety in the next class method.   It must be called instead of alloc/init, to instantiate the unique instance.   This call is made in the app controller.   The other option is to store the id as an ivar in the appController, and get it with a getter method.   Not sure which makes more sense.   Objects would need to know the id of the unique appController.   If it were a delegate, they could get that from the app itself.   But I don't think a delegate can have any instance variables.   Not sure...
 
-+ (id)tooPaletteControllerId{
++ (id)toolPaletteControllerId{
 	// returns the id of the unique	EXTToolPaletteController instance.  Got this from Sketch, too
 	static EXTToolPaletteController *toolPaletteControllerInstance = nil;
 	// a given function or method will only initialize a static variable once.   Putting it in the method, rather than above the @interface line limits the scope of the variable to the method.  Otherwise its scope is the whole class, hence it would be accessible from every instance (which, in this case is unique, so it probably doesn't make much real difference).  	
@@ -60,7 +60,8 @@
 	Class theClass = nil;
 	switch (toolType) {
 		case EXTArrowToolRow:
-			theClass = [EXTdifferential class]; // until I work out something better
+            // TODO: this can't be right.
+			theClass = [EXTdifferential class];
 			break;
 		case EXTGeneratorToolRow:
 			theClass = [EXTTerm class];

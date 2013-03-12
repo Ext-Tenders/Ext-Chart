@@ -43,6 +43,7 @@
 @property(retain) NSMutableArray *terms;
 @property(retain) NSMutableArray *differentials;
 
+-(void)randomize;
 -(void)drawPagesUpTo: (NSUInteger) pageNumber;
 -(void) drawPageNumber:(NSUInteger)pageNumber ll:(EXTPair*)lowerLeftCoord ur:(EXTPair*)upperRightCoord withSpacing:(CGFloat)gridSpacing;
 //- (NSUInteger) maxPage;

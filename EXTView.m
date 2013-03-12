@@ -71,11 +71,11 @@ static NSColor *highlightRectColor = nil;
 		highlightRectColor = [NSColor colorWithCalibratedRed:0 green:1.0 blue:1.0 alpha:1];
 		[highlightRectColor retain];
 		
-		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(toolSelectionDidChange) name:@"EXTtoolSelectionChanged" object:[EXTToolPaletteController tooPaletteControllerId]];
+		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(toolSelectionDidChange) name:@"EXTtoolSelectionChanged" object:[EXTToolPaletteController toolPaletteControllerId]];
 
 // a new document can get initialized when any tool is selected
 		
-		currentTool = [[EXTToolPaletteController tooPaletteControllerId] currentToolClass];
+		currentTool = [[EXTToolPaletteController toolPaletteControllerId] currentToolClass];
 		 
 		 }
 
@@ -172,11 +172,9 @@ static NSColor *highlightRectColor = nil;
 		EXTPair* lowerLeftCoord = [self convertToGridCoordinates:lowerLeftPoint];
 		EXTPair* upperRightCoord = [self convertToGridCoordinates:upperRightPoint];
 		
-//		NSArray* pages = [[self delegate] pages];
+        // XXX: this may be drawing too narrow a window, resulting in blank Ext
+        // charts if the scroll is dragged too slowly.
         [delegate drawPageNumber:pageInView ll:lowerLeftCoord ur:upperRightCoord withSpacing:gridSpacing];
-//		EXTPage* page0 = [pages objectAtIndex:pageInView];
-//		if (page0 != nil)
-//			[page0 drawFrom:lowerLeftCoord To:upperRightCoord WithSpacing:gridSpacing];
 		
 		//  // restore the graphics context
 		//	[theContext restoreGraphicsState];
@@ -416,7 +414,15 @@ static NSColor *highlightRectColor = nil;
         // TODO: reenable clicks.  the idea is that both terms and differentials
         // present the same 'insertable' interface, which is called here.
         
-//		[currentTool addSelfToSequence:[self pages] onPageNumber:pageInView atPoint:[_grid convertToGridCoordinates:locationPoint]];
+        NSPoint point = [_grid convertToGridCoordinates:locationPoint];
+        EXTPair	*pointPair = [EXTPair pairWithA:point.x B:point.y];
+        
+        // XXX: this is broken for differentials.  change "newTerm" to some
+        // other message name.
+        NSLog(@"Trying to add term: %d, %d", [pointPair a], [pointPair b]);
+        [[delegate terms] addObject:[currentTool newTerm:pointPair
+                    andNames:[[NSMutableArray alloc] init]]];
+
 		[self setNeedsDisplayInRect:NSInsetRect([highlightPath bounds], -1, -1)];
 	}
 }
@@ -441,27 +447,13 @@ static NSColor *highlightRectColor = nil;
 - (void)toolSelectionDidChange{
 	// just set the tool class to what it is
 
-	currentTool = [[EXTToolPaletteController tooPaletteControllerId] currentToolClass];
+	currentTool = [[EXTToolPaletteController toolPaletteControllerId] currentToolClass];
 }
 
 #pragma mark *** random button ***
 
 - (IBAction) randomGroups:(id)sender{
-	EXTPage *pageZero = [pages objectAtIndex:0];
-	for(int i = 0; i < 6*8; i++){
-		for(int j = 0; j < 5*8; j++) {
-			int r = arc4random()%10;
-			if (r < 1) {
-				EXTPair* loc = [EXTPair pairWithA:i B:j];
-                EXTTerm* term = [EXTTerm newTerm:loc andNames:[[NSMutableArray alloc]initWithObjects:@"", nil]];
-                
-                // TODO: this is wrong.
-                //
-                // TODO: also, isn't this also in EXTPage...???
-				[[pageZero termsArray]setObject:term forKey:loc];
-			}
-		}
-	}
+    [delegate randomize];
 	[self setNeedsDisplay:YES];
 }
 		

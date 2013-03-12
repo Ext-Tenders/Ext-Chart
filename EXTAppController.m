@@ -35,6 +35,6 @@
 //	}
 //	[toolPaletteController showWindow:self];
 
-	[[EXTToolPaletteController tooPaletteControllerId] showWindow:self];
+	[[EXTToolPaletteController toolPaletteControllerId] showWindow:self];
 }
 @end

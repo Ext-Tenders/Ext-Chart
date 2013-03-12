@@ -23,34 +23,39 @@
 #pragma mark *** initialization and dealloc ***
 
 - (id)init {
+    // upcall.
     self = [super init];
+    
+    // if we succeeded...
     if (self) {
-
+        // allocate the display parts of things
 		theArtBoard = [EXTArtBoard alloc];
 		[theArtBoard initWithRect:NSMakeRect(0, 0, 792, 612)];
         
+        // and allocate the internal parts of things
         terms = [[NSMutableArray alloc] init];
         differentials = [[NSMutableArray alloc] init];
-        
-        NSLog(@"generating some EXTTerms.");
-        for(int i = 0; i < 10; i++) {
-            EXTPair *location = [EXTPair pairWithA:(arc4random()%10) B:(arc4random()%10)];
-            EXTTerm *term = [EXTTerm newTerm:location
-                    andNames:[[NSMutableArray alloc]initWithObjects:@"x",nil]];
-            [terms addObject:term];
-        }
-
-        //
-        //		//NSLog(@"generating random pages..");
-        //		for(int i = 0; i < 10; i++) {
-        //			EXTPage* page = [[EXTPage alloc]randomInitPage:i];
-        //			//NSLog(@"size of newly generated page: %d", [[page termsArray] count]);
-        //			//should this be autoreleased?
-        //			[pages addObject:page];
-        //		}
     }
 
     return self;
+}
+
+// if requested, we can initialize the terms array with some test garbage
+-(void) randomize {
+    // remove all the old garbage
+    [terms release];
+    terms = [[NSMutableArray alloc] init];
+    
+    // add some new garbage.
+    // TODO: this ought to randomize the dimension too.
+    // XXX: this doesn't catch collisions.
+    for(int i = 0; i < 40; i++) {
+        EXTPair *location = [EXTPair pairWithA:(arc4random()%30)
+                                             B:(arc4random()%30)];
+        EXTTerm *term = [EXTTerm newTerm:location
+                                andNames:[[NSMutableArray alloc] initWithObjects:@"x",nil]];
+        [terms addObject:term];
+    }
 }
 
 - (void) dealloc {
