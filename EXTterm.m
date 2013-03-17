@@ -75,11 +75,23 @@
 
 #pragma mark *** drawing; TODO: SEPARATE THIS OUT ***
 
-- (void) drawWithSpacing:(CGFloat)spacing {
-	CGFloat x = [[self location] a]*spacing, y = [[self location] b]*spacing;
-	NSRect dotPosition = NSMakeRect(x + 3.5/9*spacing, y+3.5/9*spacing, 2.0*spacing/9, 2.0*spacing/9);
-	[[NSColor blackColor] set];
-	NSBezierPath* path = [NSBezierPath bezierPathWithOvalInRect:dotPosition];
+// TODO: separate out these magic constants
+- (void) drawWithSpacing:(CGFloat)spacing page:(int)page {
+    NSBezierPath* path = [[NSBezierPath alloc] init];
+    CGFloat x = [[self location] a]*spacing,
+            y = [[self location] b]*spacing;
+    
+    for (int j = 0; j < [self dimension:page]; j++) {
+        NSRect dotPosition =
+            NSMakeRect(x + 3.5/9*spacing + ((CGFloat)((j%3)-1)*2)/9*spacing,
+                       y+3.5/9*spacing + ((CGFloat)((1+j%4)-2)*2)/9*spacing,
+                       2.0*spacing/9,
+                       2.0*spacing/9);
+        
+        [path appendBezierPathWithOvalInRect:dotPosition];
+    }
+    
+    [[NSColor blackColor] set];
 	[path fill];
 }
 
@@ -106,7 +118,9 @@
 }
 
 -(int) dimension:(int)whichPage {
-    return [names count];
+    // XXX: this is just for testing!
+    return arc4random() % 10;
+//    return [names count];
 }
 
 +(id) dealWithClick:(NSPoint)location document:(EXTDocument*)document {

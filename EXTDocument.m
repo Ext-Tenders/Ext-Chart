@@ -136,12 +136,12 @@
         
         // otherwise, we're obligated to try to draw it
         // TODO: this still seems like it's put in the wrong place...
-        [term drawWithSpacing:withSpacing];
+        [term drawWithSpacing:withSpacing page:pageNumber];
     }
     
     // iterate also through the available differentials
     for (EXTDifferential* differential in [self differentials]) {
-        // eventually try to draw these.
+        // XXX: eventually try to draw these.
         //
         // [differential drawWithSpacing:gridSpacing];
     }
