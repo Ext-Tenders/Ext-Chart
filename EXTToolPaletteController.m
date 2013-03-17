@@ -8,7 +8,7 @@
 
 #import "EXTToolPaletteController.h"
 #import "EXTTerm.h"
-#import "EXTdifferential.h"
+#import "EXTDifferential.h"
 
 
 @implementation EXTToolPaletteController
@@ -61,13 +61,13 @@
 	switch (toolType) {
 		case EXTArrowToolRow:
             // TODO: this can't be right.
-			theClass = [EXTdifferential class];
+			theClass = [EXTDifferential class];
 			break;
 		case EXTGeneratorToolRow:
 			theClass = [EXTTerm class];
 			break;
 		case EXTDifferentialToolRow:
-			theClass = [EXTdifferential class];
+			theClass = [EXTDifferential class];
 			break;
 	}
 	return theClass;

@@ -7,7 +7,7 @@
 //
 
 #import <Cocoa/Cocoa.h>
-@class EXTTerm, EXTdifferential;
+@class EXTTerm, EXTDifferential;
 
 // If I understand the scoping correctly, this declaration of an enumerated data type makes these available in any other method that imports this header file.
 

@@ -8,7 +8,7 @@
 
 
 #import <Cocoa/Cocoa.h>
-@class EXTPair, EXTScrollView, EXTArtBoard, EXTGrid, EXTDocument, EXTToolPaletteController, EXTTerm, EXTdifferential; 
+@class EXTPair, EXTScrollView, EXTArtBoard, EXTGrid, EXTDocument, EXTToolPaletteController, EXTTerm, EXTDifferential; 
 
 
 @interface EXTView : NSView {

@@ -140,7 +140,7 @@
     }
     
     // iterate also through the available differentials
-    for (EXTdifferential* differential in [self differentials]) {
+    for (EXTDifferential* differential in [self differentials]) {
         // eventually try to draw these.
         //
         // [differential drawWithSpacing:gridSpacing];

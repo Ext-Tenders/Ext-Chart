@@ -23,6 +23,7 @@
 		31D403C013DA04D8006A8C06 /* EXTdifferential.m in Sources */ = {isa = PBXBuildFile; fileRef = 31D403BF13DA04D8006A8C06 /* EXTdifferential.m */; };
 		31D5D2E513F6933B00F1B2F9 /* EXTArtBoard.m in Sources */ = {isa = PBXBuildFile; fileRef = 31D5D2E413F6933B00F1B2F9 /* EXTArtBoard.m */; };
 		31EEEF65140430380035BE7A /* EXTToolPalette.xib in Resources */ = {isa = PBXBuildFile; fileRef = 31EEEF64140430380035BE7A /* EXTToolPalette.xib */; };
+		3896548D16F538D90008FB8D /* EXTMatrix.m in Sources */ = {isa = PBXBuildFile; fileRef = 3896548C16F538D90008FB8D /* EXTMatrix.m */; };
 		38DDAA7B16EDA8990001841D /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 38DDAA7A16EDA8990001841D /* README.md */; };
 		8D15AC2C0486D014006FF6A4 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 2A37F4B9FDCFA73011CA2CEA /* Credits.rtf */; };
 		8D15AC2F0486D014006FF6A4 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165FFE840EACC02AAC07 /* InfoPlist.strings */; };
@@ -68,6 +69,8 @@
 		31D5D2E313F6933B00F1B2F9 /* EXTArtBoard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTArtBoard.h; sourceTree = "<group>"; };
 		31D5D2E413F6933B00F1B2F9 /* EXTArtBoard.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTArtBoard.m; sourceTree = "<group>"; };
 		31EEEF64140430380035BE7A /* EXTToolPalette.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = EXTToolPalette.xib; sourceTree = "<group>"; };
+		3896548B16F538D90008FB8D /* EXTMatrix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTMatrix.h; sourceTree = "<group>"; };
+		3896548C16F538D90008FB8D /* EXTMatrix.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTMatrix.m; sourceTree = "<group>"; };
 		38DDAA7A16EDA8990001841D /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.md; sourceTree = "<group>"; };
 		8D15AC360486D014006FF6A4 /* Ext_Chart-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Ext_Chart-Info.plist"; sourceTree = "<group>"; };
 		8D15AC370486D014006FF6A4 /* Ext Chart.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Ext Chart.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -138,6 +141,8 @@
 				31D403BA13DA0476006A8C06 /* EXTterm.m */,
 				31D403BE13DA04D8006A8C06 /* EXTdifferential.h */,
 				31D403BF13DA04D8006A8C06 /* EXTdifferential.m */,
+				3896548B16F538D90008FB8D /* EXTMatrix.h */,
+				3896548C16F538D90008FB8D /* EXTMatrix.m */,
 				2A37F4AEFDCFA73011CA2CEA /* EXTDocument.h */,
 				2A37F4ACFDCFA73011CA2CEA /* EXTDocument.m */,
 				317707C213D784B0003475A2 /* EXTGrid.h */,
@@ -280,6 +285,7 @@
 				31C77BB613E647A000E9DBFC /* EXTsettingPanelController.m in Sources */,
 				31D5D2E513F6933B00F1B2F9 /* EXTArtBoard.m in Sources */,
 				315BC80F140430B7007D49CA /* EXTToolPaletteController.m in Sources */,
+				3896548D16F538D90008FB8D /* EXTMatrix.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

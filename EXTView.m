@@ -14,7 +14,7 @@
 #import "EXTArtBoard.h"
 #import "EXTToolPaletteController.h"
 #import "EXTTerm.h"
-#import "EXTdifferential.h"
+#import "EXTDifferential.h"
 
 
 static NSColor *highlightRectColor = nil;
@@ -208,7 +208,7 @@ static NSColor *highlightRectColor = nil;
 
 
 -(void)setPageInView:(int) newPage{
-	pageInView = MIN(newPage, [delegate maxPage]);
+	pageInView = newPage;
 	if (highlighting) {
 		NSPoint mousePoint = [[[self enclosingScrollView] window] mouseLocationOutsideOfEventStream];
 		mousePoint = [self convertPoint:mousePoint fromView:nil];

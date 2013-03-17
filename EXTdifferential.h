@@ -1,5 +1,5 @@
 //
-//  EXTdifferential.h
+//  EXTDifferential.h
 //  Ext Chart
 //
 //  Created by Michael Hopkins on 7/22/11.
@@ -8,12 +8,32 @@
 
 #import <Cocoa/Cocoa.h>
 #import "EXTDocument.h"
+#import "EXTMatrix.h"
 @class EXTPair;
 @class EXTGrid;
 @class EXTPage;
 
+// this class models a differential in the spectral sequence.
+@interface EXTDifferential : NSObject <NSCoding>
+    {
+        EXTTerm *start, *end;
+        int page;
+        EXTMatrix *presentation;
+        // some sort of presentation
+    }
 
-@interface EXTdifferential : NSObject <NSCoding> {
+    @property(retain) EXTTerm *start, *end;
+    @property(assign) int page;
+    @property(retain) EXTMatrix *presentation;
+
+    -(id) set:(EXTTerm *)start end:(EXTTerm *)end page:(int)page;
+    +(id) newDifferential:(EXTTerm *)start end:(EXTTerm *)end page:(int)page;
+
+    +(id) dealWithClick:(NSPoint)location document:(EXTDocument*)document;
+@end
+
+#if 0
+@interface EXTDifferential : NSObject <NSCoding> {
 	EXTPair* start;
 	EXTPair* end;
 	int page;
@@ -51,6 +71,5 @@
 + (NSBezierPath *) makeHighlightPathAtPoint:(NSPoint)point onGrid:(EXTGrid *)theGrid onPage:(NSInteger)page;
 + (void)addSelfToSequence:(NSMutableArray *)pageSequence onPageNumber:(NSUInteger)pageNo atPoint:(NSPoint)point;
 
-
-
 @end
+#endif

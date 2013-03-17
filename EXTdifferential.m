@@ -1,40 +1,46 @@
 //
-//  EXTdifferential.m
+//  EXTDifferential.m
 //  Ext Chart
 //
 //  Created by Michael Hopkins on 7/22/11.
 //  Copyright 2011 Harvard. All rights reserved.
 //
 
-#import "EXTdifferential.h"
+#import "EXTDifferential.h"
 #import "EXTPair.h"
 #import "EXTGrid.h"
 #import "EXTTerm.h"
 
-@implementation EXTdifferential
+@implementation EXTDifferential
 
 @synthesize page;
-@synthesize start;
-@synthesize end;
-@synthesize source;
-@synthesize target;
+@synthesize start, end;
+@synthesize presentation;
 
-- (id) initWithPage:(int)whichPage Start:(EXTPair*)startLocation AndEnd:(EXTPair*)endLocation {
-	if (self = [super init]) {
-		[self setPage:whichPage];
-		[self setStart:startLocation];
-		[self setEnd:endLocation];
-	}
-	return self;
+-(id) set:(EXTTerm *)start end:(EXTTerm *)end page:(int)page {
+    [self setStart:start];
+    [self setEnd:end];
+    [self setPage:page];
+    
+    return self;
 }
 
-- (id) initWithPage:(int)whichPage AndStart:(EXTPair*) startLocation {
-	EXTPair* endLocation = [EXTdifferential getEndFrom:startLocation OnPage:whichPage];
-	return [self initWithPage:whichPage Start:startLocation AndEnd:endLocation];
++(id) newDifferential:(EXTTerm *)start end:(EXTTerm *)end page:(int)page {
+    EXTDifferential *object = [EXTDifferential alloc];
+    
+    [object set:start end:end page:page];
+    
+    [object setPresentation:[EXTMatrix initWithWidth:[start dimension:page] andHeight:[end dimension:page]]];
+    
+    return object;
+}
+
++(id) dealWithClick:(NSPoint)location document:(EXTDocument *)document {
+    return nil;
 }
 
 + (id) differentialWithPage:(int)whichPage AndStart:(EXTPair*) startLocation {
-	EXTdifferential* differential = [[EXTdifferential alloc] initWithPage:whichPage AndStart:startLocation];
+	EXTDifferential* differential = [[EXTDifferential alloc] initWithPage:whichPage AndStart:startLocation];
 	return [differential autorelease];
 }
 
@@ -101,7 +107,8 @@
 	return newPath;
 }
 
-+ (void)addSelfToSequence:(NSMutableArray *)pageSequence onPageNumber:(NSUInteger)pageNo atPoint:(NSPoint)point{
++ (void)addSelfToSequence:(NSMutableArray *)pageSequence
+             onPageNumber:(NSUInteger)pageNo atPoint:(NSPoint)point {
 	
 //	EXTPage *extPage = [pageSequence objectAtIndex:pageNo];
 //	EXTPair	*sourcePosition = [EXTPair pairWithA:point.x AndB:point.y];
@@ -109,7 +116,7 @@
 //	EXTTerm *source = [[extPage termsArray] objectForKey:sourcePosition];
 //	EXTTerm *target = [[extPage termsArray] objectForKey:targetPosition];
 //	if (source && target) {
-//		EXTdifferential* differential = [[EXTdifferential alloc] initWithPage:pageNo Start:sourcePosition AndEnd:targetPosition];
+//		EXTDifferential* differential = [[EXTDifferential alloc] initWithPage:pageNo Start:sourcePosition AndEnd:targetPosition];
 //		[[extPage differentialsArray] setObject:differential forKey:sourcePosition];
 // 		[extPage setModified:YES];
 //	}
