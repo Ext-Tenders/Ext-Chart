@@ -26,9 +26,15 @@
     if (self = [super init]) {
         // if it succeeds, then initialize the members
         [self setLocation:whichLocation];
-        [self setNames:whichNames];
         [self setBoundaries:[[NSMutableArray alloc]initWithObjects: nil]];
         [self setCycles:[[NSMutableArray alloc]initWithObjects: nil]];
+        
+        // XXX: this is just being used for testing.
+        int numberOfNames = arc4random() % 8;
+        NSMutableArray *randomNames = [[NSMutableArray alloc] initWithCapacity:numberOfNames];
+        for (int j = 0; j < numberOfNames; j++)
+            [randomNames setObject:@"x" atIndexedSubscript:j];
+        [self setNames:randomNames];
     }
     
     // regardless, return the object as best we've initialized it.
@@ -118,9 +124,9 @@
 }
 
 -(int) dimension:(int)whichPage {
-    // XXX: this is just for testing!
-    return arc4random() % 10;
-//    return [names count];
+    // XXX: this is just for testing!  it ought to be computing something.
+    //return (arc4random() % 8);
+    return [[self names] count];
 }
 
 +(id) dealWithClick:(NSPoint)location document:(EXTDocument*)document {
