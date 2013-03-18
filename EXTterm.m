@@ -31,7 +31,8 @@
         
         // XXX: this is just being used for testing.
         int numberOfNames = arc4random() % 8;
-        NSMutableArray *randomNames = [[NSMutableArray alloc] initWithCapacity:numberOfNames];
+        NSMutableArray *randomNames =
+            [[NSMutableArray alloc] initWithCapacity:numberOfNames];
         for (int j = 0; j < numberOfNames; j++)
             [randomNames setObject:@"x" atIndexedSubscript:j];
         [self setNames:randomNames];

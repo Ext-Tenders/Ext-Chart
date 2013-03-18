@@ -20,4 +20,10 @@
 
     +(EXTMatrix*) initWithWidth:(int)newWidth andHeight:(int)newHeight;
 
+    // matrix operations
+    +(EXTMatrix*) transpose:(EXTMatrix*)input;
+    -(EXTMatrix*) columnReduce;
+    -(NSMutableArray*) kernel;
+    -(NSMutableArray*) cokernel;
+
 @end
