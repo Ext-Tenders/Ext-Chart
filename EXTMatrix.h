@@ -22,8 +22,9 @@
 
     // matrix operations
     +(EXTMatrix*) transpose:(EXTMatrix*)input;
+    +(EXTMatrix*) multiply:(EXTMatrix*)left by:(EXTMatrix*)right;
     -(EXTMatrix*) columnReduce;
     -(NSMutableArray*) kernel;
-    -(NSMutableArray*) cokernel;
+    -(NSMutableArray*) image;
 
 @end

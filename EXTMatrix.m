@@ -138,11 +138,11 @@
     // XXX: is this necessary?  is it even valid?
     [transpose autorelease];
     
-    return [transpose cokernel];
+    return [transpose image];
 }
 
 // returns a basis for the cokernel of a matrix
--(NSMutableArray*) cokernel {
+-(NSMutableArray*) image {
     EXTMatrix *reduced = [self columnReduce];
     NSMutableArray *ret = [[NSMutableArray alloc] init];
     
@@ -155,8 +155,9 @@
         for (int j = 0; j < [column count]; j++)
             if ([column objectAtIndex:j] != 0)
                 skipit = false;
-        if (skipit)
-            continue;
+        
+        if (skipit)   // it's all zeroes...
+            continue; // so skip it.
         
         // and, if it's not all zeroes, we should add it to the collection.
         [ret addObject:column];
@@ -164,6 +165,31 @@
     
     [reduced release];
     return ret;
+}
+
++(EXTMatrix*) multiply:(EXTMatrix*)left by:(EXTMatrix*)right {
+    EXTMatrix *product = [EXTMatrix initWithWidth:[right width]
+                                        andHeight:[left height]];
+    
+    for (int k = 0; k < [right width]; k++) {
+        NSMutableArray *rightColumn = [[right presentation] objectAtIndex:k],
+                       *column = [[NSMutableArray alloc]
+                                  initWithCapacity:[left height]];
+        for (int i = 0; i < [left height]; i++) {
+            int total = 0;
+            
+            for (int j = 0; j < [left width]; j++)
+                total += (int)[column objectAtIndex:j] *
+                    (int)[[[left presentation] objectAtIndex:i] objectAtIndex:j];
+            
+            [column setObject:total atIndexedSubscript:i];
+        }
+        
+        [[product presentation] setObject:column atIndexedSubscript:k];
+    }
+    
+    // XXX: again, autorelease??
+    return product;
 }
 
 // debug routine to dump the matrix to the console.

@@ -13,6 +13,14 @@
 @class EXTGrid;
 @class EXTPage;
 
+//
+// TODO: a real question is how to implement "partial definitions" of a
+// differential.  like if you know that dx = e but not the rest of the
+// differential, which you compute later, what do you do?  add them?  adding
+// requires a sort of orthogonal complement to make sure you don't muck up
+// what's already there.  this seems like a pretty complicated problem...
+//
+
 // this class models a differential in the spectral sequence.
 @interface EXTDifferential : NSObject <NSCoding>
     {

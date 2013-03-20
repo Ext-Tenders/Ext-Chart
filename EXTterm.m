@@ -10,6 +10,7 @@
 #import "EXTPair.h"
 #import "EXTGrid.h"
 #import "EXTDOcument.h"
+#import "EXTdifferential.h"
 
 @implementation EXTTerm
 
@@ -114,14 +115,78 @@
         [[theDocument terms] addObject:self];
 }
 
-+ (NSBezierPath *) makeHighlightPathAtPoint: (NSPoint)point onGrid:(EXTGrid *)theGrid onPage:(NSInteger)thePage{
++ (NSBezierPath *) makeHighlightPathAtPoint: (NSPoint)point onGrid:(EXTGrid *)theGrid onPage:(NSInteger)thePage {
 	return [[NSBezierPath bezierPathWithRect:[theGrid enclosingGridRect:point]] retain];
 }
 
 #pragma mark *** not yet sure how to classify this (it's an init, in some sense) ***
 
-+ (id) sumOfTerms:(EXTTerm *)termOne and:(EXTTerm *)termTwo{
+// TODO: this requires sophisticated logic now that terms understand where they
+// live in the spectral sequence.  summation is more appropriate an operation on
+// modules, rather than on EXTTerms...
++ (id) sumOfTerms:(EXTTerm *)termOne and:(EXTTerm *)termTwo {
 	return nil; // allowed?
+}
+
+// this assumes that the cycles from the page before have already been computed.
+// this may or may not be a desirable trait, but for the moment, that's the way
+// things are.
+-(void) computeCycles:(int)whichPage
+    differentialArray:(NSMutableArray*)differentials {
+    NSMutableArray *newCycles = [[NSMutableArray alloc] init];
+    
+    // iterate through the differentials, looking for more cycles
+    for (EXTDifferential *differential in differentials) {
+        if (([differential start] != self) ||   // if we're not the source...
+            ([differential page] != whichPage)) // ... or this isn't the page...
+            continue;                           // then skip this differential.
+        
+        // ask for the kernel of this differential
+        NSMutableArray *kernel = [[differential presentation] kernel];
+        
+        // and add it to the cycles
+        [newCycles addObjectsFromArray:kernel];
+        
+        // there should really only be one differential attached to a given
+        // EXTTerm on a given page.
+        //
+        // XXX: if this were smarter, it would continue thumbing through the
+        // differentials and throw an error if there were more than one.
+        break;
+    }
+    
+    // if there weren't any differentials acting, then really the zero
+    // differential acted, and we should carry over the same cycles as from
+    // last time.
+    if ([newCycles count] == 0)
+        newCycles = [[[self cycles] objectAtIndex:(whichPage-1)] copy];
+    
+    [[self cycles] setObject:newCycles atIndexedSubscript:whichPage];
+}
+
+// TODO: this is a duplicate of the code above. it would be nice to fix that.
+-(void) computeBoundaries:(int)whichPage
+        differentialArray:(NSMutableArray*)differentials {
+    NSMutableArray *newBoundaries = [[NSMutableArray alloc] init];
+    
+    for (EXTDifferential *differential in differentials) {
+        if (([differential end] != self) ||
+            ([differential page] != whichPage))
+            continue;
+        
+        // XXX: maybe we should right-multiply by the cycle matrix first?
+        NSMutableArray *image = [[differential presentation] image];
+        
+        // and add it to the new boundaries
+        [newBoundaries addObjectsFromArray:image];
+        
+        break;
+    }
+    
+    if ([newBoundaries count] == 0)
+        newBoundaries = [[[self boundaries] objectAtIndex:(whichPage-1)] copy];
+    
+    [[self boundaries] setObject:newBoundaries atIndexedSubscript:whichPage];
 }
 
 -(int) dimension:(int)whichPage {
