@@ -27,8 +27,8 @@
     if (self = [super init]) {
         // if it succeeds, then initialize the members
         [self setLocation:whichLocation];
-        [self setBoundaries:[[NSMutableArray alloc] initWithObjects: nil]];
-        [self setCycles:[[NSMutableArray alloc] initWithObjects: nil]];
+        [self setBoundaries:[NSMutableArray arrayWithObjects: nil]];
+        [self setCycles:[NSMutableArray arrayWithObjects: nil]];
         
         // XXX: this is just being used for testing.
         int numberOfNames = arc4random() % 8;
@@ -40,6 +40,7 @@
         
         // initialize the cycles to contain everything.
         // XXX: change the array upper bound when we stop randomizing.
+        NSMutableArray *initialCycles = [NSMutableArray arrayWithCapacity:numberOfNames];
         for (int j = 0; j < numberOfNames; j++) {
             NSMutableArray *column = [[NSMutableArray alloc] init];
             for (int i = 0; i < numberOfNames; i++) {
@@ -49,8 +50,12 @@
                     [column setObject:@(0) atIndexedSubscript:i];
             }
 
-            [cycles addObject:column];
+            [initialCycles addObject:column];
         }
+        
+        [cycles addObject:initialCycles];
+        
+        [boundaries addObject:@[]];
     }
     
     // regardless, return the object as best we've initialized it.
@@ -147,6 +152,12 @@
 // things are.
 -(void) computeCycles:(int)whichPage
     differentialArray:(NSMutableArray*)differentials {
+    
+    // if we're at the bottom page, then do nothing --- there are no
+    // differentials available to study, and we don't want to fuck up our copies.
+    if (whichPage == 0)
+        return;
+    
     NSMutableArray *newCycles = [[NSMutableArray alloc] init];
     
     // iterate through the differentials, looking for more cycles
@@ -181,7 +192,11 @@
 // TODO: this is a duplicate of the code above. it would be nice to fix that.
 -(void) computeBoundaries:(int)whichPage
         differentialArray:(NSMutableArray*)differentials {
-    NSMutableArray *newBoundaries = [[NSMutableArray alloc] init];
+    
+    if (whichPage == 0)
+        return;
+    
+    NSMutableArray *newBoundaries = [NSMutableArray array];
     
     for (EXTDifferential *differential in differentials) {
         if (([differential end] != self) ||
@@ -204,7 +219,8 @@
 }
 
 -(int) dimension:(int)whichPage {
-    return [[self cycles] count] - [[self boundaries] count];
+    return [[cycles objectAtIndex:whichPage] count] -
+           [[boundaries objectAtIndex:whichPage] count];
 }
 
 +(id) dealWithClick:(NSPoint)location document:(EXTDocument*)document {
