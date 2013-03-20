@@ -11,7 +11,6 @@
 @interface EXTMatrix : NSObject
     {
         NSUInteger height, width;
-        
         NSMutableArray *presentation;
     }
 
@@ -19,6 +18,7 @@
     @property(retain) NSMutableArray *presentation;
 
     +(EXTMatrix*) initWithWidth:(int)newWidth andHeight:(int)newHeight;
+    +(EXTMatrix*) matrixWithWidth:(int)newWidth andHeight:(int)newHeight;
 
     // matrix operations
     +(EXTMatrix*) copyTranspose:(EXTMatrix*)input;
@@ -26,5 +26,8 @@
     -(EXTMatrix*) columnReduce;
     -(NSMutableArray*) kernel;
     -(NSMutableArray*) image;
+
+    // debug operations
+    -(void) log;
 
 @end

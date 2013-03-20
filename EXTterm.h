@@ -40,6 +40,7 @@
 
     // a constructor
     +(id) newTerm:(EXTPair*)whichLocation andNames:(NSMutableArray*)whichNames;
+    +(id) term:(EXTPair*)whichLocation andNames:(NSMutableArray*)whichNames;
     // and an in-place constructor
     -(id) setTerm:(EXTPair*)whichLocation andNames:(NSMutableArray*)whichNames;
     // TODO: a direct sum constructor might be nice?

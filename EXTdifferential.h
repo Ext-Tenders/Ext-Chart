@@ -34,8 +34,8 @@
     @property(assign) int page;
     @property(retain) EXTMatrix *presentation;
 
-    -(id) set:(EXTTerm *)start end:(EXTTerm *)end page:(int)page;
     +(id) newDifferential:(EXTTerm *)start end:(EXTTerm *)end page:(int)page;
+    +(id) differential:(EXTTerm *)start end:(EXTTerm *)end page:(int)page;
 
     +(id) dealWithClick:(NSPoint)location document:(EXTDocument*)document;
 @end

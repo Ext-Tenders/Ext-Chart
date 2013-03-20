@@ -12,6 +12,7 @@
 #import "EXTArtBoard.h"
 #import "EXTterm.h"
 #import "EXTPair.h"
+#import "EXTdifferential.h"
 
 @implementation EXTDocument
 
@@ -44,7 +45,7 @@
 -(void) randomize {
     // remove all the old garbage
     [terms release];
-    terms = [[NSMutableArray alloc] init];
+    terms = [NSMutableArray array];
     
     // add some new garbage.
     // TODO: this ought to randomize the dimension too.
@@ -52,10 +53,49 @@
     for(int i = 0; i < 40; i++) {
         EXTPair *location = [EXTPair pairWithA:(arc4random()%30)
                                              B:(arc4random()%30)];
-        EXTTerm *term = [EXTTerm newTerm:location
-                                andNames:[[NSMutableArray alloc] initWithObjects:@"x",nil]];
+        NSArray *names = nil;
+        
+        if ((location.a == 0) || (location.a == 1) ||
+            (location.b == 0) || (location.b == 1))
+            continue;
+        
+        switch ((arc4random()%4)+1) {
+            case 1:
+                names = @[@"x"];
+                break;
+            case 2:
+                names = @[@"x", @"y"];
+                break;
+            case 3:
+                names = @[@"x", @"y", @"z"];
+                break;
+            case 4:
+            default:
+                names = @[@"x", @"y", @"z", @"s"];
+                break;
+        }
+        
+        EXTTerm *term = [EXTTerm term:location andNames:[NSMutableArray arrayWithArray:names]];
+                         
         [terms addObject:term];
     }
+    
+    // construct two dummy terms to demonstrate differential calculations
+    EXTTerm *source = [EXTTerm term:[EXTPair pairWithA:1 B:0]
+                           andNames:[NSMutableArray arrayWithArray:@[@"y"]]],
+            *target = [EXTTerm term:[EXTPair pairWithA:0 B:0]
+                           andNames:[NSMutableArray arrayWithArray:@[@"x"]]];
+    [terms addObject:source];
+    [terms addObject:target];
+    
+    // and construct a dummy differential
+//    EXTDifferential *differential = [EXTDifferential differential:source
+//                                                              end:target
+//                                                             page:0];
+    EXTMatrix *matrix = [EXTMatrix matrixWithWidth:1 andHeight:1];
+    [matrix log];
+//    [[matrix.presentation objectAtIndex:0] setObject:@(1) atIndex:0];
+//    [differentials addObject:differential];
 }
 
 - (void) dealloc {

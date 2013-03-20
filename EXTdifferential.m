@@ -17,22 +17,25 @@
 @synthesize start, end;
 @synthesize presentation;
 
--(id) set:(EXTTerm *)start end:(EXTTerm *)end page:(int)page {
-    [self setStart:start];
-    [self setEnd:end];
-    [self setPage:page];
-    
-    return self;
-}
-
 +(id) newDifferential:(EXTTerm *)start end:(EXTTerm *)end page:(int)page {
     EXTDifferential *object = [EXTDifferential alloc];
     
-    [object set:start end:end page:page];
+    object.start = start;
+    object.end = end;
+    object.page = page;
     
     [object setPresentation:[EXTMatrix initWithWidth:[start dimension:page] andHeight:[end dimension:page]]];
     
     return object;
+}
+
++(id) differential:(EXTTerm *)start end:(EXTTerm *)end page:(int)page {
+    EXTDifferential *differential =
+        [EXTDifferential newDifferential:start end:end page:page];
+    
+    [differential autorelease];
+    
+    return differential;
 }
 
 +(id) dealWithClick:(NSPoint)location document:(EXTDocument *)document {

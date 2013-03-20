@@ -25,7 +25,7 @@
     
     // allocate the matrix
     NSMutableArray *matrix = [NSMutableArray arrayWithCapacity:object.width];
-    for (int j = 0; j < [object height]; j++) {
+    for (int j = 0; j < object.width; j++) {
         [matrix setObject:[NSMutableArray arrayWithCapacity:object.height]
             atIndexedSubscript:j];
     }
@@ -33,6 +33,14 @@
     // ... and store the matrix.
     object.presentation = matrix;
     [matrix release];
+    
+    return object;
+}
+
+-(EXTMatrix*) matrixWithWidth:(int)newWidth andHeight:(int)newHeight {
+    EXTMatrix *object = [EXTMatrix initWithWidth:newWidth andHeight:newHeight];
+    
+    [object autorelease];
     
     return object;
 }

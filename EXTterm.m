@@ -30,20 +30,15 @@
         [self setBoundaries:[NSMutableArray arrayWithObjects: nil]];
         [self setCycles:[NSMutableArray arrayWithObjects: nil]];
         
-        // XXX: this is just being used for testing.
-        int numberOfNames = arc4random() % 8;
-        NSMutableArray *randomNames =
-            [[NSMutableArray alloc] initWithCapacity:numberOfNames];
-        for (int j = 0; j < numberOfNames; j++)
-            [randomNames setObject:@"x" atIndexedSubscript:j];
-        [self setNames:randomNames];
+        [self setNames:whichNames];
         
         // initialize the cycles to contain everything.
         // XXX: change the array upper bound when we stop randomizing.
-        NSMutableArray *initialCycles = [NSMutableArray arrayWithCapacity:numberOfNames];
-        for (int j = 0; j < numberOfNames; j++) {
+        NSMutableArray *initialCycles = [NSMutableArray
+                                         arrayWithCapacity:[whichNames count]];
+        for (int j = 0; j < [whichNames count]; j++) {
             NSMutableArray *column = [[NSMutableArray alloc] init];
-            for (int i = 0; i < numberOfNames; i++) {
+            for (int i = 0; i < [whichNames count]; i++) {
                 if (i == j)
                     [column setObject:@(1) atIndexedSubscript:i];
                 else
@@ -52,9 +47,9 @@
 
             [initialCycles addObject:column];
         }
-        
         [cycles addObject:initialCycles];
         
+        // and we start with no boundaries.
         [boundaries addObject:@[]];
     }
     
@@ -66,7 +61,15 @@
 +(id) newTerm:(EXTPair*)whichLocation andNames:(NSMutableArray*)whichNames {
     EXTTerm* term = [[EXTTerm alloc] setTerm:whichLocation andNames:whichNames];
     
-    return [term autorelease];
+    return term;
+}
+
++(EXTTerm*) term:(EXTPair*)whichLocation andNames:(NSMutableArray*)whichNames {
+    EXTTerm* term = [EXTTerm newTerm:whichLocation andNames:whichNames];
+    
+    [term autorelease];
+    
+    return term;
 }
 
 // decrement the reference counts for all the members we control
@@ -184,9 +187,9 @@
     // differential acted, and we should carry over the same cycles as from
     // last time.
     if (newCycles.count == 0)
-        newCycles = [[[self cycles] objectAtIndex:(whichPage-1)] copy];
+        newCycles = [[cycles objectAtIndex:(whichPage-1)] copy];
     
-    [[self cycles] setObject:newCycles atIndexedSubscript:whichPage];
+    [cycles setObject:newCycles atIndexedSubscript:whichPage];
 }
 
 // TODO: this is a duplicate of the code above. it would be nice to fix that.
@@ -225,8 +228,7 @@
 
 +(id) dealWithClick:(NSPoint)location document:(EXTDocument*)document {
     EXTPair	*pointPair = [EXTPair pairWithA:location.x B:location.y];
-    EXTTerm *term = [EXTTerm newTerm:pointPair
-                            andNames:[[NSMutableArray alloc] init]];
+    EXTTerm *term = [EXTTerm term:pointPair andNames:[NSMutableArray array]];
 
     [[document terms] addObject:term];
     
