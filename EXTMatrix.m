@@ -131,6 +131,10 @@
         
         // then iterate through the other columns...
         for (j = 0; j < width; j++) {
+            // skip the column we're working with, of course!
+            if (j == pivotColumn)
+                continue;
+            
             NSMutableArray *workingColumn = [ret.presentation objectAtIndex:j];
             int factor = [[workingColumn objectAtIndex:pivotRow] intValue] /
                          [[column objectAtIndex:pivotRow] intValue];
@@ -153,15 +157,48 @@
 
 // returns a basis for the kernel of a matrix
 -(NSMutableArray*) kernel {
-    EXTMatrix *transpose = [EXTMatrix copyTranspose:self];
-    NSMutableArray *image = [transpose image];
+    // vertically augment the matrix by an identity matrix
+    EXTMatrix *augmentedMatrix = [self copy];
+    [augmentedMatrix setHeight:(self.height + self.width)];
     
-    [transpose release];
+    for (int i = 0; i < self.width; i++) {
+        NSMutableArray *column = [augmentedMatrix.presentation objectAtIndex:i];
+        for (int j = 0; j < self.height; j++) {
+            if (i == j)
+                [column addObject:@(1)];
+            else
+                [column addObject:@(0)];
+        }
+    }
     
-    return image;
+    // column-reduce the augmented matrix
+    EXTMatrix *reducedMatrix = [augmentedMatrix columnReduce];
+    
+    // read off the augmented columns corresponding to zero columns in the orig
+    NSMutableArray *ret = [NSMutableArray array];
+    
+    for (int i = 0; i < reducedMatrix.width; i++) {
+        NSMutableArray *augmentedColumn =
+            [reducedMatrix.presentation objectAtIndex:i];
+        
+        // test to see if the original column is full of zeroes
+        bool skipme = false;
+        for (int j = 0; j < self.height; j++)
+            if ([[augmentedColumn objectAtIndex:j] intValue] != 0)
+                skipme = true;
+        if (skipme)   // if we found nonzero entries...
+            continue; // ... skip this column.
+        
+        // otherwise, strip to the augmented portion
+        NSArray *strippedColumn = [augmentedColumn subarrayWithRange:NSMakeRange(self.height, self.width)];
+        [ret addObject:[NSMutableArray arrayWithArray:strippedColumn]];
+    }
+    
+    // that's a basis for the kernel!
+    return ret;
 }
 
-// returns a basis for the cokernel of a matrix
+// returns a basis for the image of a matrix
 -(NSMutableArray*) image {
     EXTMatrix *reduced = [self columnReduce];
     NSMutableArray *ret = [[NSMutableArray alloc] init];

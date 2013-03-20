@@ -164,18 +164,19 @@
         [newCycles addObjectsFromArray:kernel];
         
         // there should really only be one differential attached to a given
-        // EXTTerm on a given page.
+        // EXTTerm on a given page.  so, at this point we should return.
         //
         // XXX: if this were smarter, it would continue thumbing through the
         // differentials and throw an error if there were more than one.
-        break;
+        [cycles setObject:newCycles atIndexedSubscript:whichPage];
+        
+        return;
     }
     
     // if there weren't any differentials acting, then really the zero
     // differential acted, and we should carry over the same cycles as from
     // last time.
-    if (newCycles.count == 0)
-        newCycles = [[cycles objectAtIndex:(whichPage-1)] copy];
+    newCycles = [[cycles objectAtIndex:(whichPage-1)] copy];
     
     [cycles setObject:newCycles atIndexedSubscript:whichPage];
 }

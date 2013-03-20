@@ -80,6 +80,10 @@
         [terms addObject:term];
     }
     
+    
+    // XXX: this next bit is *really* just included for testing.  it should be
+    // deleted once we introduce the addition of differentials.
+    //
     // construct two dummy terms to demonstrate differential calculations
     EXTTerm *source = [EXTTerm term:[EXTPair pairWithA:1 B:0]
                            andNames:[NSMutableArray arrayWithArray:@[@"y"]]],
@@ -96,6 +100,7 @@
     [differentials addObject:differential];
     
     [source computeCycles:1 differentialArray:differentials];
+    [target computeBoundaries:1 differentialArray:differentials];
 }
 
 #pragma mark *** windowController tasks ***
