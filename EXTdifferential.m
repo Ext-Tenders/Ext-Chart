@@ -42,17 +42,6 @@
     return nil;
 }
 
-+ (id) differentialWithPage:(int)whichPage AndStart:(EXTPair*) startLocation {
-	EXTDifferential* differential = [[EXTDifferential alloc] initWithPage:whichPage AndStart:startLocation];
-	return [differential autorelease];
-}
-
-- (void) dealloc {
-	[start release];
-	[end release];
-	[super dealloc];
-}
-
 - (id) initWithCoder: (NSCoder*) coder {
 	if (self = [super init])
 	{

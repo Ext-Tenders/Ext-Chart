@@ -17,24 +17,25 @@
 // initializes an EXTMatrix object and allocates all the NSMutableArrays
 // used in the presentation.
 +(EXTMatrix*) initWithWidth:(int)newWidth andHeight:(int)newHeight {
-    EXTMatrix *object = [[EXTMatrix alloc] init];
+    EXTMatrix *obj = [[EXTMatrix alloc] init];
     
     // set the basic properties
-    [object setHeight:newHeight];
-    [object setWidth:newWidth];
+    [obj setHeight:newHeight];
+    [obj setWidth:newWidth];
     
     // allocate the matrix
-    NSMutableArray *matrix = [NSMutableArray arrayWithCapacity:object.width];
-    for (int j = 0; j < object.width; j++) {
-        [matrix setObject:[NSMutableArray arrayWithCapacity:object.height]
-            atIndexedSubscript:j];
+    NSMutableArray *matrix = [NSMutableArray arrayWithCapacity:obj.width];
+    for (int j = 0; j < obj.width; j++) {
+        NSMutableArray *column = [NSMutableArray arrayWithCapacity:obj.height];
+        for (int i = 0; i < obj.height; i++)
+            [column setObject:@(0) atIndexedSubscript:i];
+        [matrix setObject:column atIndexedSubscript:j];
     }
     
     // ... and store the matrix.
-    object.presentation = matrix;
-    [matrix release];
+    obj.presentation = matrix;
     
-    return object;
+    return obj;
 }
 
 -(EXTMatrix*) matrixWithWidth:(int)newWidth andHeight:(int)newHeight {
@@ -43,13 +44,6 @@
     [object autorelease];
     
     return object;
-}
-
-// if we're released, release the matrix we're holding onto too.
--(void) dealloc {
-    [presentation dealloc];
-    
-    [super dealloc];
 }
 
 // allocates and initializes a new matrix 
@@ -189,7 +183,6 @@
         [ret addObject:column];
     }
     
-    [reduced release];
     [ret autorelease];
     
     return ret;

@@ -72,18 +72,6 @@
     return term;
 }
 
-// decrement the reference counts for all the members we control
-- (void) dealloc {
-    [names release];      // NOTE: Cocoa containers are such that if the
-    [boundaries release]; // container gets released, then a release message is
-    [cycles release];     // sent to all its elements as well.  Useful!
-    
-    [location release];
-    
-    // lastly, up-call.
-	[super dealloc];
-}
-
 #pragma mark *** packing and unpacking ***
 
 // TODO: update these to pull in the element names.  they should not bother
@@ -165,9 +153,9 @@
     
     // iterate through the differentials, looking for more cycles
     for (EXTDifferential *differential in differentials) {
-        if (([differential start] != self) ||   // if we're not the source...
-            ([differential page] != whichPage)) // ... or this isn't the page...
-            continue;                           // then skip this differential.
+        if (([differential start] != self) ||     // if we're not the source...
+            ([differential page]+1 != whichPage)) // ...or this isn't the page...
+            continue;                             // then skip this differential.
         
         // ask for the kernel of this differential
         NSMutableArray *kernel = [[differential presentation] kernel];
@@ -203,7 +191,7 @@
     
     for (EXTDifferential *differential in differentials) {
         if (([differential end] != self) ||
-            ([differential page] != whichPage))
+            ([differential page]+1 != whichPage))
             continue;
         
         // XXX: maybe we should right-multiply by the cycle matrix first?

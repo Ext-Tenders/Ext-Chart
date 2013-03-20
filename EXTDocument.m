@@ -34,8 +34,8 @@
 		[theArtBoard initWithRect:NSMakeRect(0, 0, 792, 612)];
         
         // and allocate the internal parts of things
-        terms = [[NSMutableArray alloc] init];
-        differentials = [[NSMutableArray alloc] init];
+        [self setTerms:[NSMutableArray array]];
+        [self setDifferentials:[NSMutableArray array]];
     }
 
     return self;
@@ -44,8 +44,8 @@
 // if requested, we can initialize the terms array with some test garbage
 -(void) randomize {
     // remove all the old garbage
-    [terms release];
-    terms = [NSMutableArray array];
+    [self setTerms:[NSMutableArray array]];
+    [self setDifferentials:[NSMutableArray array]];
     
     // add some new garbage.
     // TODO: this ought to randomize the dimension too.
@@ -87,19 +87,15 @@
                            andNames:[NSMutableArray arrayWithArray:@[@"x"]]];
     [terms addObject:source];
     [terms addObject:target];
-    
-    // and construct a dummy differential
-//    EXTDifferential *differential = [EXTDifferential differential:source
-//                                                              end:target
-//                                                             page:0];
-    EXTMatrix *matrix = [EXTMatrix matrixWithWidth:1 andHeight:1];
-    [matrix log];
-//    [[matrix.presentation objectAtIndex:0] setObject:@(1) atIndex:0];
-//    [differentials addObject:differential];
-}
 
-- (void) dealloc {
-	[super dealloc];
+    // and construct a dummy differential
+    EXTDifferential *differential = [EXTDifferential differential:source
+                                                              end:target
+                                                             page:0];
+    [[differential.presentation.presentation objectAtIndex:0] setObject:@(1) atIndex:0];
+    [differentials addObject:differential];
+    
+    [source computeCycles:1 differentialArray:differentials];
 }
 
 #pragma mark *** windowController tasks ***

@@ -129,33 +129,32 @@
 		2A37F4ABFDCFA73011CA2CEA /* Classes */ = {
 			isa = PBXGroup;
 			children = (
-				3190C40A1411B50900ABB8E6 /* module and differential */,
-				318EC0681409385F005D21D4 /* to do list.rtf */,
+				31C77BA613E63F6800E9DBFC /* EXTAppController.h */,
+				31C77BA713E63F6800E9DBFC /* EXTAppController.m */,
 				31D5D2E313F6933B00F1B2F9 /* EXTArtBoard.h */,
 				31D5D2E413F6933B00F1B2F9 /* EXTArtBoard.m */,
-				093AEADB13E10759003E9F58 /* EXTPair.h */,
-				093AEADC13E10759003E9F58 /* EXTPair.m */,
-				3187BA2313DC6C6C00C26803 /* EXTScrollView.h */,
-				3187BA2413DC6C6C00C26803 /* EXTScrollView.m */,
-				31D403B913DA0476006A8C06 /* EXTterm.h */,
-				31D403BA13DA0476006A8C06 /* EXTterm.m */,
 				31D403BE13DA04D8006A8C06 /* EXTdifferential.h */,
 				31D403BF13DA04D8006A8C06 /* EXTdifferential.m */,
-				3896548B16F538D90008FB8D /* EXTMatrix.h */,
-				3896548C16F538D90008FB8D /* EXTMatrix.m */,
 				2A37F4AEFDCFA73011CA2CEA /* EXTDocument.h */,
 				2A37F4ACFDCFA73011CA2CEA /* EXTDocument.m */,
 				317707C213D784B0003475A2 /* EXTGrid.h */,
 				317707C313D784B0003475A2 /* EXTGrid.m */,
-				317707DF13D7893A003475A2 /* EXTView.h */,
-				317707E013D7893A003475A2 /* EXTView.m */,
-				31C77BA613E63F6800E9DBFC /* EXTAppController.h */,
-				31C77BA713E63F6800E9DBFC /* EXTAppController.m */,
+				3896548B16F538D90008FB8D /* EXTMatrix.h */,
+				3896548C16F538D90008FB8D /* EXTMatrix.m */,
+				093AEADB13E10759003E9F58 /* EXTPair.h */,
+				093AEADC13E10759003E9F58 /* EXTPair.m */,
+				3187BA2313DC6C6C00C26803 /* EXTScrollView.h */,
+				3187BA2413DC6C6C00C26803 /* EXTScrollView.m */,
 				31C77BB413E647A000E9DBFC /* EXTsettingPanelController.h */,
 				31C77BB513E647A000E9DBFC /* EXTsettingPanelController.m */,
+				31D403B913DA0476006A8C06 /* EXTterm.h */,
+				31D403BA13DA0476006A8C06 /* EXTterm.m */,
 				315BC80D140430B7007D49CA /* EXTToolPaletteController.h */,
 				315BC80E140430B7007D49CA /* EXTToolPaletteController.m */,
+				317707DF13D7893A003475A2 /* EXTView.h */,
+				317707E013D7893A003475A2 /* EXTView.m */,
 				38DDAA7A16EDA8990001841D /* README.md */,
+				318EC0681409385F005D21D4 /* to do list.rtf */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -191,13 +190,6 @@
 				1058C7A8FEA54F5311CA2CBB /* Other Frameworks */,
 			);
 			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		3190C40A1411B50900ABB8E6 /* module and differential */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = "module and differential";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
