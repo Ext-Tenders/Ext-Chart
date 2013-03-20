@@ -27,8 +27,8 @@
     if (self = [super init]) {
         // if it succeeds, then initialize the members
         [self setLocation:whichLocation];
-        [self setBoundaries:[[NSMutableArray alloc]initWithObjects: nil]];
-        [self setCycles:[[NSMutableArray alloc]initWithObjects: nil]];
+        [self setBoundaries:[[NSMutableArray alloc] initWithObjects: nil]];
+        [self setCycles:[[NSMutableArray alloc] initWithObjects: nil]];
         
         // XXX: this is just being used for testing.
         int numberOfNames = arc4random() % 8;
@@ -37,6 +37,20 @@
         for (int j = 0; j < numberOfNames; j++)
             [randomNames setObject:@"x" atIndexedSubscript:j];
         [self setNames:randomNames];
+        
+        // initialize the cycles to contain everything.
+        // XXX: change the array upper bound when we stop randomizing.
+        for (int j = 0; j < numberOfNames; j++) {
+            NSMutableArray *column = [[NSMutableArray alloc] init];
+            for (int i = 0; i < numberOfNames; i++) {
+                if (i == j)
+                    [column setObject:@(1) atIndexedSubscript:i];
+                else
+                    [column setObject:@(0) atIndexedSubscript:i];
+            }
+
+            [cycles addObject:column];
+        }
     }
     
     // regardless, return the object as best we've initialized it.
@@ -45,7 +59,7 @@
 
 // build a new EXTTerm object and initialize it
 +(id) newTerm:(EXTPair*)whichLocation andNames:(NSMutableArray*)whichNames {
-    EXTTerm* term = [[EXTTerm alloc]setTerm:whichLocation andNames:whichNames];
+    EXTTerm* term = [[EXTTerm alloc] setTerm:whichLocation andNames:whichNames];
     
     return [term autorelease];
 }
@@ -158,7 +172,7 @@
     // if there weren't any differentials acting, then really the zero
     // differential acted, and we should carry over the same cycles as from
     // last time.
-    if ([newCycles count] == 0)
+    if (newCycles.count == 0)
         newCycles = [[[self cycles] objectAtIndex:(whichPage-1)] copy];
     
     [[self cycles] setObject:newCycles atIndexedSubscript:whichPage];
@@ -183,16 +197,14 @@
         break;
     }
     
-    if ([newBoundaries count] == 0)
+    if (newBoundaries.count == 0)
         newBoundaries = [[[self boundaries] objectAtIndex:(whichPage-1)] copy];
     
     [[self boundaries] setObject:newBoundaries atIndexedSubscript:whichPage];
 }
 
 -(int) dimension:(int)whichPage {
-    // XXX: this is just for testing!  it ought to be computing something.
-    //return (arc4random() % 8);
-    return [[self names] count];
+    return [[self cycles] count] - [[self boundaries] count];
 }
 
 +(id) dealWithClick:(NSPoint)location document:(EXTDocument*)document {

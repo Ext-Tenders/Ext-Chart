@@ -209,11 +209,20 @@ static NSColor *highlightRectColor = nil;
 
 -(void)setPageInView:(int) newPage{
 	pageInView = newPage;
+    
 	if (highlighting) {
 		NSPoint mousePoint = [[[self enclosingScrollView] window] mouseLocationOutsideOfEventStream];
 		mousePoint = [self convertPoint:mousePoint fromView:nil];
 		[self resetHighlightRectAtLocation:mousePoint];
 	}
+    
+    // compute all the cycles and boundaries for this new page.
+    for (EXTTerm *term in [delegate terms]) {
+        [term computeCycles:pageInView
+          differentialArray:[delegate differentials]];
+        [term computeBoundaries:pageInView
+              differentialArray:[delegate differentials]];
+    }
 	
 	[self setNeedsDisplay:YES];
 }

@@ -21,8 +21,8 @@
     +(EXTMatrix*) initWithWidth:(int)newWidth andHeight:(int)newHeight;
 
     // matrix operations
-    +(EXTMatrix*) transpose:(EXTMatrix*)input;
-    +(EXTMatrix*) multiply:(EXTMatrix*)left by:(EXTMatrix*)right;
+    +(EXTMatrix*) copyTranspose:(EXTMatrix*)input;
+    +(EXTMatrix*) newMultiply:(EXTMatrix*)left by:(EXTMatrix*)right;
     -(EXTMatrix*) columnReduce;
     -(NSMutableArray*) kernel;
     -(NSMutableArray*) image;

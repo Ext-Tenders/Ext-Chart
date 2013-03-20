@@ -42,13 +42,17 @@
     +(id) newTerm:(EXTPair*)whichLocation andNames:(NSMutableArray*)whichNames;
     // and an in-place constructor
     -(id) setTerm:(EXTPair*)whichLocation andNames:(NSMutableArray*)whichNames;
+    // TODO: a direct sum constructor might be nice?
+
 
     // this gets called when the Term tool receives a click event
     +(id) dealWithClick:(NSPoint)location document:(EXTDocument*)document;
 
-    // TODO: a direct sum constructor might be nice?
-
     -(int) dimension:(int)whichPage; // useful for drawing
+    -(void) computeCycles:(int)whichPage
+        differentialArray:(NSMutableArray*)differentials;
+    -(void) computeBoundaries:(int)whichPage
+        differentialArray:(NSMutableArray*)differentials;
 
     // TODO: here are some other routines that i haven't investigated yet.
     // TODO: this drawing code must be offloaded into some other module!!
