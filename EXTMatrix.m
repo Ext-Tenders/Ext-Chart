@@ -114,11 +114,10 @@
         
         // if we found a nonzero entry, then this is the new pivot column.
         // if we didn't, then we should skip this row entirely.
-        if (0 != [[[ret.presentation objectAtIndex:j]
-                   objectAtIndex:pivotRow] intValue])
-            pivotColumn = j;
-        else
+        if (j == width)
             continue;
+        else
+            pivotColumn = j;
         
         // if we've made it here, then we have a new pivot location, and we're
         // tasked with clearing the rest of the row of nonzero entries.
@@ -163,7 +162,7 @@
     
     for (int i = 0; i < self.width; i++) {
         NSMutableArray *column = [augmentedMatrix.presentation objectAtIndex:i];
-        for (int j = 0; j < self.height; j++) {
+        for (int j = 0; j < self.width; j++) {
             if (i == j)
                 [column addObject:@(1)];
             else

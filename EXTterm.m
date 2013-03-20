@@ -36,9 +36,9 @@
         // XXX: change the array upper bound when we stop randomizing.
         NSMutableArray *initialCycles = [NSMutableArray
                                          arrayWithCapacity:[whichNames count]];
-        for (int j = 0; j < [whichNames count]; j++) {
-            NSMutableArray *column = [[NSMutableArray alloc] init];
-            for (int i = 0; i < [whichNames count]; i++) {
+        for (int j = 0; j < whichNames.count; j++) {
+            NSMutableArray *column = [NSMutableArray array];
+            for (int i = 0; i < whichNames.count; i++) {
                 if (i == j)
                     [column setObject:@(1) atIndexedSubscript:i];
                 else
@@ -149,7 +149,7 @@
     if (whichPage == 0)
         return;
     
-    NSMutableArray *newCycles = [[NSMutableArray alloc] init];
+    NSMutableArray *newCycles = [NSMutableArray array];
     
     // iterate through the differentials, looking for more cycles
     for (EXTDifferential *differential in differentials) {
