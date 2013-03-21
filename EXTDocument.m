@@ -84,7 +84,7 @@
     // XXX: this next bit is *really* just included for testing.  it should be
     // deleted once we introduce the addition of differentials.
     //
-    // construct two dummy terms to demonstrate differential calculations
+    // construct some dummy terms to demonstrate differential calculations
     EXTTerm *source  = [EXTTerm term:[EXTPair pairWithA:1 B:0]
                         andNames:[NSMutableArray arrayWithArray:@[@"y1",@"y2"]]],
             *target1 = [EXTTerm term:[EXTPair pairWithA:0 B:0]
@@ -111,13 +111,15 @@
     [source computeCycles:1 differentialArray:differentials];
     [target1 computeBoundaries:1 differentialArray:differentials];
     [source computeCycles:2 differentialArray:differentials];
+    [target2 computeBoundaries:1 differentialArray:differentials];
     [target2 computeBoundaries:2 differentialArray:differentials];
+    
+    return;
 }
 
 #pragma mark *** windowController tasks ***
 
-- (NSString *)windowNibName
-{
+- (NSString *)windowNibName {
     return @"EXTDocument";
 }
 

@@ -28,7 +28,7 @@
     // is probably NOT the behavior that we want.  i've changed this to use
     // page 0 instead, but that is probably ALSO not what we want.  this needs
     // to be thought through.
-    [object setPresentation:[EXTMatrix initWithWidth:[start dimension:0] andHeight:[end dimension:0]]];
+    [object setPresentation:[EXTMatrix matrixWidth:[start dimension:0] height:[end dimension:0]]];
     
     return object;
 }

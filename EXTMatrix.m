@@ -16,7 +16,7 @@
 
 // initializes an EXTMatrix object and allocates all the NSMutableArrays
 // used in the presentation.
-+(EXTMatrix*) initWithWidth:(int)newWidth andHeight:(int)newHeight {
++(EXTMatrix*) initWidth:(int)newWidth height:(int)newHeight {
     EXTMatrix *obj = [[EXTMatrix alloc] init];
     
     // set the basic properties
@@ -38,8 +38,8 @@
     return obj;
 }
 
--(EXTMatrix*) matrixWithWidth:(int)newWidth andHeight:(int)newHeight {
-    EXTMatrix *object = [EXTMatrix initWithWidth:newWidth andHeight:newHeight];
++(EXTMatrix*) matrixWidth:(int)newWidth height:(int)newHeight {
+    EXTMatrix *object = [EXTMatrix initWidth:newWidth height:newHeight];
     
     [object autorelease];
     
@@ -48,8 +48,8 @@
 
 // allocates and initializes a new matrix 
 +(EXTMatrix*) copyTranspose:(EXTMatrix *)input {
-    EXTMatrix *ret = [EXTMatrix initWithWidth:input.height
-                                    andHeight:input.width];
+    EXTMatrix *ret = [EXTMatrix initWidth:input.height
+                                    height:input.width];
     
     for (int i = 0; i < [input height]; i++) {
         NSMutableArray *newColumn =
@@ -80,7 +80,7 @@
 
 // performs a *deep* copy of the matrix
 -(EXTMatrix*) copy {
-    EXTMatrix *copy = [EXTMatrix initWithWidth:width andHeight:height];
+    EXTMatrix *copy = [EXTMatrix initWidth:width height:height];
     
     for (int i = 0; i < width; i++) {
         for (int j = 0; j < height; j++) {
@@ -225,8 +225,8 @@
 }
 
 +(EXTMatrix*) newMultiply:(EXTMatrix*)left by:(EXTMatrix*)right {
-    EXTMatrix *product = [EXTMatrix initWithWidth:[right width]
-                                        andHeight:[left height]];
+    EXTMatrix *product = [EXTMatrix initWidth:[right width]
+                                        height:[left height]];
     
     for (int k = 0; k < [right width]; k++) {
         NSMutableArray *rightColumn = [[right presentation] objectAtIndex:k],
@@ -236,8 +236,8 @@
             
             for (int j = 0; j < [left width]; j++)
                 total += [[rightColumn objectAtIndex:j] intValue] *
-                    [[[left.presentation objectAtIndex:i]
-                      objectAtIndex:j] intValue];
+                    [[[left.presentation objectAtIndex:j]
+                      objectAtIndex:i] intValue];
             
             [column setObject:@(total) atIndexedSubscript:i];
         }

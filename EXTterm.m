@@ -9,8 +9,9 @@
 #import "EXTTerm.h"
 #import "EXTPair.h"
 #import "EXTGrid.h"
-#import "EXTDOcument.h"
+#import "EXTDocument.h"
 #import "EXTdifferential.h"
+#import "EXTMatrix.h"
 
 @implementation EXTTerm
 
@@ -141,6 +142,10 @@
 // this assumes that the cycles from the page before have already been computed.
 // this may or may not be a desirable trait, but for the moment, that's the way
 // things are.
+//
+// XXX: something about this logic is wrong; it should be, like, taking inter-
+// sections of cycle groups across pages or something... or right-multiplying
+// in the old cycle group and interpreting the results... or something.
 -(void) computeCycles:(int)whichPage
     differentialArray:(NSMutableArray*)differentials {
     
@@ -150,6 +155,14 @@
         return;
     
     NSMutableArray *newCycles = [NSMutableArray array];
+    NSMutableArray *oldCycles = [cycles objectAtIndex:(whichPage-1)];
+
+    // if the EXTTerm has already been emptied, don't even bother computing any
+    // new differentials.
+    if ([oldCycles count] == 0) {
+        [cycles setObject:@[] atIndexedSubscript:whichPage];
+        return;
+    }
     
     // iterate through the differentials, looking for more cycles
     for (EXTDifferential *differential in differentials) {
@@ -158,10 +171,23 @@
             continue;                             // then skip this differential.
         
         // ask for the kernel of this differential
-        NSMutableArray *kernel = [[differential presentation] kernel];
+        EXTMatrix *cycleMatrix = [EXTMatrix matrixWidth:oldCycles.count height:names.count];
+        [cycleMatrix setPresentation:oldCycles];
+        
+        EXTMatrix *restricted = [EXTMatrix newMultiply:differential.presentation by:cycleMatrix];
+        
+        NSMutableArray *kernel = [restricted kernel];
+        EXTMatrix *kernelMatrix = [EXTMatrix matrixWidth:[kernel count] height:[oldCycles count]];
+        [kernelMatrix setPresentation:kernel];
+        
+        EXTMatrix *newCycleMatrix = [EXTMatrix newMultiply:cycleMatrix by:kernelMatrix];
         
         // and add it to the cycles
-        [newCycles addObjectsFromArray:kernel];
+        [newCycles addObjectsFromArray:newCycleMatrix.presentation];
+        
+        // release all this ridiculous stuff we've allocated
+        [restricted release];
+        [newCycleMatrix release];
         
         // there should really only be one differential attached to a given
         // EXTTerm on a given page.  so, at this point we should return.
@@ -205,9 +231,10 @@
     }
     
     if (newBoundaries.count == 0)
-        newBoundaries = [[[self boundaries] objectAtIndex:(whichPage-1)] copy];
+        [newBoundaries addObjectsFromArray:
+            [boundaries objectAtIndex:(whichPage-1)]];
     
-    [[self boundaries] setObject:newBoundaries atIndexedSubscript:whichPage];
+    [boundaries setObject:newBoundaries atIndexedSubscript:whichPage];
 }
 
 -(int) dimension:(int)whichPage {
