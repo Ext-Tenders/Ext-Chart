@@ -59,7 +59,7 @@
             (location.b == 0) || (location.b == 1))
             continue;
         
-        switch ((arc4random()%4)+1) {
+        switch ((arc4random()%7)+1) {
             case 1:
                 names = @[@"x"];
                 break;
@@ -70,8 +70,17 @@
                 names = @[@"x", @"y", @"z"];
                 break;
             case 4:
-            default:
                 names = @[@"x", @"y", @"z", @"s"];
+                break;
+            case 5:
+                names = @[@"x", @"y", @"z", @"s", @"t"];
+                break;
+            case 6:
+                names = @[@"x", @"y", @"z", @"s", @"t", @"u"];
+                break;
+            case 7:
+            default:
+                names = @[@"x", @"y", @"z", @"s", @"t", @"u", @"v"];
                 break;
         }
         
@@ -107,12 +116,6 @@
     [differentials addObject:differential1];
     [[differential2.presentation.presentation objectAtIndex:1] setObject:@(1) atIndex:0];
     [differentials addObject:differential2];
-    
-    [source computeCycles:1 differentialArray:differentials];
-    [target1 computeBoundaries:1 differentialArray:differentials];
-    [source computeCycles:2 differentialArray:differentials];
-    [target2 computeBoundaries:1 differentialArray:differentials];
-    [target2 computeBoundaries:2 differentialArray:differentials];
     
     return;
 }
@@ -195,9 +198,8 @@
     
     // iterate also through the available differentials
     for (EXTDifferential* differential in [self differentials]) {
-        // XXX: eventually try to draw these.
-        //
-        // [differential drawWithSpacing:gridSpacing];
+        if ([differential page] == pageNumber)
+            [differential drawWithSpacing:withSpacing];
     }
 }
 

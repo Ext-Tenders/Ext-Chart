@@ -76,11 +76,16 @@
 	return [EXTPair pairWithA:a B:b];
 }
 
+// TODO: fix these magic numbers.
+// XXX: the differentials always attach themselves to the bottom class.  really,
+// it looks better if they always attach themselves to the *last* class.
+// *really* really, they should attach themselves intelligently to the class
+// that makes most sense.  :)
 - (void) drawWithSpacing:(CGFloat)spacing{
-	CGFloat x1 = ([start a]+0.5)*spacing,
-			y1 = ([start b]+0.5)*spacing,
-			x2 = ([end a]+0.5)*spacing,
-			y2 = ([end b]+0.5)*spacing;
+	CGFloat x1 = ([start.location a]+0.25)*spacing,
+			y1 = ([start.location b]+0.25)*spacing,
+			x2 = ([end.location a]+0.25)*spacing,
+			y2 = ([end.location b]+0.25)*spacing;
 	[[NSColor blackColor] set];
 	NSBezierPath *line = [NSBezierPath bezierPath];
 	[line moveToPoint:NSMakePoint(x1, y1)];

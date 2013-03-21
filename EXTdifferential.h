@@ -37,6 +37,7 @@
     +(id) newDifferential:(EXTTerm *)start end:(EXTTerm *)end page:(int)page;
     +(id) differential:(EXTTerm *)start end:(EXTTerm *)end page:(int)page;
 
+    -(void) drawWithSpacing:(CGFloat)spacing;
     +(id) dealWithClick:(NSPoint)location document:(EXTDocument*)document;
 @end
 
