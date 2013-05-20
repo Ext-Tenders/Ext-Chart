@@ -262,6 +262,52 @@
     return result;
 }
 
++(EXTMatrix*) identity:(int)width {
+    EXTMatrix *ret = [EXTMatrix matrixWidth:width height:width];
+    
+    for (int i = 0; i < width; i++)
+        [[ret.presentation objectAtIndex:i] setObject:@1 atIndexedSubscript:i];
+    
+    return [ret autorelease];
+}
+
+-(EXTMatrix*) invert {
+    if (height != width)
+        return nil;
+    
+    // augment the matrix by the identity
+    EXTMatrix *temp = [self copy];
+    [temp setWidth:(self.width*2)];
+    [temp.presentation addObjectsFromArray:
+                                [[EXTMatrix identity:self.width] presentation]];
+    
+    // perform column reduction
+    EXTMatrix *flip = [EXTMatrix copyTranspose:temp];
+    [flip columnReduce];
+    EXTMatrix *unflip = [EXTMatrix copyTranspose:flip];
+    
+    // peel off the inverse from the augmented portion
+    // XXX: some kind of error checking would be nice
+    EXTMatrix *ret = [EXTMatrix matrixWidth:self.width height:self.width];
+    for (int i = 0; i < self.width; i++) {
+        [ret.presentation setObject:
+            [unflip.presentation objectAtIndex:(self.width+i)]
+                            atIndexedSubscript:i];
+    }
+    
+    [temp release];
+    [flip release];
+    [unflip release];
+    
+    return ret;
+}
+
+-(int) rank {
+    NSMutableArray *image = [self image];
+    
+    return image.count;
+}
+
 // debug routine to dump the matrix to the console.
 -(void) log {
     for (int i = 0; i < width; i++) {

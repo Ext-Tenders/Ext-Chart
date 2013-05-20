@@ -140,21 +140,20 @@
     
     [terms addObjectsFromArray:@[one,e,x,ex,x2,ex2]];
     
+    // add a single differential
     EXTDifferential *firstdiff = [EXTDifferential differential:e end:x page:2];
     [[firstdiff.presentation.presentation objectAtIndex:0] setObject:@1 atIndexedSubscript:0];
     [differentials addObject:firstdiff];
     
-    // e * x
-    EXTMatrix *exMatrix = [multTables getMatrixFor:[e location] with:[x location]];
-    [exMatrix.presentation setObject:@[@1] atIndexedSubscript:0];
+    // specify the multiplicative structure
+    [[multTables getMatrixFor:[e location] with:[x location]].presentation setObject:@[@1] atIndexedSubscript:0];
+    [[multTables getMatrixFor:[ex location] with:[x location]].presentation setObject:@[@1] atIndexedSubscript:0];
+    [[multTables getMatrixFor:[e location] with:[x2 location]].presentation setObject:@[@1] atIndexedSubscript:0];
+    [[multTables getMatrixFor:[x location] with:[e location]].presentation setObject:@[@1] atIndexedSubscript:0];
+    [[multTables getMatrixFor:[x location] with:[ex location]].presentation setObject:@[@1] atIndexedSubscript:0];
+    [[multTables getMatrixFor:[x2 location] with:[e location]].presentation setObject:@[@1] atIndexedSubscript:0];
     
-    // ex * x
-    EXTMatrix *exxMatrix = [multTables getMatrixFor:[ex location] with:[x location]];
-    [exxMatrix.presentation setObject:@[@1] atIndexedSubscript:0];
-    
-    // e * x2
-    EXTMatrix *ex2Matrix = [multTables getMatrixFor:[e location] with:[x2 location]];
-    [ex2Matrix.presentation setObject:@[@1] atIndexedSubscript:0];
+    [multTables updateDifferentials:[e location] with:[x location]];
     
     return;
 }

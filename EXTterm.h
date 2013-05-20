@@ -17,7 +17,7 @@
 // many things, including not just its position but also its cycle/boundary
 // filtration, any multiplicative structures present, ...
 //
-// TODO: for the moment, i'm only even trying to make vector spaces work. any
+// TODO: for the moment, i'm only even trying to make F2-vector-spaces work. any
 // more sophisticated variant of modules is going to take a substantial rewrite.
 @interface EXTTerm : NSObject <NSCoding>
     {

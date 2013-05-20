@@ -19,14 +19,19 @@
 
     +(EXTMatrix*) initWidth:(int)newWidth height:(int)newHeight;
     +(EXTMatrix*) matrixWidth:(int)newWidth height:(int)newHeight;
+    -(EXTMatrix*) copy;
 
     // matrix operations
     +(EXTMatrix*) copyTranspose:(EXTMatrix*)input;
     +(EXTMatrix*) newMultiply:(EXTMatrix*)left by:(EXTMatrix*)right;
+    +(EXTMatrix*) identity:(int)width;
+    -(EXTMatrix*) invert;
     -(EXTMatrix*) columnReduce;
+    -(void) modularReduction;
     -(NSMutableArray*) kernel;
     -(NSMutableArray*) image;
     -(NSMutableArray*) actOn:(NSMutableArray*)vector;
+    -(int) rank;
 
     // debug operations
     -(void) log;

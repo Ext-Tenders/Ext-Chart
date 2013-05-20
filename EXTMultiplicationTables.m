@@ -50,7 +50,7 @@
                               height:[targetterm names].count];
         
         // and store it to the tables
-        [tables setValue:ret forKey:key];
+        [tables setObject:ret forKey:key];
     }
 
     return ret;
@@ -85,6 +85,12 @@
     
     // and return the action.
     return [productRule actOn:hadamardVector];
+}
+
+-(void) updateDifferentials:(EXTPair *)loc1 with:(EXTPair *)loc2 {
+    NSLog(@"This isn't implemented yet.");
+    
+    return;
 }
 
 @end
