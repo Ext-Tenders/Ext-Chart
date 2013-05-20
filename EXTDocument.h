@@ -48,6 +48,8 @@
 -(void) drawPageNumber:(NSUInteger)pageNumber ll:(EXTPair*)lowerLeftCoord ur:(EXTPair*)upperRightCoord withSpacing:(CGFloat)gridSpacing;
 //- (NSUInteger) maxPage;
 
+-(EXTTerm*) findTerm:(EXTPair*)loc;
+
 
 @end
 

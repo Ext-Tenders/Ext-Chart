@@ -24,6 +24,8 @@
 		31D5D2E513F6933B00F1B2F9 /* EXTArtBoard.m in Sources */ = {isa = PBXBuildFile; fileRef = 31D5D2E413F6933B00F1B2F9 /* EXTArtBoard.m */; };
 		31EEEF65140430380035BE7A /* EXTToolPalette.xib in Resources */ = {isa = PBXBuildFile; fileRef = 31EEEF64140430380035BE7A /* EXTToolPalette.xib */; };
 		3896548D16F538D90008FB8D /* EXTMatrix.m in Sources */ = {isa = PBXBuildFile; fileRef = 3896548C16F538D90008FB8D /* EXTMatrix.m */; };
+		389FB38D17498AF500D0FE75 /* EXTMultiplicationTables.m in Sources */ = {isa = PBXBuildFile; fileRef = 389FB38C17498AF500D0FE75 /* EXTMultiplicationTables.m */; };
+		38A1AB6E1727009C00F9F9D5 /* todo.md in Resources */ = {isa = PBXBuildFile; fileRef = 38A1AB6D1727009C00F9F9D5 /* todo.md */; };
 		38DDAA7B16EDA8990001841D /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 38DDAA7A16EDA8990001841D /* README.md */; };
 		8D15AC2C0486D014006FF6A4 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 2A37F4B9FDCFA73011CA2CEA /* Credits.rtf */; };
 		8D15AC2F0486D014006FF6A4 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165FFE840EACC02AAC07 /* InfoPlist.strings */; };
@@ -71,6 +73,9 @@
 		31EEEF64140430380035BE7A /* EXTToolPalette.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = EXTToolPalette.xib; sourceTree = "<group>"; };
 		3896548B16F538D90008FB8D /* EXTMatrix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTMatrix.h; sourceTree = "<group>"; };
 		3896548C16F538D90008FB8D /* EXTMatrix.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTMatrix.m; sourceTree = "<group>"; };
+		389FB38B17498AF500D0FE75 /* EXTMultiplicationTables.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTMultiplicationTables.h; sourceTree = "<group>"; };
+		389FB38C17498AF500D0FE75 /* EXTMultiplicationTables.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTMultiplicationTables.m; sourceTree = "<group>"; };
+		38A1AB6D1727009C00F9F9D5 /* todo.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = todo.md; sourceTree = "<group>"; };
 		38DDAA7A16EDA8990001841D /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.md; sourceTree = "<group>"; };
 		8D15AC360486D014006FF6A4 /* Ext_Chart-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Ext_Chart-Info.plist"; sourceTree = "<group>"; };
 		8D15AC370486D014006FF6A4 /* Ext Chart.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Ext Chart.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -143,6 +148,8 @@
 				3896548C16F538D90008FB8D /* EXTMatrix.m */,
 				093AEADB13E10759003E9F58 /* EXTPair.h */,
 				093AEADC13E10759003E9F58 /* EXTPair.m */,
+				389FB38B17498AF500D0FE75 /* EXTMultiplicationTables.h */,
+				389FB38C17498AF500D0FE75 /* EXTMultiplicationTables.m */,
 				3187BA2313DC6C6C00C26803 /* EXTScrollView.h */,
 				3187BA2413DC6C6C00C26803 /* EXTScrollView.m */,
 				31C77BB413E647A000E9DBFC /* EXTsettingPanelController.h */,
@@ -155,6 +162,7 @@
 				317707E013D7893A003475A2 /* EXTView.m */,
 				38DDAA7A16EDA8990001841D /* README.md */,
 				318EC0681409385F005D21D4 /* to do list.rtf */,
+				38A1AB6D1727009C00F9F9D5 /* todo.md */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -255,6 +263,7 @@
 				31EEEF65140430380035BE7A /* EXTToolPalette.xib in Resources */,
 				318EC0691409385F005D21D4 /* to do list.rtf in Resources */,
 				38DDAA7B16EDA8990001841D /* README.md in Resources */,
+				38A1AB6E1727009C00F9F9D5 /* todo.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -278,6 +287,7 @@
 				31D5D2E513F6933B00F1B2F9 /* EXTArtBoard.m in Sources */,
 				315BC80F140430B7007D49CA /* EXTToolPaletteController.m in Sources */,
 				3896548D16F538D90008FB8D /* EXTMatrix.m in Sources */,
+				389FB38D17498AF500D0FE75 /* EXTMultiplicationTables.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

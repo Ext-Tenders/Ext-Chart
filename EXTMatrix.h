@@ -26,6 +26,7 @@
     -(EXTMatrix*) columnReduce;
     -(NSMutableArray*) kernel;
     -(NSMutableArray*) image;
+    -(NSMutableArray*) actOn:(NSMutableArray*)vector;
 
     // debug operations
     -(void) log;

@@ -120,6 +120,15 @@
     return;
 }
 
+-(EXTTerm*) findTerm:(EXTPair *)loc {
+    for (EXTTerm *term in terms) {
+        if ([loc isEqual:[term location]])
+            return term;
+    }
+    
+    return nil;
+}
+
 #pragma mark *** windowController tasks ***
 
 - (NSString *)windowNibName {

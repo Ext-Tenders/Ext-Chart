@@ -224,6 +224,7 @@
     return ret;
 }
 
+// returns the product of two matrices.
 +(EXTMatrix*) newMultiply:(EXTMatrix*)left by:(EXTMatrix*)right {
     EXTMatrix *product = [EXTMatrix initWidth:[right width]
                                         height:[left height]];
@@ -246,6 +247,19 @@
     }
     
     return product;
+}
+
+// matrix acts on a vector from the left.
+-(NSMutableArray*) actOn:(NSMutableArray *)vector {
+    EXTMatrix *tempMatrix = [EXTMatrix matrixWidth:1 height:vector.count];
+    
+    [tempMatrix.presentation setObject:vector atIndexedSubscript:0];
+    
+    EXTMatrix *product = [EXTMatrix newMultiply:self by:tempMatrix];
+    
+    NSMutableArray *result = [product.presentation objectAtIndex:0];
+    
+    return result;
 }
 
 // debug routine to dump the matrix to the console.

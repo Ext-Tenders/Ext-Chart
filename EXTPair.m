@@ -30,6 +30,12 @@
 	return NSMakePoint([self a], [self b]);
 }
 
++(EXTPair*) addPairs:(EXTPair *)a to:(EXTPair *)b {
+    return [EXTPair pairWithA:(a.a+b.a) B:(a.b+b.b)];
+}
+
+/// NSCoder routines ///
+
 - (id) copyWithZone:(NSZone*) zone {
 	EXTPair* copy = [[EXTPair alloc] init];
 	[copy setA:[self a]];

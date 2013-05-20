@@ -21,6 +21,8 @@
 // more sophisticated variant of modules is going to take a substantial rewrite.
 @interface EXTTerm : NSObject <NSCoding>
     {
+        // TODO: the May SS is trigraded; EXTPair should be a subclass of some
+        // interface class tracking this sort of behavior.
         EXTPair* location;          // position on grid
         NSMutableArray* names;      // contains NSString's, basis element names
         // TODO: this next item means we need to understand some kind of linear

@@ -18,5 +18,6 @@
 + (id) pairWithA:(int)aa B:(int)bb;
 - (NSPoint) makePoint;
 -(NSString *) description;
++(EXTPair*) addPairs:(EXTPair*)a to:(EXTPair*)b;
 
 @end
