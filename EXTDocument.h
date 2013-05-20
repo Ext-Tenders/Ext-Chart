@@ -9,13 +9,14 @@
 
 #import <Cocoa/Cocoa.h>
 #import "EXTView.h"
-@class EXTGrid, EXTArtBoard;
+@class EXTGrid, EXTArtBoard, EXTMultiplicationTables;
 
 @interface EXTDocument : NSDocument
 {
 	// file data
     NSMutableArray *terms;
     NSMutableArray *differentials;
+    EXTMultiplicationTables *multTables;
 	
 	// view configuration
 	CGFloat gridSpacing;
@@ -42,6 +43,7 @@
 @property(retain) EXTGrid *theGrid;
 @property(retain) NSMutableArray *terms;
 @property(retain) NSMutableArray *differentials;
+@property(retain) EXTMultiplicationTables *multTables;
 
 -(void)randomize;
 -(void)drawPagesUpTo: (NSUInteger) pageNumber;

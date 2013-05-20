@@ -21,6 +21,7 @@
 @property(retain) EXTDocument *document;
 
 -(id) init;
++(id) multiplicationTables:(EXTDocument*)document;
 
 -(EXTMatrix*) getMatrixFor:(EXTPair*)loc1 with:(EXTPair*)loc2;
 

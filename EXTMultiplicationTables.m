@@ -15,10 +15,20 @@
 @synthesize document;
 
 -(id) init {
-    tables = [NSMutableDictionary dictionary];
-    document = nil;
+    [super init];
+    
+    [self setTables:[NSMutableDictionary dictionary]];
+    [self setDocument:nil];
     
     return self;
+}
+
++(id) multiplicationTables:(EXTDocument *)document {
+    EXTMultiplicationTables *ret = [[EXTMultiplicationTables alloc] init];
+    
+    [ret setDocument:document];
+    
+    return [ret autorelease];
 }
 
 // TODO: for the moment, note that this is order-sensitive.
@@ -26,7 +36,7 @@
     // start by trying to pull the matrix out of the dictionary.
     NSString *key = [NSString stringWithFormat:@"%@ %@",
                      [loc1 description], [loc2 description]];
-    EXTMatrix *ret = [tables valueForKey:key];
+    EXTMatrix *ret = [tables objectForKey:key];
     
     // if we can't find it, then we should instantiate it.
     if (!ret) {

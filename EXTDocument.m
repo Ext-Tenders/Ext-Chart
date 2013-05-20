@@ -13,6 +13,7 @@
 #import "EXTterm.h"
 #import "EXTPair.h"
 #import "EXTdifferential.h"
+#import "EXTMultiplicationTables.h"
 
 @implementation EXTDocument
 
@@ -20,7 +21,7 @@
 @synthesize theArtBoard;
 @synthesize theGrid;
 @synthesize maxPage;
-@synthesize terms, differentials;
+@synthesize terms, differentials, multTables;
 #pragma mark *** initialization and dealloc ***
 
 - (id)init {
@@ -36,6 +37,7 @@
         // and allocate the internal parts of things
         [self setTerms:[NSMutableArray array]];
         [self setDifferentials:[NSMutableArray array]];
+        [self setMultTables:[EXTMultiplicationTables multiplicationTables:self]];
     }
 
     return self;
@@ -46,7 +48,11 @@
     // remove all the old garbage
     [self setTerms:[NSMutableArray array]];
     [self setDifferentials:[NSMutableArray array]];
-    
+
+    // this old test code initializes the grid with some random stuff.  that's
+    // neat, but it's not organized enough to test the multiplicative structure,
+    // so i'm going to skip it for now.
+/*
     // add some new garbage.
     // TODO: this ought to randomize the dimension too.
     // XXX: this doesn't catch collisions.
@@ -116,6 +122,39 @@
     [differentials addObject:differential1];
     [[differential2.presentation.presentation objectAtIndex:1] setObject:@(1) atIndex:0];
     [differentials addObject:differential2];
+ */
+    
+    // add the terms in the SSS for S^1 --> S^5 --> CP^2
+    EXTTerm *e   = [EXTTerm term:[EXTPair pairWithA:1 B:0]
+                        andNames:[NSMutableArray arrayWithArray:@[@"e"]]],
+            *x   = [EXTTerm term:[EXTPair pairWithA:0 B:2]
+                        andNames:[NSMutableArray arrayWithArray:@[@"x"]]],
+            *ex  = [EXTTerm term:[EXTPair pairWithA:1 B:2]
+                        andNames:[NSMutableArray arrayWithArray:@[@"ex"]]],
+            *x2  = [EXTTerm term:[EXTPair pairWithA:0 B:4]
+                        andNames:[NSMutableArray arrayWithArray:@[@"x2"]]],
+            *ex2 = [EXTTerm term:[EXTPair pairWithA:1 B:4]
+                        andNames:[NSMutableArray arrayWithArray:@[@"ex2"]]],
+            *one = [EXTTerm term:[EXTPair pairWithA:0 B:0]
+                        andNames:[NSMutableArray arrayWithArray:@[@"1"]]];
+    
+    [terms addObjectsFromArray:@[one,e,x,ex,x2,ex2]];
+    
+    EXTDifferential *firstdiff = [EXTDifferential differential:e end:x page:2];
+    [[firstdiff.presentation.presentation objectAtIndex:0] setObject:@1 atIndexedSubscript:0];
+    [differentials addObject:firstdiff];
+    
+    // e * x
+    EXTMatrix *exMatrix = [multTables getMatrixFor:[e location] with:[x location]];
+    [exMatrix.presentation setObject:@[@1] atIndexedSubscript:0];
+    
+    // ex * x
+    EXTMatrix *exxMatrix = [multTables getMatrixFor:[ex location] with:[x location]];
+    [exxMatrix.presentation setObject:@[@1] atIndexedSubscript:0];
+    
+    // e * x2
+    EXTMatrix *ex2Matrix = [multTables getMatrixFor:[e location] with:[x2 location]];
+    [ex2Matrix.presentation setObject:@[@1] atIndexedSubscript:0];
     
     return;
 }
