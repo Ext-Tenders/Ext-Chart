@@ -11,11 +11,38 @@
 #import "EXTGrid.h"
 #import "EXTTerm.h"
 
+// little class to keep track of partial subdefinitions of a parent differential
+@implementation EXTPartialDifferential
+
+@synthesize inclusion;
+@synthesize differential;
+@synthesize automaticallyGenerated;
+
+// TODO: make the boolean flag into (change to true)-only, like a dirty flag.
+// use this to decide whether to prompt the user when deleting partial
+// definitions, or generally when performing any other destructive operation.
+
+@end
+
+
+// redeclare part of the EXTDifferential interface so that we synthesize both
+// getters *and* setters for the publicly read-only properties.
+@interface EXTDifferential ()
+
+@property(retain) NSMutableArray *partialDefinitions;
+@property(retain) EXTMatrix *presentation;
+
+@end
+
+
+// actual class housing the differential information
 @implementation EXTDifferential
 
 @synthesize page;
 @synthesize start, end;
+@synthesize partialDefinitions;
 @synthesize presentation;
+@synthesize wellDefined;
 
 +(id) newDifferential:(EXTTerm *)start end:(EXTTerm *)end page:(int)page {
     EXTDifferential *object = [EXTDifferential alloc];
@@ -37,9 +64,32 @@
     EXTDifferential *differential =
         [EXTDifferential newDifferential:start end:end page:page];
     
-    [differential autorelease];
+    return [differential autorelease];
+}
+
+-(void) assemblePresentation {
+    // create a list of all the image vectors in all the partial definitions
     
-    return differential;
+    // put them together and find their collective image.
+    
+    // if it has rank less than the rank of the cycle groups, then set the
+    // wellDefined flag to false and quit.
+    
+    // otherwise, pick off a minimal set of vectors which contribute to the
+    // image, remembering which definition they came from and which column
+    // vector they were in there.
+    
+    // construct a matrix presenting the differential in this basis
+    
+    // construct a matrix inverting this basis matrix
+    
+    // multiply to get a matrix presenting the differential in the std basis.
+    
+    // store it and set the wellDefined flag to true.
+    
+    NSLog(@"XXX: Not yet implemented.");
+    
+    return;
 }
 
 +(id) dealWithClick:(NSPoint)location document:(EXTDocument *)document {
@@ -122,24 +172,5 @@
 // 		[extPage setModified:YES];
 //	}
 }
-
-#pragma mark *** tools for calculation homology (must be overridden in subclasses) ***
-
-- (id) kernel{
-	return nil;	
-}
-- (id) cokernel{
-	return nil;
-}
-
-- (void) replaceSourceByKernel{
-// override in subclasses.   For our "boolean" version, every non-zero map is an isomorphism, so
-
-}
-
-- (void) replaceTargetByCokernel{
-	
-}
-
 
 @end

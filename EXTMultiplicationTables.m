@@ -185,6 +185,8 @@
     
     // store the array actions as the acting matrix for a partial definition.
     
+    NSLog(@"XXX: Still not implemented yet.");
+    
     return;
 }
 

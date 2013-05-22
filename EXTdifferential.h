@@ -13,13 +13,28 @@
 @class EXTGrid;
 @class EXTPage;
 
+
+// this class models "partial definitions" of a differential.  for instance, we
+// have inference code that determines the differential on the image of a cup
+// product map E_{p, q} (x) E_{p', q'} --> E_{p+p', q+q'}.  there's no reason
+// for that map to be surjective, so instead this determines the behavior of the
+// differential only on the subspace that is its image.
 //
-// TODO: a real question is how to implement "partial definitions" of a
-// differential.  like if you know that dx = e but not the rest of the
-// differential, which you compute later, what do you do?  add them?  adding
-// requires a sort of orthogonal complement to make sure you don't muck up
-// what's already there.  this seems like a pretty complicated problem...
-//
+// such partial definitions are not trivial to stitch together, and so to do
+// that successfully, we just record all the definitions we have, together.
+@interface EXTPartialDifferential : NSObject {
+    EXTMatrix *inclusion;
+    EXTMatrix *differential;
+    bool automaticallyGenerated;
+}
+
+@property (retain) EXTMatrix *inclusion;
+@property (retain) EXTMatrix *differential;
+@property (assign) bool automaticallyGenerated;
+
+@end
+
+
 
 // this class models a differential in the spectral sequence.
 // XXX: we don't implement NSCoding!
@@ -28,22 +43,33 @@
         EXTTerm *start, *end;
         int page;
         
-        // TODO: change this to allow for partial presentations.
-        // this will probably require a separate object, some kind of subdiff'l.
-        EXTMatrix *presentation;
+        NSMutableArray *partialDefinitions; // array of EXTPartialDifferential's
+        EXTMatrix *presentation;            // assembled from the array
+        bool wellDefined;                   // false if definitions don't span
     }
 
     @property(retain) EXTTerm *start, *end;
     @property(assign) int page;
-    @property(retain) EXTMatrix *presentation;
+    @property(retain,readonly) NSMutableArray *partialDefinitions;
+    @property(readonly,retain) EXTMatrix *presentation;
+    @property(assign) bool wellDefined;
 
+    // constructors
     +(id) newDifferential:(EXTTerm *)start end:(EXTTerm *)end page:(int)page;
     +(id) differential:(EXTTerm *)start end:(EXTTerm *)end page:(int)page;
 
+    // deal wih its
+    -(void) assemblePresentation;
+
+    // UI messages
     -(void) drawWithSpacing:(CGFloat)spacing;
     +(id) dealWithClick:(NSPoint)location document:(EXTDocument*)document;
 @end
 
+
+
+
+// here's Mike's old class, in case i need to reference the interface for sth.
 #if 0
 @interface EXTDifferential : NSObject <NSCoding> {
 	EXTPair* start;
