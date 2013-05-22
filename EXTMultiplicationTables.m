@@ -15,6 +15,9 @@
 @synthesize tables;
 @synthesize document;
 
+// XXX: general oversight: i don't check for when the target term exists.  this
+// surely must get in the way sometimes...
+
 -(id) init {
     [super init];
     
@@ -99,9 +102,7 @@
     for (NSMutableArray *column in image) {
         for (int i = 0; i < product.presentation.count; i++) {
             bool isThisOne = true;
-            for (int j = 0;
-                 j < [[product.presentation objectAtIndex:i] count];
-                 j++) {
+            for (int j = 0; j < [product.presentation[i] count]; j++) {
                 if ([[[product.presentation objectAtIndex:i] objectAtIndex:j] intValue] != [[column objectAtIndex:j] intValue]) {
                     isThisOne = false;
                     

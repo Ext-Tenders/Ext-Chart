@@ -67,17 +67,62 @@
     return [differential autorelease];
 }
 
+// this routine assembles from the available partial definitions of the
+// differential a single definition on the cycle group.  it's a bit convoluted.
 -(void) assemblePresentation {
-    // create a list of all the image vectors in all the partial definitions
+    NSMutableArray *imageVectors = [NSMutableArray array], // array of vectors
+        *imageParents = [NSMutableArray array], // def'n indices they belong to
+        *imageIndices = [NSMutableArray array]; // column indices they belong to
     
-    // put them together and find their collective image.
+    // assemble all the inclusion image vectors into one massive array.
+    for (int i = 0; i < self.partialDefinitions.count; i++) {
+        EXTPartialDifferential *workingPartial = self.partialDefinitions[i];
+        NSMutableArray *workingVectors = workingPartial.inclusion.presentation;
+        for (int j = 0; j < workingVectors.count; j++) {
+            [imageVectors addObject:workingVectors[j]];
+            [imageParents addObject:@(i)];
+            [imageIndices addObject:@(j)];
+        }
+    }
     
-    // if it has rank less than the rank of the cycle groups, then set the
-    // wellDefined flag to false and quit.
+    // the point of doing that was to perform column reduction and find a
+    // minimal spanning set for their image.
+    EXTMatrix *enormousMat = [EXTMatrix matrixWidth:imageVectors.count
+                                             height:[imageVectors[0] count]];
+    enormousMat.presentation = imageVectors;
+    enormousMat = [enormousMat columnReduce];
     
-    // otherwise, pick off a minimal set of vectors which contribute to the
-    // image, remembering which definition they came from and which column
-    // vector they were in there.
+    // from this, let's extract a *minimal* generating set for the image.  if
+    // the inclusions are jointly of full rank, we'll need this for later
+    // calculations.  if they aren't of full rank, we can use this to see that
+    // and bail if necessary.
+    NSMutableArray *minimalVectors = [NSMutableArray array],
+                   *minimalParents = [NSMutableArray array],
+                   *minimalIndices = [NSMutableArray array];
+    
+    for (int i = 0; i < enormousMat.width; i++) {
+        bool isEmpty = true;
+        
+        for (int j = 0; j < enormousMat.height; j++)
+            if (enormousMat.presentation[i][j] != 0)
+                isEmpty = false;
+        
+        // if this vector is inessential, it will have been eliminated by rcef.
+        if (isEmpty)
+            continue;
+        
+        // if it's essential, we should add it. :)
+        [minimalVectors addObject:enormousMat.presentation[i]];
+        [minimalParents addObject:imageParents[i]];
+        [minimalIndices addObject:imageIndices[i]];
+    }
+    
+    // TODO: maybe we should extend by 0 in some underdetermined way?  this
+    // might be mildly more preferable to just failing outright.
+    if (minimalVectors.count != [start.cycles[page] count]) { // if too few...
+        wellDefined = false; // ... mark that we failed
+        return;              //     and then jump back.
+    }
     
     // construct a matrix presenting the differential in this basis
     
