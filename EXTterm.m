@@ -165,6 +165,8 @@
     }
     
     // iterate through the differentials, looking for more cycles
+    //
+    // XXX: USE EXTRACTED FIND-DIFFERENTIAL ROUTINE
     for (EXTDifferential *differential in differentials) {
         if (([differential start] != self) ||     // if we're not the source...
             ([differential page]+1 != whichPage)) // ...or this isn't the page...
@@ -216,6 +218,7 @@
     
     NSMutableArray *newBoundaries = [NSMutableArray array];
     
+    // XXX: USE BUILT-IN FIND-DIFFERENTIAL ROUTINE.
     for (EXTDifferential *differential in differentials) {
         if (([differential end] != self) ||
             ([differential page]+1 != whichPage))

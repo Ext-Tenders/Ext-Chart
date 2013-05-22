@@ -200,7 +200,7 @@
 // returns a basis for the image of a matrix
 -(NSMutableArray*) image {
     EXTMatrix *reduced = [self columnReduce];
-    NSMutableArray *ret = [[NSMutableArray alloc] init];
+    NSMutableArray *ret = [NSMutableArray array];
     
     // iterate through the columns
     for (int i = 0; i < [reduced width]; i++) {
@@ -216,10 +216,10 @@
             continue; // so skip it.
         
         // and, if it's not all zeroes, we should add it to the collection.
-        [ret addObject:column];
+        // NOTE: it's important that we actually return a column from the
+        // original matrix.  this is used elsewhere.
+        [ret addObject:[[self presentation] objectAtIndex:i]];
     }
-    
-    [ret autorelease];
     
     return ret;
 }

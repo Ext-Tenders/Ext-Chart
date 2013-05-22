@@ -51,7 +51,8 @@
 //- (NSUInteger) maxPage;
 
 -(EXTTerm*) findTerm:(EXTPair*)loc;
-
+-(EXTDifferential*) findDifflWithSource:(EXTPair*)loc onPage:(int)page;
+-(EXTDifferential*) findDifflWithTarget:(EXTPair*)loc onPage:(int)page;
 
 @end
 

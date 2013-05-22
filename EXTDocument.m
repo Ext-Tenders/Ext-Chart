@@ -52,7 +52,8 @@
     // this old test code initializes the grid with some random stuff.  that's
     // neat, but it's not organized enough to test the multiplicative structure,
     // so i'm going to skip it for now.
-/*
+
+    /*
     // add some new garbage.
     // TODO: this ought to randomize the dimension too.
     // XXX: this doesn't catch collisions.
@@ -122,7 +123,7 @@
     [differentials addObject:differential1];
     [[differential2.presentation.presentation objectAtIndex:1] setObject:@(1) atIndex:0];
     [differentials addObject:differential2];
- */
+     */
     
     // add the terms in the SSS for S^1 --> S^5 --> CP^2
     EXTTerm *e   = [EXTTerm term:[EXTPair pairWithA:1 B:0]
@@ -153,7 +154,7 @@
     [[multTables getMatrixFor:[x location] with:[ex location]].presentation setObject:@[@1] atIndexedSubscript:0];
     [[multTables getMatrixFor:[x2 location] with:[e location]].presentation setObject:@[@1] atIndexedSubscript:0];
     
-    [multTables updateDifferentials:[e location] with:[x location]];
+    [multTables computeLeibniz:[e location] with:[x location] onPage:2];
     
     return;
 }
@@ -163,6 +164,22 @@
         if ([loc isEqual:[term location]])
             return term;
     }
+    
+    return nil;
+}
+
+-(EXTDifferential*) findDifflWithSource:(EXTPair *)loc onPage:(int)page {
+    for (EXTDifferential *diffl in differentials)
+        if (([[diffl start] location] == loc) && ([diffl page] == page))
+            return diffl;
+    
+    return nil;
+}
+
+-(EXTDifferential*) findDifflWithTarget:(EXTPair *)loc onPage:(int)page {
+    for (EXTDifferential *diffl in differentials)
+        if (([[diffl end] location] == loc) && ([diffl page] == page))
+            return diffl;
     
     return nil;
 }

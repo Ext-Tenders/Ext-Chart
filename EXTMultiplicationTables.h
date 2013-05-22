@@ -28,6 +28,6 @@
 -(NSMutableArray*) multiplyClass:(NSMutableArray*)class1 at:(EXTPair*)loc1
                             with:(NSMutableArray*)class2 at:(EXTPair*)loc2;
 
--(void) updateDifferentials:(EXTPair*)loc1 with:(EXTPair*)loc2;
+-(void) computeLeibniz:(EXTPair*)loc1 with:(EXTPair*)loc2 onPage:(int)page;
 
 @end

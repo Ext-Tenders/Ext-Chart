@@ -27,8 +27,10 @@
     {
         EXTTerm *start, *end;
         int page;
+        
+        // TODO: change this to allow for partial presentations.
+        // this will probably require a separate object, some kind of subdiff'l.
         EXTMatrix *presentation;
-        // some sort of presentation
     }
 
     @property(retain) EXTTerm *start, *end;

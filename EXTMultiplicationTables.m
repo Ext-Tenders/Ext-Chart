@@ -8,6 +8,7 @@
 
 #import "EXTMultiplicationTables.h"
 #import "EXTterm.h"
+#import "EXTdifferential.h"
 
 @implementation EXTMultiplicationTables
 
@@ -87,8 +88,101 @@
     return [productRule actOn:hadamardVector];
 }
 
--(void) updateDifferentials:(EXTPair *)loc1 with:(EXTPair *)loc2 {
-    NSLog(@"This isn't implemented yet.");
+-(void) computeLeibniz:(EXTPair *)loc1 with:(EXTPair *)loc2 onPage:(int)page {
+    // find a basis for the image of the product map, and select which vectors
+    // we need to multiply to get them.
+    EXTMatrix *product = [self getMatrixFor:loc1 with:loc2];
+    NSMutableArray *image = [product image];
+    
+    // extract which columns contributed to the image of the product map
+    NSMutableArray *indices = [NSMutableArray array];
+    for (NSMutableArray *column in image) {
+        for (int i = 0; i < product.presentation.count; i++) {
+            bool isThisOne = true;
+            for (int j = 0;
+                 j < [[product.presentation objectAtIndex:i] count];
+                 j++) {
+                if ([[[product.presentation objectAtIndex:i] objectAtIndex:j] intValue] != [[column objectAtIndex:j] intValue]) {
+                    isThisOne = false;
+                    
+                    break;
+                }
+            }
+            
+            if (!isThisOne) // if the image col mismatched the working col...
+                continue;   // then skip to the next working column.
+            
+            [indices addObject:@(i)]; // otherwise, add this index to the array
+            break;                    // and skip to the next image column.
+        }
+    }
+    
+    // compute the action of the differentials on each factor in the
+    // product decomposition: d(xy) = dx y + x dy.
+    // XXX: deal with sign errors here.
+    EXTTerm *term1 = [document findTerm:loc1],
+            *term2 = [document findTerm:loc2],
+          *sumterm = [document findTerm:[EXTPair addPairs:loc1 to:loc2]];
+    EXTDifferential *d1 = [document findDifflWithSource:loc1 onPage:page],
+                    *d2 = [document findDifflWithSource:loc2 onPage:page];
+    NSMutableArray *actions = [NSMutableArray array];
+    
+    for (NSNumber *hadamardPosition in indices) {
+        int unwrappedPosition = [hadamardPosition intValue];
+        
+        // extract the actual en | fm pure tensor term
+        int f = unwrappedPosition % [term1 names].count,
+            e = unwrappedPosition - f * [term1 names].count;
+        
+        // assemble vectors expressing en and fm
+        NSMutableArray *en = [NSMutableArray array];
+        for (int i = 0; i < [term1 names].count; i++) {
+            if (i == e)
+                [en setObject:@(1) atIndexedSubscript:i];
+            else
+                [en setObject:@(0) atIndexedSubscript:i];
+        }
+        
+        NSMutableArray *fm = [NSMutableArray array];
+        for (int j = 0; j < [term2 names].count; j++) {
+            if (j == f)
+                [fm setObject:@(1) atIndexedSubscript:j];
+            else
+                [fm setObject:@(0) atIndexedSubscript:j];
+        }
+        
+        // apply the differential matrices to them individually.
+        // we have to be careful here --- missing differentials are implicit 0s.
+        //
+        // XXX: how do we know that these are up-to-date?  should EXTDiff'l
+        // automatically try to compute a presentation when it's accessed?
+        NSMutableArray *summand1 = nil, *summand2 = nil;
+        if (d1) {
+            NSMutableArray *den = [[d1 presentation] actOn:en];
+            summand1 = [self multiplyClass:den at:[d1 end].location
+                                      with:fm at:loc2];
+        } else
+            for (int i = 0; i < sumterm.names.count; i++)
+                [summand1 setObject:@(0) atIndexedSubscript:i];
+        if (d2) {
+            NSMutableArray *dfm = [[d2 presentation] actOn:fm];
+            summand1 = [self multiplyClass:en at:loc1
+                                      with:dfm at:[d2 end].location];
+        } else
+            for (int i = 0; i < sumterm.names.count; i++)
+                [summand2 setObject:@(0) atIndexedSubscript:i];
+        
+        // sum and store to the list of actions.
+        NSMutableArray *sum = [NSMutableArray array];
+        for (int i = 0; i < summand1.count; i++)
+            [sum setObject:@([[summand1 objectAtIndex:i] intValue] +
+                             [[summand2 objectAtIndex:i] intValue])
+                 atIndexedSubscript:i];
+        
+        [actions addObject:sum];
+    }
+    
+    // store the array actions as the acting matrix for a partial definition.
     
     return;
 }
