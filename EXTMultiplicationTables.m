@@ -67,9 +67,9 @@
     // using dictionary ordering in the two slots.
     for (int i = 0; i < vec1.count; i++)
         for (int j = 0; j < vec2.count; j++)
-            [ret setObject:([[vec1 objectAtIndex:i] intValue] *
-                            [[vec2 objectAtIndex:j] intValue])
-                 atIndexedSubscript:@(vec1.count * i + j)];
+            [ret setObject:@([[vec1 objectAtIndex:i] intValue] *
+                             [[vec2 objectAtIndex:j] intValue])
+                 atIndexedSubscript:(vec1.count * i + j)];
     
     return ret;
 }
@@ -156,7 +156,8 @@
         //
         // XXX: how do we know that these are up-to-date?  should EXTDiff'l
         // automatically try to compute a presentation when it's accessed?
-        NSMutableArray *summand1 = nil, *summand2 = nil;
+        NSMutableArray *summand1 = [NSMutableArray array],
+                       *summand2 = [NSMutableArray array];
         if (d1) {
             NSMutableArray *den = [[d1 presentation] actOn:en];
             summand1 = [self multiplyClass:den at:[d1 end].location
@@ -178,7 +179,7 @@
             [sum setObject:@([[summand1 objectAtIndex:i] intValue] +
                              [[summand2 objectAtIndex:i] intValue])
                  atIndexedSubscript:i];
-        
+
         [actions addObject:sum];
     }
     

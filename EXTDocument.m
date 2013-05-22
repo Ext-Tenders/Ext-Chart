@@ -153,6 +153,8 @@
     [[multTables getMatrixFor:[x location] with:[e location]].presentation setObject:@[@1] atIndexedSubscript:0];
     [[multTables getMatrixFor:[x location] with:[ex location]].presentation setObject:@[@1] atIndexedSubscript:0];
     [[multTables getMatrixFor:[x2 location] with:[e location]].presentation setObject:@[@1] atIndexedSubscript:0];
+    [[multTables getMatrixFor:[x location] with:[x location]].presentation setObject:@[@1] atIndexedSubscript:0];
+
     
     [multTables computeLeibniz:[e location] with:[x location] onPage:2];
     
