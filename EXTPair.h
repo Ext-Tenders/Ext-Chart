@@ -19,5 +19,7 @@
 - (NSPoint) makePoint;
 -(NSString *) description;
 +(EXTPair*) addPairs:(EXTPair*)a to:(EXTPair*)b;
++(EXTPair*) followDiffl:(EXTPair*)a page:(int)page;
++(EXTPair*) reverseDiffl:(EXTPair*)b page:(int)page;
 
 @end

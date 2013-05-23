@@ -121,9 +121,10 @@
     // compute the action of the differentials on each factor in the
     // product decomposition: d(xy) = dx y + x dy.
     // XXX: deal with sign errors here.
+    EXTPair *sumloc = [EXTPair addPairs:loc1 to:loc2];
     EXTTerm *term1 = [document findTerm:loc1],
             *term2 = [document findTerm:loc2],
-          *sumterm = [document findTerm:[EXTPair addPairs:loc1 to:loc2]];
+          *sumterm = [document findTerm:sumloc];
     EXTDifferential *d1 = [document findDifflWithSource:loc1 onPage:page],
                     *d2 = [document findDifflWithSource:loc2 onPage:page];
     NSMutableArray *actions = [NSMutableArray array];
@@ -185,8 +186,28 @@
     }
     
     // store the array actions as the acting matrix for a partial definition.
+    EXTDifferential *diffl = [document findDifflWithSource:sumloc onPage:page];
+    // if the differential we're trying to write to doesn't yet exist, build it.
+    if (!diffl) {
+        EXTTerm *targetterm =
+                    [document findTerm:[EXTPair followDiffl:sumloc page:page]];
+        diffl = [EXTDifferential differential:sumterm end:targetterm page:page];
+        [[document differentials] addObject:diffl];
+    }
     
-    NSLog(@"XXX: Still not implemented yet.");
+    // set up the partial definition matrices
+    EXTPartialDifferential *partial = [[EXTPartialDifferential alloc] init];
+    EXTMatrix *differential = [EXTMatrix matrixWidth:actions.count
+                                              height:[actions[0] count]],
+              *inclusion = [EXTMatrix matrixWidth:actions.count
+                                           height:[actions[0] count]];
+    differential.presentation = image;
+    inclusion.presentation = actions;
+    partial.differential = differential;
+    partial.inclusion = inclusion;
+    
+    // and, finally, add it to the list of partial definitions. :)
+    [[diffl partialDefinitions] addObject:[partial autorelease]];
     
     return;
 }

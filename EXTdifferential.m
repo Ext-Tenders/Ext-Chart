@@ -18,6 +18,17 @@
 @synthesize differential;
 @synthesize automaticallyGenerated;
 
+-(EXTPartialDifferential*) init {
+    [super init];
+    
+    // we don't keep track of enough information about dimensions to make the
+    // appropriate initialization calls to EXTMatrix factories.
+    inclusion = nil;
+    differential = nil;
+    
+    return self;
+}
+
 // TODO: make the boolean flag into (change to true)-only, like a dirty flag.
 // use this to decide whether to prompt the user when deleting partial
 // definitions, or generally when performing any other destructive operation.
@@ -56,6 +67,8 @@
     // page 0 instead, but that is probably ALSO not what we want.  this needs
     // to be thought through.
     [object setPresentation:[EXTMatrix matrixWidth:[start dimension:0] height:[end dimension:0]]];
+    object.wellDefined = false;
+    object.partialDefinitions = [NSMutableArray array];
     
     return object;
 }

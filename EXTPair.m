@@ -34,6 +34,14 @@
     return [EXTPair pairWithA:(a.a+b.a) B:(a.b+b.b)];
 }
 
++(EXTPair*) followDiffl:(EXTPair*)a page:(int)page {
+    return [EXTPair pairWithA:(a.a-1) B:(a.b+page)];
+}
+
++(EXTPair*) reverseDiffl:(EXTPair*)b page:(int)page {
+    return [EXTPair pairWithA:(b.a+1) B:(b.b-page)];
+}
+
 /// NSCoder routines ///
 
 - (id) copyWithZone:(NSZone*) zone {
