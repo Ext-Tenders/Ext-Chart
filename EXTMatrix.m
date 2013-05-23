@@ -268,7 +268,7 @@
     for (int i = 0; i < width; i++)
         [[ret.presentation objectAtIndex:i] setObject:@1 atIndexedSubscript:i];
     
-    return [ret autorelease];
+    return ret;
 }
 
 -(EXTMatrix*) invert {

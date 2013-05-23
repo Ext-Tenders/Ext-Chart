@@ -28,7 +28,7 @@
 }
 
 +(id) multiplicationTables:(EXTDocument *)document {
-    EXTMultiplicationTables *ret = [[EXTMultiplicationTables alloc] init];
+    EXTMultiplicationTables *ret = [EXTMultiplicationTables new];
     
     [ret setDocument:document];
     
@@ -196,7 +196,7 @@
     }
     
     // set up the partial definition matrices
-    EXTPartialDifferential *partial = [[EXTPartialDifferential alloc] init];
+    EXTPartialDifferential *partial = [EXTPartialDifferential new];
     EXTMatrix *differential = [EXTMatrix matrixWidth:actions.count
                                               height:[actions[0] count]],
               *inclusion = [EXTMatrix matrixWidth:actions.count

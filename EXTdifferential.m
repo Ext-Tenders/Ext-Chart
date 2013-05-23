@@ -158,13 +158,14 @@
     EXTMatrix *augmentedMat =
         [EXTMatrix matrixWidth:augmentedVectors.count height:end.names.count];
     augmentedMat.presentation = augmentedVectors;
-    [augmentedMat columnReduce];
+    EXTMatrix *reducedMat = [augmentedMat columnReduce];
+    NSMutableArray *reducedVectors = reducedMat.presentation;
     
     // having reduced it, we pull out the basis vectors we needed for extension
-    for (int i = minimalVectors.count; i < augmentedVectors.count; i++) {
+    for (int i = minimalVectors.count; i < reducedVectors.count; i++) {
         bool needThisOne = true;
-        for (int j = 0; j < [augmentedVectors[i] count]; j++) {
-            if ([augmentedVectors[i] objectAtIndex:j] != 0)
+        for (int j = 0; j < [reducedVectors[i] count]; j++) {
+            if ([reducedVectors[i] objectAtIndex:j] != 0)
                 needThisOne = false;
         }
         
@@ -174,9 +175,9 @@
     
     // and so here's our basis matrix.
     EXTMatrix *basisMatrix =
-        [EXTMatrix matrixWidth:augmentedVectors.count
-                        height:[augmentedVectors[0] count]];
-    basisMatrix.presentation = augmentedVectors;
+        [EXTMatrix matrixWidth:minimalVectors.count
+                        height:[minimalVectors[0] count]];
+    basisMatrix.presentation = minimalVectors;
 
     // now, we construct a matrix presenting the differential in this basis.
     // this is where the partial definitions actually get used.
@@ -187,11 +188,11 @@
         if (i < minimalParents.count) {
             EXTPartialDifferential *pdiffl =
                 [partialDefinitions
-                        objectAtIndex:[minimalParents objectAtIndex:i]];
+                    objectAtIndex:[[minimalParents objectAtIndex:i] intValue]];
             EXTMatrix *diffl = [pdiffl differential];
             differentialInCoordinates.presentation[i] =
                 [[diffl presentation]
-                        objectAtIndex:[minimalIndices objectAtIndex:i]];
+                    objectAtIndex:[[minimalIndices objectAtIndex:i] intValue]];
         } else {
             // otherwise, extend by zero.
             NSMutableArray *workingColumn = [NSMutableArray array];

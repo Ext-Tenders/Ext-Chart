@@ -172,6 +172,9 @@
             ([differential page]+1 != whichPage)) // ...or this isn't the page...
             continue;                             // then skip this differential.
         
+        // before touching the differential, we need to get it up-to-date.
+        [differential assemblePresentation];
+        
         // ask for the kernel of this differential
         EXTMatrix *cycleMatrix = [EXTMatrix matrixWidth:oldCycles.count height:names.count];
         [cycleMatrix setPresentation:oldCycles];
@@ -223,6 +226,9 @@
         if (([differential end] != self) ||
             ([differential page]+1 != whichPage))
             continue;
+        
+        // clean up the differential's presentation before touching it
+        [differential assemblePresentation];
         
         // XXX: maybe we should right-multiply by the cycle matrix first?
         NSMutableArray *image = [[differential presentation] image];

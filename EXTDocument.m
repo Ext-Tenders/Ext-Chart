@@ -141,10 +141,24 @@
     
     [terms addObjectsFromArray:@[one,e,x,ex,x2,ex2]];
     
+    [extview setPageInView:1];
+    [extview setPageInView:2];
+    [extview setPageInView:0];
+    
     // add a single differential
     EXTDifferential *firstdiff = [EXTDifferential differential:e end:x page:2];
-    [[firstdiff.presentation.presentation objectAtIndex:0] setObject:@1 atIndexedSubscript:0];
+    EXTPartialDifferential *firstpartial = [EXTPartialDifferential new];
+    EXTMatrix *inclusion = [EXTMatrix matrixWidth:1 height:1];
+    EXTMatrix *differential = [EXTMatrix matrixWidth:1 height:1];
+    [[inclusion.presentation objectAtIndex:0] setObject:@1 atIndex:0];
+    [[differential.presentation objectAtIndex:0] setObject:@1 atIndex:0];
+    firstpartial.inclusion = inclusion;
+    firstpartial.differential = differential;
+    firstdiff.partialDefinitions[0] = [firstpartial autorelease];
     [differentials addObject:firstdiff];
+    
+    // TODO: need to assemble the cycle groups for lower pages first...
+    [firstdiff assemblePresentation]; // test!
     
     // specify the multiplicative structure
     [[multTables getMatrixFor:[e location] with:[x location]].presentation setObject:@[@1] atIndexedSubscript:0];
