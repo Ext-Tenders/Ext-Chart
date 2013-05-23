@@ -112,27 +112,93 @@
             continue;
         
         // if it's essential, we should add it. :)
-        [minimalVectors addObject:enormousMat.presentation[i]];
+        [minimalVectors addObject:imageVectors[i]];
         [minimalParents addObject:imageParents[i]];
         [minimalIndices addObject:imageIndices[i]];
     }
     
-    // TODO: maybe we should extend by 0 in some underdetermined way?  this
-    // might be mildly more preferable to just failing outright.
-    if (minimalVectors.count != [start.cycles[page] count]) { // if too few...
-        wellDefined = false; // ... mark that we failed
-        return;              //     and then jump back.
+    // then, if we have too few vectors left to be of full rank...
+    if (minimalVectors.count != [start.cycles[page] count])
+        wellDefined = false; // ... then mark that we failed
+    else
+        wellDefined = true;  // ... otherwise, mark that we're good to go.
+    
+    // we want to extend this basis of the cycle groups to a basis of the entire
+    // E_1 term.  start by augmenting to a matrix containing a definite surplus
+    // of basis vectors.
+    NSMutableArray *augmentedVectors =
+        [NSMutableArray arrayWithArray:minimalVectors];
+    for (int i = 0; i < end.names.count; i++) {
+        NSMutableArray *en = [NSMutableArray array];
+        for (int j = 0; j < end.names.count; j++) {
+            if (i == j) {
+                [en addObject:@1];
+            } else {
+                [en addObject:@0];
+            }
+        }
+        
+        [augmentedVectors addObject:en];
     }
     
-    // construct a matrix presenting the differential in this basis
+    // then, column reduce it.  the vectors that survive will be our full basis.
+    EXTMatrix *augmentedMat =
+        [EXTMatrix matrixWidth:augmentedVectors.count height:end.names.count];
+    augmentedMat.presentation = augmentedVectors;
+    [augmentedMat columnReduce];
     
-    // construct a matrix inverting this basis matrix
+    // having reduced it, we pull out the basis vectors we needed for extension
+    for (int i = minimalVectors.count; i < augmentedVectors.count; i++) {
+        bool needThisOne = true;
+        for (int j = 0; j < [augmentedVectors[i] count]; j++) {
+            if ([augmentedVectors[i] objectAtIndex:j] != 0)
+                needThisOne = false;
+        }
+        
+        if (needThisOne)
+            [minimalVectors addObject:augmentedVectors[i]];
+    }
     
-    // multiply to get a matrix presenting the differential in the std basis.
+    // and so here's our basis matrix.
+    EXTMatrix *basisMatrix =
+        [EXTMatrix matrixWidth:augmentedVectors.count
+                        height:[augmentedVectors[0] count]];
+    basisMatrix.presentation = augmentedVectors;
+
+    // now, we construct a matrix presenting the differential in this basis.
+    // this is where the partial definitions actually get used.
+    EXTMatrix *differentialInCoordinates =
+        [EXTMatrix matrixWidth:basisMatrix.width height:basisMatrix.height];
+    for (int i = 0; i < basisMatrix.width; i++) {
+        // if we're in the range of partially determined stuff, use the def'ns
+        if (i < minimalParents.count) {
+            EXTPartialDifferential *pdiffl =
+                [partialDefinitions
+                        objectAtIndex:[minimalParents objectAtIndex:i]];
+            EXTMatrix *diffl = [pdiffl differential];
+            differentialInCoordinates.presentation[i] =
+                [[diffl presentation]
+                        objectAtIndex:[minimalIndices objectAtIndex:i]];
+        } else {
+            // otherwise, extend by zero.
+            NSMutableArray *workingColumn = [NSMutableArray array];
+            
+            for (int j = 0; j < basisMatrix.height; j++)
+                [workingColumn setObject:@0 atIndexedSubscript:j];
+            
+            differentialInCoordinates.presentation[i] = workingColumn;
+        }
+    }
     
-    // store it and set the wellDefined flag to true.
+    // finally, we need to put these matrices together to build a presentation
+    // of the differential in the standard basis.  this is simple: just invert
+    // and multiply. :)
+    EXTMatrix *basisConversion = [basisMatrix invert];
+    EXTMatrix *stdDifferential =
+        [EXTMatrix newMultiply:differentialInCoordinates by:basisConversion];
     
-    NSLog(@"XXX: Not yet implemented.");
+    // finally, all our hard work done, we store and jump back.
+    presentation = stdDifferential;
     
     return;
 }
