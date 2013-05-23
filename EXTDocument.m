@@ -53,7 +53,7 @@
     // neat, but it's not organized enough to test the multiplicative structure,
     // so i'm going to skip it for now.
 
-    /*
+    
     // add some new garbage.
     // TODO: this ought to randomize the dimension too.
     // XXX: this doesn't catch collisions.
@@ -62,8 +62,7 @@
                                              B:(arc4random()%30)];
         NSArray *names = nil;
         
-        if ((location.a == 0) || (location.a == 1) ||
-            (location.b == 0) || (location.b == 1))
+        if ((location.a < 2) || (location.b < 5))
             continue;
         
         switch ((arc4random()%7)+1) {
@@ -95,35 +94,6 @@
                          
         [terms addObject:term];
     }
-    
-    
-    // XXX: this next bit is *really* just included for testing.  it should be
-    // deleted once we introduce the addition of differentials.
-    //
-    // construct some dummy terms to demonstrate differential calculations
-    EXTTerm *source  = [EXTTerm term:[EXTPair pairWithA:1 B:0]
-                        andNames:[NSMutableArray arrayWithArray:@[@"y1",@"y2"]]],
-            *target1 = [EXTTerm term:[EXTPair pairWithA:0 B:0]
-                            andNames:[NSMutableArray arrayWithArray:@[@"x"]]],
-            *target2 = [EXTTerm term:[EXTPair pairWithA:0 B:1]
-                            andNames:[NSMutableArray arrayWithArray:@[@"z"]]];
-    [terms addObject:source];
-    [terms addObject:target1];
-    [terms addObject:target2];
-
-    // and construct a dummy differential
-    EXTDifferential *differential1 = [EXTDifferential differential:source
-                                                               end:target1
-                                                              page:0],
-                    *differential2 = [EXTDifferential differential:source
-                                                               end:target2
-                                                              page:1];
-    
-    [[differential1.presentation.presentation objectAtIndex:0] setObject:@(1) atIndex:0];
-    [differentials addObject:differential1];
-    [[differential2.presentation.presentation objectAtIndex:1] setObject:@(1) atIndex:0];
-    [differentials addObject:differential2];
-     */
     
     // add the terms in the SSS for S^1 --> S^5 --> CP^2
     EXTTerm *e   = [EXTTerm term:[EXTPair pairWithA:1 B:0]
