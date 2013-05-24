@@ -123,7 +123,7 @@
 }
 
 + (NSBezierPath *) makeHighlightPathAtPoint: (NSPoint)point onGrid:(EXTGrid *)theGrid onPage:(NSInteger)thePage {
-	return [[NSBezierPath bezierPathWithRect:[theGrid enclosingGridRect:point]] retain];
+	return [NSBezierPath bezierPathWithRect:[theGrid enclosingGridRect:point]];
 }
 
 #pragma mark *** not yet sure how to classify this (it's an init, in some sense) ***
@@ -187,8 +187,6 @@
         [newCycles addObjectsFromArray:newCycleMatrix.presentation];
         
         // release all this ridiculous stuff we've allocated
-        [restricted release];
-        [newCycleMatrix release];
         
         // there should really only be one differential attached to a given
         // EXTTerm on a given page.  so, at this point we should return.

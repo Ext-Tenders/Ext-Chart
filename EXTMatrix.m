@@ -251,7 +251,7 @@
     
     [tempMatrix.presentation setObject:vector atIndexedSubscript:0];
     
-    EXTMatrix *product = [[EXTMatrix newMultiply:self by:tempMatrix] autorelease];
+    EXTMatrix *product = [EXTMatrix newMultiply:self by:tempMatrix];
     
     NSMutableArray *result = [product.presentation objectAtIndex:0];
     
@@ -291,9 +291,6 @@
                             atIndexedSubscript:i];
     }
     
-    [temp release];
-    [flip release];
-    [unflip release];
     
     return ret;
 }

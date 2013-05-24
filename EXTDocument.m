@@ -124,7 +124,7 @@
     [[differential.presentation objectAtIndex:0] setObject:@1 atIndex:0];
     firstpartial.inclusion = inclusion;
     firstpartial.differential = differential;
-    firstdiff.partialDefinitions[0] = [firstpartial autorelease];
+    firstdiff.partialDefinitions[0] = firstpartial;
     [differentials addObject:firstdiff];
     
     // TODO: need to assemble the cycle groups for lower pages first...
@@ -220,7 +220,6 @@
 	NSMutableArray* marr = [arr mutableCopy];
 	
 //	[self setPages:marr];
-	[marr release];
     return YES;
 }
 

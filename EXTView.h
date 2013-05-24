@@ -12,7 +12,7 @@
 
 
 @interface EXTView : NSView {
-	EXTDocument *delegate; // the EXTDocument
+	EXTDocument *__unsafe_unretained delegate; // the EXTDocument
 	BOOL showGrid;
 	BOOL showPages;
 	BOOL editMode;
@@ -40,16 +40,16 @@
 
 @property(assign) CGFloat gridSpacing; 
 @property(assign) BOOL showGrid, editMode, showPages, editingArtBoards, highlighting;
-@property(retain) EXTArtBoard *artBoard;
-@property(retain) EXTGrid *_grid;
-@property(retain) NSBezierPath *highlightPath;
-@property(retain) NSMutableArray *pages;
+@property(strong) EXTArtBoard *artBoard;
+@property(strong) EXTGrid *_grid;
+@property(strong) NSBezierPath *highlightPath;
+@property(strong) NSMutableArray *pages;
 
 
 // this is an exception to the usual "retain" for objects, since the document and the view are always
 // cretaed together
 // http://en.wikibooks.org/wiki/Programming_Mac_OS_X_with_Cocoa_for_Beginners/Wikidraw%27s_view_class
-@property(assign) id delegate;
+@property(unsafe_unretained) id delegate;
 @property(assign) int pageInView;
 
 

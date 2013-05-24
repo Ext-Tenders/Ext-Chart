@@ -69,7 +69,6 @@ static NSColor *highlightRectColor = nil;
 
 //		highlightRectColor = [NSColor colorWithCalibratedRed:102.0/255 green:255.0/255 blue:204.0/255 alpha:1];
 		highlightRectColor = [NSColor colorWithCalibratedRed:0 green:1.0 blue:1.0 alpha:1];
-		[highlightRectColor retain];
 		
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(toolSelectionDidChange) name:@"EXTtoolSelectionChanged" object:[EXTToolPaletteController toolPaletteControllerId]];
 

@@ -15,7 +15,7 @@
     }
 
     @property(assign) NSUInteger height, width;
-    @property(retain) NSMutableArray *presentation;
+    @property(strong) NSMutableArray *presentation;
 
     +(EXTMatrix*) initWidth:(int)newWidth height:(int)newHeight;
     +(EXTMatrix*) matrixWidth:(int)newWidth height:(int)newHeight;

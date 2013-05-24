@@ -19,7 +19,7 @@
 @synthesize automaticallyGenerated;
 
 -(EXTPartialDifferential*) init {
-    [super init];
+    if (!(self = [super init])) return nil;
     
     // we don't keep track of enough information about dimensions to make the
     // appropriate initialization calls to EXTMatrix factories.
@@ -40,8 +40,8 @@
 // getters *and* setters for the publicly read-only properties.
 @interface EXTDifferential ()
 
-@property(retain) NSMutableArray *partialDefinitions;
-@property(retain) EXTMatrix *presentation;
+@property(strong) NSMutableArray *partialDefinitions;
+@property(strong) EXTMatrix *presentation;
 
 @end
 
@@ -77,7 +77,7 @@
     EXTDifferential *differential =
         [EXTDifferential newDifferential:start end:end page:page];
     
-    return [differential autorelease];
+    return differential;
 }
 
 // this routine assembles from the available partial definitions of the
@@ -279,7 +279,6 @@
 	NSBezierPath *newPath = [NSBezierPath bezierPathWithRect:baseRect];
 	[newPath appendBezierPathWithRect:targetRect];
 	
-	[newPath retain];
 	return newPath;
 }
 

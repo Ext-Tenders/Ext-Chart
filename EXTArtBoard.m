@@ -20,7 +20,7 @@ NSString *EXTArtBoardDrawingRectKey = @"drawingRect";
 #pragma mark ** initialization ***
 
 -(id) init{
-	[self initWithRect:NSMakeRect(0, 0, 792, 612)];
+	if (!(self = [self initWithRect:NSMakeRect(0, 0, 792, 612)])) return nil;
 	return self;
 }
 
@@ -58,7 +58,6 @@ NSString *EXTArtBoardDrawingRectKey = @"drawingRect";
 	
 	[documentRectanglePath stroke];
 	[NSGraphicsContext restoreGraphicsState];
-	[theShadow release];
 }
 
 #pragma mark *** the setters and getters for the components of bounds, and the drawingRect ***
