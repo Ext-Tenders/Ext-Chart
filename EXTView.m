@@ -17,7 +17,8 @@
 #import "EXTDifferential.h"
 
 
-static NSColor *highlightRectColor = nil;
+// TODO: check whether this variable is necessary
+//static NSColor *highlightRectColor = nil;
 
 
 @implementation EXTView
