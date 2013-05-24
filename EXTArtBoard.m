@@ -107,7 +107,7 @@ NSString *EXTArtBoardDrawingRectKey = @"drawingRect";
 - (void)setHeight:(CGFloat)h{
 	bounds.size.height = h;
 	[self setBounds:bounds];	
-};
+}
 			
 						
 - (NSRect)drawingRect{
