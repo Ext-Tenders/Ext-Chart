@@ -31,8 +31,7 @@
     // if we succeeded...
     if (self) {
         // allocate the display parts of things
-		theArtBoard = [EXTArtBoard alloc];
-		[theArtBoard initWithRect:NSMakeRect(0, 0, 792, 612)];
+		theArtBoard = [[EXTArtBoard alloc] initWithRect:NSMakeRect(0, 0, 792, 612)];
         
         // and allocate the internal parts of things
         [self setTerms:[NSMutableArray array]];
