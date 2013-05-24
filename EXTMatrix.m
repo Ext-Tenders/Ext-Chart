@@ -17,7 +17,7 @@
 // initializes an EXTMatrix object and allocates all the NSMutableArrays
 // used in the presentation.
 +(EXTMatrix*) initWidth:(int)newWidth height:(int)newHeight {
-    EXTMatrix *obj = [[EXTMatrix alloc] init];
+    EXTMatrix *obj = [EXTMatrix new];
     
     // set the basic properties
     [obj setHeight:newHeight];

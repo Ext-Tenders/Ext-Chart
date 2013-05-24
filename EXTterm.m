@@ -58,19 +58,11 @@
     return self;
 }
 
-// build a new EXTTerm object and initialize it
-+(id) newTerm:(EXTPair*)whichLocation andNames:(NSMutableArray*)whichNames {
-    EXTTerm* term = [[EXTTerm alloc] setTerm:whichLocation andNames:whichNames];
-    
-    return term;
-}
-
 +(EXTTerm*) term:(EXTPair*)whichLocation andNames:(NSMutableArray*)whichNames {
-    EXTTerm* term = [EXTTerm newTerm:whichLocation andNames:whichNames];
-    
-    [term autorelease];
-    
-    return term;
+    EXTTerm *term = [EXTTerm new];
+    [term setTerm:whichLocation andNames:whichNames];
+
+    return [term autorelease];
 }
 
 #pragma mark *** packing and unpacking ***
@@ -96,7 +88,7 @@
 
 // TODO: separate out these magic constants
 - (void) drawWithSpacing:(CGFloat)spacing page:(int)page {
-    NSBezierPath* path = [[NSBezierPath alloc] init];
+    NSBezierPath* path = [NSBezierPath new];
     CGFloat x = [[self location] a]*spacing,
             y = [[self location] b]*spacing;
     
@@ -112,6 +104,7 @@
     
     [[NSColor blackColor] set];
 	[path fill];
+    [path release];
 }
 
 
@@ -209,7 +202,7 @@
     // last time.
     newCycles = [[cycles objectAtIndex:(whichPage-1)] copy];
     
-    [cycles setObject:newCycles atIndexedSubscript:whichPage];
+    [cycles setObject:[newCycles autorelease] atIndexedSubscript:whichPage];
 }
 
 // TODO: this is a duplicate of the code above. it would be nice to fix that.
