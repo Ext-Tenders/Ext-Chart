@@ -39,7 +39,8 @@
 
 
 @property(assign) CGFloat gridSpacing; 
-@property(assign) BOOL showGrid, editMode, showPages, editingArtBoards, highlighting;
+@property(nonatomic, assign) BOOL showGrid;
+@property(assign) BOOL editMode, showPages, editingArtBoards, highlighting;
 @property(strong) EXTArtBoard *artBoard;
 @property(strong) EXTGrid *_grid;
 @property(strong) NSBezierPath *highlightPath;
@@ -50,7 +51,7 @@
 // cretaed together
 // http://en.wikibooks.org/wiki/Programming_Mac_OS_X_with_Cocoa_for_Beginners/Wikidraw%27s_view_class
 @property(unsafe_unretained) id delegate;
-@property(assign) int pageInView;
+@property(nonatomic, assign) int pageInView;
 
 
 

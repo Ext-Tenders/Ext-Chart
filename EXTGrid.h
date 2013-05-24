@@ -24,9 +24,9 @@ extern NSString *EXTGridAnyKey;
 }
 
 @property(strong) NSColor *gridColor, *emphasisGridColor, *axisColor;
-@property(assign) CGFloat gridSpacing;
-@property(assign) NSUInteger emphasisSpacing;
-@property(assign) NSRect boundsRect;
+@property(nonatomic, assign) CGFloat gridSpacing;
+@property(nonatomic, assign) NSUInteger emphasisSpacing;
+@property(nonatomic, assign) NSRect boundsRect;
 @property(strong) NSBezierPath *gridPath, *emphasisGridPath;
 
 -(id) initWithRect:(NSRect) rect;

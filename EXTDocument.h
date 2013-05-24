@@ -38,7 +38,7 @@
 }
 
 @property(assign) CGFloat artboardRectX;
-@property(assign) NSUInteger maxPage;
+@property(nonatomic, assign) NSUInteger maxPage;
 @property(strong) EXTArtBoard *theArtBoard;
 @property(strong) EXTGrid *theGrid;
 @property(strong) NSMutableArray *terms;
