@@ -40,9 +40,6 @@
 
 +(EXTMatrix*) matrixWidth:(int)newWidth height:(int)newHeight {
     EXTMatrix *object = [EXTMatrix initWidth:newWidth height:newHeight];
-    
-    [object autorelease];
-    
     return object;
 }
 
@@ -149,8 +146,7 @@
         // prevent us from considering the same column twice.
         pivotColumn++;
     }
-    
-    [ret autorelease];
+
     return ret;
 }
 

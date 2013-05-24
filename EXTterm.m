@@ -25,35 +25,34 @@
 // setTerm re/initializes an EXTTerm with the desired values.
 -(id) setTerm:(EXTPair*)whichLocation andNames:(NSMutableArray*)whichNames {
     // first try to initialize the memory for the object which we don't control
-    if (self = [super init]) {
-        // if it succeeds, then initialize the members
-        [self setLocation:whichLocation];
-        [self setBoundaries:[NSMutableArray arrayWithObjects: nil]];
-        [self setCycles:[NSMutableArray arrayWithObjects: nil]];
-        
-        [self setNames:whichNames];
-        
-        // initialize the cycles to contain everything.
-        // XXX: change the array upper bound when we stop randomizing.
-        NSMutableArray *initialCycles = [NSMutableArray
-                                         arrayWithCapacity:[whichNames count]];
-        for (int j = 0; j < whichNames.count; j++) {
-            NSMutableArray *column = [NSMutableArray array];
-            for (int i = 0; i < whichNames.count; i++) {
-                if (i == j)
-                    [column setObject:@(1) atIndexedSubscript:i];
-                else
-                    [column setObject:@(0) atIndexedSubscript:i];
-            }
 
-            [initialCycles addObject:column];
+    // if it succeeds, then initialize the members
+    [self setLocation:whichLocation];
+    [self setBoundaries:[NSMutableArray arrayWithObjects: nil]];
+    [self setCycles:[NSMutableArray arrayWithObjects: nil]];
+
+    [self setNames:whichNames];
+
+    // initialize the cycles to contain everything.
+    // XXX: change the array upper bound when we stop randomizing.
+    NSMutableArray *initialCycles = [NSMutableArray
+                                     arrayWithCapacity:[whichNames count]];
+    for (int j = 0; j < whichNames.count; j++) {
+        NSMutableArray *column = [NSMutableArray array];
+        for (int i = 0; i < whichNames.count; i++) {
+            if (i == j)
+                [column setObject:@(1) atIndexedSubscript:i];
+            else
+                [column setObject:@(0) atIndexedSubscript:i];
         }
-        [cycles addObject:initialCycles];
-        
-        // and we start with no boundaries.
-        [boundaries addObject:@[]];
+
+        [initialCycles addObject:column];
     }
-    
+    [cycles addObject:initialCycles];
+
+    // and we start with no boundaries.
+    [boundaries addObject:@[]];
+
     // regardless, return the object as best we've initialized it.
     return self;
 }
@@ -67,9 +66,6 @@
 
 +(EXTTerm*) term:(EXTPair*)whichLocation andNames:(NSMutableArray*)whichNames {
     EXTTerm* term = [EXTTerm newTerm:whichLocation andNames:whichNames];
-    
-    [term autorelease];
-    
     return term;
 }
 
