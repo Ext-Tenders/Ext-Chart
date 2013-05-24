@@ -17,8 +17,8 @@
         EXTDocument *document;
     }
 
-@property(retain) NSMutableDictionary *tables;
-@property(retain) EXTDocument *document;
+@property(strong) NSMutableDictionary *tables;
+@property(strong) EXTDocument *document;
 
 -(id) init;
 +(id) multiplicationTables:(EXTDocument*)document;

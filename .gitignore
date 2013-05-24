@@ -1,2 +1,28 @@
+# Invisible files and directories c.f. # c.f. http://www.westwind.com/reference/os-x/invisibles.html
 .DS_Store
+.Trashes
+*.swp
+*.lock
+
+# Temporary Xcode files
+*~.nib
+
+# Xcode build directories
+DerivedData/
+build/
+
+# Xcode private settings
+*.pbxuser
+*.mode1v3
+*.mode2v3
+*.perspectivev3
+# and whitelist the default ones
+!default.pbxuser
+!default.mode1v3
+!default.mode2v3
+!default.perspectivev3
+
+# Xcode 4 personal settings
+xcuserdata
+
 Ext Chart.xcodeproj/project.xcworkspace
