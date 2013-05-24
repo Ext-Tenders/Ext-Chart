@@ -11,49 +11,67 @@
 #import "EXTDifferential.h"
 
 
+@interface EXTToolPaletteController ()
+    @property(nonatomic, weak) IBOutlet NSMatrix *toolPallette;
+
+    - (IBAction)toolSelectionDidChange:(id)sender;
+@end
+
+
 @implementation EXTToolPaletteController
 
-// there's a subtlety in the next class method.   It must be called instead of alloc/init, to instantiate the unique instance.   This call is made in the app controller.   The other option is to store the id as an ivar in the appController, and get it with a getter method.   Not sure which makes more sense.   Objects would need to know the id of the unique appController.   If it were a delegate, they could get that from the app itself.   But I don't think a delegate can have any instance variables.   Not sure...
+static EXTToolPaletteController *_sharedToolPaletteController = nil; // singleton
 
-+ (id)toolPaletteControllerId{
-	// returns the id of the unique	EXTToolPaletteController instance.  Got this from Sketch, too
-	static EXTToolPaletteController *toolPaletteControllerInstance = nil;
-	// a given function or method will only initialize a static variable once.   Putting it in the method, rather than above the @interface line limits the scope of the variable to the method.  Otherwise its scope is the whole class, hence it would be accessible from every instance (which, in this case is unique, so it probably doesn't make much real difference).  	
-	
-    if (!toolPaletteControllerInstance) {
-		//        sharedToolPaletteController = [[SKTToolPaletteController allocWithZone:NULL] init];
-		toolPaletteControllerInstance = [[EXTToolPaletteController allocWithZone:NULL] init];
-    }
-    return toolPaletteControllerInstance;
++ (instancetype)sharedToolPaletteController
+{
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        _sharedToolPaletteController = [[super allocWithZone:NULL] init];
+    });
+
+    return _sharedToolPaletteController;
 }
 
--(id)init{
++ (id)allocWithZone:(NSZone *)zone
+{
+    return self.sharedToolPaletteController;
+}
+
+- (id)init
+{
 	self = [super initWithWindowNibName:@"EXTToolPalette"];
-	return self;
+    return self;
 }
 
-- (void)windowDidLoad {
-//    NSArray *cells = [toolPallette cells];
-//    NSUInteger i, c = [cells count];
-    
+- (id)copyWithZone:(NSZone *)zone
+{
+    return self;
+}
+
+- (void)windowDidLoad
+{
     [super windowDidLoad];
 	
+//    NSArray *cells = [toolPallette cells];
+//    NSUInteger i, c = [cells count];
 //    for (i=0; i<c; i++) {
 //        [[cells objectAtIndex:i] setRefusesFirstResponder:YES];
 //    }
-	[(NSPanel *)[self window] setBecomesKeyOnlyIfNeeded:YES];	
+
+	[(NSPanel *)[self window] setBecomesKeyOnlyIfNeeded:YES];
 }
 
-- (IBAction) toolSelectionDidChange:(id)sender{	
+- (IBAction)toolSelectionDidChange:(id)sender
+{
 	// post a notification that the tool did change
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:@"EXTtoolSelectionChanged" object:self];
-	
 }
 
 
-- (Class)currentToolClass{
-	enum EXTToolType toolType = (enum EXTToolType)[toolPallette selectedRow];
+- (Class)currentToolClass
+{
+	enum EXTToolType toolType = (enum EXTToolType)self.toolPallette.selectedRow;
 	Class theClass = nil;
 	switch (toolType) {
 		case EXTArrowToolRow:

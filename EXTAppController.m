@@ -11,30 +11,29 @@
 #import "EXTToolPaletteController.h"
 
 
+@interface EXTAppController ()
+    @property(nonatomic, strong) EXTsettingPanelController *panelController;
+    @property(nonatomic, strong) EXTToolPaletteController *toolPaletteController;
+@end
+
+
 @implementation EXTAppController
 
-- (void) awakeFromNib{
-	[self showToolPalette:self];	
-//	NSLog(@"toolPaletteController's retain count is %d", [toolPaletteController retainCount]);
-
+- (void)applicationDidFinishLaunching:(NSNotification *)notification
+{
+	[self showToolPalette:self];
 }
 
--(IBAction) showSettingsPanel:(id)sender{
-	if (!panelController) {
-		panelController = [[EXTsettingPanelController alloc] init];
+- (IBAction)showSettingsPanel:(id)sender{
+	if (! self.panelController) {
+		self.panelController = [EXTsettingPanelController new];
 	}
-//		NSLog(@"showing %@", panelController);
-		[panelController showWindow:self];
+
+    [self.panelController showWindow:self];
 }
 
-// the commented out code in the method below resulted in there being _two_ instances of the toolPaletteController, one, the running one, and the other just there to have an ID.   Of course notifications then failed to work
-
-- (IBAction) showToolPalette:(id)sender{
-//	if (!toolPaletteController) {
-//		toolPaletteController = [[EXTToolPaletteController alloc] init];
-//	}
-//	[toolPaletteController showWindow:self];
-
-	[[EXTToolPaletteController toolPaletteControllerId] showWindow:self];
+- (IBAction) showToolPalette:(id)sender
+{
+    [EXTToolPaletteController.sharedToolPaletteController showWindow:self];
 }
 @end
