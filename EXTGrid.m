@@ -23,7 +23,7 @@ NSString *EXTGridAnyKey = @"anyGridKey";
 - (id)init{
     self = [super init];
     if (self) {
-		[self initWithRect:NSZeroRect];
+		if (!(self = [self initWithRect:NSZeroRect])) return nil;
 	}
     return self;
 }
@@ -53,10 +53,8 @@ NSString *EXTGridAnyKey = @"anyGridKey";
 		axisColor = [NSColor blueColor];
 		
 		gridPath = [self makeGridInRect:boundsRect withFactor:1];
-		[gridPath retain];
 		
 		emphasisGridPath = [self makeGridInRect:boundsRect withFactor:emphasisSpacing];
-		[emphasisGridPath retain];
 
 	}
 	return self;
@@ -73,10 +71,8 @@ NSString *EXTGridAnyKey = @"anyGridKey";
 	axisColor = [NSColor blueColor];
 	
 	gridPath = [self makeGridInRect:boundsRect withFactor:1];
-	[gridPath retain];
 	
 	emphasisGridPath = [self makeGridInRect:boundsRect withFactor:emphasisSpacing];
-	[emphasisGridPath retain];	
 }
 
 - (void)resetToDefaults{

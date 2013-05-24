@@ -9,16 +9,26 @@
 #import "EXTsettingPanelController.h"
 
 
+@interface EXTsettingPanelController ()
+    @property(nonatomic,weak) IBOutlet NSColorWell *gridLineColorWell;
+    @property(nonatomic,weak) IBOutlet NSColorWell *emphasisLineColorWell;
+    @property(nonatomic,weak) IBOutlet NSTextField *gridSpacingSelection;
+    @property(nonatomic,weak) IBOutlet NSTextField *emphasisLineSelection;
+
+//-(IBAction) setGridLineColor:(id)sender;
+//-(IBAction) setGridEmphasisColor:(id)sender;
+//-(IBAction) setGridSpacing:(id)sender;
+//-(IBAction) setEmphasisSpacing:(id)sender;
+//
+@end
+
+
 @implementation EXTsettingPanelController
 
-@synthesize emphasisGridSpacing;
-
--(id)init{
-	
-	if (![super initWithWindowNibName:@"EXTDocSettings"]){
-		return nil;
-	}
-	return self;
+- (id)init
+{
+	self = [super initWithWindowNibName:@"EXTDocSettings"];
+    return self;
 }
 
 @end

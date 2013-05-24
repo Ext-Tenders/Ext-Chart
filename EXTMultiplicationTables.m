@@ -19,7 +19,7 @@
 // surely must get in the way sometimes...
 
 -(id) init {
-    [super init];
+    if (!(self = [super init])) return nil;
     
     [self setTables:[NSMutableDictionary dictionary]];
     [self setDocument:nil];
@@ -32,7 +32,7 @@
     
     [ret setDocument:document];
     
-    return [ret autorelease];
+    return ret;
 }
 
 // TODO: for the moment, note that this is order-sensitive.
@@ -207,7 +207,7 @@
     partial.inclusion = inclusion;
     
     // and, finally, add it to the list of partial definitions. :)
-    [[diffl partialDefinitions] addObject:[partial autorelease]];
+    [[diffl partialDefinitions] addObject:partial];
     
     return;
 }

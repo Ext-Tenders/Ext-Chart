@@ -9,20 +9,6 @@
 #import <Cocoa/Cocoa.h>
 
 
-@interface EXTsettingPanelController : NSWindowController {
-	IBOutlet NSColorWell *gridLineColorWell;
-	IBOutlet NSColorWell *emphasisLineColorWell;
-	IBOutlet NSTextField *gridSpacingSelection;
-	IBOutlet NSTextField *emphasisLineSelection;
-	
-	NSUInteger emphasisGridSpacing;
-}
-
-@property(assign) NSUInteger emphasisGridSpacing;
-
-//-(IBAction) setGridLineColor:(id)sender;
-//-(IBAction) setGridEmphasisColor:(id)sender;
-//-(IBAction) setGridSpacing:(id)sender;
-//-(IBAction) setEmphasisSpacing:(id)sender;
-//
+@interface EXTsettingPanelController : NSWindowController
+    @property(assign) NSUInteger emphasisGridSpacing;
 @end

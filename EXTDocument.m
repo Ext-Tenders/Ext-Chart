@@ -31,8 +31,7 @@
     // if we succeeded...
     if (self) {
         // allocate the display parts of things
-		theArtBoard = [EXTArtBoard alloc];
-		[theArtBoard initWithRect:NSMakeRect(0, 0, 792, 612)];
+		theArtBoard = [[EXTArtBoard alloc] initWithRect:NSMakeRect(0, 0, 792, 612)];
         
         // and allocate the internal parts of things
         [self setTerms:[NSMutableArray array]];
@@ -124,7 +123,7 @@
     [[differential.presentation objectAtIndex:0] setObject:@1 atIndex:0];
     firstpartial.inclusion = inclusion;
     firstpartial.differential = differential;
-    firstdiff.partialDefinitions[0] = [firstpartial autorelease];
+    firstdiff.partialDefinitions[0] = firstpartial;
     [differentials addObject:firstdiff];
     
     // TODO: need to assemble the cycle groups for lower pages first...
@@ -215,12 +214,12 @@
 	if ( outError != NULL ) {
 		*outError = [NSError errorWithDomain:NSOSStatusErrorDomain code:unimpErr userInfo:NULL];
 	}
-	
-	NSArray* arr = [NSKeyedUnarchiver unarchiveObjectWithData:data];
-	NSMutableArray* marr = [arr mutableCopy];
-	
+
+	// TODO: review this
+//	NSArray* arr = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+//	NSMutableArray* marr = [arr mutableCopy];
+//	
 //	[self setPages:marr];
-	[marr release];
     return YES;
 }
 

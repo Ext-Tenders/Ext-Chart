@@ -23,7 +23,7 @@
 
 + (id) pairWithA:(int)aa B:(int)bb {
 	EXTPair* pair = [[EXTPair alloc] initWithA:aa B:bb];
-	return [pair autorelease];
+	return pair;
 }
 
 - (NSPoint) makePoint {

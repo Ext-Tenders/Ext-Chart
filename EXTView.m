@@ -17,7 +17,8 @@
 #import "EXTDifferential.h"
 
 
-static NSColor *highlightRectColor = nil;
+// TODO: check whether this variable is necessary
+//static NSColor *highlightRectColor = nil;
 
 
 @implementation EXTView
@@ -69,13 +70,12 @@ static NSColor *highlightRectColor = nil;
 
 //		highlightRectColor = [NSColor colorWithCalibratedRed:102.0/255 green:255.0/255 blue:204.0/255 alpha:1];
 		highlightRectColor = [NSColor colorWithCalibratedRed:0 green:1.0 blue:1.0 alpha:1];
-		[highlightRectColor retain];
 		
-		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(toolSelectionDidChange) name:@"EXTtoolSelectionChanged" object:[EXTToolPaletteController toolPaletteControllerId]];
+		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(toolSelectionDidChange) name:@"EXTtoolSelectionChanged" object:EXTToolPaletteController.sharedToolPaletteController];
 
 // a new document can get initialized when any tool is selected
 		
-		currentTool = [[EXTToolPaletteController toolPaletteControllerId] currentToolClass];
+		currentTool = EXTToolPaletteController.sharedToolPaletteController.currentToolClass;
 		 
 		 }
 
@@ -451,7 +451,7 @@ static NSColor *highlightRectColor = nil;
 - (void)toolSelectionDidChange{
 	// just set the tool class to what it is
 
-	currentTool = [[EXTToolPaletteController toolPaletteControllerId] currentToolClass];
+	currentTool = EXTToolPaletteController.sharedToolPaletteController.currentToolClass;
 }
 
 #pragma mark *** random button ***
