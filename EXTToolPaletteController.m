@@ -28,10 +28,7 @@
 }
 
 -(id)init{
-	
-	if (![super initWithWindowNibName:@"EXTToolPalette"]){
-		return nil;
-	}
+	self = [super initWithWindowNibName:@"EXTToolPalette"];
 	return self;
 }
 

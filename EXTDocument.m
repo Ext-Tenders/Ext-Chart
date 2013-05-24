@@ -215,10 +215,11 @@
 	if ( outError != NULL ) {
 		*outError = [NSError errorWithDomain:NSOSStatusErrorDomain code:unimpErr userInfo:NULL];
 	}
-	
-	NSArray* arr = [NSKeyedUnarchiver unarchiveObjectWithData:data];
-	NSMutableArray* marr = [arr mutableCopy];
-	
+
+	// TODO: review this
+//	NSArray* arr = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+//	NSMutableArray* marr = [arr mutableCopy];
+//	
 //	[self setPages:marr];
     return YES;
 }

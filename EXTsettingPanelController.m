@@ -14,11 +14,8 @@
 @synthesize emphasisGridSpacing;
 
 -(id)init{
-	
-	if (![super initWithWindowNibName:@"EXTDocSettings"]){
-		return nil;
-	}
-	return self;
+	self = [super initWithWindowNibName:@"EXTDocSettings"];
+    return self;
 }
 
 @end
