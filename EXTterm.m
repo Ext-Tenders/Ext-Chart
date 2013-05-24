@@ -25,44 +25,41 @@
 // setTerm re/initializes an EXTTerm with the desired values.
 -(id) setTerm:(EXTPair*)whichLocation andNames:(NSMutableArray*)whichNames {
     // first try to initialize the memory for the object which we don't control
-    if (self = [super init]) {
-        // if it succeeds, then initialize the members
-        [self setLocation:whichLocation];
-        [self setBoundaries:[NSMutableArray arrayWithObjects: nil]];
-        [self setCycles:[NSMutableArray arrayWithObjects: nil]];
-        
-        [self setNames:whichNames];
-        
-        // initialize the cycles to contain everything.
-        // XXX: change the array upper bound when we stop randomizing.
-        NSMutableArray *initialCycles = [NSMutableArray
-                                         arrayWithCapacity:[whichNames count]];
-        for (int j = 0; j < whichNames.count; j++) {
-            NSMutableArray *column = [NSMutableArray array];
-            for (int i = 0; i < whichNames.count; i++) {
-                if (i == j)
-                    [column setObject:@(1) atIndexedSubscript:i];
-                else
-                    [column setObject:@(0) atIndexedSubscript:i];
-            }
 
-            [initialCycles addObject:column];
+    // if it succeeds, then initialize the members
+    [self setLocation:whichLocation];
+    [self setBoundaries:[NSMutableArray arrayWithObjects: nil]];
+    [self setCycles:[NSMutableArray arrayWithObjects: nil]];
+
+    [self setNames:whichNames];
+
+    // initialize the cycles to contain everything.
+    // XXX: change the array upper bound when we stop randomizing.
+    NSMutableArray *initialCycles = [NSMutableArray
+                                     arrayWithCapacity:[whichNames count]];
+    for (int j = 0; j < whichNames.count; j++) {
+        NSMutableArray *column = [NSMutableArray array];
+        for (int i = 0; i < whichNames.count; i++) {
+            if (i == j)
+                [column setObject:@(1) atIndexedSubscript:i];
+            else
+                [column setObject:@(0) atIndexedSubscript:i];
         }
-        [cycles addObject:initialCycles];
-        
-        // and we start with no boundaries.
-        [boundaries addObject:@[]];
+
+        [initialCycles addObject:column];
     }
-    
+    [cycles addObject:initialCycles];
+
+    // and we start with no boundaries.
+    [boundaries addObject:@[]];
+
     // regardless, return the object as best we've initialized it.
     return self;
 }
 
 +(EXTTerm*) term:(EXTPair*)whichLocation andNames:(NSMutableArray*)whichNames {
-    EXTTerm *term = [EXTTerm new];
-    [term setTerm:whichLocation andNames:whichNames];
-
-    return [term autorelease];
+    EXTTerm* term = [EXTTerm newTerm:whichLocation andNames:whichNames];
+    return term;
 }
 
 #pragma mark *** packing and unpacking ***
@@ -120,7 +117,7 @@
 }
 
 + (NSBezierPath *) makeHighlightPathAtPoint: (NSPoint)point onGrid:(EXTGrid *)theGrid onPage:(NSInteger)thePage {
-	return [[NSBezierPath bezierPathWithRect:[theGrid enclosingGridRect:point]] retain];
+	return [NSBezierPath bezierPathWithRect:[theGrid enclosingGridRect:point]];
 }
 
 #pragma mark *** not yet sure how to classify this (it's an init, in some sense) ***
@@ -184,8 +181,6 @@
         [newCycles addObjectsFromArray:newCycleMatrix.presentation];
         
         // release all this ridiculous stuff we've allocated
-        [restricted release];
-        [newCycleMatrix release];
         
         // there should really only be one differential attached to a given
         // EXTTerm on a given page.  so, at this point we should return.

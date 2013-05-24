@@ -7,14 +7,8 @@
 //
 
 #import <Cocoa/Cocoa.h>
-@class EXTsettingPanelController;
-@class EXTToolPaletteController;
 
-
-@interface EXTAppController : NSObject {
-	EXTsettingPanelController *panelController;
-	EXTToolPaletteController *toolPaletteController;
-}
+@interface EXTAppController : NSObject <NSApplicationDelegate>
 - (IBAction) showSettingsPanel:(id)sender;
 - (IBAction) showToolPalette:(id)sender;
 @end

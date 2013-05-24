@@ -50,8 +50,8 @@
 
     @property(retain) EXTTerm *start, *end;
     @property(assign) int page;
-    @property(retain,readonly) NSMutableArray *partialDefinitions;
-    @property(readonly,retain) EXTMatrix *presentation;
+    @property(strong,readonly) NSMutableArray *partialDefinitions;
+    @property(strong,readonly) EXTMatrix *presentation;
     @property(assign) bool wellDefined;
 
     // constructors

@@ -40,9 +40,6 @@
 
 +(EXTMatrix*) matrixWidth:(int)newWidth height:(int)newHeight {
     EXTMatrix *object = [EXTMatrix initWidth:newWidth height:newHeight];
-    
-    [object autorelease];
-    
     return object;
 }
 
@@ -149,8 +146,7 @@
         // prevent us from considering the same column twice.
         pivotColumn++;
     }
-    
-    [ret autorelease];
+
     return ret;
 }
 
@@ -255,7 +251,7 @@
     
     [tempMatrix.presentation setObject:vector atIndexedSubscript:0];
     
-    EXTMatrix *product = [[EXTMatrix newMultiply:self by:tempMatrix] autorelease];
+    EXTMatrix *product = [EXTMatrix newMultiply:self by:tempMatrix];
     
     NSMutableArray *result = [product.presentation objectAtIndex:0];
     
@@ -295,9 +291,6 @@
                             atIndexedSubscript:i];
     }
     
-    [temp release];
-    [flip release];
-    [unflip release];
     
     return ret;
 }

@@ -38,12 +38,12 @@
 }
 
 @property(assign) CGFloat artboardRectX;
-@property(assign) NSUInteger maxPage;
-@property(retain) EXTArtBoard *theArtBoard;
-@property(retain) EXTGrid *theGrid;
-@property(retain) NSMutableArray *terms;
-@property(retain) NSMutableArray *differentials;
-@property(retain) EXTMultiplicationTables *multTables;
+@property(nonatomic, assign) NSUInteger maxPage;
+@property(strong) EXTArtBoard *theArtBoard;
+@property(strong) EXTGrid *theGrid;
+@property(strong) NSMutableArray *terms;
+@property(strong) NSMutableArray *differentials;
+@property(strong) EXTMultiplicationTables *multTables;
 
 -(void)randomize;
 -(void)drawPagesUpTo: (NSUInteger) pageNumber;
