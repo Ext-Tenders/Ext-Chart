@@ -27,10 +27,9 @@
         //	extern NSRect canvasRect;
         NSColor *gridLineColor;
         NSColor *emphasGridLineColor;
-
-        IBOutlet EXTView *extview;
     }
-    
+
+    @property(nonatomic, weak) IBOutlet EXTView *extview;
 @end
 
 @implementation EXTDocument
@@ -123,9 +122,9 @@
     
     [self.terms addObjectsFromArray:@[one,e,x,ex,x2,ex2]];
     
-    [extview setPageInView:1];
-    [extview setPageInView:2];
-    [extview setPageInView:0];
+    [self.extview setPageInView:1];
+    [self.extview setPageInView:2];
+    [self.extview setPageInView:0];
     
     // add a single differential
     EXTDifferential *firstdiff = [EXTDifferential differential:e end:x page:2];
@@ -196,17 +195,17 @@
 //	theGrid = [EXTGrid alloc];
 //	[theGrid initWithRect:[extview bounds]];
 	
-	[self.theGrid setBoundsRect:[extview bounds]];
+	[self.theGrid setBoundsRect:[self.extview bounds]];
 	
 // The analogue of these next settings 	 are done with bindings in Sketch.   I'm not sure what the difference is.
-	[extview setDelegate:self];
-	[extview setArtBoard:self.theArtBoard];
-	[extview set_grid:self.theGrid];
+	[self.extview setDelegate:self];
+	[self.extview setArtBoard:self.theArtBoard];
+	[self.extview set_grid:self.theGrid];
 	
 // since the frame extends past the bounds rectangle, we need observe the drawingRect in order to know what to refresh when the artBoard changes
 	
-	[self.theArtBoard addObserver: extview forKeyPath:EXTArtBoardDrawingRectKey options:(NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld) context:nil];
-	[self.theGrid addObserver:extview forKeyPath:EXTGridAnyKey options:0 context:nil];
+	[self.theArtBoard addObserver: self.extview forKeyPath:EXTArtBoardDrawingRectKey options:(NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld) context:nil];
+	[self.theGrid addObserver:self.extview forKeyPath:EXTGridAnyKey options:0 context:nil];
 
 //	[self setEmphasisGridSpacing:8];		
 }
