@@ -8,10 +8,10 @@
 
 
 #import <Cocoa/Cocoa.h>
-#import "EXTView.h"
 
 
-@class EXTGrid, EXTArtBoard, EXTMultiplicationTables;
+@class EXTGrid, EXTArtBoard, EXTMultiplicationTables, EXTPair, EXTTerm, EXTDifferential;
+
 
 @interface EXTDocument : NSDocument
     @property(nonatomic, strong) NSMutableArray *terms;
