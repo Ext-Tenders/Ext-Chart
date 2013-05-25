@@ -9,26 +9,27 @@
 
 #import <Cocoa/Cocoa.h>
 #import "EXTView.h"
+
+
 @class EXTGrid, EXTArtBoard, EXTMultiplicationTables;
 
 @interface EXTDocument : NSDocument
-@property(assign) CGFloat artboardRectX;
-@property(nonatomic, assign) NSUInteger maxPage;
-@property(strong) EXTArtBoard *theArtBoard;
-@property(strong) EXTGrid *theGrid;
-@property(strong) NSMutableArray *terms;
-@property(strong) NSMutableArray *differentials;
-@property(strong) EXTMultiplicationTables *multTables;
+    @property(nonatomic, strong) NSMutableArray *terms;
+    @property(nonatomic, strong) NSMutableArray *differentials;
+    @property(nonatomic, strong) EXTMultiplicationTables *multTables;
 
--(void)randomize;
--(void)drawPagesUpTo: (NSUInteger) pageNumber;
--(void) drawPageNumber:(NSUInteger)pageNumber ll:(EXTPair*)lowerLeftCoord ur:(EXTPair*)upperRightCoord withSpacing:(CGFloat)gridSpacing;
-//- (NSUInteger) maxPage;
+    @property(nonatomic, assign) CGFloat artboardRectX;
+    @property(nonatomic, assign) NSUInteger maxPage;
+    @property(nonatomic, strong) EXTArtBoard *theArtBoard;
+    @property(nonatomic, strong) EXTGrid *theGrid;
 
--(EXTTerm*) findTerm:(EXTPair*)loc;
--(EXTDifferential*) findDifflWithSource:(EXTPair*)loc onPage:(int)page;
--(EXTDifferential*) findDifflWithTarget:(EXTPair*)loc onPage:(int)page;
+    - (void)randomize;
+    - (void)drawPagesUpTo:(NSUInteger)pageNumber;
+    - (void)drawPageNumber:(NSUInteger)pageNumber ll:(EXTPair*)lowerLeftCoord ur:(EXTPair*)upperRightCoord withSpacing:(CGFloat)gridSpacing;
 
+    - (EXTTerm*)findTerm:(EXTPair*)loc;
+    - (EXTDifferential*)findDifflWithSource:(EXTPair*)loc onPage:(int)page;
+    - (EXTDifferential*)findDifflWithTarget:(EXTPair*)loc onPage:(int)page;
 @end
 
 // Notes: need something to specify the size (width, height) of the document, origin location, serre or adams convention?  
