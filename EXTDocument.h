@@ -12,31 +12,6 @@
 @class EXTGrid, EXTArtBoard, EXTMultiplicationTables;
 
 @interface EXTDocument : NSDocument
-{
-	// file data
-    NSMutableArray *terms;
-    NSMutableArray *differentials;
-    EXTMultiplicationTables *multTables;
-	
-	// view configuration
-	CGFloat gridSpacing;
-	CGFloat gridScalingFactor;
-	NSSize extDocumentSize;
-	NSPoint extDocumentOrigin;
-//	extern CGFloat gridSpacing;
-//	extern NSRect canvasRect;
-	NSColor *gridLineColor;
-	NSColor *emphasGridLineColor;
-	
-	CGFloat artboardRectX;
-	
-	IBOutlet EXTView *extview;
-
-	IBOutlet EXTGrid *theGrid;
-	EXTArtBoard *theArtBoard;
-	NSUInteger maxPage;
-}
-
 @property(assign) CGFloat artboardRectX;
 @property(nonatomic, assign) NSUInteger maxPage;
 @property(strong) EXTArtBoard *theArtBoard;
