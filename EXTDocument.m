@@ -46,9 +46,9 @@
 		_theArtBoard = [[EXTArtBoard alloc] initWithRect:NSMakeRect(0, 0, 792, 612)];
         
         // and allocate the internal parts of things
-        [self setTerms:[NSMutableArray array]];
-        [self setDifferentials:[NSMutableArray array]];
-        [self setMultTables:[EXTMultiplicationTables multiplicationTables:self]];
+        _terms = [NSMutableArray array];
+        _differentials = [NSMutableArray array];
+        _multTables = [EXTMultiplicationTables multiplicationTables:self];
     }
 
     return self;
