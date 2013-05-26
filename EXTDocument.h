@@ -32,4 +32,4 @@
     - (EXTDifferential*)findDifflWithTarget:(EXTPair*)loc onPage:(int)page;
 @end
 
-// Notes: need something to specify the size (width, height) of the document, origin location, serre or adams convention?  
+// Notes: need something to specify the size (width, height) of the document, origin location, serre or adams convention?
