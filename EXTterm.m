@@ -58,7 +58,8 @@
 }
 
 +(EXTTerm*) term:(EXTPair*)whichLocation andNames:(NSMutableArray*)whichNames {
-    EXTTerm* term = [EXTTerm newTerm:whichLocation andNames:whichNames];
+    EXTTerm *term = [EXTTerm new];
+    [term setTerm:whichLocation andNames:whichNames];
     return term;
 }
 
@@ -101,7 +102,6 @@
     
     [[NSColor blackColor] set];
 	[path fill];
-    [path release];
 }
 
 
@@ -197,7 +197,7 @@
     // last time.
     newCycles = [[cycles objectAtIndex:(whichPage-1)] copy];
     
-    [cycles setObject:[newCycles autorelease] atIndexedSubscript:whichPage];
+    [cycles setObject:newCycles atIndexedSubscript:whichPage];
 }
 
 // TODO: this is a duplicate of the code above. it would be nice to fix that.
