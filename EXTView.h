@@ -8,7 +8,7 @@
 
 
 #import <Cocoa/Cocoa.h>
-@class EXTPair, EXTScrollView, EXTArtBoard, EXTGrid, EXTDocument, EXTToolPaletteController, EXTTerm, EXTDifferential; 
+@class EXTScrollView, EXTArtBoard, EXTGrid, EXTDocument, EXTToolPaletteController, EXTTerm, EXTDifferential; 
 
 
 @interface EXTView : NSView {
@@ -55,8 +55,8 @@
 
 
 
-- (EXTPair*) convertToGridCoordinates:(NSPoint)pixelLoc;
-- (NSPoint) convertToPixelCoordinates:(EXTPair*) gridLoc;
+- (NSPoint) convertToGridCoordinates:(NSPoint)pixelLoc;
+- (NSPoint) convertToPixelCoordinates:(NSPoint) gridLoc;
 
 // paging and zooming
 

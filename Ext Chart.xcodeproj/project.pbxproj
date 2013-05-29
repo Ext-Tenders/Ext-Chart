@@ -27,6 +27,7 @@
 		389FB38D17498AF500D0FE75 /* EXTMultiplicationTables.m in Sources */ = {isa = PBXBuildFile; fileRef = 389FB38C17498AF500D0FE75 /* EXTMultiplicationTables.m */; };
 		38A1AB6E1727009C00F9F9D5 /* todo.md in Resources */ = {isa = PBXBuildFile; fileRef = 38A1AB6D1727009C00F9F9D5 /* todo.md */; };
 		38DDAA7B16EDA8990001841D /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 38DDAA7A16EDA8990001841D /* README.md */; };
+		38F7830B17565F72009D207A /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = 38F7830A17565F72009D207A /* LICENSE */; };
 		8D15AC2C0486D014006FF6A4 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 2A37F4B9FDCFA73011CA2CEA /* Credits.rtf */; };
 		8D15AC2F0486D014006FF6A4 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165FFE840EACC02AAC07 /* InfoPlist.strings */; };
 		8D15AC310486D014006FF6A4 /* EXTDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A37F4ACFDCFA73011CA2CEA /* EXTDocument.m */; settings = {ATTRIBUTES = (); }; };
@@ -77,6 +78,8 @@
 		389FB38C17498AF500D0FE75 /* EXTMultiplicationTables.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTMultiplicationTables.m; sourceTree = "<group>"; };
 		38A1AB6D1727009C00F9F9D5 /* todo.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = todo.md; sourceTree = "<group>"; };
 		38DDAA7A16EDA8990001841D /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.md; sourceTree = "<group>"; };
+		38F7830A17565F72009D207A /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
+		38F7830F17566281009D207A /* EXTLocation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EXTLocation.h; sourceTree = "<group>"; };
 		8D15AC360486D014006FF6A4 /* Ext_Chart-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Ext_Chart-Info.plist"; sourceTree = "<group>"; };
 		8D15AC370486D014006FF6A4 /* Ext Chart.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Ext Chart.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -116,6 +119,7 @@
 			children = (
 				31D403BE13DA04D8006A8C06 /* EXTdifferential.h */,
 				31D403BF13DA04D8006A8C06 /* EXTdifferential.m */,
+				38F7830F17566281009D207A /* EXTLocation.h */,
 				3896548B16F538D90008FB8D /* EXTMatrix.h */,
 				3896548C16F538D90008FB8D /* EXTMatrix.m */,
 				389FB38B17498AF500D0FE75 /* EXTMultiplicationTables.h */,
@@ -192,6 +196,7 @@
 				14C13C4F174FE410001BE9F9 /* Controllers */,
 				14C13C4E174FE3B3001BE9F9 /* Views */,
 				14C13C50174FE468001BE9F9 /* Documents */,
+				38F7830A17565F72009D207A /* LICENSE */,
 				38DDAA7A16EDA8990001841D /* README.md */,
 				318EC0681409385F005D21D4 /* to do list.rtf */,
 				38A1AB6D1727009C00F9F9D5 /* todo.md */,
@@ -296,6 +301,7 @@
 				318EC0691409385F005D21D4 /* to do list.rtf in Resources */,
 				38DDAA7B16EDA8990001841D /* README.md in Resources */,
 				38A1AB6E1727009C00F9F9D5 /* todo.md in Resources */,
+				38F7830B17565F72009D207A /* LICENSE in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

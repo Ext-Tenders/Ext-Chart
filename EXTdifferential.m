@@ -7,7 +7,6 @@
 //
 
 #import "EXTDifferential.h"
-#import "EXTPair.h"
 #import "EXTGrid.h"
 #import "EXTTerm.h"
 
@@ -237,30 +236,18 @@
 	[coder encodeInt:page forKey:@"page"];
 }
 
-+ (EXTPair*) getEndFrom:(EXTPair*)start OnPage:(int)page {
-	int a = [start a], b = [start b];
-	a -= 1;
-	b += page;
-	return [EXTPair pairWithA:a B:b];
-}
-
-+ (EXTPair*) getStartFrom:(EXTPair*)end OnPage:(int)page {
-	int a = [end a], b = [end b];
-	a += 1;
-	b -= page;
-	return [EXTPair pairWithA:a B:b];
-}
-
 // TODO: fix these magic numbers.
 // XXX: the differentials always attach themselves to the bottom class.  really,
 // it looks better if they always attach themselves to the *last* class.
 // *really* really, they should attach themselves intelligently to the class
 // that makes most sense.  :)
 - (void) drawWithSpacing:(CGFloat)spacing{
-	CGFloat x1 = ([start.location a]+0.25)*spacing,
-			y1 = ([start.location b]+0.25)*spacing,
-			x2 = ([end.location a]+0.25)*spacing,
-			y2 = ([end.location b]+0.25)*spacing;
+    NSPoint pointStart = [start.location makePoint],
+            pointEnd = [end.location makePoint];
+	CGFloat x1 = (pointStart.x+0.25)*spacing,
+			y1 = (pointStart.y+0.25)*spacing,
+			x2 = (pointEnd.x+0.25)*spacing,
+			y2 = (pointEnd.y+0.25)*spacing;
 	[[NSColor blackColor] set];
 	NSBezierPath *line = [NSBezierPath bezierPath];
 	[line moveToPoint:NSMakePoint(x1, y1)];
@@ -280,21 +267,6 @@
 	[newPath appendBezierPathWithRect:targetRect];
 	
 	return newPath;
-}
-
-+ (void)addSelfToSequence:(NSMutableArray *)pageSequence
-             onPageNumber:(NSUInteger)pageNo atPoint:(NSPoint)point {
-	
-//	EXTPage *extPage = [pageSequence objectAtIndex:pageNo];
-//	EXTPair	*sourcePosition = [EXTPair pairWithA:point.x AndB:point.y];
-//	EXTPair	*targetPosition = [EXTPair pairWithA:(point.x-1) AndB:(point.y+pageNo)];
-//	EXTTerm *source = [[extPage termsArray] objectForKey:sourcePosition];
-//	EXTTerm *target = [[extPage termsArray] objectForKey:targetPosition];
-//	if (source && target) {
-//		EXTDifferential* differential = [[EXTDifferential alloc] initWithPage:pageNo Start:sourcePosition AndEnd:targetPosition];
-//		[[extPage differentialsArray] setObject:differential forKey:sourcePosition];
-// 		[extPage setModified:YES];
-//	}
 }
 
 @end

@@ -8,9 +8,9 @@
 
 #import <Cocoa/Cocoa.h>
 #import "EXTDocument.h"
+#import "EXTLocation.h"
 
 // forward prototypes for classes in other headers.
-@class EXTPair;
 @class EXTGrid;
 
 // this class models a cell in the spectral sequence.  it needs to keep track of
@@ -21,9 +21,7 @@
 // more sophisticated variant of modules is going to take a substantial rewrite.
 @interface EXTTerm : NSObject <NSCoding>
     {
-        // TODO: the May SS is trigraded; EXTPair should be a subclass of some
-        // interface class tracking this sort of behavior.
-        EXTPair* location;          // position on grid
+        EXTLocation* location;          // position on grid
         NSMutableArray* names;      // contains NSString's, basis element names
         // TODO: this next item means we need to understand some kind of linear
         // algebra, and how to name things inside a vector space.
@@ -35,15 +33,15 @@
         // TODO: add some list that keeps track of multiplicative structures
     }
 
-    @property(retain) EXTPair* location;
+    @property(retain) EXTLocation* location;
     @property(retain) NSMutableArray* names;
     @property(retain) NSMutableArray* cycles;
     @property(retain) NSMutableArray* boundaries;
 
     // a constructor
-    +(id) term:(EXTPair*)whichLocation andNames:(NSMutableArray*)whichNames;
+    +(id) term:(EXTLocation*)whichLocation andNames:(NSMutableArray*)whichNames;
     // and an in-place initializer
-    -(id) setTerm:(EXTPair*)whichLocation andNames:(NSMutableArray*)whichNames;
+    -(id) setTerm:(EXTLocation*)whichLocation andNames:(NSMutableArray*)whichNames;
     // TODO: a direct sum constructor might be nice?
 
 

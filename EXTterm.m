@@ -7,11 +7,11 @@
 //
 
 #import "EXTTerm.h"
-#import "EXTPair.h"
 #import "EXTGrid.h"
 #import "EXTDocument.h"
 #import "EXTdifferential.h"
 #import "EXTMatrix.h"
+#import "EXTPair.h"
 
 @implementation EXTTerm
 
@@ -23,7 +23,7 @@
 #pragma mark *** initialization ***
 
 // setTerm re/initializes an EXTTerm with the desired values.
--(id) setTerm:(EXTPair*)whichLocation andNames:(NSMutableArray*)whichNames {
+-(id) setTerm:(EXTLocation*)whichLocation andNames:(NSMutableArray*)whichNames {
     // first try to initialize the memory for the object which we don't control
 
     // if it succeeds, then initialize the members
@@ -57,7 +57,7 @@
     return self;
 }
 
-+(EXTTerm*) term:(EXTPair*)whichLocation andNames:(NSMutableArray*)whichNames {
++(EXTTerm*) term:(EXTLocation*)whichLocation andNames:(NSMutableArray*)whichNames {
     EXTTerm *term = [EXTTerm new];
     [term setTerm:whichLocation andNames:whichNames];
     return term;
@@ -87,8 +87,9 @@
 // TODO: separate out these magic constants
 - (void) drawWithSpacing:(CGFloat)spacing page:(int)page {
     NSBezierPath* path = [NSBezierPath new];
-    CGFloat x = [[self location] a]*spacing,
-            y = [[self location] b]*spacing;
+    NSPoint point = [[self location] makePoint];
+    CGFloat x = (point.x)*spacing,
+            y = (point.y)*spacing;
     
     for (int j = 0; j < [self dimension:page]; j++) {
         NSRect dotPosition =
@@ -239,8 +240,10 @@
            [[boundaries objectAtIndex:whichPage] count];
 }
 
+// XXX: this should deal with EXTLocation in a sane way.
 +(id) dealWithClick:(NSPoint)location document:(EXTDocument*)document {
-    EXTPair	*pointPair = [EXTPair pairWithA:location.x B:location.y];
+    EXTPair	*pointPair = [EXTPair pairWithA:(int)(location.x)
+                                          B:(int)(location.y)];
     EXTTerm *term = [EXTTerm term:pointPair andNames:[NSMutableArray array]];
 
     [[document terms] addObject:term];

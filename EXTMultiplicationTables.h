@@ -7,7 +7,6 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "EXTPair.h"
 #import "EXTMatrix.h"
 #import "EXTDocument.h"
 
@@ -23,11 +22,13 @@
 -(id) init;
 +(id) multiplicationTables:(EXTDocument*)document;
 
--(EXTMatrix*) getMatrixFor:(EXTPair*)loc1 with:(EXTPair*)loc2;
+-(EXTMatrix*) getMatrixFor:(EXTLocation*)loc1 with:(EXTLocation*)loc2;
 
--(NSMutableArray*) multiplyClass:(NSMutableArray*)class1 at:(EXTPair*)loc1
-                            with:(NSMutableArray*)class2 at:(EXTPair*)loc2;
+-(NSMutableArray*) multiplyClass:(NSMutableArray*)class1 at:(EXTLocation*)loc1
+                            with:(NSMutableArray*)class2 at:(EXTLocation*)loc2;
 
--(void) computeLeibniz:(EXTPair*)loc1 with:(EXTPair*)loc2 onPage:(int)page;
+-(void) computeLeibniz:(EXTLocation*)loc1
+                  with:(EXTLocation*)loc2
+                onPage:(int)page;
 
 @end

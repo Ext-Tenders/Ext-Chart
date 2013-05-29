@@ -7,18 +7,19 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import "EXTLocation.h"
 
-
-@interface EXTPair : NSObject <NSCopying, NSCoding> {
+@interface EXTPair : NSObject <NSCopying, NSCoding, EXTLocation> {
 	int a, b;
 }
 @property int a;
 @property int b;
-- (id) initWithA:(int)aa B:(int)bb;
-+ (id) pairWithA:(int)aa B:(int)bb;
-- (NSPoint) makePoint;
+-(id) initWithA:(int)aa B:(int)bb;
++(id) pairWithA:(int)aa B:(int)bb;
+
+-(NSPoint) makePoint;
 -(NSString *) description;
-+(EXTPair*) addPairs:(EXTPair*)a to:(EXTPair*)b;
++(EXTPair*) addLocation:(EXTPair*)a to:(EXTPair*)b;
 +(EXTPair*) followDiffl:(EXTPair*)a page:(int)page;
 +(EXTPair*) reverseDiffl:(EXTPair*)b page:(int)page;
 

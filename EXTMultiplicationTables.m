@@ -36,7 +36,7 @@
 }
 
 // TODO: for the moment, note that this is order-sensitive.
--(EXTMatrix*) getMatrixFor:(EXTPair *)loc1 with:(EXTPair *)loc2 {
+-(EXTMatrix*) getMatrixFor:(EXTLocation*)loc1 with:(EXTLocation*)loc2 {
     // start by trying to pull the matrix out of the dictionary.
     NSString *key = [NSString stringWithFormat:@"%@ %@",
                      [loc1 description], [loc2 description]];
@@ -45,9 +45,10 @@
     // if we can't find it, then we should instantiate it.
     if (!ret) {
         // find all the relevant EXTTerms, so we can calculate the right size
+        Class<EXTLocation> locClass = [loc1 class];
         EXTTerm *term1 = [document findTerm:loc1],
                 *term2 = [document findTerm:loc2],
-           *targetterm = [document findTerm:[EXTPair addPairs:loc1 to:loc2]];
+           *targetterm = [document findTerm:[locClass addLocation:loc1 to:loc2]];
         
         // instantiate the matrix
         ret = [EXTMatrix matrixWidth:([term1 names].count * [term2 names].count)
@@ -78,8 +79,10 @@
 }
 
 // multiplies two classes together, according to the rules.
--(NSMutableArray *) multiplyClass:(NSMutableArray *)class1 at:(EXTPair *)loc1
-                             with:(NSMutableArray *)class2 at:(EXTPair *)loc2 {
+-(NSMutableArray *) multiplyClass:(NSMutableArray *)class1
+                               at:(EXTLocation *)loc1
+                             with:(NSMutableArray *)class2
+                               at:(EXTLocation *)loc2 {
     // retrieve the multiplication rule
     EXTMatrix *productRule = [self getMatrixFor:loc1 with:loc2];
     
@@ -91,7 +94,9 @@
     return [productRule actOn:hadamardVector];
 }
 
--(void) computeLeibniz:(EXTPair *)loc1 with:(EXTPair *)loc2 onPage:(int)page {
+-(void) computeLeibniz:(EXTLocation *)loc1
+                  with:(EXTLocation *)loc2
+                onPage:(int)page {
     // find a basis for the image of the product map, and select which vectors
     // we need to multiply to get them.
     EXTMatrix *product = [self getMatrixFor:loc1 with:loc2];
@@ -121,7 +126,7 @@
     // compute the action of the differentials on each factor in the
     // product decomposition: d(xy) = dx y + x dy.
     // XXX: deal with sign errors here.
-    EXTPair *sumloc = [EXTPair addPairs:loc1 to:loc2];
+    EXTLocation *sumloc = [[loc1 class] addLocation:loc1 to:loc2];
     EXTTerm *term1 = [document findTerm:loc1],
             *term2 = [document findTerm:loc2],
           *sumterm = [document findTerm:sumloc];
@@ -189,8 +194,8 @@
     EXTDifferential *diffl = [document findDifflWithSource:sumloc onPage:page];
     // if the differential we're trying to write to doesn't yet exist, build it.
     if (!diffl) {
-        EXTTerm *targetterm =
-                    [document findTerm:[EXTPair followDiffl:sumloc page:page]];
+        EXTTerm *targetterm = [document findTerm:
+                                 [[sumloc class] followDiffl:sumloc page:page]];
         diffl = [EXTDifferential differential:sumterm end:targetterm page:page];
         [[document differentials] addObject:diffl];
     }

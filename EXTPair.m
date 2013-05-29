@@ -30,7 +30,7 @@
 	return NSMakePoint([self a], [self b]);
 }
 
-+(EXTPair*) addPairs:(EXTPair *)a to:(EXTPair *)b {
++(EXTPair*) addLocation:(EXTPair *)a to:(EXTPair *)b {
     return [EXTPair pairWithA:(a.a+b.a) B:(a.b+b.b)];
 }
 

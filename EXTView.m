@@ -7,7 +7,6 @@
 //
 
 #import "EXTView.h"
-#import "EXTPair.h"
 #import "EXTDocument.h"
 #import "EXTScrollView.h"
 #import "EXTGrid.h"
@@ -102,16 +101,13 @@
 
 #pragma mark *** utility methods ***
 // convert pixel coordinates to (p, q) coordinates
-- (EXTPair*) convertToGridCoordinates:(NSPoint)pixelLoc {
-	int px = pixelLoc.x, py = pixelLoc.y;
-	int nx = floor(px/gridSpacing), ny = floor(py/gridSpacing);
-	return [EXTPair pairWithA:nx B:ny];
+-(NSPoint) convertToGridCoordinates:(NSPoint)pixelLoc {
+	return NSMakePoint(floor(pixelLoc.x/gridSpacing), floor(pixelLoc.y/gridSpacing));
 }
 
 // convert (p, q) coordinates to pixel coordinates
-- (NSPoint) convertToPixelCoordinates:(EXTPair*) gridLoc{
-	int x = gridLoc.a, y = gridLoc.b;
-	return NSMakePoint(x*gridSpacing, y*gridSpacing);
+- (NSPoint) convertToPixelCoordinates:(NSPoint) gridLoc{
+	return NSMakePoint(gridLoc.x*gridSpacing, gridLoc.y*gridSpacing);
 }
 
 
@@ -169,12 +165,13 @@
 		NSPoint upperRightPoint = rect.origin;
 		upperRightPoint.x += rect.size.width;
 		upperRightPoint.y += rect.size.height;
-		EXTPair* lowerLeftCoord = [self convertToGridCoordinates:lowerLeftPoint];
-		EXTPair* upperRightCoord = [self convertToGridCoordinates:upperRightPoint];
 		
         // XXX: this may be drawing too narrow a window, resulting in blank Ext
         // charts if the scroll is dragged too slowly.
-        [delegate drawPageNumber:pageInView ll:lowerLeftCoord ur:upperRightCoord withSpacing:gridSpacing];
+        [delegate drawPageNumber:pageInView
+                              ll:[self convertToGridCoordinates:lowerLeftPoint]
+                              ur:[self convertToGridCoordinates:upperRightPoint]
+                     withSpacing:gridSpacing];
 		
 		//  // restore the graphics context
 		//	[theContext restoreGraphicsState];

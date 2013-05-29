@@ -59,6 +59,7 @@
     // remove all the old garbage
     [self setTerms:[NSMutableArray array]];
     [self setDifferentials:[NSMutableArray array]];
+    [self setIndexClass:[EXTPair class]];
 
     // this old test code initializes the grid with some random stuff.  that's
     // neat, but it's not organized enough to test the multiplicative structure,
@@ -156,7 +157,7 @@
     return;
 }
 
--(EXTTerm*) findTerm:(EXTPair *)loc {
+-(EXTTerm*) findTerm:(EXTLocation *)loc {
     for (EXTTerm *term in self.terms) {
         if ([loc isEqual:[term location]])
             return term;
@@ -165,7 +166,7 @@
     return nil;
 }
 
--(EXTDifferential*) findDifflWithSource:(EXTPair *)loc onPage:(int)page {
+-(EXTDifferential*) findDifflWithSource:(EXTLocation *)loc onPage:(int)page {
     for (EXTDifferential *diffl in self.differentials)
         if (([[diffl start] location] == loc) && ([diffl page] == page))
             return diffl;
@@ -173,7 +174,7 @@
     return nil;
 }
 
--(EXTDifferential*) findDifflWithTarget:(EXTPair *)loc onPage:(int)page {
+-(EXTDifferential*) findDifflWithTarget:(EXTLocation *)loc onPage:(int)page {
     for (EXTDifferential *diffl in self.differentials)
         if (([[diffl end] location] == loc) && ([diffl page] == page))
             return diffl;
@@ -240,16 +241,17 @@
 // this performs the culling and delegation calls for drawing a page of the SS
 // TODO: does this need spacing to be passed in?  probably a lot of data passing
 // needs to be investigated and untangled... :(
--(void) drawPageNumber:(NSUInteger)pageNumber ll:(EXTPair*)lowerLeft
-                    ur:(EXTPair*)upperRight withSpacing:(CGFloat)withSpacing {
+-(void) drawPageNumber:(NSUInteger)pageNumber ll:(NSPoint)lowerLeft
+                    ur:(NSPoint)upperRight withSpacing:(CGFloat)withSpacing {
     
     // iterate through the available terms
     for (EXTTerm *term in [self terms]) {
         // if we're out of the viewing rectangle, then skip it
-        if (([[term location] a] <= [lowerLeft a])  ||
-            ([[term location] b] <= [lowerLeft b])  ||
-            ([[term location] a] >= [upperRight a]) ||
-            ([[term location] b] >= [upperRight b]))
+        NSPoint point = [[term location] makePoint];
+        if ((point.x <= lowerLeft.x)  ||
+            (point.y <= lowerLeft.y)  ||
+            (point.x >= upperRight.x) ||
+            (point.y >= upperRight.y))
             continue;
         
         // otherwise, we're obligated to try to draw it
