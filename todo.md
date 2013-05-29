@@ -6,7 +6,6 @@ UI work
 
 backend work
 ============
-- [ ] replace EXTPair with some general grading object
 - [ ] add entire polynomial families at once, propagate products with existing classes
 - [ ] allow for a SS to be a module over another SS of algebras
 - [ ] allow for a partially defined multiplicative structure

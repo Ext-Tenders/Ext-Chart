@@ -28,6 +28,7 @@
 		38A1AB6E1727009C00F9F9D5 /* todo.md in Resources */ = {isa = PBXBuildFile; fileRef = 38A1AB6D1727009C00F9F9D5 /* todo.md */; };
 		38DDAA7B16EDA8990001841D /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 38DDAA7A16EDA8990001841D /* README.md */; };
 		38F7830B17565F72009D207A /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = 38F7830A17565F72009D207A /* LICENSE */; };
+		38F783121756AEBF009D207A /* EXTTriple.m in Sources */ = {isa = PBXBuildFile; fileRef = 38F783111756AEBF009D207A /* EXTTriple.m */; };
 		8D15AC2C0486D014006FF6A4 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 2A37F4B9FDCFA73011CA2CEA /* Credits.rtf */; };
 		8D15AC2F0486D014006FF6A4 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165FFE840EACC02AAC07 /* InfoPlist.strings */; };
 		8D15AC310486D014006FF6A4 /* EXTDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A37F4ACFDCFA73011CA2CEA /* EXTDocument.m */; settings = {ATTRIBUTES = (); }; };
@@ -80,6 +81,8 @@
 		38DDAA7A16EDA8990001841D /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.md; sourceTree = "<group>"; };
 		38F7830A17565F72009D207A /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		38F7830F17566281009D207A /* EXTLocation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EXTLocation.h; sourceTree = "<group>"; };
+		38F783101756AEBF009D207A /* EXTTriple.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTTriple.h; sourceTree = "<group>"; };
+		38F783111756AEBF009D207A /* EXTTriple.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTTriple.m; sourceTree = "<group>"; };
 		8D15AC360486D014006FF6A4 /* Ext_Chart-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Ext_Chart-Info.plist"; sourceTree = "<group>"; };
 		8D15AC370486D014006FF6A4 /* Ext Chart.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Ext Chart.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -128,6 +131,8 @@
 				093AEADC13E10759003E9F58 /* EXTPair.m */,
 				31D403B913DA0476006A8C06 /* EXTterm.h */,
 				31D403BA13DA0476006A8C06 /* EXTterm.m */,
+				38F783101756AEBF009D207A /* EXTTriple.h */,
+				38F783111756AEBF009D207A /* EXTTriple.m */,
 			);
 			name = Model;
 			sourceTree = "<group>";
@@ -326,6 +331,7 @@
 				315BC80F140430B7007D49CA /* EXTToolPaletteController.m in Sources */,
 				3896548D16F538D90008FB8D /* EXTMatrix.m in Sources */,
 				389FB38D17498AF500D0FE75 /* EXTMultiplicationTables.m in Sources */,
+				38F783121756AEBF009D207A /* EXTTriple.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
