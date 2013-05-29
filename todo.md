@@ -17,8 +17,8 @@ backend work
 goals
 =====
 - [ ] automatic computation of May SS
-    + [ ]subgoal: get it to automatically compute Ext_A(1)(k, k).  the relevant filtration for A(1) looks like E[Q1] --> A(1) --> E[Sq1, Sq2] / Q1.  dually, this looks like F2[xi2] / xi2^2 <-- F2[xi1, xi2] / etc <-- F2[x1] / x1^4.  Lyndon-Hochschild-Serre computes the Ext over these two corner coalgebras as F2[v1] and F2[h0, h1] respectively.
-    + subgoal: then, try Ext_A(2)(k, k).
+    + [ ] subgoal: get it to automatically compute Ext_A(1)(k, k).  the relevant filtration for A(1) looks like E[Q1] --> A(1) --> E[Sq1, Sq2] / Q1.  dually, this looks like F2[xi2] / xi2^2 <-- F2[xi1, xi2] / etc <-- F2[x1] / x1^4.  Lyndon-Hochschild-Serre computes the Ext over these two corner coalgebras as F2[v1] and F2[h0, h1] respectively.
+    + [ ] subgoal: then, try Ext_A(2)(k, k).
 - [ ] automatic propagation of differentials via...
     + Leibniz rule
     + Steenrod structure in the May and Serre spectral sequences
