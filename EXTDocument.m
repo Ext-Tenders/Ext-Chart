@@ -15,13 +15,25 @@
 #import "EXTdifferential.h"
 #import "EXTMultiplicationTables.h"
 
+
+@interface EXTDocument ()
+    {
+        // view configuration
+        CGFloat gridSpacing;
+        CGFloat gridScalingFactor;
+        NSSize extDocumentSize;
+        NSPoint extDocumentOrigin;
+        //	extern CGFloat gridSpacing;
+        //	extern NSRect canvasRect;
+        NSColor *gridLineColor;
+        NSColor *emphasGridLineColor;
+    }
+
+    @property(nonatomic, weak) IBOutlet EXTView *extview;
+@end
+
 @implementation EXTDocument
 
-@synthesize artboardRectX;
-@synthesize theArtBoard;
-@synthesize theGrid;
-@synthesize maxPage;
-@synthesize terms, differentials, multTables;
 #pragma mark *** initialization and dealloc ***
 
 - (id)init {
@@ -31,12 +43,12 @@
     // if we succeeded...
     if (self) {
         // allocate the display parts of things
-		theArtBoard = [[EXTArtBoard alloc] initWithRect:NSMakeRect(0, 0, 792, 612)];
+		_theArtBoard = [[EXTArtBoard alloc] initWithRect:NSMakeRect(0, 0, 792, 612)];
         
         // and allocate the internal parts of things
-        [self setTerms:[NSMutableArray array]];
-        [self setDifferentials:[NSMutableArray array]];
-        [self setMultTables:[EXTMultiplicationTables multiplicationTables:self]];
+        _terms = [NSMutableArray array];
+        _differentials = [NSMutableArray array];
+        _multTables = [EXTMultiplicationTables multiplicationTables:self];
     }
 
     return self;
@@ -91,7 +103,7 @@
         
         EXTTerm *term = [EXTTerm term:location andNames:[NSMutableArray arrayWithArray:names]];
                          
-        [terms addObject:term];
+        [self.terms addObject:term];
     }
     
     // add the terms in the SSS for S^1 --> S^5 --> CP^2
@@ -108,11 +120,11 @@
             *one = [EXTTerm term:[EXTPair pairWithA:0 B:0]
                         andNames:[NSMutableArray arrayWithArray:@[@"1"]]];
     
-    [terms addObjectsFromArray:@[one,e,x,ex,x2,ex2]];
+    [self.terms addObjectsFromArray:@[one,e,x,ex,x2,ex2]];
     
-    [extview setPageInView:1];
-    [extview setPageInView:2];
-    [extview setPageInView:0];
+    [self.extview setPageInView:1];
+    [self.extview setPageInView:2];
+    [self.extview setPageInView:0];
     
     // add a single differential
     EXTDifferential *firstdiff = [EXTDifferential differential:e end:x page:2];
@@ -124,28 +136,28 @@
     firstpartial.inclusion = inclusion;
     firstpartial.differential = differential;
     firstdiff.partialDefinitions[0] = firstpartial;
-    [differentials addObject:firstdiff];
+    [self.differentials addObject:firstdiff];
     
     // TODO: need to assemble the cycle groups for lower pages first...
     [firstdiff assemblePresentation]; // test!
     
     // specify the multiplicative structure
-    [[multTables getMatrixFor:[e location] with:[x location]].presentation setObject:@[@1] atIndexedSubscript:0];
-    [[multTables getMatrixFor:[ex location] with:[x location]].presentation setObject:@[@1] atIndexedSubscript:0];
-    [[multTables getMatrixFor:[e location] with:[x2 location]].presentation setObject:@[@1] atIndexedSubscript:0];
-    [[multTables getMatrixFor:[x location] with:[e location]].presentation setObject:@[@1] atIndexedSubscript:0];
-    [[multTables getMatrixFor:[x location] with:[ex location]].presentation setObject:@[@1] atIndexedSubscript:0];
-    [[multTables getMatrixFor:[x2 location] with:[e location]].presentation setObject:@[@1] atIndexedSubscript:0];
-    [[multTables getMatrixFor:[x location] with:[x location]].presentation setObject:@[@1] atIndexedSubscript:0];
+    [[self.multTables getMatrixFor:[e location] with:[x location]].presentation setObject:@[@1] atIndexedSubscript:0];
+    [[self.multTables getMatrixFor:[ex location] with:[x location]].presentation setObject:@[@1] atIndexedSubscript:0];
+    [[self.multTables getMatrixFor:[e location] with:[x2 location]].presentation setObject:@[@1] atIndexedSubscript:0];
+    [[self.multTables getMatrixFor:[x location] with:[e location]].presentation setObject:@[@1] atIndexedSubscript:0];
+    [[self.multTables getMatrixFor:[x location] with:[ex location]].presentation setObject:@[@1] atIndexedSubscript:0];
+    [[self.multTables getMatrixFor:[x2 location] with:[e location]].presentation setObject:@[@1] atIndexedSubscript:0];
+    [[self.multTables getMatrixFor:[x location] with:[x location]].presentation setObject:@[@1] atIndexedSubscript:0];
 
     
-    [multTables computeLeibniz:[e location] with:[x location] onPage:2];
+    [self.multTables computeLeibniz:[e location] with:[x location] onPage:2];
     
     return;
 }
 
 -(EXTTerm*) findTerm:(EXTPair *)loc {
-    for (EXTTerm *term in terms) {
+    for (EXTTerm *term in self.terms) {
         if ([loc isEqual:[term location]])
             return term;
     }
@@ -154,7 +166,7 @@
 }
 
 -(EXTDifferential*) findDifflWithSource:(EXTPair *)loc onPage:(int)page {
-    for (EXTDifferential *diffl in differentials)
+    for (EXTDifferential *diffl in self.differentials)
         if (([[diffl start] location] == loc) && ([diffl page] == page))
             return diffl;
     
@@ -162,7 +174,7 @@
 }
 
 -(EXTDifferential*) findDifflWithTarget:(EXTPair *)loc onPage:(int)page {
-    for (EXTDifferential *diffl in differentials)
+    for (EXTDifferential *diffl in self.differentials)
         if (([[diffl end] location] == loc) && ([diffl page] == page))
             return diffl;
     
@@ -183,17 +195,17 @@
 //	theGrid = [EXTGrid alloc];
 //	[theGrid initWithRect:[extview bounds]];
 	
-	[theGrid setBoundsRect:[extview bounds]];
+	[self.theGrid setBoundsRect:[self.extview bounds]];
 	
 // The analogue of these next settings 	 are done with bindings in Sketch.   I'm not sure what the difference is.
-	[extview setDelegate:self];
-	[extview setArtBoard:theArtBoard];
-	[extview set_grid:theGrid];
+	[self.extview setDelegate:self];
+	[self.extview setArtBoard:self.theArtBoard];
+	[self.extview set_grid:self.theGrid];
 	
 // since the frame extends past the bounds rectangle, we need observe the drawingRect in order to know what to refresh when the artBoard changes
 	
-	[theArtBoard addObserver: extview forKeyPath:EXTArtBoardDrawingRectKey options:(NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld) context:nil];
-	[theGrid addObserver:extview forKeyPath:EXTGridAnyKey options:0 context:nil];
+	[self.theArtBoard addObserver: self.extview forKeyPath:EXTArtBoardDrawingRectKey options:(NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld) context:nil];
+	[self.theGrid addObserver:self.extview forKeyPath:EXTGridAnyKey options:0 context:nil];
 
 //	[self setEmphasisGridSpacing:8];		
 }
