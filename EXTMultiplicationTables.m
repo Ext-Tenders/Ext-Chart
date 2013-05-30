@@ -201,7 +201,7 @@
     }
     
     // set up the partial definition matrices
-    EXTPartialDifferential *partial = [EXTPartialDifferential new];
+    EXTPartialDefinition *partial = [EXTPartialDefinition new];
     EXTMatrix *differential = [EXTMatrix matrixWidth:actions.count
                                               height:[actions[0] count]],
               *inclusion = [EXTMatrix matrixWidth:actions.count

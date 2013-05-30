@@ -9,6 +9,8 @@
 #import "EXTTriple.h"
 
 // TODO: implement the NSCoder and NSCopying protocols.
+// TODO: possibly someday we'll want to replace both EXTPair and EXTTriple by
+//       some kind of EXTTuple object.  for now, though, this is fine.
 @implementation EXTTriple
 
 @synthesize a, b, c;

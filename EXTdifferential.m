@@ -10,31 +10,6 @@
 #import "EXTGrid.h"
 #import "EXTTerm.h"
 
-// little class to keep track of partial subdefinitions of a parent differential
-@implementation EXTPartialDifferential
-
-@synthesize inclusion;
-@synthesize differential;
-@synthesize automaticallyGenerated;
-
--(EXTPartialDifferential*) init {
-    if (!(self = [super init])) return nil;
-    
-    // we don't keep track of enough information about dimensions to make the
-    // appropriate initialization calls to EXTMatrix factories.
-    inclusion = nil;
-    differential = nil;
-    
-    return self;
-}
-
-// TODO: make the boolean flag into (change to true)-only, like a dirty flag.
-// use this to decide whether to prompt the user when deleting partial
-// definitions, or generally when performing any other destructive operation.
-
-@end
-
-
 // redeclare part of the EXTDifferential interface so that we synthesize both
 // getters *and* setters for the publicly read-only properties.
 @interface EXTDifferential ()
@@ -82,136 +57,13 @@
 // this routine assembles from the available partial definitions of the
 // differential a single definition on the cycle group.  it's a bit convoluted.
 -(void) assemblePresentation {
-    NSMutableArray *imageVectors = [NSMutableArray array], // array of vectors
-        *imageParents = [NSMutableArray array], // def'n indices they belong to
-        *imageIndices = [NSMutableArray array]; // column indices they belong to
+    EXTMatrix *assembled =
+        [EXTMatrix assemblePresentation:self.partialDefinitions
+                        sourceDimension:[[self.start.boundaries
+                                            objectAtIndex:(self.page-1)] count]
+                        targetDimension:end.names.count];
     
-    // assemble all the inclusion image vectors into one massive array.
-    for (int i = 0; i < self.partialDefinitions.count; i++) {
-        EXTPartialDifferential *workingPartial = self.partialDefinitions[i];
-        NSMutableArray *workingVectors = workingPartial.inclusion.presentation;
-        for (int j = 0; j < workingVectors.count; j++) {
-            [imageVectors addObject:workingVectors[j]];
-            [imageParents addObject:@(i)];
-            [imageIndices addObject:@(j)];
-        }
-    }
-    
-    // the point of doing that was to perform column reduction and find a
-    // minimal spanning set for their image.
-    EXTMatrix *enormousMat = [EXTMatrix matrixWidth:imageVectors.count
-                                             height:[imageVectors[0] count]];
-    enormousMat.presentation = imageVectors;
-    enormousMat = [enormousMat columnReduce];
-    
-    // from this, let's extract a *minimal* generating set for the image.  if
-    // the inclusions are jointly of full rank, we'll need this for later
-    // calculations.  if they aren't of full rank, we can use this to see that
-    // and bail if necessary.
-    NSMutableArray *minimalVectors = [NSMutableArray array],
-                   *minimalParents = [NSMutableArray array],
-                   *minimalIndices = [NSMutableArray array];
-    
-    for (int i = 0; i < enormousMat.width; i++) {
-        bool isEmpty = true;
-        
-        for (int j = 0; j < enormousMat.height; j++)
-            if (enormousMat.presentation[i][j] != 0)
-                isEmpty = false;
-        
-        // if this vector is inessential, it will have been eliminated by rcef.
-        if (isEmpty)
-            continue;
-        
-        // if it's essential, we should add it. :)
-        [minimalVectors addObject:imageVectors[i]];
-        [minimalParents addObject:imageParents[i]];
-        [minimalIndices addObject:imageIndices[i]];
-    }
-    
-    // then, if we have too few vectors left to be of full rank...
-    if (minimalVectors.count != [start.cycles[page] count])
-        wellDefined = false; // ... then mark that we failed
-    else
-        wellDefined = true;  // ... otherwise, mark that we're good to go.
-    
-    // we want to extend this basis of the cycle groups to a basis of the entire
-    // E_1 term.  start by augmenting to a matrix containing a definite surplus
-    // of basis vectors.
-    NSMutableArray *augmentedVectors =
-        [NSMutableArray arrayWithArray:minimalVectors];
-    for (int i = 0; i < end.names.count; i++) {
-        NSMutableArray *en = [NSMutableArray array];
-        for (int j = 0; j < end.names.count; j++) {
-            if (i == j) {
-                [en addObject:@1];
-            } else {
-                [en addObject:@0];
-            }
-        }
-        
-        [augmentedVectors addObject:en];
-    }
-    
-    // then, column reduce it.  the vectors that survive will be our full basis.
-    EXTMatrix *augmentedMat =
-        [EXTMatrix matrixWidth:augmentedVectors.count height:end.names.count];
-    augmentedMat.presentation = augmentedVectors;
-    EXTMatrix *reducedMat = [augmentedMat columnReduce];
-    NSMutableArray *reducedVectors = reducedMat.presentation;
-    
-    // having reduced it, we pull out the basis vectors we needed for extension
-    for (int i = minimalVectors.count; i < reducedVectors.count; i++) {
-        bool needThisOne = true;
-        for (int j = 0; j < [reducedVectors[i] count]; j++) {
-            if ([reducedVectors[i] objectAtIndex:j] != 0)
-                needThisOne = false;
-        }
-        
-        if (needThisOne)
-            [minimalVectors addObject:augmentedVectors[i]];
-    }
-    
-    // and so here's our basis matrix.
-    EXTMatrix *basisMatrix =
-        [EXTMatrix matrixWidth:minimalVectors.count
-                        height:[minimalVectors[0] count]];
-    basisMatrix.presentation = minimalVectors;
-
-    // now, we construct a matrix presenting the differential in this basis.
-    // this is where the partial definitions actually get used.
-    EXTMatrix *differentialInCoordinates =
-        [EXTMatrix matrixWidth:basisMatrix.width height:basisMatrix.height];
-    for (int i = 0; i < basisMatrix.width; i++) {
-        // if we're in the range of partially determined stuff, use the def'ns
-        if (i < minimalParents.count) {
-            EXTPartialDifferential *pdiffl =
-                [partialDefinitions
-                    objectAtIndex:[[minimalParents objectAtIndex:i] intValue]];
-            EXTMatrix *diffl = [pdiffl differential];
-            differentialInCoordinates.presentation[i] =
-                [[diffl presentation]
-                    objectAtIndex:[[minimalIndices objectAtIndex:i] intValue]];
-        } else {
-            // otherwise, extend by zero.
-            NSMutableArray *workingColumn = [NSMutableArray array];
-            
-            for (int j = 0; j < basisMatrix.height; j++)
-                [workingColumn setObject:@0 atIndexedSubscript:j];
-            
-            differentialInCoordinates.presentation[i] = workingColumn;
-        }
-    }
-    
-    // finally, we need to put these matrices together to build a presentation
-    // of the differential in the standard basis.  this is simple: just invert
-    // and multiply. :)
-    EXTMatrix *basisConversion = [basisMatrix invert];
-    EXTMatrix *stdDifferential =
-        [EXTMatrix newMultiply:differentialInCoordinates by:basisConversion];
-    
-    // finally, all our hard work done, we store and jump back.
-    presentation = stdDifferential;
+    self.presentation = assembled;
     
     return;
 }

@@ -129,7 +129,7 @@
     
     // add a single differential
     EXTDifferential *firstdiff = [EXTDifferential differential:e end:x page:2];
-    EXTPartialDifferential *firstpartial = [EXTPartialDifferential new];
+    EXTPartialDefinition *firstpartial = [EXTPartialDefinition new];
     EXTMatrix *inclusion = [EXTMatrix matrixWidth:1 height:1];
     EXTMatrix *differential = [EXTMatrix matrixWidth:1 height:1];
     [[inclusion.presentation objectAtIndex:0] setObject:@1 atIndex:0];
