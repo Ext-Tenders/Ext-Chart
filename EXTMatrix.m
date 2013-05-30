@@ -331,11 +331,17 @@
 +(EXTMatrix*) assemblePresentation:(NSMutableArray*)partialDefinitions
                    sourceDimension:(int)sourceDimension
                    targetDimension:(int)targetDimension {
+    
+    // first, make sure we're not going to bomb.
+    if (partialDefinitions.count == 0)
+        return [EXTMatrix matrixWidth:sourceDimension height:targetDimension];
+    
+    // we first need to assemble all the inclusion image vectors into one
+    // massive array.
     NSMutableArray *imageVectors = [NSMutableArray array], // array of vectors
         *imageParents = [NSMutableArray array], // def'n indices they belong to
         *imageIndices = [NSMutableArray array]; // column indices they belong to
     
-    // assemble all the inclusion image vectors into one massive array.
     for (int i = 0; i < partialDefinitions.count; i++) {
         EXTPartialDefinition *workingPartial = partialDefinitions[i];
         NSMutableArray *workingVectors = workingPartial.inclusion.presentation;

@@ -10,6 +10,29 @@
 #import "EXTterm.h"
 #import "EXTdifferential.h"
 
+
+@implementation EXTMultiplicationEntry
+@synthesize presentation, partialDefinitions;
+
+-(EXTMultiplicationEntry*) init {
+    if (self = [super init]) {
+        self.presentation = nil;
+        self.partialDefinitions = [NSMutableArray array];
+    }
+    
+    return self;
+}
+
++(id) entry {
+    EXTMultiplicationEntry *ret = [[EXTMultiplicationEntry alloc] init];
+    return ret;
+}
+
+@end
+
+
+
+
 @implementation EXTMultiplicationTables
 
 @synthesize tables;
@@ -35,30 +58,80 @@
     return ret;
 }
 
-// TODO: for the moment, note that this is order-sensitive.
--(EXTMatrix*) getMatrixFor:(EXTLocation*)loc1 with:(EXTLocation*)loc2 {
+-(EXTMultiplicationEntry*) performLookup:(EXTLocation*)loc1
+                                    with:(EXTLocation*)loc2 {
     // start by trying to pull the matrix out of the dictionary.
     NSString *key = [NSString stringWithFormat:@"%@ %@",
                      [loc1 description], [loc2 description]];
-    EXTMatrix *ret = [tables objectForKey:key];
+    EXTMultiplicationEntry *ret = [tables objectForKey:key];
+    
+    // find all the relevant EXTTerms, so we can calculate the right size
+    Class<EXTLocation> locClass = [loc1 class];
+    EXTTerm *term1 = [document findTerm:loc1],
+    *term2 = [document findTerm:loc2],
+    *targetterm = [document findTerm:[locClass addLocation:loc1 to:loc2]];
+    
+    int width, height;
+    if (!term1 || !term2 || !targetterm) {
+        width = height = 0;
+    } else {
+        width = [term1 names].count * [term2 names].count;
+        height = [targetterm names].count;
+    }
     
     // if we can't find it, then we should instantiate it.
     if (!ret) {
-        // find all the relevant EXTTerms, so we can calculate the right size
-        Class<EXTLocation> locClass = [loc1 class];
-        EXTTerm *term1 = [document findTerm:loc1],
-                *term2 = [document findTerm:loc2],
-           *targetterm = [document findTerm:[locClass addLocation:loc1 to:loc2]];
-        
         // instantiate the matrix
-        ret = [EXTMatrix matrixWidth:([term1 names].count * [term2 names].count)
-                              height:[targetterm names].count];
+        ret = [EXTMultiplicationEntry entry];
+        ret.presentation =
+            [EXTMatrix matrixWidth:([term1 names].count * [term2 names].count)
+                            height:[targetterm names].count];
         
         // and store it to the tables
         [tables setObject:ret forKey:key];
     }
-
+    
     return ret;
+}
+
+-(void) addPartialDefinition:(EXTPartialDefinition*)partial
+                          to:(EXTLocation*)loc1
+                        with:(EXTLocation*)loc2 {
+    EXTMultiplicationEntry *entry = [self performLookup:loc1 with:loc2];
+    [entry.partialDefinitions addObject:partial];
+    
+    return;
+}
+
+// TODO: for the moment, note that this is order-sensitive.
+-(EXTMatrix*) getMatrixFor:(EXTLocation*)loc1 with:(EXTLocation*)loc2 {
+    EXTMultiplicationEntry *entry = [self performLookup:loc1 with:loc2];
+    Class<EXTLocation> locClass = [loc1 class];
+    EXTTerm *term1 = [document findTerm:loc1],
+    *term2 = [document findTerm:loc2],
+    *targetterm = [document findTerm:[locClass addLocation:loc1 to:loc2]];
+    
+    int width, height;
+    if (!term1 || !term2 || !targetterm) {
+        width = height = 0;
+    } else {
+        width = [term1 names].count * [term2 names].count;
+        height = [targetterm names].count;
+    }
+    
+    entry.presentation = [EXTMatrix assemblePresentation:entry.partialDefinitions sourceDimension:width targetDimension:height];
+    
+    return entry.presentation;
+}
+
+// unsafe lookup
+-(EXTMatrix*) getMatrixWithoutRecomputingFor:(EXTLocation*)loc1
+                                        with:(EXTLocation*)loc2 {
+    NSString *key = [NSString stringWithFormat:@"%@ %@",
+                     [loc1 description], [loc2 description]];
+    EXTMultiplicationEntry *ret = [tables objectForKey:key];
+    
+    return ret.presentation;
 }
 
 // return the hadamard product, so to speak, of two vectors.
@@ -186,7 +259,7 @@
             [sum setObject:@([[summand1 objectAtIndex:i] intValue] +
                              [[summand2 objectAtIndex:i] intValue])
                  atIndexedSubscript:i];
-
+        
         [actions addObject:sum];
     }
     

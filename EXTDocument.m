@@ -143,13 +143,18 @@
     [firstdiff assemblePresentation]; // test!
     
     // specify the multiplicative structure
-    [[self.multTables getMatrixFor:[e location] with:[x location]].presentation setObject:@[@1] atIndexedSubscript:0];
-    [[self.multTables getMatrixFor:[ex location] with:[x location]].presentation setObject:@[@1] atIndexedSubscript:0];
-    [[self.multTables getMatrixFor:[e location] with:[x2 location]].presentation setObject:@[@1] atIndexedSubscript:0];
-    [[self.multTables getMatrixFor:[x location] with:[e location]].presentation setObject:@[@1] atIndexedSubscript:0];
-    [[self.multTables getMatrixFor:[x location] with:[ex location]].presentation setObject:@[@1] atIndexedSubscript:0];
-    [[self.multTables getMatrixFor:[x2 location] with:[e location]].presentation setObject:@[@1] atIndexedSubscript:0];
-    [[self.multTables getMatrixFor:[x location] with:[x location]].presentation setObject:@[@1] atIndexedSubscript:0];
+    EXTMatrix *matrix = [EXTMatrix matrixWidth:1 height:1];
+    [matrix.presentation[0] setObject:@1 atIndex:0];
+    EXTPartialDefinition *partialDefinition = [[EXTPartialDefinition alloc] init];
+    partialDefinition.inclusion = matrix;
+    partialDefinition.differential = matrix;
+    [self.multTables addPartialDefinition:partialDefinition to:[e location] with:[x location]];
+    [self.multTables addPartialDefinition:partialDefinition to:[ex location] with:[x location]];
+    [self.multTables addPartialDefinition:partialDefinition to:[e location] with:[x2 location]];
+    [self.multTables addPartialDefinition:partialDefinition to:[x location] with:[e location]];
+    [self.multTables addPartialDefinition:partialDefinition to:[x location] with:[ex location]];
+    [self.multTables addPartialDefinition:partialDefinition to:[x2 location] with:[e location]];
+    [self.multTables addPartialDefinition:partialDefinition to:[x location] with:[x location]];
     
     [self.multTables computeLeibniz:[e location] with:[x location] onPage:2];
     
