@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		093AEADD13E10759003E9F58 /* EXTPair.m in Sources */ = {isa = PBXBuildFile; fileRef = 093AEADC13E10759003E9F58 /* EXTPair.m */; };
+		14EF1A661756EE3C0012DD3C /* SelectTool.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 14EF1A651756EE3C0012DD3C /* SelectTool.pdf */; };
 		1DDD582C0DA1D0D100B32029 /* EXTDocument.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1DDD58280DA1D0D100B32029 /* EXTDocument.xib */; };
 		1DDD582D0DA1D0D100B32029 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1DDD582A0DA1D0D100B32029 /* MainMenu.xib */; };
 		315BC80F140430B7007D49CA /* EXTToolPaletteController.m in Sources */ = {isa = PBXBuildFile; fileRef = 315BC80E140430B7007D49CA /* EXTToolPaletteController.m */; };
@@ -42,6 +43,7 @@
 		093AEADC13E10759003E9F58 /* EXTPair.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTPair.m; sourceTree = "<group>"; };
 		1058C7A7FEA54F5311CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		13E42FBA07B3F13500E4EEF1 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
+		14EF1A651756EE3C0012DD3C /* SelectTool.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = SelectTool.pdf; path = Images/SelectTool.pdf; sourceTree = "<group>"; };
 		1DDD58290DA1D0D100B32029 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/EXTDocument.xib; sourceTree = "<group>"; };
 		1DDD582B0DA1D0D100B32029 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		2564AD2C0F5327BB00F57823 /* Ext_Chart_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Ext_Chart_Prefix.pch; sourceTree = "<group>"; };
@@ -174,6 +176,26 @@
 			name = Documents;
 			sourceTree = "<group>";
 		};
+		14EF1A611756ED430012DD3C /* Images */ = {
+			isa = PBXGroup;
+			children = (
+				14EF1A651756EE3C0012DD3C /* SelectTool.pdf */,
+			);
+			name = Images;
+			sourceTree = "<group>";
+		};
+		14EF1A641756EE020012DD3C /* XIBs */ = {
+			isa = PBXGroup;
+			children = (
+				1DDD58280DA1D0D100B32029 /* EXTDocument.xib */,
+				1DDD582A0DA1D0D100B32029 /* MainMenu.xib */,
+				31C77B8C13E43E3100E9DBFC /* Preferences.xib */,
+				31C77BA013E63E8F00E9DBFC /* EXTDocSettings.xib */,
+				31EEEF64140430380035BE7A /* EXTToolPalette.xib */,
+			);
+			name = XIBs;
+			sourceTree = "<group>";
+		};
 		19C28FB0FE9D524F11CA2CBB /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -221,14 +243,11 @@
 		2A37F4B8FDCFA73011CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				14EF1A641756EE020012DD3C /* XIBs */,
+				14EF1A611756ED430012DD3C /* Images */,
 				2A37F4B9FDCFA73011CA2CEA /* Credits.rtf */,
 				8D15AC360486D014006FF6A4 /* Ext_Chart-Info.plist */,
 				089C165FFE840EACC02AAC07 /* InfoPlist.strings */,
-				1DDD58280DA1D0D100B32029 /* EXTDocument.xib */,
-				1DDD582A0DA1D0D100B32029 /* MainMenu.xib */,
-				31C77B8C13E43E3100E9DBFC /* Preferences.xib */,
-				31C77BA013E63E8F00E9DBFC /* EXTDocSettings.xib */,
-				31EEEF64140430380035BE7A /* EXTToolPalette.xib */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -307,6 +326,7 @@
 				38DDAA7B16EDA8990001841D /* README.md in Resources */,
 				38A1AB6E1727009C00F9F9D5 /* todo.md in Resources */,
 				38F7830B17565F72009D207A /* LICENSE in Resources */,
+				14EF1A661756EE3C0012DD3C /* SelectTool.pdf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
