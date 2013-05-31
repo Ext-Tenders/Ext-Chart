@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "EXTLocation.h"
 
-@interface EXTTriple : NSObject <NSCopying, NSCoding, EXTLocation> {
+@interface EXTTriple : NSObject <EXTLocation> {
     int a, b, c;
 }
 @property int a;

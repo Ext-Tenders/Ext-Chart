@@ -37,6 +37,8 @@
 
 @synthesize tables;
 @synthesize document;
+@synthesize unitTerm;
+@synthesize unitClass;
 
 // XXX: general oversight: i don't check for when the target term exists.  this
 // surely must get in the way sometimes...
@@ -46,6 +48,8 @@
     
     [self setTables:[NSMutableDictionary dictionary]];
     [self setDocument:nil];
+    [self setUnitTerm:nil];
+    [self setUnitClass:[NSMutableArray array]];
     
     return self;
 }
@@ -70,14 +74,6 @@
     EXTTerm *term1 = [document findTerm:loc1],
     *term2 = [document findTerm:loc2],
     *targetterm = [document findTerm:[locClass addLocation:loc1 to:loc2]];
-    
-    int width, height;
-    if (!term1 || !term2 || !targetterm) {
-        width = height = 0;
-    } else {
-        width = [term1 names].count * [term2 names].count;
-        height = [targetterm names].count;
-    }
     
     // if we can't find it, then we should instantiate it.
     if (!ret) {
@@ -288,6 +284,19 @@
     [[diffl partialDefinitions] addObject:partial];
     
     return;
+}
+
+-(EXTTerm*) addTruncatedLaurentClass:(NSString*)name
+                            location:(EXTLocation*)loc
+                              downTo:(int)downTo
+                                upTo:(int)UpTo {
+    return nil;
+}
+
+-(EXTTerm*) addTruncatedPolynomialClass:(NSString*)name
+                               location:(EXTLocation*)loc
+                                   upTo:(int)upTo {
+    return [self addTruncatedLaurentClass:name location:loc downTo:0 upTo:upTo];
 }
 
 @end

@@ -9,7 +9,7 @@
 #import <Cocoa/Cocoa.h>
 #import "EXTLocation.h"
 
-@interface EXTPair : NSObject <NSCopying, NSCoding, EXTLocation> {
+@interface EXTPair : NSObject <EXTLocation> {
 	int a, b;
 }
 @property int a;

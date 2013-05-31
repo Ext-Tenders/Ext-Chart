@@ -42,13 +42,10 @@
     return [EXTPair pairWithA:(b.a+1) B:(b.b-page)];
 }
 
-/// NSCoder routines ///
+/// NSCoder, NSCopying routines ///
 
-- (id) copyWithZone:(NSZone*) zone {
-	EXTPair* copy = [[EXTPair alloc] init];
-	[copy setA:[self a]];
-	[copy setB:[self b]];
-	return copy;
+-(EXTPair*) copyWithZone:(NSZone*)zone {
+    return [EXTPair pairWithA:self.a B:self.b];
 }
 
 - (NSUInteger) hash {

@@ -51,4 +51,8 @@
     return [EXTTriple tripleWithA:(a.a + 1) B:(a.b - 1) C:(a.c + page)];
 }
 
+-(EXTTriple*) copyWithZone:(NSZone*)zone {
+    return [EXTTriple tripleWithA:self.a B:self.b C:self.c];
+}
+
 @end

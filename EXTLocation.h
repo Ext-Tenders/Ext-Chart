@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-@protocol EXTLocation <NSObject>
+@protocol EXTLocation <NSObject, NSCopying, NSCoding>
 
 -(NSPoint) makePoint;
 -(NSString *) description;
