@@ -76,7 +76,7 @@
 
 - (void)setPageInView:(int)newPage
 {
-    // TODO: implement this
+    self.extView.pageInView = newPage;
 }
 
 // this performs the culling and delegation calls for drawing a page of the SS
