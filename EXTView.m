@@ -22,7 +22,6 @@
 
 @implementation EXTView
 
-@synthesize delegate;
 @synthesize gridSpacing;
 @synthesize pageInView;
 @synthesize showGrid, editMode, showPages, editingArtBoards;
@@ -168,7 +167,7 @@
 		
         // XXX: this may be drawing too narrow a window, resulting in blank Ext
         // charts if the scroll is dragged too slowly.
-        [delegate drawPageNumber:pageInView
+        [_delegate drawPageNumber:pageInView
                               ll:[self convertToGridCoordinates:lowerLeftPoint]
                               ur:[self convertToGridCoordinates:upperRightPoint]
                      withSpacing:gridSpacing];
@@ -214,11 +213,11 @@
 	}
     
     // compute all the cycles and boundaries for this new page.
-    for (EXTTerm *term in [delegate.sseq terms]) {
+    for (EXTTerm *term in _dataSource.sseq.terms) {
         [term computeCycles:pageInView
-          differentialArray:[delegate.sseq differentials]];
+          differentialArray:_dataSource.sseq.differentials];
         [term computeBoundaries:pageInView
-              differentialArray:[delegate.sseq differentials]];
+              differentialArray:_dataSource.sseq.differentials];
     }
 	
 	[self setNeedsDisplay:YES];
@@ -420,9 +419,10 @@
         // TODO: reenable clicks.  the idea is that both terms and differentials
         // present the same 'insertable' interface, which is called here.
         
-        NSPoint point = [_grid convertToGridCoordinates:locationPoint];
-        
-        [currentTool dealWithClick:point document:delegate];
+//        NSPoint point = [_grid convertToGridCoordinates:locationPoint];
+
+        // TODO: review why the tool needs the document
+//        [currentTool dealWithClick:point document:_delegate];
 
 		[self setNeedsDisplayInRect:NSInsetRect([highlightPath bounds],-1,-1)];
 	}
@@ -451,11 +451,4 @@
 	currentTool = EXTToolPaletteController.sharedToolPaletteController.currentToolClass;
 }
 
-#pragma mark *** random button ***
-
-- (IBAction) randomGroups:(id)sender{
-    [delegate randomize];
-	[self setNeedsDisplay:YES];
-}
-		
 @end

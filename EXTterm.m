@@ -138,13 +138,13 @@
 // sections of cycle groups across pages or something... or right-multiplying
 // in the old cycle group and interpreting the results... or something.
 -(void) computeCycles:(int)whichPage
-    differentialArray:(NSMutableArray*)differentials {
+    differentialArray:(NSArray *)differentials {
     
     // if we're at the bottom page, then do nothing --- there are no
     // differentials available to study, and we don't want to fuck up our copies.
     if (whichPage == 0)
         return;
-    
+
     NSMutableArray *newCycles = [NSMutableArray array];
     NSMutableArray *oldCycles = [cycles objectAtIndex:(whichPage-1)];
 
@@ -203,7 +203,7 @@
 
 // TODO: this is a duplicate of the code above. it would be nice to fix that.
 -(void) computeBoundaries:(int)whichPage
-        differentialArray:(NSMutableArray*)differentials {
+        differentialArray:(NSArray *)differentials {
     
     if (whichPage == 0)
         return;

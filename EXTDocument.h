@@ -17,14 +17,7 @@
 @interface EXTDocument : NSDocument
     @property(nonatomic, strong) EXTSpectralSequence *sseq;
 
-    @property(nonatomic, assign) CGFloat artboardRectX;
-    @property(nonatomic, assign) NSUInteger maxPage;
-    @property(nonatomic, strong) EXTArtBoard *theArtBoard;
-    @property(nonatomic, strong) EXTGrid *theGrid;
-
     - (void)randomize;
-    - (void)drawPagesUpTo:(NSUInteger)pageNumber;
-    - (void)drawPageNumber:(NSUInteger)pageNumber ll:(NSPoint)lowerLeftCoord ur:(NSPoint)upperRightCoord withSpacing:(CGFloat)gridSpacing;
 
 @end
 
