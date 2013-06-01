@@ -8,24 +8,14 @@
 
 
 #import <Cocoa/Cocoa.h>
-#import "EXTLocation.h"
-#import "EXTSpectralSequence.h"
 
-@class EXTGrid, EXTArtBoard, EXTMultiplicationTables, EXTTerm, EXTDifferential;
+@class EXTSpectralSequence;
 
 
 @interface EXTDocument : NSDocument
-    @property(nonatomic, strong) EXTSpectralSequence *sseq;
-
-    @property(nonatomic, assign) CGFloat artboardRectX;
-    @property(nonatomic, assign) NSUInteger maxPage;
-    @property(nonatomic, strong) EXTArtBoard *theArtBoard;
-    @property(nonatomic, strong) EXTGrid *theGrid;
+    @property(nonatomic, strong) EXTSpectralSequence *sseq; // TODO: shouldn’t this be a readonly property?
 
     - (void)randomize;
-    - (void)drawPagesUpTo:(NSUInteger)pageNumber;
-    - (void)drawPageNumber:(NSUInteger)pageNumber ll:(NSPoint)lowerLeftCoord ur:(NSPoint)upperRightCoord withSpacing:(CGFloat)gridSpacing;
-
 @end
 
 // Notes: need something to specify the size (width, height) of the document, origin location, serre or adams convention?
