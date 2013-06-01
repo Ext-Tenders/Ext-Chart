@@ -8,17 +8,14 @@
 
 
 #import <Cocoa/Cocoa.h>
-#import "EXTLocation.h"
-#import "EXTSpectralSequence.h"
 
-@class EXTGrid, EXTArtBoard, EXTMultiplicationTables, EXTTerm, EXTDifferential;
+@class EXTSpectralSequence;
 
 
 @interface EXTDocument : NSDocument
-    @property(nonatomic, strong) EXTSpectralSequence *sseq;
+    @property(nonatomic, strong) EXTSpectralSequence *sseq; // TODO: shouldn’t this be a readonly property?
 
     - (void)randomize;
-
 @end
 
 // Notes: need something to specify the size (width, height) of the document, origin location, serre or adams convention?

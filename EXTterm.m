@@ -12,6 +12,7 @@
 #import "EXTdifferential.h"
 #import "EXTMatrix.h"
 #import "EXTPair.h"
+#import "EXTSpectralSequence.h"
 
 @implementation EXTTerm
 

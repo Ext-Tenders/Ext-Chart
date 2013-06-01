@@ -13,6 +13,7 @@
 #import "EXTView.h"
 #import "EXTArtBoard.h"
 #import "EXTGrid.h"
+#import "EXTSpectralSequence.h"
 
 @interface EXTDocumentWindowController ()
 @property(nonatomic, weak) IBOutlet EXTView *extView;

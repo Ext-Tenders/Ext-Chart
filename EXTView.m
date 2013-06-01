@@ -14,6 +14,7 @@
 #import "EXTToolPaletteController.h"
 #import "EXTTerm.h"
 #import "EXTDifferential.h"
+#import "EXTSpectralSequence.h"
 
 
 // TODO: check whether this variable is necessary
