@@ -213,11 +213,11 @@
 	}
     
     // compute all the cycles and boundaries for this new page.
-    for (EXTTerm *term in _dataSource.sseq.terms) {
+    for (EXTTerm *term in _sseq.terms) {
         [term computeCycles:pageInView
-          differentialArray:_dataSource.sseq.differentials];
+          differentialArray:_sseq.differentials];
         [term computeBoundaries:pageInView
-              differentialArray:_dataSource.sseq.differentials];
+              differentialArray:_sseq.differentials];
     }
 	
 	[self setNeedsDisplay:YES];

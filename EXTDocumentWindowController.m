@@ -56,7 +56,7 @@
     self.grid.boundsRect = self.extView.bounds;
 
     // The analogue of these next settings 	 are done with bindings in Sketch.   I'm not sure what the difference is.
-    self.extView.dataSource = self.document;
+    self.extView.sseq = [self.document sseq];
     self.extView.delegate = self;
     self.extView.artBoard = self.artBoard;
     self.extView._grid = self.grid;

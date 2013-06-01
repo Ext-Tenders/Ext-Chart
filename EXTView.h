@@ -10,10 +10,6 @@
 #import <Cocoa/Cocoa.h>
 @class EXTScrollView, EXTArtBoard, EXTGrid, EXTDocument, EXTToolPaletteController, EXTTerm, EXTDifferential, EXTSpectralSequence;
 
-@protocol EXTViewDataSource <NSObject>
-    - (EXTSpectralSequence *)sseq;
-@end
-
 @protocol EXTViewDelegate <NSObject>
     - (void)drawPageNumber:(NSUInteger)pageNumber ll:(NSPoint)lowerLeftCoord ur:(NSPoint)upperRightCoord withSpacing:(CGFloat)gridSpacing;
 @end
@@ -54,7 +50,7 @@
 @property(strong) NSMutableArray *pages;
 
 
-@property(nonatomic, weak) id<EXTViewDataSource> dataSource;
+@property(nonatomic, strong) EXTSpectralSequence *sseq; // TODO: this should evolve to a copy property in order to avoid side effects
 @property(nonatomic, weak) id<EXTViewDelegate> delegate;
 @property(nonatomic, assign) int pageInView;
 
