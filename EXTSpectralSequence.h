@@ -22,6 +22,10 @@
 @property(nonatomic, assign) Class<EXTLocation> indexClass;
 
 + (EXTSpectralSequence*) spectralSequence;
+- (EXTSpectralSequence*) tensorSSeqs:(EXTSpectralSequence*)p;
+- (EXTSpectralSequence*) tensorWithClasses:(NSMutableArray*)classes
+                             differentials:(NSMutableArray*)differentials
+                                multTables:(EXTMultiplicationTables*)multTables;
 
 - (EXTTerm*)findTerm:(EXTLocation*)loc;
 - (EXTDifferential*)findDifflWithSource:(EXTLocation*)loc onPage:(int)page;
