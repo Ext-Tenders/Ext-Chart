@@ -24,8 +24,7 @@
 }
 
 +(id) entry {
-    EXTMultiplicationEntry *ret = [[EXTMultiplicationEntry alloc] init];
-    return ret;
+    return [EXTMultiplicationEntry new];
 }
 
 @end
@@ -284,19 +283,6 @@
     [[diffl partialDefinitions] addObject:partial];
     
     return;
-}
-
--(EXTTerm*) addTruncatedLaurentClass:(NSString*)name
-                            location:(EXTLocation*)loc
-                              downTo:(int)downTo
-                                upTo:(int)UpTo {
-    return nil;
-}
-
--(EXTTerm*) addTruncatedPolynomialClass:(NSString*)name
-                               location:(EXTLocation*)loc
-                                   upTo:(int)upTo {
-    return [self addTruncatedLaurentClass:name location:loc downTo:0 upTo:upTo];
 }
 
 @end

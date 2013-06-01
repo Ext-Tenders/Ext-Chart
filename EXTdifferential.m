@@ -30,7 +30,7 @@
 @synthesize wellDefined;
 
 +(id) newDifferential:(EXTTerm *)start end:(EXTTerm *)end page:(int)page {
-    EXTDifferential *object = [EXTDifferential alloc];
+    EXTDifferential *object = [EXTDifferential new];
     
     object.start = start;
     object.end = end;

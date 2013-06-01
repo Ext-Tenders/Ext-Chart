@@ -49,7 +49,7 @@ NSString *EXTArtBoardDrawingRectKey = @"drawingRect";
 	[documentRectanglePath setLineWidth:1.0];
 	[[NSColor blackColor] set];
 	
-	NSShadow *theShadow = [[NSShadow alloc] init];
+	NSShadow *theShadow = [NSShadow new];
 	[theShadow setShadowOffset:NSMakeSize(-1.0, -2.0)];
 	[theShadow setShadowBlurRadius:2.0];
 	[theShadow setShadowColor:[[NSColor blackColor]

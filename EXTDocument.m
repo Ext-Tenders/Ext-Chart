@@ -143,7 +143,7 @@
     // specify the multiplicative structure
     EXTMatrix *matrix = [EXTMatrix matrixWidth:1 height:1];
     [matrix.presentation[0] setObject:@1 atIndex:0];
-    EXTPartialDefinition *partialDefinition = [[EXTPartialDefinition alloc] init];
+    EXTPartialDefinition *partialDefinition = [EXTPartialDefinition new];
     partialDefinition.inclusion = matrix;
     partialDefinition.differential = matrix;
     [self.sseq.multTables addPartialDefinition:partialDefinition to:[e location] with:[x location]];
