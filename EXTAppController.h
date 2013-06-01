@@ -3,7 +3,7 @@
 //  Ext Chart
 //
 //  Created by Michael Hopkins on 7/31/11.
-//  Copyright 2011 HLProducts. All rights reserved.
+//  Copyright 2011 Harvard University. All rights reserved.
 //
 
 #import <Cocoa/Cocoa.h>

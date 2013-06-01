@@ -3,7 +3,7 @@
 //  Ext Chart
 //
 //  Created by Michael Hopkins on 8/13/11.
-//  Copyright 2011 HLProducts. All rights reserved.
+//  Copyright 2011 Harvard University. All rights reserved.
 //
 
 #import "EXTArtBoard.h"

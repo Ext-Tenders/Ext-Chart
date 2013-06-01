@@ -3,7 +3,7 @@
 //  Ext Chart
 //
 //  Created by Eric Peterson on 3/16/13.
-//  Copyright (c) 2013 HLProducts. All rights reserved.
+//  Copyright (c) 2013 Harvard University. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>

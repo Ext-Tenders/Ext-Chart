@@ -3,7 +3,7 @@
 //  Ext Chart
 //
 //  Created by Eric Peterson on 5/31/13.
-//  Copyright (c) 2013 HLProducts. All rights reserved.
+//  Copyright (c) 2013 Harvard University. All rights reserved.
 //
 
 #import "EXTSpectralSequence.h"

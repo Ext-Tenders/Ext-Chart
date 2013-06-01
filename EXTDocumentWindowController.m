@@ -3,7 +3,7 @@
 //  Ext Chart
 //
 //  Created by Bavarious on 31/05/2013.
-//  Copyright (c) 2013 HLProducts. All rights reserved.
+//  Copyright (c) 2013 Harvard University. All rights reserved.
 //
 
 #import "EXTDocumentWindowController.h"
