@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		093AEADD13E10759003E9F58 /* EXTPair.m in Sources */ = {isa = PBXBuildFile; fileRef = 093AEADC13E10759003E9F58 /* EXTPair.m */; };
 		14EF1A661756EE3C0012DD3C /* SelectTool.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 14EF1A651756EE3C0012DD3C /* SelectTool.pdf */; };
+		14EF1A6B17584C080012DD3C /* EXTDocumentWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 14EF1A6A17584C080012DD3C /* EXTDocumentWindowController.m */; };
 		1DDD582C0DA1D0D100B32029 /* EXTDocument.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1DDD58280DA1D0D100B32029 /* EXTDocument.xib */; };
 		1DDD582D0DA1D0D100B32029 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1DDD582A0DA1D0D100B32029 /* MainMenu.xib */; };
 		315BC80F140430B7007D49CA /* EXTToolPaletteController.m in Sources */ = {isa = PBXBuildFile; fileRef = 315BC80E140430B7007D49CA /* EXTToolPaletteController.m */; };
@@ -45,6 +46,8 @@
 		1058C7A7FEA54F5311CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		13E42FBA07B3F13500E4EEF1 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
 		14EF1A651756EE3C0012DD3C /* SelectTool.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = SelectTool.pdf; path = Images/SelectTool.pdf; sourceTree = "<group>"; };
+		14EF1A6917584C080012DD3C /* EXTDocumentWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTDocumentWindowController.h; sourceTree = "<group>"; };
+		14EF1A6A17584C080012DD3C /* EXTDocumentWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTDocumentWindowController.m; sourceTree = "<group>"; };
 		1DDD58290DA1D0D100B32029 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/EXTDocument.xib; sourceTree = "<group>"; };
 		1DDD582B0DA1D0D100B32029 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		2564AD2C0F5327BB00F57823 /* Ext_Chart_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Ext_Chart_Prefix.pch; sourceTree = "<group>"; };
@@ -164,6 +167,8 @@
 			children = (
 				31C77BA613E63F6800E9DBFC /* EXTAppController.h */,
 				31C77BA713E63F6800E9DBFC /* EXTAppController.m */,
+				14EF1A6917584C080012DD3C /* EXTDocumentWindowController.h */,
+				14EF1A6A17584C080012DD3C /* EXTDocumentWindowController.m */,
 				315BC80D140430B7007D49CA /* EXTToolPaletteController.h */,
 				315BC80E140430B7007D49CA /* EXTToolPaletteController.m */,
 				31C77BB413E647A000E9DBFC /* EXTsettingPanelController.h */,
@@ -358,6 +363,7 @@
 				389FB38D17498AF500D0FE75 /* EXTMultiplicationTables.m in Sources */,
 				38F783121756AEBF009D207A /* EXTTriple.m in Sources */,
 				38B4B08417597EA80065D421 /* EXTSpectralSequence.m in Sources */,
+				14EF1A6B17584C080012DD3C /* EXTDocumentWindowController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

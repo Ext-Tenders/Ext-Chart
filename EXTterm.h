@@ -50,9 +50,9 @@
 
     -(int) dimension:(int)whichPage; // useful for drawing
     -(void) computeCycles:(int)whichPage
-        differentialArray:(NSMutableArray*)differentials;
+        differentialArray:(NSArray *)differentials;
     -(void) computeBoundaries:(int)whichPage
-        differentialArray:(NSMutableArray*)differentials;
+        differentialArray:(NSArray *)differentials;
 
     // TODO: here are some other routines that i haven't investigated yet.
     // TODO: this drawing code must be offloaded into some other module!!

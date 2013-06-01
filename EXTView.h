@@ -8,11 +8,14 @@
 
 
 #import <Cocoa/Cocoa.h>
-@class EXTScrollView, EXTArtBoard, EXTGrid, EXTDocument, EXTToolPaletteController, EXTTerm, EXTDifferential; 
+@class EXTScrollView, EXTArtBoard, EXTGrid, EXTDocument, EXTToolPaletteController, EXTTerm, EXTDifferential, EXTSpectralSequence;
+
+@protocol EXTViewDelegate <NSObject>
+    - (void)drawPageNumber:(NSUInteger)pageNumber ll:(NSPoint)lowerLeftCoord ur:(NSPoint)upperRightCoord withSpacing:(CGFloat)gridSpacing;
+@end
 
 
 @interface EXTView : NSView {
-	EXTDocument *__unsafe_unretained delegate; // the EXTDocument
 	BOOL showGrid;
 	BOOL showPages;
 	BOOL editMode;
@@ -47,10 +50,8 @@
 @property(strong) NSMutableArray *pages;
 
 
-// this is an exception to the usual "retain" for objects, since the document and the view are always
-// cretaed together
-// http://en.wikibooks.org/wiki/Programming_Mac_OS_X_with_Cocoa_for_Beginners/Wikidraw%27s_view_class
-@property(unsafe_unretained) id delegate;
+@property(nonatomic, strong) EXTSpectralSequence *sseq; // TODO: this should evolve to a copy property in order to avoid side effects
+@property(nonatomic, weak) id<EXTViewDelegate> delegate;
 @property(nonatomic, assign) int pageInView;
 
 
@@ -70,10 +71,6 @@
 
 - (void)toolSelectionDidChange;
 - (void)resetHighlightRectAtLocation:(NSPoint)location;
-
-- (IBAction) randomGroups:(id)sender;
-
-
 
 @end
 
