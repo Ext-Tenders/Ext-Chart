@@ -45,10 +45,7 @@
         // allocate the display parts of things
 		_theArtBoard = [[EXTArtBoard alloc] initWithRect:NSMakeRect(0, 0, 792, 612)];
         
-        // and allocate the internal parts of things
-        _terms = [NSMutableArray array];
-        _differentials = [NSMutableArray array];
-        _multTables = [EXTMultiplicationTables multiplicationTables:self];
+        _sseq = [EXTSpectralSequence spectralSequence];
     }
 
     return self;
@@ -57,9 +54,9 @@
 // if requested, we can initialize the terms array with some test garbage
 -(void) randomize {
     // remove all the old garbage
-    [self setTerms:[NSMutableArray array]];
-    [self setDifferentials:[NSMutableArray array]];
-    [self setIndexClass:[EXTPair class]];
+    [self.sseq setTerms:[NSMutableArray array]];
+    [self.sseq setDifferentials:[NSMutableArray array]];
+    [self.sseq setIndexClass:[EXTPair class]];
 
     // this old test code initializes the grid with some random stuff.  that's
     // neat, but it's not organized enough to test the multiplicative structure,
@@ -104,7 +101,7 @@
         
         EXTTerm *term = [EXTTerm term:location andNames:[NSMutableArray arrayWithArray:names]];
                          
-        [self.terms addObject:term];
+        [self.sseq.terms addObject:term];
     }
     
     // add the terms in the SSS for S^1 --> S^5 --> CP^2
@@ -121,7 +118,7 @@
             *one = [EXTTerm term:[EXTPair pairWithA:0 B:0]
                         andNames:[NSMutableArray arrayWithArray:@[@"1"]]];
     
-    [self.terms addObjectsFromArray:@[one,e,x,ex,x2,ex2]];
+    [self.sseq.terms addObjectsFromArray:@[one,e,x,ex,x2,ex2]];
     
     [self.extview setPageInView:1];
     [self.extview setPageInView:2];
@@ -137,7 +134,7 @@
     firstpartial.inclusion = inclusion;
     firstpartial.differential = differential;
     firstdiff.partialDefinitions[0] = firstpartial;
-    [self.differentials addObject:firstdiff];
+    [self.sseq.differentials addObject:firstdiff];
     
     // TODO: need to assemble the cycle groups for lower pages first...
     [firstdiff assemblePresentation]; // test!
@@ -148,42 +145,17 @@
     EXTPartialDefinition *partialDefinition = [[EXTPartialDefinition alloc] init];
     partialDefinition.inclusion = matrix;
     partialDefinition.differential = matrix;
-    [self.multTables addPartialDefinition:partialDefinition to:[e location] with:[x location]];
-    [self.multTables addPartialDefinition:partialDefinition to:[ex location] with:[x location]];
-    [self.multTables addPartialDefinition:partialDefinition to:[e location] with:[x2 location]];
-    [self.multTables addPartialDefinition:partialDefinition to:[x location] with:[e location]];
-    [self.multTables addPartialDefinition:partialDefinition to:[x location] with:[ex location]];
-    [self.multTables addPartialDefinition:partialDefinition to:[x2 location] with:[e location]];
-    [self.multTables addPartialDefinition:partialDefinition to:[x location] with:[x location]];
+    [self.sseq.multTables addPartialDefinition:partialDefinition to:[e location] with:[x location]];
+    [self.sseq.multTables addPartialDefinition:partialDefinition to:[ex location] with:[x location]];
+    [self.sseq.multTables addPartialDefinition:partialDefinition to:[e location] with:[x2 location]];
+    [self.sseq.multTables addPartialDefinition:partialDefinition to:[x location] with:[e location]];
+    [self.sseq.multTables addPartialDefinition:partialDefinition to:[x location] with:[ex location]];
+    [self.sseq.multTables addPartialDefinition:partialDefinition to:[x2 location] with:[e location]];
+    [self.sseq.multTables addPartialDefinition:partialDefinition to:[x location] with:[x location]];
     
-    [self.multTables computeLeibniz:[e location] with:[x location] onPage:2];
+    [self.sseq.multTables computeLeibniz:[e location] with:[x location] onPage:2];
     
     return;
-}
-
--(EXTTerm*) findTerm:(EXTLocation *)loc {
-    for (EXTTerm *term in self.terms) {
-        if ([loc isEqual:[term location]])
-            return term;
-    }
-    
-    return nil;
-}
-
--(EXTDifferential*) findDifflWithSource:(EXTLocation *)loc onPage:(int)page {
-    for (EXTDifferential *diffl in self.differentials)
-        if (([[diffl start] location] == loc) && ([diffl page] == page))
-            return diffl;
-    
-    return nil;
-}
-
--(EXTDifferential*) findDifflWithTarget:(EXTLocation *)loc onPage:(int)page {
-    for (EXTDifferential *diffl in self.differentials)
-        if (([[diffl end] location] == loc) && ([diffl page] == page))
-            return diffl;
-    
-    return nil;
 }
 
 #pragma mark *** windowController tasks ***
@@ -249,7 +221,7 @@
                     ur:(NSPoint)upperRight withSpacing:(CGFloat)withSpacing {
     
     // iterate through the available terms
-    for (EXTTerm *term in [self terms]) {
+    for (EXTTerm *term in [self.sseq terms]) {
         // if we're out of the viewing rectangle, then skip it
         NSPoint point = [[term location] makePoint];
         if ((point.x <= lowerLeft.x)  ||
@@ -264,7 +236,7 @@
     }
     
     // iterate also through the available differentials
-    for (EXTDifferential* differential in [self differentials]) {
+    for (EXTDifferential* differential in [self.sseq differentials]) {
         if ([differential page] == pageNumber)
             [differential drawWithSpacing:withSpacing];
     }

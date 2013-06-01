@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "EXTMatrix.h"
 #import "EXTDocument.h"
+#import "EXTSpectralSequence.h"
 
 // the dictionary entries contain both precompiled matrices and partial def'ns.
 @interface EXTMultiplicationEntry : NSObject {
@@ -34,12 +35,12 @@
     }
 
 @property(strong) NSMutableDictionary *tables;
-@property(strong) EXTDocument *document;
+@property(strong) EXTSpectralSequence* sSeq;
 @property(strong) EXTTerm *unitTerm;
 @property(strong) NSMutableArray *unitClass;
 
 -(id) init;
-+(id) multiplicationTables:(EXTDocument*)document;
++(id) multiplicationTables:(EXTSpectralSequence*)sseq;
 
 -(EXTMatrix*) getMatrixFor:(EXTLocation*)loc1 with:(EXTLocation*)loc2;
 -(EXTMatrix*) getMatrixWithoutRecomputingFor:(EXTLocation*)loc1

@@ -43,3 +43,17 @@ When modifying the product structure of existing classes:
       + do nothing.
       + otherwise, ask what to do.
       + If we're told to accept a new definition, modify the differential and propagate.
+
+Introducing a polynomial class:
+ + Build the truncated polynomial algebra separately, P.
+ + Build EXTTerms for all the tensor pairs A (x) P.
+    ... and store these separately.
+ + Iterate over pairs of existing terms;
+    use the old multiplication tables to build new ones: (a|p)(a'|p') = aa'|pp'
+    use old differentials to build new ones: d(a|p) = da|p + a|dp.
+ + Discard / release all the old terms, differentials, tables.
+ + Store the new ones.
+ + Cycle through the pages to perform boundary/cycle computations.
+ 
+Keep in mind the tensor ordering convention:
+    e1 | f1, e1 | f2, e2 | f1, e2 | f2.

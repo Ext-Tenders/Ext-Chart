@@ -9,6 +9,7 @@
 #import <Cocoa/Cocoa.h>
 #import "EXTDocument.h"
 #import "EXTMatrix.h"
+#import "EXTTerm.h"
 @class EXTGrid;
 @class EXTPage;
 

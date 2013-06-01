@@ -27,6 +27,7 @@
 		3896548D16F538D90008FB8D /* EXTMatrix.m in Sources */ = {isa = PBXBuildFile; fileRef = 3896548C16F538D90008FB8D /* EXTMatrix.m */; };
 		389FB38D17498AF500D0FE75 /* EXTMultiplicationTables.m in Sources */ = {isa = PBXBuildFile; fileRef = 389FB38C17498AF500D0FE75 /* EXTMultiplicationTables.m */; };
 		38A1AB6E1727009C00F9F9D5 /* todo.md in Resources */ = {isa = PBXBuildFile; fileRef = 38A1AB6D1727009C00F9F9D5 /* todo.md */; };
+		38B4B08417597EA80065D421 /* EXTSpectralSequence.m in Sources */ = {isa = PBXBuildFile; fileRef = 38B4B08317597EA80065D421 /* EXTSpectralSequence.m */; };
 		38DDAA7B16EDA8990001841D /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 38DDAA7A16EDA8990001841D /* README.md */; };
 		38F7830B17565F72009D207A /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = 38F7830A17565F72009D207A /* LICENSE */; };
 		38F783121756AEBF009D207A /* EXTTriple.m in Sources */ = {isa = PBXBuildFile; fileRef = 38F783111756AEBF009D207A /* EXTTriple.m */; };
@@ -80,6 +81,8 @@
 		389FB38B17498AF500D0FE75 /* EXTMultiplicationTables.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTMultiplicationTables.h; sourceTree = "<group>"; };
 		389FB38C17498AF500D0FE75 /* EXTMultiplicationTables.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTMultiplicationTables.m; sourceTree = "<group>"; };
 		38A1AB6D1727009C00F9F9D5 /* todo.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = todo.md; sourceTree = "<group>"; };
+		38B4B08217597EA80065D421 /* EXTSpectralSequence.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTSpectralSequence.h; sourceTree = "<group>"; };
+		38B4B08317597EA80065D421 /* EXTSpectralSequence.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTSpectralSequence.m; sourceTree = "<group>"; };
 		38DDAA7A16EDA8990001841D /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.md; sourceTree = "<group>"; };
 		38F7830A17565F72009D207A /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		38F7830F17566281009D207A /* EXTLocation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EXTLocation.h; sourceTree = "<group>"; };
@@ -135,6 +138,8 @@
 				31D403BA13DA0476006A8C06 /* EXTterm.m */,
 				38F783101756AEBF009D207A /* EXTTriple.h */,
 				38F783111756AEBF009D207A /* EXTTriple.m */,
+				38B4B08217597EA80065D421 /* EXTSpectralSequence.h */,
+				38B4B08317597EA80065D421 /* EXTSpectralSequence.m */,
 			);
 			name = Model;
 			sourceTree = "<group>";
@@ -352,6 +357,7 @@
 				3896548D16F538D90008FB8D /* EXTMatrix.m in Sources */,
 				389FB38D17498AF500D0FE75 /* EXTMultiplicationTables.m in Sources */,
 				38F783121756AEBF009D207A /* EXTTriple.m in Sources */,
+				38B4B08417597EA80065D421 /* EXTSpectralSequence.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

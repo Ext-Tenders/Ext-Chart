@@ -36,7 +36,7 @@
 @implementation EXTMultiplicationTables
 
 @synthesize tables;
-@synthesize document;
+@synthesize sSeq;
 @synthesize unitTerm;
 @synthesize unitClass;
 
@@ -47,17 +47,17 @@
     if (!(self = [super init])) return nil;
     
     [self setTables:[NSMutableDictionary dictionary]];
-    [self setDocument:nil];
+    [self setSSeq:nil];
     [self setUnitTerm:nil];
     [self setUnitClass:[NSMutableArray array]];
     
     return self;
 }
 
-+(id) multiplicationTables:(EXTDocument *)document {
++(id) multiplicationTables:(EXTSpectralSequence *)sseq {
     EXTMultiplicationTables *ret = [EXTMultiplicationTables new];
     
-    [ret setDocument:document];
+    [ret setSSeq:sseq];
     
     return ret;
 }
@@ -71,9 +71,9 @@
     
     // find all the relevant EXTTerms, so we can calculate the right size
     Class<EXTLocation> locClass = [loc1 class];
-    EXTTerm *term1 = [document findTerm:loc1],
-    *term2 = [document findTerm:loc2],
-    *targetterm = [document findTerm:[locClass addLocation:loc1 to:loc2]];
+    EXTTerm *term1 = [self.sSeq findTerm:loc1],
+    *term2 = [self.sSeq findTerm:loc2],
+    *targetterm = [self.sSeq findTerm:[locClass addLocation:loc1 to:loc2]];
     
     // if we can't find it, then we should instantiate it.
     if (!ret) {
@@ -103,9 +103,9 @@
 -(EXTMatrix*) getMatrixFor:(EXTLocation*)loc1 with:(EXTLocation*)loc2 {
     EXTMultiplicationEntry *entry = [self performLookup:loc1 with:loc2];
     Class<EXTLocation> locClass = [loc1 class];
-    EXTTerm *term1 = [document findTerm:loc1],
-    *term2 = [document findTerm:loc2],
-    *targetterm = [document findTerm:[locClass addLocation:loc1 to:loc2]];
+    EXTTerm *term1 = [self.sSeq findTerm:loc1],
+    *term2 = [self.sSeq findTerm:loc2],
+    *targetterm = [self.sSeq findTerm:[locClass addLocation:loc1 to:loc2]];
     
     int width, height;
     if (!term1 || !term2 || !targetterm) {
@@ -196,11 +196,11 @@
     // product decomposition: d(xy) = dx y + x dy.
     // XXX: deal with sign errors here.
     EXTLocation *sumloc = [[loc1 class] addLocation:loc1 to:loc2];
-    EXTTerm *term1 = [document findTerm:loc1],
-            *term2 = [document findTerm:loc2],
-          *sumterm = [document findTerm:sumloc];
-    EXTDifferential *d1 = [document findDifflWithSource:loc1 onPage:page],
-                    *d2 = [document findDifflWithSource:loc2 onPage:page];
+    EXTTerm *term1 = [self.sSeq findTerm:loc1],
+            *term2 = [self.sSeq findTerm:loc2],
+          *sumterm = [self.sSeq findTerm:sumloc];
+    EXTDifferential *d1 = [self.sSeq findDifflWithSource:loc1 onPage:page],
+                    *d2 = [self.sSeq findDifflWithSource:loc2 onPage:page];
     NSMutableArray *actions = [NSMutableArray array];
     
     for (NSNumber *hadamardPosition in indices) {
@@ -260,13 +260,13 @@
     }
     
     // store the array actions as the acting matrix for a partial definition.
-    EXTDifferential *diffl = [document findDifflWithSource:sumloc onPage:page];
+    EXTDifferential *diffl = [self.sSeq findDifflWithSource:sumloc onPage:page];
     // if the differential we're trying to write to doesn't yet exist, build it.
     if (!diffl) {
-        EXTTerm *targetterm = [document findTerm:
+        EXTTerm *targetterm = [self.sSeq findTerm:
                                  [[sumloc class] followDiffl:sumloc page:page]];
         diffl = [EXTDifferential differential:sumterm end:targetterm page:page];
-        [[document differentials] addObject:diffl];
+        [[self.sSeq differentials] addObject:diffl];
     }
     
     // set up the partial definition matrices
