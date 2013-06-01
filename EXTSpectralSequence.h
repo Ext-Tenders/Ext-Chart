@@ -22,22 +22,30 @@
 @property(nonatomic, assign) Class<EXTLocation> indexClass;
 
 + (EXTSpectralSequence*) spectralSequence;
-- (EXTSpectralSequence*) tensorSSeqs:(EXTSpectralSequence*)p;
+- (EXTSpectralSequence*) tensorWithSSeq:(EXTSpectralSequence*)p;
 - (EXTSpectralSequence*) tensorWithClasses:(NSMutableArray*)classes
                              differentials:(NSMutableArray*)differentials
                                 multTables:(EXTMultiplicationTables*)multTables;
 
 // these are misleading names
--(EXTSpectralSequence*) introducePolyClass:(NSString*)name
-                                  location:(EXTLocation*)loc
-                                      upTo:(int)upTo;
--(EXTSpectralSequence*) introduceLaurentClass:(NSString*)name
-                                     location:(EXTLocation*)loc
-                                         upTo:(int)upTo
-                                       downTo:(int)downTo;
+-(EXTSpectralSequence*) tensorWithPolyClass:(NSString*)name
+                                   location:(EXTLocation*)loc
+                                       upTo:(int)upTo;
+-(EXTSpectralSequence*) tensorWithLaurentClass:(NSString*)name
+                                      location:(EXTLocation*)loc
+                                          upTo:(int)upTo
+                                        downTo:(int)downTo;
 
 - (EXTTerm*)findTerm:(EXTLocation*)loc;
 - (EXTDifferential*)findDifflWithSource:(EXTLocation*)loc onPage:(int)page;
 - (EXTDifferential*)findDifflWithTarget:(EXTLocation*)loc onPage:(int)page;
+
+-(void) computeGroupsForPage:(int)page;
+
+#pragma mark - built-in demos
+
++(EXTSpectralSequence*) workingDemo;
++(EXTSpectralSequence*) randomDemo;
++(EXTSpectralSequence*) S5Demo;
 
 @end

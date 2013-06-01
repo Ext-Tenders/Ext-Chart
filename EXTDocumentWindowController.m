@@ -119,8 +119,11 @@
     return 0; // XXX: what is this used for? fix it!
 }
 
-- (IBAction) randomGroups:(id)sender{
-    [[self document] randomize];
+- (IBAction) demoGroups:(id)sender{
+    // XXX: i think this could be more smartly written. this is probably a
+    // symptom of something that will become a real headache later on.
+    EXTSpectralSequence *sseq = [[self document] runDemo];
+    [_extView setSseq:sseq]; // make sure our EXTView is sync'd.
 	[_extView setNeedsDisplay:YES];
 }
 

@@ -245,19 +245,19 @@
     return ret;
 }
 
--(EXTSpectralSequence*) tensorSSeqs:(EXTSpectralSequence *)p {
+-(EXTSpectralSequence*) tensorWithSSeq:(EXTSpectralSequence *)p {
     return [self tensorWithClasses:p.terms
                      differentials:p.differentials
                         multTables:p.multTables];
 }
 
--(EXTSpectralSequence*) introducePolyClass:(NSString*)name
+-(EXTSpectralSequence*) tensorWithPolyClass:(NSString*)name
                                   location:(EXTLocation*)loc
                                       upTo:(int)upTo {
-    return [self introduceLaurentClass:name location:loc upTo:upTo downTo:0];
+    return [self tensorWithLaurentClass:name location:loc upTo:upTo downTo:0];
 }
 
--(EXTSpectralSequence*) introduceLaurentClass:(NSString*)name
+-(EXTSpectralSequence*) tensorWithLaurentClass:(NSString*)name
                                      location:(EXTLocation*)loc
                                          upTo:(int)upTo
                                        downTo:(int)downTo {
@@ -283,7 +283,7 @@
     // XXX: i'm skipping this for now.
     
     // pass this toward the tensor routine
-    return [self tensorSSeqs:l];
+    return [self tensorWithSSeq:l];
 }
 
 -(EXTTerm*) findTerm:(EXTLocation *)loc {
@@ -309,6 +309,132 @@
             return diffl;
     
     return nil;
+}
+
+-(void) computeGroupsForPage:(int)page {
+    for (EXTTerm *term in self.terms) {
+        [term computeCycles:page
+          differentialArray:self.differentials];
+        [term computeBoundaries:page
+              differentialArray:self.differentials];
+    }
+    
+    return;
+}
+
+#pragma mark - built-in demos
+
++(EXTSpectralSequence*) workingDemo {
+    EXTSpectralSequence *ret = [EXTSpectralSequence spectralSequence];
+    
+    [ret.terms addObject:[EXTTerm term:[EXTPair identityLocation] andNames:[NSMutableArray arrayWithObject:@"1"]]];
+    ret = [ret tensorWithLaurentClass:@"beta^2" location:[EXTPair pairWithA:4 B:0] upTo:5 downTo:-5];
+    ret = [ret tensorWithPolyClass:@"eta" location:[EXTPair pairWithA:1 B:1] upTo:10];
+    
+    return ret;
+}
+
++(EXTSpectralSequence*) randomDemo {
+    EXTSpectralSequence *ret = [EXTSpectralSequence spectralSequence];
+    
+    // XXX: this doesn't catch collisions.
+    for (int i = 0; i < 40; i++) {
+        EXTPair *location =
+                    [EXTPair pairWithA:(arc4random()%30) B:(arc4random()%30)];
+        NSArray *names = nil;
+        
+        if ((location.a < 2) || (location.b < 5))
+            continue;
+        
+        switch ((arc4random()%7)+1) {
+            case 1:
+                names = @[@"x"];
+                break;
+            case 2:
+                names = @[@"x", @"y"];
+                break;
+            case 3:
+                names = @[@"x", @"y", @"z"];
+                break;
+            case 4:
+                names = @[@"x", @"y", @"z", @"s"];
+                break;
+            case 5:
+                names = @[@"x", @"y", @"z", @"s", @"t"];
+                break;
+            case 6:
+                names = @[@"x", @"y", @"z", @"s", @"t", @"u"];
+                break;
+            case 7:
+            default:
+                names = @[@"x", @"y", @"z", @"s", @"t", @"u", @"v"];
+                break;
+        }
+        
+        EXTTerm *term = [EXTTerm term:location andNames:[NSMutableArray arrayWithArray:names]];
+        
+        [ret.terms addObject:term];
+    }
+    
+    return ret;
+}
+
++(EXTSpectralSequence*) S5Demo {
+    EXTSpectralSequence *ret = [EXTSpectralSequence spectralSequence];
+    
+    // add the terms in the SSS for S^1 --> S^5 --> CP^2
+    EXTTerm *e   = [EXTTerm term:[EXTPair pairWithA:1 B:0]
+                        andNames:[NSMutableArray arrayWithArray:@[@"e"]]],
+    *x   = [EXTTerm term:[EXTPair pairWithA:0 B:2]
+                andNames:[NSMutableArray arrayWithArray:@[@"x"]]],
+    *ex  = [EXTTerm term:[EXTPair pairWithA:1 B:2]
+                andNames:[NSMutableArray arrayWithArray:@[@"ex"]]],
+    *x2  = [EXTTerm term:[EXTPair pairWithA:0 B:4]
+                andNames:[NSMutableArray arrayWithArray:@[@"x2"]]],
+    *ex2 = [EXTTerm term:[EXTPair pairWithA:1 B:4]
+                andNames:[NSMutableArray arrayWithArray:@[@"ex2"]]],
+    *one = [EXTTerm term:[EXTPair pairWithA:0 B:0]
+                andNames:[NSMutableArray arrayWithArray:@[@"1"]]];
+    
+    [ret.terms addObjectsFromArray:@[one,e,x,ex,x2,ex2]];
+    
+    // you're not allowed to add differentials to pages which you haven't "seen"
+    [ret computeGroupsForPage:0];
+    [ret computeGroupsForPage:1];
+    [ret computeGroupsForPage:2];
+    
+    // add a single differential
+    EXTDifferential *firstdiff = [EXTDifferential differential:e end:x page:2];
+    EXTPartialDefinition *firstpartial = [EXTPartialDefinition new];
+    EXTMatrix *inclusion = [EXTMatrix matrixWidth:1 height:1];
+    EXTMatrix *differential = [EXTMatrix matrixWidth:1 height:1];
+    [[inclusion.presentation objectAtIndex:0] setObject:@1 atIndex:0];
+    [[differential.presentation objectAtIndex:0] setObject:@1 atIndex:0];
+    firstpartial.inclusion = inclusion;
+    firstpartial.differential = differential;
+    firstdiff.partialDefinitions[0] = firstpartial;
+    [ret.differentials addObject:firstdiff];
+    
+    // TODO: need to assemble the cycle groups for lower pages first...
+    [firstdiff assemblePresentation]; // test!
+    
+    // specify the multiplicative structure
+    EXTMatrix *matrix = [EXTMatrix matrixWidth:1 height:1];
+    [matrix.presentation[0] setObject:@1 atIndex:0];
+    EXTPartialDefinition *partialDefinition = [EXTPartialDefinition new];
+    partialDefinition.inclusion = matrix;
+    partialDefinition.differential = matrix;
+    [ret.multTables addPartialDefinition:partialDefinition to:[e location] with:[x location]];
+    [ret.multTables addPartialDefinition:partialDefinition to:[ex location] with:[x location]];
+    [ret.multTables addPartialDefinition:partialDefinition to:[e location] with:[x2 location]];
+    [ret.multTables addPartialDefinition:partialDefinition to:[x location] with:[e location]];
+    [ret.multTables addPartialDefinition:partialDefinition to:[x location] with:[ex location]];
+    [ret.multTables addPartialDefinition:partialDefinition to:[x2 location] with:[e location]];
+    [ret.multTables addPartialDefinition:partialDefinition to:[x location] with:[x location]];
+    
+    [ret.multTables computeLeibniz:[e location] with:[x location] onPage:2];
+    
+    return ret;
 }
 
 @end

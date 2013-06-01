@@ -30,8 +30,6 @@
 @synthesize _grid;
 @synthesize highlighting;
 @synthesize highlightPath;
-@synthesize pages;
-
 
 #pragma mark *** initialization ***
 
@@ -214,12 +212,7 @@
 	}
     
     // compute all the cycles and boundaries for this new page.
-    for (EXTTerm *term in _sseq.terms) {
-        [term computeCycles:pageInView
-          differentialArray:_sseq.differentials];
-        [term computeBoundaries:pageInView
-              differentialArray:_sseq.differentials];
-    }
+    [self.sseq computeGroupsForPage:pageInView];
 	
 	[self setNeedsDisplay:YES];
 }

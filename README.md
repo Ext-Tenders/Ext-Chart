@@ -3,10 +3,16 @@ The goal of this project is to facilitate the drawing and manipulation of spectr
 Credits
 -------
 
-### Programmers
+### Engineering
 + Mike Hopkins
 + Spencer Liang
 + Eric Peterson
+
+### Human interface design
+
+### Testing
+
+### Documentation
 
 ### Special thanks
 + bavarious

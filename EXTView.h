@@ -28,7 +28,6 @@
 	
 	EXTArtBoard *artBoard;
 	IBOutlet EXTGrid *_grid;
-	NSMutableArray *pages;
 	
 	NSRect highlightRect;    // make this private?
 	NSColor *highlightRectColor;  // if this is not customizable, it should be a constant.   I couldn't make it work as a static or extern...
@@ -47,8 +46,6 @@
 @property(strong) EXTArtBoard *artBoard;
 @property(strong) EXTGrid *_grid;
 @property(strong) NSBezierPath *highlightPath;
-@property(strong) NSMutableArray *pages;
-
 
 @property(nonatomic, strong) EXTSpectralSequence *sseq; // TODO: this should evolve to a copy property in order to avoid side effects
 @property(nonatomic, weak) id<EXTViewDelegate> delegate;
