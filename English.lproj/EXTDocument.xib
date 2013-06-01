@@ -2,10 +2,10 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.10">
 	<data>
 		<int key="IBDocument.SystemTarget">1060</int>
-		<string key="IBDocument.SystemVersion">12C3012</string>
+		<string key="IBDocument.SystemVersion">12D78</string>
 		<string key="IBDocument.InterfaceBuilderVersion">3084</string>
-		<string key="IBDocument.AppKitVersion">1187.34</string>
-		<string key="IBDocument.HIToolboxVersion">625.00</string>
+		<string key="IBDocument.AppKitVersion">1187.37</string>
+		<string key="IBDocument.HIToolboxVersion">626.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
 			<string key="NS.object.0">3084</string>
@@ -38,7 +38,7 @@
 		<object class="NSMutableArray" key="IBDocument.RootObjects" id="580458321">
 			<bool key="EncodedWithXMLCoder">YES</bool>
 			<object class="NSCustomObject" id="512844837">
-				<string key="NSClassName">EXTDocument</string>
+				<string key="NSClassName">EXTDocumentWindowController</string>
 			</object>
 			<object class="NSCustomObject" id="613418571">
 				<string key="NSClassName">FirstResponder</string>
@@ -508,7 +508,7 @@
 					<reference key="NSWindow"/>
 					<reference key="NSNextKeyView" ref="1002089432"/>
 				</object>
-				<string key="NSScreenRect">{{0, 0}, {1440, 878}}</string>
+				<string key="NSScreenRect">{{0, 0}, {1920, 1058}}</string>
 				<string key="NSMinSize">{94, 108}</string>
 				<string key="NSMaxSize">{10000000000000, 10000000000000}</string>
 				<bool key="NSWindowIsRestorable">YES</bool>
@@ -528,14 +528,6 @@
 				<bool key="EncodedWithXMLCoder">YES</bool>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
-						<string key="label">extview</string>
-						<reference key="source" ref="512844837"/>
-						<reference key="destination" ref="869348958"/>
-					</object>
-					<int key="connectionID">100043</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
 						<string key="label">window</string>
 						<reference key="source" ref="512844837"/>
 						<reference key="destination" ref="275939982"/>
@@ -544,11 +536,19 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
-						<string key="label">theGrid</string>
+						<string key="label">extView</string>
+						<reference key="source" ref="512844837"/>
+						<reference key="destination" ref="869348958"/>
+					</object>
+					<int key="connectionID">100189</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">grid</string>
 						<reference key="source" ref="512844837"/>
 						<reference key="destination" ref="942165863"/>
 					</object>
-					<int key="connectionID">100152</int>
+					<int key="connectionID">100190</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
@@ -576,15 +576,15 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBBindingConnection" key="connection">
-						<string key="label">value: theGrid.emphasisSpacing</string>
+						<string key="label">value: grid.emphasisSpacing</string>
 						<reference key="source" ref="608341678"/>
 						<reference key="destination" ref="512844837"/>
 						<object class="NSNibBindingConnector" key="connector">
 							<reference key="NSSource" ref="608341678"/>
 							<reference key="NSDestination" ref="512844837"/>
-							<string key="NSLabel">value: theGrid.emphasisSpacing</string>
+							<string key="NSLabel">value: grid.emphasisSpacing</string>
 							<string key="NSBinding">value</string>
-							<string key="NSKeyPath">theGrid.emphasisSpacing</string>
+							<string key="NSKeyPath">grid.emphasisSpacing</string>
 							<int key="NSNibBindingConnectorVersion">2</int>
 						</object>
 					</object>
@@ -592,15 +592,15 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBBindingConnection" key="connection">
-						<string key="label">value: extview.pageInView</string>
+						<string key="label">value: extView.pageInView</string>
 						<reference key="source" ref="463392880"/>
 						<reference key="destination" ref="512844837"/>
 						<object class="NSNibBindingConnector" key="connector">
 							<reference key="NSSource" ref="463392880"/>
 							<reference key="NSDestination" ref="512844837"/>
-							<string key="NSLabel">value: extview.pageInView</string>
+							<string key="NSLabel">value: extView.pageInView</string>
 							<string key="NSBinding">value</string>
-							<string key="NSKeyPath">extview.pageInView</string>
+							<string key="NSKeyPath">extView.pageInView</string>
 							<int key="NSNibBindingConnectorVersion">2</int>
 						</object>
 					</object>
@@ -608,15 +608,15 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBBindingConnection" key="connection">
-						<string key="label">value: extview.pageInView</string>
+						<string key="label">value: extView.pageInView</string>
 						<reference key="source" ref="131465093"/>
 						<reference key="destination" ref="512844837"/>
 						<object class="NSNibBindingConnector" key="connector">
 							<reference key="NSSource" ref="131465093"/>
 							<reference key="NSDestination" ref="512844837"/>
-							<string key="NSLabel">value: extview.pageInView</string>
+							<string key="NSLabel">value: extView.pageInView</string>
 							<string key="NSBinding">value</string>
-							<string key="NSKeyPath">extview.pageInView</string>
+							<string key="NSKeyPath">extView.pageInView</string>
 							<int key="NSNibBindingConnectorVersion">2</int>
 						</object>
 					</object>
@@ -624,15 +624,15 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBBindingConnection" key="connection">
-						<string key="label">value: extview.showPages</string>
+						<string key="label">value: extView.showPages</string>
 						<reference key="source" ref="575113243"/>
 						<reference key="destination" ref="512844837"/>
 						<object class="NSNibBindingConnector" key="connector">
 							<reference key="NSSource" ref="575113243"/>
 							<reference key="NSDestination" ref="512844837"/>
-							<string key="NSLabel">value: extview.showPages</string>
+							<string key="NSLabel">value: extView.showPages</string>
 							<string key="NSBinding">value</string>
-							<string key="NSKeyPath">extview.showPages</string>
+							<string key="NSKeyPath">extView.showPages</string>
 							<int key="NSNibBindingConnectorVersion">2</int>
 						</object>
 					</object>
@@ -640,15 +640,15 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBBindingConnection" key="connection">
-						<string key="label">value: extview.editingArtBoards</string>
+						<string key="label">value: extView.editingArtBoards</string>
 						<reference key="source" ref="774565633"/>
 						<reference key="destination" ref="512844837"/>
 						<object class="NSNibBindingConnector" key="connector">
 							<reference key="NSSource" ref="774565633"/>
 							<reference key="NSDestination" ref="512844837"/>
-							<string key="NSLabel">value: extview.editingArtBoards</string>
+							<string key="NSLabel">value: extView.editingArtBoards</string>
 							<string key="NSBinding">value</string>
-							<string key="NSKeyPath">extview.editingArtBoards</string>
+							<string key="NSKeyPath">extView.editingArtBoards</string>
 							<int key="NSNibBindingConnectorVersion">2</int>
 						</object>
 					</object>
@@ -656,15 +656,15 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBBindingConnection" key="connection">
-						<string key="label">value: extview.editingArtBoards</string>
+						<string key="label">value: extView.editingArtBoards</string>
 						<reference key="source" ref="877272513"/>
 						<reference key="destination" ref="512844837"/>
 						<object class="NSNibBindingConnector" key="connector">
 							<reference key="NSSource" ref="877272513"/>
 							<reference key="NSDestination" ref="512844837"/>
-							<string key="NSLabel">value: extview.editingArtBoards</string>
+							<string key="NSLabel">value: extView.editingArtBoards</string>
 							<string key="NSBinding">value</string>
-							<string key="NSKeyPath">extview.editingArtBoards</string>
+							<string key="NSKeyPath">extView.editingArtBoards</string>
 							<int key="NSNibBindingConnectorVersion">2</int>
 						</object>
 					</object>
@@ -1037,20 +1037,20 @@
 				<reference key="dict.values" ref="0"/>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">100188</int>
+			<int key="maxID">100190</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
 				<bool key="EncodedWithXMLCoder">YES</bool>
 				<object class="IBPartialClassDescription">
-					<string key="className">EXTDocument</string>
-					<string key="superclassName">NSDocument</string>
+					<string key="className">EXTDocumentWindowController</string>
+					<string key="superclassName">NSWindowController</string>
 					<object class="NSMutableDictionary" key="outlets">
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>extview</string>
-							<string>theGrid</string>
+							<string>extView</string>
+							<string>grid</string>
 						</object>
 						<object class="NSArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
@@ -1062,24 +1062,24 @@
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>extview</string>
-							<string>theGrid</string>
+							<string>extView</string>
+							<string>grid</string>
 						</object>
 						<object class="NSArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<object class="IBToOneOutletInfo">
-								<string key="name">extview</string>
+								<string key="name">extView</string>
 								<string key="candidateClassName">EXTView</string>
 							</object>
 							<object class="IBToOneOutletInfo">
-								<string key="name">theGrid</string>
+								<string key="name">grid</string>
 								<string key="candidateClassName">EXTGrid</string>
 							</object>
 						</object>
 					</object>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">./Classes/EXTDocument.h</string>
+						<string key="minorKey">./Classes/EXTDocumentWindowController.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
@@ -1170,12 +1170,10 @@
 							<string>fitWidth:</string>
 							<string>nextPage:</string>
 							<string>previousPage:</string>
-							<string>randomGroups:</string>
 							<string>setGridToDefaults:</string>
 						</object>
 						<object class="NSArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>id</string>
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>
@@ -1193,7 +1191,6 @@
 							<string>fitWidth:</string>
 							<string>nextPage:</string>
 							<string>previousPage:</string>
-							<string>randomGroups:</string>
 							<string>setGridToDefaults:</string>
 						</object>
 						<object class="NSArray" key="dict.values">
@@ -1216,10 +1213,6 @@
 							</object>
 							<object class="IBActionInfo">
 								<string key="name">previousPage:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">randomGroups:</string>
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBActionInfo">

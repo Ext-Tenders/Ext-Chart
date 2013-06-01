@@ -14,6 +14,7 @@
 #import "EXTPair.h"
 #import "EXTdifferential.h"
 #import "EXTMultiplicationTables.h"
+#import "EXTDocumentWindowController.h"
 
 
 @interface EXTDocument ()
@@ -29,12 +30,12 @@
         NSColor *emphasGridLineColor;
     }
 
-    @property(nonatomic, weak) IBOutlet EXTView *extview;
+    @property(nonatomic, weak) EXTDocumentWindowController *windowController;
 @end
 
 @implementation EXTDocument
 
-#pragma mark *** initialization and dealloc ***
+#pragma mark - Lifecycle
 
 - (id)init {
     // upcall.
@@ -43,7 +44,6 @@
     // if we succeeded...
     if (self) {
         // allocate the display parts of things
-		_theArtBoard = [[EXTArtBoard alloc] initWithRect:NSMakeRect(0, 0, 792, 612)];
         
         _sseq = [EXTSpectralSequence spectralSequence];
     }
@@ -120,9 +120,10 @@
     
     [self.sseq.terms addObjectsFromArray:@[one,e,x,ex,x2,ex2]];
     
-    [self.extview setPageInView:1];
-    [self.extview setPageInView:2];
-    [self.extview setPageInView:0];
+    // TODO: review why this is necessary
+    [self.windowController setPageInView:1];
+    [self.windowController setPageInView:2];
+    [self.windowController setPageInView:0];
     
     // add a single differential
     EXTDifferential *firstdiff = [EXTDifferential differential:e end:x page:2];
@@ -158,36 +159,19 @@
     return;
 }
 
-#pragma mark *** windowController tasks ***
+#pragma mark - Window controllers
 
-- (NSString *)windowNibName {
-    return @"EXTDocument";
-}
-
-- (void)windowControllerDidLoadNib:(NSWindowController *) aController
+- (void)makeWindowControllers
 {
-    [super windowControllerDidLoadNib:aController];
-	// the big board is the bounds rectangle of the EXTView object, and is set in the xib file, so we initialize theGrid in the windowControllerDidLoadNib function.   HOWEVER, it screws up the binding of the text cell on the main document.  see the console
-	
-//	theGrid = [EXTGrid alloc];
-//	[theGrid initWithRect:[extview bounds]];
-	
-	[self.theGrid setBoundsRect:[self.extview bounds]];
-	
-// The analogue of these next settings 	 are done with bindings in Sketch.   I'm not sure what the difference is.
-	[self.extview setDelegate:self];
-	[self.extview setArtBoard:self.theArtBoard];
-	[self.extview set_grid:self.theGrid];
-	
-// since the frame extends past the bounds rectangle, we need observe the drawingRect in order to know what to refresh when the artBoard changes
-	
-	[self.theArtBoard addObserver: self.extview forKeyPath:EXTArtBoardDrawingRectKey options:(NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld) context:nil];
-	[self.theGrid addObserver:self.extview forKeyPath:EXTGridAnyKey options:0 context:nil];
-
-//	[self setEmphasisGridSpacing:8];		
+    [self addWindowController:[EXTDocumentWindowController new]];
 }
 
-#pragma mark ***document saving and loading / TODO: THESE ARE DISABLED ***
+- (EXTDocumentWindowController *)windowController
+{
+    return (self.windowControllers.count == 1 ? self.windowControllers[0] : nil);
+}
+
+#pragma mark - Document saving and loading / TODO: THESE ARE DISABLED ***
 
 - (NSData *)dataOfType:(NSString *)typeName error:(NSError **)outError
 {
@@ -211,50 +195,5 @@
 //	[self setPages:marr];
     return YES;
 }
-
-#pragma mark ***Drawing***
-
-// this performs the culling and delegation calls for drawing a page of the SS
-// TODO: does this need spacing to be passed in?  probably a lot of data passing
-// needs to be investigated and untangled... :(
--(void) drawPageNumber:(NSUInteger)pageNumber ll:(NSPoint)lowerLeft
-                    ur:(NSPoint)upperRight withSpacing:(CGFloat)withSpacing {
-    
-    // iterate through the available terms
-    for (EXTTerm *term in [self.sseq terms]) {
-        // if we're out of the viewing rectangle, then skip it
-        NSPoint point = [[term location] makePoint];
-        if ((point.x <= lowerLeft.x)  ||
-            (point.y <= lowerLeft.y)  ||
-            (point.x >= upperRight.x) ||
-            (point.y >= upperRight.y))
-            continue;
-        
-        // otherwise, we're obligated to try to draw it
-        // TODO: this still seems like it's put in the wrong place...
-        [term drawWithSpacing:withSpacing page:pageNumber];
-    }
-    
-    // iterate also through the available differentials
-    for (EXTDifferential* differential in [self.sseq differentials]) {
-        if ([differential page] == pageNumber)
-            [differential drawWithSpacing:withSpacing];
-    }
-}
-
--(void)drawPagesUpTo: (NSUInteger) pageNumber {
-	;
-}
-
-#pragma mark ***view customization***
-
--(NSUInteger) maxPage {
-//	return [pages count] - 1;
-    return 0; // XXX: what is this used for? fix it!
-}
-
-#pragma mark ***probably controller methods ****
-
-
 
 @end
