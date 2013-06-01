@@ -43,6 +43,23 @@
     return [EXTTriple tripleWithA:(a.a + b.a) B:(a.b + b.b) C:(a.c + b.c)];
 }
 
++(EXTTriple*) identityLocation {
+    return [EXTTriple tripleWithA:0 B:0 C:0];
+}
+
++(EXTTriple*) negate:(EXTTriple*)loc {
+    return [EXTTriple tripleWithA:(-loc.a) B:(-loc.b) C:(-loc.c)];
+}
+
++(EXTTriple*) scale:(EXTTriple*)loc by:(int)scale {
+    if (scale == 0)
+        return [EXTTriple identityLocation];
+    if (scale < 0)
+        return [EXTTriple scale:[EXTTriple negate:loc] by:(-scale)];
+    
+    return [EXTTriple addLocation:loc to:[EXTTriple scale:loc by:(scale-1)]];
+}
+
 +(EXTTriple*) followDiffl:(EXTTriple *)a page:(int)page {
     return [EXTTriple tripleWithA:(a.a - 1) B:(a.b + 1) C:(a.c - page)];
 }

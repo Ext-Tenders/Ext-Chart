@@ -34,6 +34,23 @@
     return [EXTPair pairWithA:(a.a+b.a) B:(a.b+b.b)];
 }
 
++(EXTPair*) identityLocation {
+    return [EXTPair pairWithA:0 B:0];
+}
+
++(EXTPair*) negate:(EXTPair*)loc {
+    return [EXTPair pairWithA:(-loc.a) B:(-loc.b)];
+}
+
++(EXTPair*) scale:(EXTPair*)loc by:(int)scale {
+    if (scale == 0)
+        return [EXTPair identityLocation];
+    if (scale < 0)
+        return [EXTPair scale:[EXTPair negate:loc] by:(-scale)];
+    
+    return [EXTPair addLocation:loc to:[EXTPair scale:loc by:(scale-1)]];
+}
+
 +(EXTPair*) followDiffl:(EXTPair*)a page:(int)page {
     return [EXTPair pairWithA:(a.a-1) B:(a.b+page)];
 }

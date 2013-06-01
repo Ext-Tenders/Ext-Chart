@@ -21,6 +21,9 @@
 
 -(NSPoint) makePoint;
 -(NSString *) description;
++(EXTTriple*) identityLocation;
++(EXTTriple*) negate:(EXTTriple*)loc;
++(EXTTriple*) scale:(EXTTriple*)loc by:(int)scale;
 +(EXTTriple*) addLocation:(EXTTriple*)a to:(EXTTriple*)b;
 +(EXTTriple*) followDiffl:(EXTTriple*)a page:(int)page;
 +(EXTTriple*) reverseDiffl:(EXTTriple*)b page:(int)page;
