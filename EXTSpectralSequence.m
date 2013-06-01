@@ -17,7 +17,7 @@
 @synthesize terms, differentials, multTables, indexClass;
 
 +(EXTSpectralSequence*) spectralSequence {
-    EXTSpectralSequence *ret = [[EXTSpectralSequence alloc] init];
+    EXTSpectralSequence *ret = [EXTSpectralSequence new];
     
     if (!ret)
         return nil;
@@ -231,16 +231,59 @@
     
     // iterate over pairs of of pairs of existing terms...
     // ... and use the old multiplication tables to build new ones, via the rule (a|p)(a'|p') = (aa')|(pp')
+    // XXX: i'm skipping this for now.
 
-    // finally, sum up all the terms which share a given EXTLocation.  add them to a *new* list --- this is the one you'll be storing for return.
+    // now that we have all this data laying around, it's time to package it
+    // into an EXTSpectralSequence and return.
+    EXTSpectralSequence *ret = [EXTSpectralSequence spectralSequence];
+    for (NSMutableArray* tuple in splicedTensorTerms) {
+        [ret.terms addObject:tuple[0]];
+    }
     
-    return nil;
+    ret.differentials = outputDifferentials;
+    
+    return ret;
 }
 
 -(EXTSpectralSequence*) tensorSSeqs:(EXTSpectralSequence *)p {
     return [self tensorWithClasses:p.terms
                      differentials:p.differentials
                         multTables:p.multTables];
+}
+
+-(EXTSpectralSequence*) introducePolyClass:(NSString*)name
+                                  location:(EXTLocation*)loc
+                                      upTo:(int)upTo {
+    return [self introduceLaurentClass:name location:loc upTo:upTo downTo:0];
+}
+
+-(EXTSpectralSequence*) introduceLaurentClass:(NSString*)name
+                                     location:(EXTLocation*)loc
+                                         upTo:(int)upTo
+                                       downTo:(int)downTo {
+    Class<EXTLocation> locClass = [loc class];
+    EXTSpectralSequence *l = [EXTSpectralSequence spectralSequence];
+    
+    // construct a bunch of terms
+    for (int i = downTo; i <= upTo; i++) {
+        // TODO: possibly there's a better way to name these classes. at the
+        // moment, i've opted to name them for easy LaTeX printing.
+        EXTLocation *workingLoc = [locClass scale:loc by:i];
+        EXTTerm *workingTerm = [EXTTerm term:workingLoc andNames:
+                                [NSMutableArray arrayWithObject:
+                                 [NSString stringWithFormat:@"{%@}^{%d}",
+                                                            name, i]]];
+        [l.terms addObject:workingTerm];
+    }
+    
+    // they have no differentials among them, so skip that.
+    // but! they do have a multiplicative structure:
+    EXTMultiplicationTables *newTables =
+                            [EXTMultiplicationTables multiplicationTables:l];
+    // XXX: i'm skipping this for now.
+    
+    // pass this toward the tensor routine
+    return [self tensorSSeqs:l];
 }
 
 -(EXTTerm*) findTerm:(EXTLocation *)loc {

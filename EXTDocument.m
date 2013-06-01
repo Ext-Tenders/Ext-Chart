@@ -57,12 +57,15 @@
     [self.sseq setTerms:[NSMutableArray array]];
     [self.sseq setDifferentials:[NSMutableArray array]];
     [self.sseq setIndexClass:[EXTPair class]];
+    
+    [self.sseq.terms addObject:[EXTTerm term:[EXTPair identityLocation] andNames:[NSMutableArray arrayWithObject:@"1"]]];
+    self.sseq = [self.sseq introduceLaurentClass:@"beta^2" location:[EXTPair pairWithA:4 B:0] upTo:5 downTo:-5];
+    self.sseq = [self.sseq introducePolyClass:@"eta" location:[EXTPair pairWithA:1 B:1] upTo:10];
 
     // this old test code initializes the grid with some random stuff.  that's
     // neat, but it's not organized enough to test the multiplicative structure,
     // so i'm going to skip it for now.
-
-    
+/*
     // add some new garbage.
     // TODO: this ought to randomize the dimension too.
     // XXX: this doesn't catch collisions.
@@ -155,6 +158,7 @@
     [self.sseq.multTables addPartialDefinition:partialDefinition to:[x location] with:[x location]];
     
     [self.sseq.multTables computeLeibniz:[e location] with:[x location] onPage:2];
+*/
     
     return;
 }

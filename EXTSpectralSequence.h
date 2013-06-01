@@ -27,6 +27,15 @@
                              differentials:(NSMutableArray*)differentials
                                 multTables:(EXTMultiplicationTables*)multTables;
 
+// these are misleading names
+-(EXTSpectralSequence*) introducePolyClass:(NSString*)name
+                                  location:(EXTLocation*)loc
+                                      upTo:(int)upTo;
+-(EXTSpectralSequence*) introduceLaurentClass:(NSString*)name
+                                     location:(EXTLocation*)loc
+                                         upTo:(int)upTo
+                                       downTo:(int)downTo;
+
 - (EXTTerm*)findTerm:(EXTLocation*)loc;
 - (EXTDifferential*)findDifflWithSource:(EXTLocation*)loc onPage:(int)page;
 - (EXTDifferential*)findDifflWithTarget:(EXTLocation*)loc onPage:(int)page;
