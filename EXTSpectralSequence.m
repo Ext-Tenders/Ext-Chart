@@ -98,7 +98,7 @@
         // find all the differentials involving any of the working left-summands
         NSMutableArray *partialPresentations = [NSMutableArray array];
         for (EXTDifferential *d1 in self.differentials) {
-            // check if this diff'l is attached to one of our left-summand.
+            // check if this diff'l is attached to one of our left-summands.
             int sourceIndex = -1, sourceOffset = 0;
             for (int i = 0; i < startSummands.count; i++) {
                 NSMutableArray *tuple = startSummands[i];
@@ -130,7 +130,7 @@
                         endIndex = i;
                         break;
                     }
-                    endOffset += ((EXTTerm*)tuple[1]).names.count;
+                    endOffset += ((EXTTerm*)tuple[0]).names.count;
                 }
                 
                 if (endIndex != -1)
@@ -163,7 +163,74 @@
             [partialPresentations addObject:[NSMutableArray arrayWithObjects:start, end, @(d1.page), partialsForThisD, @false, nil]];
         } // d1
         
-        // XXX: now also do d2.
+        // now also do d2.
+        // XXX: THIS IS DUPLICATED CODE. BUGS IN ONE MEAN BUGS IN THE OTHER.
+        // CORRECT APPROPRIATELY, AND EVENTUALLY FACTOR THIS ALL OUT.
+        for (EXTDifferential *d2 in newDifferentials) {
+            // check if this diff'l is attached to one of our right-summands.
+            int sourceIndex = -1, sourceOffset = 0;
+            for (int i = 0; i < startSummands.count; i++) {
+                NSMutableArray *tuple = startSummands[i];
+                if (tuple[2] == d2.start) {
+                    sourceIndex = i;
+                    break;
+                }
+                sourceOffset += ((EXTTerm*)tuple[2]).names.count;
+            }
+            if (sourceIndex == -1)
+                continue;
+            
+            EXTTerm *AP = ((NSMutableArray*)startSummands[sourceIndex])[0],
+                     *A = ((NSMutableArray*)startSummands[sourceIndex])[1],
+                     *P = ((NSMutableArray*)startSummands[sourceIndex])[2];
+            
+            // ok, so this differential is attached to our source term. we now
+            // find all the same data for its target term.
+            int endIndex = -1, endOffset = 0;
+            NSMutableArray *endSummands = nil;
+            EXTTerm *end = nil;
+            for (NSMutableArray *workingTuple in splicedTensorTerms) {
+                end = workingTuple[0];
+                endSummands = workingTuple[1];
+                endIndex = -1, endOffset = 0;
+                for (int i = 0; i < endSummands.count; i++) {
+                    NSMutableArray *tuple = endSummands[i];
+                    if ((tuple[1] == A) && (tuple[2] == d2.end)) {
+                        endIndex = i;
+                        break;
+                    }
+                    endOffset += ((EXTTerm*)tuple[0]).names.count;
+                }
+                
+                if (endIndex != -1)
+                    break;
+            }
+            
+            EXTTerm *AQ = ((NSMutableArray*)endSummands[endIndex])[0],
+                    *Q = ((NSMutableArray*)endSummands[endIndex])[2];
+            
+            // an EXTPartialDefinition used to look like P <-i--< P' --d-> Q.
+            // now we're going to tensor up to A, which will give something like
+            // (+)_I A|P <-i1- A|P <-(1|i)-< A|P' -(1|d)-> A|Q -i2-> (+)_J A|Q.
+            // many of these pieces are common to varying i and d, so we pre-
+            // compute the ones we can hold constant.
+            EXTMatrix *idA = [EXTMatrix identity:A.names.count];
+            EXTMatrix *i1 = [EXTMatrix includeEvenlySpacedBasis:AP.names.count endDim:start.names.count offset:sourceOffset spacing:1];
+            EXTMatrix *i2 = [EXTMatrix includeEvenlySpacedBasis:AQ.names.count endDim:end.names.count offset:endOffset spacing:1];
+            
+            // now we iterate through the available i and d.
+            NSMutableArray *partialsForThisD = [NSMutableArray array];
+            for (EXTPartialDefinition *partial in d2.partialDefinitions) {
+                EXTPartialDefinition *newPartial = [EXTPartialDefinition new];
+                EXTMatrix *ix1 = [EXTMatrix hadamardProduct:idA with:partial.inclusion];
+                EXTMatrix *dx1 = [EXTMatrix hadamardProduct:idA with:partial.differential];
+                newPartial.inclusion = [EXTMatrix newMultiply:i1 by:ix1];
+                newPartial.differential = [EXTMatrix newMultiply:i2 by:dx1];
+                [partialsForThisD addObject:partial];
+            }
+            
+            [partialPresentations addObject:[NSMutableArray arrayWithObjects:start, end, @(d2.page), partialsForThisD, @false, nil]];
+        } // d2
         
         // now collect all the differentials that live on the same term.
         for (NSMutableArray *tagPartial in partialPresentations) {
