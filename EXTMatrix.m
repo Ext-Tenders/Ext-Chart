@@ -65,6 +65,40 @@
     return obj;
 }
 
++(EXTMatrix*) hadamardProduct:(EXTMatrix*)left with:(EXTMatrix*)right {
+    EXTMatrix *ret = [EXTMatrix matrixWidth:(left.width*right.width)
+                                     height:(left.height*right.height)];
+    
+    for (int i = 0; i < left.width; i++) {
+        NSMutableArray *leftcol = left.presentation[i];
+        for (int j = 0; j < right.width; j++) {
+            NSMutableArray *rightcol = right.presentation[j],
+                             *retcol = ret.presentation[i*left.width+j];
+            for (int k = 0; k < left.height; k++) {
+                for (int l = 0; l < right.height; l++) {
+                    retcol[k*left.height+l] =
+                            @([leftcol[k] intValue] * [rightcol[l] intValue]);
+                }
+            }
+        }
+    }
+    
+    return ret;
+}
+
++(EXTMatrix*) includeEvenlySpacedBasis:(int)startDim
+                                endDim:(int)endDim
+                                offset:(int)offset
+                               spacing:(int)spacing {
+    EXTMatrix *ret = [EXTMatrix matrixWidth:startDim height:endDim];
+    
+    // poke some 1s into the right places :)
+    for (int i = 0; i < startDim; i++)
+        ((NSMutableArray*)ret.presentation[offset+spacing*i])[i] = @1;
+    
+    return ret;
+}
+
 +(EXTMatrix*) matrixWidth:(int)newWidth height:(int)newHeight {
     EXTMatrix *object = [EXTMatrix initWidth:newWidth height:newHeight];
     return object;

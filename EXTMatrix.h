@@ -32,36 +32,41 @@
 
 
 
-@interface EXTMatrix : NSObject
-    {
-        NSUInteger height, width;
-        NSMutableArray *presentation;
-    }
+@interface EXTMatrix : NSObject {
+    NSUInteger height, width;
+    NSMutableArray *presentation;
+}
 
-    @property(assign) NSUInteger height, width;
-    @property(strong) NSMutableArray *presentation;
+@property(assign) NSUInteger height, width;
+@property(strong) NSMutableArray *presentation;
 
-    +(EXTMatrix*) initWidth:(int)newWidth height:(int)newHeight;
-    +(EXTMatrix*) matrixWidth:(int)newWidth height:(int)newHeight;
-    -(EXTMatrix*) copy;
++(EXTMatrix*) initWidth:(int)newWidth height:(int)newHeight;
++(EXTMatrix*) matrixWidth:(int)newWidth height:(int)newHeight;
+-(EXTMatrix*) copy;
 
-    // matrix operations
-    +(EXTMatrix*) copyTranspose:(EXTMatrix*)input;
-    +(EXTMatrix*) newMultiply:(EXTMatrix*)left by:(EXTMatrix*)right;
-    +(EXTMatrix*) identity:(int)width;
-    -(EXTMatrix*) invert;
-    -(EXTMatrix*) columnReduce;
-    -(void) modularReduction;
-    -(NSMutableArray*) kernel;
-    -(NSMutableArray*) image;
-    -(NSMutableArray*) actOn:(NSMutableArray*)vector;
-    -(int) rank;
++(EXTMatrix*) hadamardProduct:(EXTMatrix*)left with:(EXTMatrix*)right;
++(EXTMatrix*) includeEvenlySpacedBasis:(int)startDim
+                                endDim:(int)endDim
+                                offset:(int)offset
+                               spacing:(int)spacing;
 
-    +(EXTMatrix*) assemblePresentation:(NSMutableArray*)partialDefinitions
-                       sourceDimension:(int)sourceDimension
-                       targetDimension:(int)targetDimension;
+// matrix operations
++(EXTMatrix*) copyTranspose:(EXTMatrix*)input;
++(EXTMatrix*) newMultiply:(EXTMatrix*)left by:(EXTMatrix*)right;
++(EXTMatrix*) identity:(int)width;
+-(EXTMatrix*) invert;
+-(EXTMatrix*) columnReduce;
+-(void) modularReduction;
+-(NSMutableArray*) kernel;
+-(NSMutableArray*) image;
+-(NSMutableArray*) actOn:(NSMutableArray*)vector;
+-(int) rank;
 
-    // debug operations
-    -(void) log;
++(EXTMatrix*) assemblePresentation:(NSMutableArray*)partialDefinitions
+                   sourceDimension:(int)sourceDimension
+                   targetDimension:(int)targetDimension;
+
+// debug operations
+-(void) log;
 
 @end
