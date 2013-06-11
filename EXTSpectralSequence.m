@@ -282,16 +282,24 @@
             EXTTerm *C = [self findTerm:[[A.location class] addLocation:A.location to:B.location]],
                     *R = [p findTerm:[[P.location class] addLocation:P.location to:Q.location]];
             
+            // if we're not going to multiply into anything, then the
+            // multiplication is zero/undefined and we skip it.
+            if (!C || !R)
+                continue;
+            
             EXTTerm *CR = nil, *CRplus = nil;
             int CRoffset = 0;
-            for (NSMutableArray *workingTuple in tensorTerms)
-            for (NSMutableArray *subTuple in workingTuple[1]) {
-                if ((subTuple[1] == C) &&
-                    (subTuple[2] == R)) {
-                    CR = subTuple[0];
-                    CRplus = workingTuple[0];
-                    break;
-                } else CRoffset += ((EXTTerm*)(subTuple[0])).names.count;
+            for (NSMutableArray *workingTuple in splicedTensorTerms) {
+                for (NSMutableArray *subTuple in workingTuple[1]) {
+                    if ((subTuple[1] == C) &&
+                        (subTuple[2] == R)) {
+                        CR = subTuple[0];
+                        CRplus = workingTuple[0];
+                        break;
+                    } else CRoffset += ((EXTTerm*)(subTuple[0])).names.count;
+                }
+                if (CR) break;
+                CRoffset = 0;
             }
             
             int BQoffset = 0;
@@ -354,8 +362,6 @@
                                        downTo:(int)downTo {
     Class<EXTLocation> locClass = [loc class];
     EXTSpectralSequence *l = [EXTSpectralSequence spectralSequence];
-    EXTMultiplicationTables *newTables =
-        [EXTMultiplicationTables multiplicationTables:l];
     
     // construct a bunch of terms
     for (int i = downTo; i <= upTo; i++) {
@@ -426,6 +432,10 @@
 #pragma mark - built-in demos
 
 +(EXTSpectralSequence*) workingDemo {
+    return [EXTSpectralSequence KUhC2Demo];
+}
+
++(EXTSpectralSequence*) ladderDemo {
     EXTSpectralSequence *ret = [EXTSpectralSequence spectralSequence];
     
     EXTTerm *start = [EXTTerm term:[EXTPair pairWithA:1 B:0] andNames:[NSMutableArray arrayWithObject:@"e"]],
@@ -451,6 +461,12 @@
     [ret.terms addObject:[EXTTerm term:[EXTPair identityLocation] andNames:[NSMutableArray arrayWithObject:@"1"]]];
     ret = [ret tensorWithLaurentClass:@"beta^2" location:[EXTPair pairWithA:4 B:0] upTo:5 downTo:-5];
     ret = [ret tensorWithPolyClass:@"eta" location:[EXTPair pairWithA:1 B:1] upTo:10];
+    
+    // TODO: OK, so now we want to add the differential d_3 [beta^2] = eta^3.
+    // this is probably best done if we first reorganize the tensor routines to
+    // be destructive and modify their owner instances, and instead return a
+    // pointer to the EXTTerm we just tensored in...? is that possible? or is
+    // the tensoring code too general to track a vector through?
     
     return ret;
 }
