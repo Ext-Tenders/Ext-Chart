@@ -271,8 +271,7 @@
         // iterate over pairs of old terms which belong to splicedVectorTerms
         for (NSMutableArray *leftSummand in leftSummands)
         for (NSMutableArray *rightSummand in rightSummands) {
-            EXTTerm *AB = leftSummand[0], *A = leftSummand[1],
-                    *B = leftSummand[2], *PQ = rightSummand[0],
+            EXTTerm *A = leftSummand[1], *B = leftSummand[2],
                     *P = rightSummand[1], *Q = rightSummand[2];
             
             NSMutableArray
@@ -295,6 +294,10 @@
                 } else CRoffset += ((EXTTerm*)(subTuple[0])).names.count;
             }
             
+            int BQoffset = 0;
+            for (int i = 0; i < [rightSummands indexOfObject:rightSummand]; i++)
+                BQoffset += ((EXTTerm*)(rightSummands[i])).names.count;
+            
             // while we're at it, build the inclusion matrix C|R --> (+) C|R
             EXTMatrix *i2 = [EXTMatrix includeEvenlySpacedBasis:CR.names.count endDim:CRplus.names.count offset:CRoffset spacing:1];
             
@@ -308,19 +311,32 @@
                 // this second one is easy, so we do it first.
                 tensorPartial.inclusion = [EXTMatrix newMultiply:i2 by:[EXTMatrix hadamardProduct:leftPartial.inclusion with:rightPartial.inclusion]];
                 
-                // this biggest challenge is constructing i1.
+                // this biggest challenge is constructing i1.  this matrix has
+                // to include across the reassociation and transposition
+                // (A|B)|(P|Q) ~= (A|P)|(B|Q), along with dealing with one of
+                // the big direct sum inclusions we're constructing.
+                EXTMatrix *i1 = [EXTMatrix matrixWidth:(A.names.count*B.names.count*P.names.count*Q.names.count) height:(leftTerm.names.count*rightTerm.names.count)];
                 
-                // XXX: actually compute the action of the multiplication
+                for (int i = 0; i < A.names.count; i++)
+                for (int j = 0; j < P.names.count; j++)
+                for (int k = 0; k < B.names.count; k++)
+                for (int l = 0; l < Q.names.count; l++) {
+                    int APskip = B.names.count*Q.names.count*([leftSummands indexOfObject:leftSummand] + i*P.names.count + j);
+                    // poke a 1 in at this location.  the only way to see that
+                    // this is a reasonable thing to do is to draw out an
+                    // example.  i'm very sorry. :(
+                    ((NSMutableArray*)(i1.presentation[l+Q.names.count*(j+P.names.count*(k+i*B.names.count))]))[APskip + BQoffset + k*Q.names.count + l] = @1;
+                }
                 
-                // tensorPartial.differential = [EXTMatrix hadamardProduct:leftPartial.differential with:rightPartial.differential];
+                // now, we use this to build the differential presentation.
+                tensorPartial.differential = [EXTMatrix newMultiply:i1 by:[EXTMatrix hadamardProduct:leftPartial.differential with:rightPartial.differential]];
                 
                 // store to the table
                 [ret.multTables addPartialDefinition:tensorPartial
                                                   to:[leftTerm location]
                                                 with:[rightTerm location]];
-            }
+            } // left/rightPartials
         } // left/rightSummands
-        // take hadamard products of partial def'ns: (a|p)(b|q) = (ab)|(pq)
     } // splicedTensorTerms
     
     return ret;

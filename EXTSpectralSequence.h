@@ -23,9 +23,6 @@
 
 + (EXTSpectralSequence*) spectralSequence;
 - (EXTSpectralSequence*) tensorWithSSeq:(EXTSpectralSequence*)p;
-- (EXTSpectralSequence*) tensorWithClasses:(NSMutableArray*)classes
-                             differentials:(NSMutableArray*)differentials
-                                multTables:(EXTMultiplicationTables*)multTables;
 
 // these are misleading names
 -(EXTSpectralSequence*) tensorWithPolyClass:(NSString*)name
