@@ -38,6 +38,9 @@
 
 @implementation EXTMatrix
 
+// XXX: somehow change the presentation getter to recompute the presentation off
+// of the partial definitions --- but ideally not every time we need to access
+// the presentation, just when it's somehow "dirty"...
 @synthesize height, width;
 @synthesize presentation;
 

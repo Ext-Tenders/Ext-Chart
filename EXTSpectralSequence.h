@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "EXTLocation.h"
+// i guess objective C isn't particularly good at circular dependence
 //#import "EXTTerm.h"
 //#import "EXTdifferential.h"
 

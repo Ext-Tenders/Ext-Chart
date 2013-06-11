@@ -354,6 +354,8 @@
                                        downTo:(int)downTo {
     Class<EXTLocation> locClass = [loc class];
     EXTSpectralSequence *l = [EXTSpectralSequence spectralSequence];
+    EXTMultiplicationTables *newTables =
+        [EXTMultiplicationTables multiplicationTables:l];
     
     // construct a bunch of terms
     for (int i = downTo; i <= upTo; i++) {
@@ -367,11 +369,19 @@
         [l.terms addObject:workingTerm];
     }
     
-    // they have no differentials among them, so skip that.
-    // but! they do have a multiplicative structure:
-    EXTMultiplicationTables *newTables =
-                            [EXTMultiplicationTables multiplicationTables:l];
-    // XXX: i'm skipping this for now.
+    // now we throw in the internal multiplicative structure
+    for (EXTTerm *leftTerm in l.terms)
+    for (EXTTerm *rightTerm in l.terms) {
+        EXTTerm *targetTerm = [l findTerm:[locClass addLocation:leftTerm.location to:rightTerm.location]];
+        if (targetTerm) {
+            EXTMatrix *product = [EXTMatrix matrixWidth:1 height:1];
+            product.presentation[0] = [NSMutableArray arrayWithObject:@1];
+            EXTPartialDefinition *def = [EXTPartialDefinition new];
+            def.inclusion = def.differential = product;
+            [l.multTables addPartialDefinition:def to:leftTerm.location
+                                                 with:rightTerm.location];
+        }
+    }
     
     // pass this toward the tensor routine
     return [self tensorWithSSeq:l];
