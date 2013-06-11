@@ -50,6 +50,9 @@
                           to:(EXTLocation*)loc1
                         with:(EXTLocation*)loc2;
 
+-(EXTMultiplicationEntry*) performLookup:(EXTLocation*)loc1
+                                    with:(EXTLocation*)loc2;
+
 -(NSMutableArray*) multiplyClass:(NSMutableArray*)class1 at:(EXTLocation*)loc1
                             with:(NSMutableArray*)class2 at:(EXTLocation*)loc2;
 

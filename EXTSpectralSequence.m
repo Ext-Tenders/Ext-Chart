@@ -40,14 +40,15 @@
 // a language with strong typing and an easy production of tuple types, neither
 // of which is quite true in Objective-C.  i'm not about to make a zillion
 // helper classes, though.
--(EXTSpectralSequence*) tensorWithClasses:(NSMutableArray*)newClasses
-                            differentials:(NSMutableArray*)newDifferentials
-                               multTables:(EXTMultiplicationTables*)newTables {
+-(EXTSpectralSequence*) tensorWithSSeq:(EXTSpectralSequence *)p {
+    // what we'll eventually be returning.
+    EXTSpectralSequence *ret = [EXTSpectralSequence spectralSequence];
+
     NSMutableArray *tensorTerms = [NSMutableArray array];
     
     // we need to do a bunch of manipulations over pairs of classes.
     for (EXTTerm *t1 in self.terms) {
-        for (EXTTerm *t2 in newClasses) {
+        for (EXTTerm *t2 in p.terms) {
             // build EXTTerm's for all the tensor pairs A (x) P, and store
             // these in a separate list.
             EXTLocation *loc = [[t1.location class] addLocation:t1.location
@@ -89,6 +90,11 @@
         [splicedTensorTerms addObject:@[[EXTTerm term:loc andNames:sumNames], atThisLoc]];
     }
     
+    // store these terms into the returning spectral sequence.
+    for (NSMutableArray* tuple in splicedTensorTerms) {
+        [ret.terms addObject:tuple[0]];
+    }
+    
     NSMutableArray *outputDifferentials = [NSMutableArray array];
     // iterate over pairs of existing terms to build differentials from old ones
     for (NSMutableArray *tuple in splicedTensorTerms) {
@@ -112,8 +118,7 @@
                 continue;
             
             EXTTerm *AP = ((NSMutableArray*)startSummands[sourceIndex])[0],
-                    *A = ((NSMutableArray*)startSummands[sourceIndex])[1],
-                    *P = ((NSMutableArray*)startSummands[sourceIndex])[2];
+                     *P = ((NSMutableArray*)startSummands[sourceIndex])[2];
             
             // ok, so this differential is attached to our source term. we now
             // find all the same data for its target term.
@@ -137,8 +142,7 @@
                     break;
             }
             
-            EXTTerm *BP = ((NSMutableArray*)endSummands[endIndex])[0],
-                    *B = ((NSMutableArray*)endSummands[endIndex])[1];
+            EXTTerm *BP = ((NSMutableArray*)endSummands[endIndex])[0];
             
             // an EXTPartialDefinition used to look like A <-i--< A' --d-> B.
             // now we're going to tensor up to P, which will give something like
@@ -166,7 +170,7 @@
         // now also do d2.
         // XXX: THIS IS DUPLICATED CODE. BUGS IN ONE MEAN BUGS IN THE OTHER.
         // CORRECT APPROPRIATELY, AND EVENTUALLY FACTOR THIS ALL OUT.
-        for (EXTDifferential *d2 in newDifferentials) {
+        for (EXTDifferential *d2 in p.differentials) {
             // check if this diff'l is attached to one of our right-summands.
             int sourceIndex = -1, sourceOffset = 0;
             for (int i = 0; i < startSummands.count; i++) {
@@ -181,8 +185,7 @@
                 continue;
             
             EXTTerm *AP = ((NSMutableArray*)startSummands[sourceIndex])[0],
-                     *A = ((NSMutableArray*)startSummands[sourceIndex])[1],
-                     *P = ((NSMutableArray*)startSummands[sourceIndex])[2];
+                    *A = ((NSMutableArray*)startSummands[sourceIndex])[1];
             
             // ok, so this differential is attached to our source term. we now
             // find all the same data for its target term.
@@ -206,8 +209,7 @@
                     break;
             }
             
-            EXTTerm *AQ = ((NSMutableArray*)endSummands[endIndex])[0],
-                    *Q = ((NSMutableArray*)endSummands[endIndex])[2];
+            EXTTerm *AQ = ((NSMutableArray*)endSummands[endIndex])[0];
             
             // an EXTPartialDefinition used to look like P <-i--< P' --d-> Q.
             // now we're going to tensor up to A, which will give something like
@@ -249,28 +251,79 @@
             
             [outputDifferentials addObject:diff];
         } // partialPresentations
-    } // splicedVectorTerms
+    } // splicedTensorTerms
     
-    // iterate over pairs of of pairs of existing terms...
-    // ... and use the old multiplication tables to build new ones, via the rule (a|p)(a'|p') = (aa')|(pp')
-    // XXX: i'm skipping this for now.
-
-    // now that we have all this data laying around, it's time to package it
-    // into an EXTSpectralSequence and return.
-    EXTSpectralSequence *ret = [EXTSpectralSequence spectralSequence];
-    for (NSMutableArray* tuple in splicedTensorTerms) {
-        [ret.terms addObject:tuple[0]];
-    }
-    
+    // store these differentials in to the returning spectral sequence
     ret.differentials = outputDifferentials;
     
+    // initialize the multiplication tables for the returning spectral sequence
+    ret.multTables = [EXTMultiplicationTables multiplicationTables:ret];
+    
+    // iterate over pairs of splicedTensorTerms
+    for (NSMutableArray *leftPair in splicedTensorTerms)
+    for (NSMutableArray *rightPair in splicedTensorTerms) {
+        EXTTerm *leftTerm = leftPair[0],
+                *rightTerm = rightPair[0];
+        NSMutableArray *leftSummands = leftPair[1],
+                      *rightSummands = rightPair[1];
+        EXTMultiplicationEntry *tensorMult = [ret.multTables performLookup:leftTerm.location with:rightTerm.location];
+        
+        // iterate over pairs of old terms which belong to splicedVectorTerms
+        for (NSMutableArray *leftSummand in leftSummands)
+        for (NSMutableArray *rightSummand in rightSummands) {
+            EXTTerm *AB = leftSummand[0], *A = leftSummand[1],
+                    *B = leftSummand[2], *PQ = rightSummand[0],
+                    *P = rightSummand[1], *Q = rightSummand[2];
+            
+            NSMutableArray
+                *leftPartials = [self.multTables performLookup:A.location with:B.location].partialDefinitions,
+                *rightPartials = [p.multTables performLookup:P.location with:Q.location].partialDefinitions;
+            
+            // look up the target term, which we need for indexing purposes.
+            EXTTerm *C = [self findTerm:[[A.location class] addLocation:A.location to:B.location]],
+                    *R = [p findTerm:[[P.location class] addLocation:P.location to:Q.location]];
+            
+            EXTTerm *CR = nil, *CRplus = nil;
+            int CRoffset = 0;
+            for (NSMutableArray *workingTuple in tensorTerms)
+            for (NSMutableArray *subTuple in workingTuple[1]) {
+                if ((subTuple[1] == C) &&
+                    (subTuple[2] == R)) {
+                    CR = subTuple[0];
+                    CRplus = workingTuple[0];
+                    break;
+                } else CRoffset += ((EXTTerm*)(subTuple[0])).names.count;
+            }
+            
+            // while we're at it, build the inclusion matrix C|R --> (+) C|R
+            EXTMatrix *i2 = [EXTMatrix includeEvenlySpacedBasis:CR.names.count endDim:CRplus.names.count offset:CRoffset spacing:1];
+            
+            for (EXTPartialDefinition *leftPartial in leftPartials)
+            for (EXTPartialDefinition *rightPartial in rightPartials) {
+                EXTPartialDefinition *tensorPartial = [EXTPartialDefinition new];
+                
+                // A|B <-i- I -f-> C and P|Q <-j- J -g-> R become the pair
+                // I|J -i|j-> (A|B)|(P|Q) -i1-> ((+)A|P)|((+)B|Q) ,
+                // I|J -f|g-> C|R -i2-> (+) C|R .
+                // this second one is easy, so we do it first.
+                tensorPartial.inclusion = [EXTMatrix newMultiply:i2 by:[EXTMatrix hadamardProduct:leftPartial.inclusion with:rightPartial.inclusion]];
+                
+                // this biggest challenge is constructing i1.
+                
+                // XXX: actually compute the action of the multiplication
+                
+                // tensorPartial.differential = [EXTMatrix hadamardProduct:leftPartial.differential with:rightPartial.differential];
+                
+                // store to the table
+                [ret.multTables addPartialDefinition:tensorPartial
+                                                  to:[leftTerm location]
+                                                with:[rightTerm location]];
+            }
+        } // left/rightSummands
+        // take hadamard products of partial def'ns: (a|p)(b|q) = (ab)|(pq)
+    } // splicedTensorTerms
+    
     return ret;
-}
-
--(EXTSpectralSequence*) tensorWithSSeq:(EXTSpectralSequence *)p {
-    return [self tensorWithClasses:p.terms
-                     differentials:p.differentials
-                        multTables:p.multTables];
 }
 
 -(EXTSpectralSequence*) tensorWithPolyClass:(NSString*)name
