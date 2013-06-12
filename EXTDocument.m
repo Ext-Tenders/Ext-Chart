@@ -53,6 +53,7 @@
 
 // if requested, we can initialize the terms array with some test garbage
 -(EXTSpectralSequence*) runDemo {
+    // XXX: this should set the current page to 0, but bavarious changed sth...
     return self.sseq = [EXTSpectralSequence workingDemo];
 }
 

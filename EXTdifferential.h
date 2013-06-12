@@ -21,7 +21,6 @@
         int page;
         
         NSMutableArray *partialDefinitions; // array of EXTPartialDifferential's
-        EXTMatrix *presentation;            // assembled from the array
         bool wellDefined;                   // false if definitions don't span
     }
 

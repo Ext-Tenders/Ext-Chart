@@ -197,13 +197,19 @@
     // compute the action of the differentials on each factor in the
     // product decomposition: d(xy) = dx y + x dy.
     // XXX: deal with sign errors here.
-    EXTLocation *sumloc = [[loc1 class] addLocation:loc1 to:loc2];
+    EXTLocation *sumloc = [[loc1 class] addLocation:loc1 to:loc2],
+             *targetLoc = [[loc1 class] followDiffl:sumloc page:page];
     EXTTerm *term1 = [self.sSeq findTerm:loc1],
             *term2 = [self.sSeq findTerm:loc2],
-          *sumterm = [self.sSeq findTerm:sumloc];
+          *sumterm = [self.sSeq findTerm:sumloc],
+       *targetterm = [self.sSeq findTerm:targetLoc];
     EXTDifferential *d1 = [self.sSeq findDifflWithSource:loc1 onPage:page],
                     *d2 = [self.sSeq findDifflWithSource:loc2 onPage:page];
     NSMutableArray *actions = [NSMutableArray array];
+    
+    // quick sanity check
+    if (!sumterm || !targetterm)
+        return;
     
     for (NSNumber *hadamardPosition in indices) {
         int unwrappedPosition = [hadamardPosition intValue];
@@ -245,7 +251,7 @@
                 [summand1 setObject:@(0) atIndexedSubscript:i];
         if (d2) {
             NSMutableArray *dfm = [[d2 presentation] actOn:fm];
-            summand1 = [self multiplyClass:en at:loc1
+            summand2 = [self multiplyClass:en at:loc1
                                       with:dfm at:[d2 end].location];
         } else
             for (int i = 0; i < sumterm.names.count; i++)
@@ -254,8 +260,8 @@
         // sum and store to the list of actions.
         NSMutableArray *sum = [NSMutableArray array];
         for (int i = 0; i < summand1.count; i++)
-            [sum setObject:@([[summand1 objectAtIndex:i] intValue] +
-                             [[summand2 objectAtIndex:i] intValue])
+            [sum setObject:@(([[summand1 objectAtIndex:i] intValue] +
+                             [[summand2 objectAtIndex:i] intValue])%2)
                  atIndexedSubscript:i];
         
         [actions addObject:sum];

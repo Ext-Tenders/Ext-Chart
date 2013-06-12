@@ -12,7 +12,9 @@
 
 // redeclare part of the EXTDifferential interface so that we synthesize both
 // getters *and* setters for the publicly read-only properties.
-@interface EXTDifferential ()
+@interface EXTDifferential () {
+    EXTMatrix *_presentation;
+}
 
 @property(strong) NSMutableArray *partialDefinitions;
 @property(strong) EXTMatrix *presentation;
@@ -26,7 +28,6 @@
 @synthesize page;
 @synthesize start, end;
 @synthesize partialDefinitions;
-@synthesize presentation;
 @synthesize wellDefined;
 
 +(id) newDifferential:(EXTTerm *)start end:(EXTTerm *)end page:(int)page {
@@ -54,6 +55,17 @@
     return differential;
 }
 
+// quietly assemble the presentation when asked for it :)
+-(EXTMatrix*) presentation {
+    [self assemblePresentation];
+    
+    return _presentation;
+}
+
+-(void) setPresentation:(EXTMatrix*)presentation {
+    _presentation = presentation;
+}
+
 // this routine assembles from the available partial definitions of the
 // differential a single definition on the cycle group.  it's a bit convoluted.
 -(void) assemblePresentation {
@@ -63,7 +75,7 @@
                                             objectAtIndex:(self.page-1)] count]
                         targetDimension:end.names.count];
     
-    self.presentation = assembled;
+    _presentation = assembled;
     
     return;
 }
@@ -93,7 +105,11 @@
 // it looks better if they always attach themselves to the *last* class.
 // *really* really, they should attach themselves intelligently to the class
 // that makes most sense.  :)
-- (void) drawWithSpacing:(CGFloat)spacing{
+- (void) drawWithSpacing:(CGFloat)spacing {
+    // if this differential is actually empty, then don't draw it.
+    if ([self.presentation image].count == 0)
+        return;
+    
     NSPoint pointStart = [start.location makePoint],
             pointEnd = [end.location makePoint];
 	CGFloat x1 = (pointStart.x+0.25)*spacing,

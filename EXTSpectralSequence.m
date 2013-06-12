@@ -466,8 +466,8 @@
 +(EXTSpectralSequence*) KUhC2Demo {
     EXTSpectralSequence *ret = [EXTSpectralSequence sSeqWithUnit:[EXTPair class]];
     
-    ret = [ret tensorWithLaurentClass:@"beta^2" location:[EXTPair pairWithA:4 B:0] upTo:2 downTo:-2];
-    ret = [ret tensorWithPolyClass:@"eta" location:[EXTPair pairWithA:1 B:1] upTo:5];
+    ret = [ret tensorWithLaurentClass:@"beta^2" location:[EXTPair pairWithA:4 B:0] upTo:2 downTo:0];
+    ret = [ret tensorWithPolyClass:@"eta" location:[EXTPair pairWithA:1 B:1] upTo:3];
     
     // not allowed to do computations with differentials on pages which you
     // haven't yet seen.

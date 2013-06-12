@@ -194,6 +194,8 @@
             // skip the column we're working with, of course!
             if (j == pivotColumn)
                 continue;
+            if ([[column objectAtIndex:pivotRow] intValue] == 0)
+                continue;
             
             NSMutableArray *workingColumn = [ret.presentation objectAtIndex:j];
             int factor = [[workingColumn objectAtIndex:pivotRow] intValue] /
@@ -202,8 +204,8 @@
             // ... and for each entry in this column, subtract.
             for (int i = 0; i < height; i++)
                 [workingColumn
-                    setObject:@([[workingColumn objectAtIndex:i] intValue] -
-                               factor * [[column objectAtIndex:i] intValue])
+                    setObject:@(([[workingColumn objectAtIndex:i] intValue] -
+                               factor * [[column objectAtIndex:i] intValue])%2)
                     atIndexedSubscript:i];
         }
         
