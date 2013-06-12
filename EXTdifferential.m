@@ -95,8 +95,8 @@
 }
 
 - (void) encodeWithCoder:(NSCoder*) coder {
-	[coder encodeObject: start forKey:@"start"];
-	[coder encodeObject: end forKey:@"end"];
+	[coder encodeObject:start forKey:@"start"];
+	[coder encodeObject:end forKey:@"end"];
 	[coder encodeInt:page forKey:@"page"];
 }
 

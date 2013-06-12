@@ -25,5 +25,6 @@
 +(EXTPair*) scale:(EXTPair*)loc by:(int)scale;
 +(EXTPair*) followDiffl:(EXTPair*)a page:(int)page;
 +(EXTPair*) reverseDiffl:(EXTPair*)b page:(int)page;
+-(BOOL) isEqual:(EXTPair*)other;
 
 @end

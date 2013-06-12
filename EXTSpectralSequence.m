@@ -412,7 +412,7 @@
 
 -(EXTDifferential*) findDifflWithSource:(EXTLocation *)loc onPage:(int)page {
     for (EXTDifferential *diffl in self.differentials)
-        if (([[diffl start] location] == loc) && ([diffl page] == page))
+        if ([[[diffl start] location] isEqual:loc] && ([diffl page] == page))
             return diffl;
     
     return nil;
@@ -420,7 +420,7 @@
 
 -(EXTDifferential*) findDifflWithTarget:(EXTLocation *)loc onPage:(int)page {
     for (EXTDifferential *diffl in self.differentials)
-        if (([[diffl end] location] == loc) && ([diffl page] == page))
+        if (([[[diffl end] location] isEqual:loc]) && ([diffl page] == page))
             return diffl;
     
     return nil;

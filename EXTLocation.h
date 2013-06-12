@@ -18,6 +18,7 @@
 +(NSObject<EXTLocation>*) identityLocation;
 +(NSObject<EXTLocation>*) followDiffl:(NSObject<EXTLocation>*)a page:(int)page;
 +(NSObject<EXTLocation>*) reverseDiffl:(NSObject<EXTLocation>*)b page:(int)page;
+-(BOOL) isEqual:(NSObject<EXTLocation>*)a;
 
 @end
 
