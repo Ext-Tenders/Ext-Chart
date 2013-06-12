@@ -466,8 +466,13 @@
 +(EXTSpectralSequence*) KUhC2Demo {
     EXTSpectralSequence *ret = [EXTSpectralSequence sSeqWithUnit:[EXTPair class]];
     
-    ret = [ret tensorWithLaurentClass:@"beta^2" location:[EXTPair pairWithA:4 B:0] upTo:5 downTo:-4];
-    ret = [ret tensorWithPolyClass:@"eta" location:[EXTPair pairWithA:1 B:1] upTo:12];
+    ret = [ret tensorWithLaurentClass:@"beta^2"
+                             location:[EXTPair pairWithA:4 B:0]
+                                 upTo:5
+                               downTo:-4];
+    ret = [ret tensorWithPolyClass:@"eta"
+                          location:[EXTPair pairWithA:1 B:1]
+                              upTo:12];
     
     // not allowed to do computations with differentials on pages which you
     // haven't yet seen.
@@ -485,7 +490,9 @@
     [ret.differentials addObject:diff];
     
     for (EXTTerm *term in ret.terms)
-        [ret.multTables computeLeibniz:[beta2 location] with:[term location] onPage:3];
+        [ret.multTables computeLeibniz:[beta2 location]
+                                  with:[term location]
+                                onPage:3];
     
     [ret computeGroupsForPage:3];
     [ret computeGroupsForPage:4];

@@ -72,7 +72,10 @@
     return [EXTTriple tripleWithA:self.a B:self.b C:self.c];
 }
 
--(BOOL) isEqual:(EXTTriple*)other {
+-(BOOL) isEqual:(id)other {
+    if ([other class] != [EXTTriple class])
+        return FALSE;
+    
     return (([self a] == [other a]) &&
             ([self b] == [other b]) &&
             ([self c] == [other c]));

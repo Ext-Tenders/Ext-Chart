@@ -77,7 +77,10 @@
 	return (int) key;
 }
 
-- (BOOL) isEqual:(id) other{
+-(BOOL) isEqual:(id)other {
+    if ([other class] != [EXTPair class])
+        return FALSE;
+    
 	return [other a] == [self a] && [other b] == [self b];
 }
 
