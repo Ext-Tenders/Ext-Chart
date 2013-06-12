@@ -95,6 +95,7 @@
         [ret.terms addObject:tuple[0]];
     }
     
+    // XXX: i don't think that this is **summing** differentials correctly...
     NSMutableArray *outputDifferentials = [NSMutableArray array];
     // iterate over pairs of existing terms to build differentials from old ones
     for (NSMutableArray *tuple in splicedTensorTerms) {
@@ -271,8 +272,8 @@
         // iterate over pairs of old terms which belong to splicedVectorTerms
         for (NSMutableArray *leftSummand in leftSummands)
         for (NSMutableArray *rightSummand in rightSummands) {
-            EXTTerm *A = leftSummand[1], *B = leftSummand[2],
-                    *P = rightSummand[1], *Q = rightSummand[2];
+            EXTTerm *A = leftSummand[1], *P = leftSummand[2],
+                    *B = rightSummand[1], *Q = rightSummand[2];
             
             NSMutableArray
                 *leftPartials = [self.multTables performLookup:A.location with:B.location].partialDefinitions,
@@ -360,6 +361,10 @@
                                      location:(EXTLocation*)loc
                                          upTo:(int)upTo
                                        downTo:(int)downTo {
+    return [self tensorWithSSeq:[EXTSpectralSequence buildLaurentSSeq:name location:loc upTo:upTo downTo:downTo]];
+}
+
++(EXTSpectralSequence*) buildLaurentSSeq:(NSString*)name location:(EXTLocation*)loc upTo:(int)upTo downTo:(int)downTo {
     Class<EXTLocation> locClass = [loc class];
     EXTSpectralSequence *l = [EXTSpectralSequence spectralSequence];
     
@@ -371,7 +376,7 @@
         EXTTerm *workingTerm = [EXTTerm term:workingLoc andNames:
                                 [NSMutableArray arrayWithObject:
                                  [NSString stringWithFormat:@"{%@}^{%d}",
-                                                            name, i]]];
+                                  name, i]]];
         [l.terms addObject:workingTerm];
     }
     
@@ -389,8 +394,11 @@
         }
     }
     
-    // pass this toward the tensor routine
-    return [self tensorWithSSeq:l];
+    return l;
+}
+
++(EXTSpectralSequence*) sSeqWithUnit:(Class<EXTLocation>)locClass {
+    return [EXTSpectralSequence buildLaurentSSeq:@"1" location:[locClass identityLocation] upTo:0 downTo:0];
 }
 
 -(EXTTerm*) findTerm:(EXTLocation *)loc {
@@ -456,11 +464,28 @@
 }
 
 +(EXTSpectralSequence*) KUhC2Demo {
-    EXTSpectralSequence *ret = [EXTSpectralSequence spectralSequence];
+    EXTSpectralSequence *ret = [EXTSpectralSequence sSeqWithUnit:[EXTPair class]];
     
-    [ret.terms addObject:[EXTTerm term:[EXTPair identityLocation] andNames:[NSMutableArray arrayWithObject:@"1"]]];
-    ret = [ret tensorWithLaurentClass:@"beta^2" location:[EXTPair pairWithA:4 B:0] upTo:5 downTo:-5];
-    ret = [ret tensorWithPolyClass:@"eta" location:[EXTPair pairWithA:1 B:1] upTo:10];
+    ret = [ret tensorWithLaurentClass:@"beta^2" location:[EXTPair pairWithA:4 B:0] upTo:2 downTo:-2];
+    ret = [ret tensorWithPolyClass:@"eta" location:[EXTPair pairWithA:1 B:1] upTo:5];
+    
+    // not allowed to do computations with differentials on pages which you
+    // haven't yet seen.
+    [ret computeGroupsForPage:0];
+    [ret computeGroupsForPage:1];
+    [ret computeGroupsForPage:2];
+    
+    EXTTerm *beta2 = [ret findTerm:[EXTPair pairWithA:4 B:0]];
+    EXTDifferential *diff = [EXTDifferential differential:beta2 end:[ret findTerm:[EXTPair pairWithA:3 B:3]] page:3];
+    EXTPartialDefinition *diffdefn = [EXTPartialDefinition new];
+    EXTMatrix *one = [EXTMatrix matrixWidth:1 height:1];
+    one.presentation[0] = [NSMutableArray arrayWithObject:@1];
+    diffdefn.differential = diffdefn.inclusion = one;
+    [diff.partialDefinitions addObject:diffdefn];
+    [ret.differentials addObject:diff];
+    
+    for (EXTTerm *term in ret.terms)
+        [ret.multTables computeLeibniz:[beta2 location] with:[term location] onPage:3];
     
     // TODO: OK, so now we want to add the differential d_3 [beta^2] = eta^3.
     // this is probably best done if we first reorganize the tensor routines to

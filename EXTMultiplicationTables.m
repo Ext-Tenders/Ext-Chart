@@ -170,6 +170,9 @@
     EXTMatrix *product = [self getMatrixFor:loc1 with:loc2];
     NSMutableArray *image = [product image];
     
+    if (image.count == 0)
+        return;
+    
     // extract which columns contributed to the image of the product map
     NSMutableArray *indices = [NSMutableArray array];
     for (NSMutableArray *column in image) {
