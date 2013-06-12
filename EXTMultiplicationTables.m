@@ -283,8 +283,8 @@
                                               height:[actions[0] count]],
               *inclusion = [EXTMatrix matrixWidth:actions.count
                                            height:[actions[0] count]];
-    differential.presentation = image;
-    inclusion.presentation = actions;
+    differential.presentation = actions;
+    inclusion.presentation = image;
     partial.differential = differential;
     partial.inclusion = inclusion;
     

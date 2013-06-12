@@ -69,14 +69,10 @@
 // this routine assembles from the available partial definitions of the
 // differential a single definition on the cycle group.  it's a bit convoluted.
 -(void) assemblePresentation {
-    EXTMatrix *assembled =
+    _presentation =
         [EXTMatrix assemblePresentation:self.partialDefinitions
-                        sourceDimension:[[self.start.boundaries
-                                            objectAtIndex:(self.page-1)] count]
-                        targetDimension:end.names.count];
-    
-    _presentation = assembled;
-    
+                        sourceDimension:self.start.names.count
+                        targetDimension:self.end.names.count];
     return;
 }
 

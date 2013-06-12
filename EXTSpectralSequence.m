@@ -466,8 +466,8 @@
 +(EXTSpectralSequence*) KUhC2Demo {
     EXTSpectralSequence *ret = [EXTSpectralSequence sSeqWithUnit:[EXTPair class]];
     
-    ret = [ret tensorWithLaurentClass:@"beta^2" location:[EXTPair pairWithA:4 B:0] upTo:2 downTo:0];
-    ret = [ret tensorWithPolyClass:@"eta" location:[EXTPair pairWithA:1 B:1] upTo:3];
+    ret = [ret tensorWithLaurentClass:@"beta^2" location:[EXTPair pairWithA:4 B:0] upTo:5 downTo:-5];
+    ret = [ret tensorWithPolyClass:@"eta" location:[EXTPair pairWithA:1 B:1] upTo:12];
     
     // not allowed to do computations with differentials on pages which you
     // haven't yet seen.
@@ -487,11 +487,8 @@
     for (EXTTerm *term in ret.terms)
         [ret.multTables computeLeibniz:[beta2 location] with:[term location] onPage:3];
     
-    // TODO: OK, so now we want to add the differential d_3 [beta^2] = eta^3.
-    // this is probably best done if we first reorganize the tensor routines to
-    // be destructive and modify their owner instances, and instead return a
-    // pointer to the EXTTerm we just tensored in...? is that possible? or is
-    // the tensoring code too general to track a vector through?
+    [ret computeGroupsForPage:3];
+    [ret computeGroupsForPage:4];
     
     return ret;
 }

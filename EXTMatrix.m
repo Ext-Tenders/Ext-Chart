@@ -410,7 +410,7 @@
         bool isEmpty = true;
         
         for (int j = 0; j < enormousMat.height; j++)
-            if (enormousMat.presentation[i][j] != 0)
+            if ([enormousMat.presentation[i][j] intValue] != 0)
                 isEmpty = false;
         
         // if this vector is inessential, it will have been eliminated by rcef.
