@@ -28,6 +28,8 @@
 
 @implementation EXTDocumentWindowController
 
+#pragma mark - Life cycle
+
 - (id)init
 {
     return [super initWithWindowNibName:@"EXTDocument"];
@@ -68,6 +70,26 @@
 	[self.grid addObserver:self.extView forKeyPath:EXTGridAnyKey options:0 context:nil];
 
     //	[self setEmphasisGridSpacing:8];
+
+    [[self extView] bind:EXTViewSseqBindingName toObject:[self document] withKeyPath:@"sseq" options:nil];
+}
+
+#pragma mark - Properties
+
+- (void)setDocument:(NSDocument *)document
+{
+    NSAssert(!document || [document isKindOfClass:[EXTDocument class]], @"This window controller accepts EXTDocument documents only");
+
+    if (document != [self document]) {
+        if ([self document])
+            [[self extView] unbind:EXTViewSseqBindingName];
+        
+        [super setDocument:document];
+
+        if (document) {
+            [[self extView] bind:EXTViewSseqBindingName toObject:document withKeyPath:@"sseq" options:nil];
+        }
+    }
 }
 
 - (EXTDocument *)extDocument
@@ -79,6 +101,8 @@
 {
     self.extView.pageInView = newPage;
 }
+
+#pragma  mark -
 
 // this performs the culling and delegation calls for drawing a page of the SS
 // TODO: does this need spacing to be passed in?  probably a lot of data passing
@@ -119,12 +143,8 @@
     return 0; // XXX: what is this used for? fix it!
 }
 
-- (IBAction) demoGroups:(id)sender{
-    // XXX: i think this could be more smartly written. this is probably a
-    // symptom of something that will become a real headache later on.
-    EXTSpectralSequence *sseq = [[self document] runDemo];
-    [_extView setSseq:sseq]; // make sure our EXTView is sync'd.
-	[_extView setNeedsDisplay:YES];
+- (IBAction)demoGroups:(id)sender {
+    [[self document] runDemo];
 }
 
 @end

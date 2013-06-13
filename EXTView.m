@@ -21,7 +21,20 @@
 //static NSColor *highlightRectColor = nil;
 
 
+#pragma mark - Exported variables
+
+NSString * const EXTViewSseqBindingName = @"sseq";
+
+
+#pragma mark - Private variables
+
+static void *_EXTViewSseqContext = &_EXTViewSseqContext;
+
+
 @implementation EXTView
+{
+    NSMutableDictionary *_bindings;
+}
 
 @synthesize gridSpacing;
 @synthesize pageInView;
@@ -31,7 +44,13 @@
 @synthesize highlighting;
 @synthesize highlightPath;
 
-#pragma mark *** initialization ***
+#pragma mark - Life cycle
+
++ (void)initialize
+{
+    if (self == [EXTView class])
+        [self exposeBinding:EXTViewSseqBindingName];
+}
 
 - (id)initWithFrame:(NSRect)frame {
     self = [super initWithFrame:frame];
@@ -43,6 +62,8 @@
 		gridSpacing = 9.0;
 		pageInView = 0;
 		editingArtBoards = NO;
+
+        _bindings = [NSMutableDictionary dictionary];
 
 		[self setArtBoard:[[EXTArtBoard alloc] initWithRect:NSZeroRect]];
 		[self set_grid:[[EXTGrid alloc] initWithRect:NSZeroRect]];
@@ -222,6 +243,16 @@
 	[self setNeedsDisplay:YES];
 }
 
+#pragma mark - Properties
+
+- (void)setSseq:(EXTSpectralSequence *)sseq
+{
+    if (sseq != _sseq) {
+        _sseq = sseq;
+        [self setNeedsDisplay:YES];
+    }
+}
+
 #pragma mark *** paging ***
 
 // TODO: this gets called when the Compute Homology button is pressed. this
@@ -289,9 +320,9 @@
 
 
 
-#pragma mark *** bindings ***
+#pragma mark - Bindings & KVO
 
--(void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context{
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context{
 	if ([keyPath isEqualToString:EXTArtBoardDrawingRectKey]){
 		// this is not the right thing, I don't think.   It should be done with the mousUp code.  Also, it looks like the new way to do cursorRects is with tracking areas.   
 		[[[self enclosingScrollView] window] invalidateCursorRectsForView:self];
@@ -300,7 +331,7 @@
 		// I guess the [change ...] returns an NSValue object, whose rectValue is bounds.
    
 		dirtyRect = [[change objectForKey:NSKeyValueChangeNewKey] rectValue];
-		
+
 		[self setNeedsDisplayInRect:dirtyRect];
 		dirtyRect = [[change objectForKey:NSKeyValueChangeOldKey] rectValue];
 		[self setNeedsDisplayInRect:dirtyRect];
@@ -314,11 +345,51 @@
 		[self setGridSpacing:_grid.gridSpacing]; 
 		[self setNeedsDisplay:YES];
 	}
+    else if (context == _EXTViewSseqContext) {
+        EXTSpectralSequence *newSseq = [object valueForKeyPath:keyPath];
+
+        if (newSseq != NSNotApplicableMarker)
+            [self setSseq:newSseq];
+    }
 	else {
 		[super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
 	}
 }
 
+- (void)bind:(NSString *)binding toObject:(id)observable withKeyPath:(NSString *)keyPath options:(NSDictionary *)options
+{
+    if ([binding isEqualToString:EXTViewSseqBindingName]) {
+        if (_bindings[binding])
+            [self unbind:binding];
+
+        [observable addObserver:self forKeyPath:keyPath options:0 context:_EXTViewSseqContext];
+        _bindings[binding] = @{
+                               NSObservedObjectKey : observable,
+                               NSObservedKeyPathKey : [keyPath copy],
+                               NSOptionsKey : (options ? [options copy] : @{}),
+                               };
+    }
+    else
+        [super bind:binding toObject:observable withKeyPath:keyPath options:options];
+}
+
+- (void)unbind:(NSString *)binding
+{
+    NSDictionary *bindingInfo = _bindings[binding];
+
+    if (bindingInfo) {
+        [bindingInfo[NSObservedObjectKey] removeObserver:self forKeyPath:bindingInfo[NSObservedKeyPathKey]];
+        [_bindings removeObjectForKey:binding];
+    }
+    else
+        [super unbind:binding];
+}
+
+- (NSDictionary *)infoForBinding:(NSString *)binding
+{
+    NSDictionary *bindingInfo = _bindings[binding];
+    return bindingInfo ? bindingInfo : [super infoForBinding:binding];
+}
 
 
 #pragma mark *** zooming and scrolling ***
