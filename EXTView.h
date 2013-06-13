@@ -71,4 +71,8 @@
 
 @end
 
-// I'm putting the grid stuff in here, temporarily.   We can break it out into the grid object as we add more functionality later.  
+// I'm putting the grid stuff in here, temporarily.   We can break it out into the grid object as we add more functionality later.
+
+#pragma mark - Exported variables
+
+extern NSString * const EXTViewSseqBindingName;
