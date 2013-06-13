@@ -13,7 +13,7 @@
 
 
 @interface EXTDocument : NSDocument
-    @property(nonatomic, strong) EXTSpectralSequence *sseq; // TODO: shouldn’t this be a readonly property?
+    @property(nonatomic, strong) EXTSpectralSequence *sseq;
 
     - (EXTSpectralSequence*)runDemo;
 @end
