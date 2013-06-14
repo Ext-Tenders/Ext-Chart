@@ -49,7 +49,7 @@
 
 @property(nonatomic, strong) EXTSpectralSequence *sseq; // TODO: this should evolve to a copy property in order to avoid side effects
 @property(nonatomic, weak) id<EXTViewDelegate> delegate;
-@property(nonatomic, assign) int pageInView;
+@property(nonatomic, assign) NSUInteger selectedPageIndex;
 
 
 
@@ -76,3 +76,4 @@
 #pragma mark - Exported variables
 
 extern NSString * const EXTViewSseqBindingName;
+extern NSString * const EXTViewSelectedPageIndexBindingName;
