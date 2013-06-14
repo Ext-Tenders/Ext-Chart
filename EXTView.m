@@ -24,11 +24,12 @@
 #pragma mark - Exported variables
 
 NSString * const EXTViewSseqBindingName = @"sseq";
-
+NSString * const EXTViewSelectedPageIndexBindingName = @"selectedPageIndex";
 
 #pragma mark - Private variables
 
 static void *_EXTViewSseqContext = &_EXTViewSseqContext;
+static void *_EXTViewSelectedPageIndexContext = &_EXTViewSelectedPageIndexContext;
 
 
 @implementation EXTView
@@ -37,7 +38,6 @@ static void *_EXTViewSseqContext = &_EXTViewSseqContext;
 }
 
 @synthesize gridSpacing;
-@synthesize pageInView;
 @synthesize showGrid, editMode, showPages, editingArtBoards;
 @synthesize artBoard;
 @synthesize _grid;
@@ -60,7 +60,6 @@ static void *_EXTViewSseqContext = &_EXTViewSseqContext;
 		showPages = YES;
 		editMode = NO;
 		gridSpacing = 9.0;
-		pageInView = 0;
 		editingArtBoards = NO;
 
         _bindings = [NSMutableDictionary dictionary];
@@ -187,7 +186,7 @@ static void *_EXTViewSseqContext = &_EXTViewSseqContext;
 		
         // XXX: this may be drawing too narrow a window, resulting in blank Ext
         // charts if the scroll is dragged too slowly.
-        [_delegate drawPageNumber:pageInView
+        [_delegate drawPageNumber:_selectedPageIndex
                               ll:[self convertToGridCoordinates:lowerLeftPoint]
                               ur:[self convertToGridCoordinates:upperRightPoint]
                      withSpacing:gridSpacing];
@@ -222,20 +221,28 @@ static void *_EXTViewSseqContext = &_EXTViewSseqContext;
 	[_grid resetToDefaults];	
 }
 
+- (void)displaySelectedPage
+{
+    if (highlighting) {
+        NSPoint mousePoint = [[[self enclosingScrollView] window] mouseLocationOutsideOfEventStream];
+        mousePoint = [self convertPoint:mousePoint fromView:nil];
+        [self resetHighlightRectAtLocation:mousePoint];
+    }
 
--(void)setPageInView:(int) newPage{
-	pageInView = newPage;
-    
-	if (highlighting) {
-		NSPoint mousePoint = [[[self enclosingScrollView] window] mouseLocationOutsideOfEventStream];
-		mousePoint = [self convertPoint:mousePoint fromView:nil];
-		[self resetHighlightRectAtLocation:mousePoint];
-	}
-    
     // compute all the cycles and boundaries for this new page.
-    [self.sseq computeGroupsForPage:pageInView];
-	
-	[self setNeedsDisplay:YES];
+    // TODO: computations shouldn’t be done by the view. Move this to the model, mediated by a controller
+    [self.sseq computeGroupsForPage:_selectedPageIndex];
+
+    [self setNeedsDisplay:YES];
+}
+
+- (void)setSelectedPageIndex:(NSUInteger)selectedPageIndex
+{
+    // TODO: should check whether the argument lies in {min, max} page indices
+    if (selectedPageIndex != _selectedPageIndex) {
+        _selectedPageIndex = selectedPageIndex;
+        [self displaySelectedPage];
+    }
 }
 
 -(void)setShowGrid:(BOOL)showing{
@@ -249,7 +256,7 @@ static void *_EXTViewSseqContext = &_EXTViewSseqContext;
 {
     if (sseq != _sseq) {
         _sseq = sseq;
-        [self setNeedsDisplay:YES];
+        [self displaySelectedPage];
     }
 }
 
@@ -286,13 +293,12 @@ static void *_EXTViewSseqContext = &_EXTViewSseqContext;
 //			[pages replaceObjectAtIndex:pageInView +1 withObject:nextPage];
 //		}
 //	};
-	[self setPageInView:(pageInView + 1)];
+    [self setSelectedPageIndex:_selectedPageIndex + 1];
 }
 
-- (IBAction)previousPage:(id)sender{
-	if (pageInView >0) {
-		[self setPageInView:pageInView-1];
-	};	
+- (IBAction)previousPage:(id)sender {
+	if (_selectedPageIndex > 0)
+        [self setSelectedPageIndex:_selectedPageIndex - 1];
 }
 
 
@@ -351,6 +357,12 @@ static void *_EXTViewSseqContext = &_EXTViewSseqContext;
         if (newSseq != NSNotApplicableMarker)
             [self setSseq:newSseq];
     }
+    else if (context == _EXTViewSelectedPageIndexContext) {
+        NSNumber *selectedPageNumber = [object valueForKeyPath:keyPath];
+
+        if (selectedPageNumber != NSNotApplicableMarker)
+            [self setSelectedPageIndex:[selectedPageNumber unsignedIntegerValue]];
+    }
 	else {
 		[super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
 	}
@@ -358,11 +370,12 @@ static void *_EXTViewSseqContext = &_EXTViewSseqContext;
 
 - (void)bind:(NSString *)binding toObject:(id)observable withKeyPath:(NSString *)keyPath options:(NSDictionary *)options
 {
-    if ([binding isEqualToString:EXTViewSseqBindingName]) {
+    if ([binding isEqualToString:EXTViewSseqBindingName] || [binding isEqualToString:EXTViewSelectedPageIndexBindingName]) {
         if (_bindings[binding])
             [self unbind:binding];
 
-        [observable addObserver:self forKeyPath:keyPath options:0 context:_EXTViewSseqContext];
+        void *context = [binding isEqualToString:EXTViewSseqBindingName] ? _EXTViewSseqContext : _EXTViewSelectedPageIndexContext;
+        [observable addObserver:self forKeyPath:keyPath options:0 context:context];
         _bindings[binding] = @{
                                NSObservedObjectKey : observable,
                                NSObservedKeyPathKey : [keyPath copy],
