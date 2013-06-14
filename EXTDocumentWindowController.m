@@ -86,20 +86,14 @@
         
         [super setDocument:document];
 
-        if (document) {
+        if (document)
             [[self extView] bind:EXTViewSseqBindingName toObject:document withKeyPath:@"sseq" options:nil];
-        }
     }
 }
 
 - (EXTDocument *)extDocument
 {
     return self.document;
-}
-
-- (void)setPageInView:(int)newPage
-{
-    self.extView.pageInView = newPage;
 }
 
 #pragma  mark -
@@ -145,6 +139,7 @@
 
 - (IBAction)demoGroups:(id)sender {
     [[self document] runDemo];
+    [[self extView] setSelectedPageIndex:0];
 }
 
 @end

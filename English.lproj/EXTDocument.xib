@@ -2,9 +2,9 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.10">
 	<data>
 		<int key="IBDocument.SystemTarget">1060</int>
-		<string key="IBDocument.SystemVersion">12D78</string>
+		<string key="IBDocument.SystemVersion">12E55</string>
 		<string key="IBDocument.InterfaceBuilderVersion">3084</string>
-		<string key="IBDocument.AppKitVersion">1187.37</string>
+		<string key="IBDocument.AppKitVersion">1187.39</string>
 		<string key="IBDocument.HIToolboxVersion">626.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -592,35 +592,35 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBBindingConnection" key="connection">
-						<string key="label">value: extView.pageInView</string>
+						<string key="label">value: extView.selectedPageIndex</string>
 						<reference key="source" ref="463392880"/>
 						<reference key="destination" ref="512844837"/>
 						<object class="NSNibBindingConnector" key="connector">
 							<reference key="NSSource" ref="463392880"/>
 							<reference key="NSDestination" ref="512844837"/>
-							<string key="NSLabel">value: extView.pageInView</string>
+							<string key="NSLabel">value: extView.selectedPageIndex</string>
 							<string key="NSBinding">value</string>
-							<string key="NSKeyPath">extView.pageInView</string>
+							<string key="NSKeyPath">extView.selectedPageIndex</string>
 							<int key="NSNibBindingConnectorVersion">2</int>
 						</object>
 					</object>
-					<int key="connectionID">100181</int>
+					<int key="connectionID">100193</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBBindingConnection" key="connection">
-						<string key="label">value: extView.pageInView</string>
+						<string key="label">value: extView.selectedPageIndex</string>
 						<reference key="source" ref="131465093"/>
 						<reference key="destination" ref="512844837"/>
 						<object class="NSNibBindingConnector" key="connector">
 							<reference key="NSSource" ref="131465093"/>
 							<reference key="NSDestination" ref="512844837"/>
-							<string key="NSLabel">value: extView.pageInView</string>
+							<string key="NSLabel">value: extView.selectedPageIndex</string>
 							<string key="NSBinding">value</string>
-							<string key="NSKeyPath">extView.pageInView</string>
+							<string key="NSKeyPath">extView.selectedPageIndex</string>
 							<int key="NSNibBindingConnectorVersion">2</int>
 						</object>
 					</object>
-					<int key="connectionID">100182</int>
+					<int key="connectionID">100194</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBBindingConnection" key="connection">
@@ -1037,7 +1037,7 @@
 				<reference key="dict.values" ref="0"/>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">100190</int>
+			<int key="maxID">100194</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">

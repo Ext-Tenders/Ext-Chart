@@ -200,14 +200,14 @@
 								</object>
 								<object class="NSMenuItem" id="236304293">
 									<reference key="NSMenu" ref="720053764"/>
-									<string key="NSTitle">Examples</string>
+									<string key="NSTitle">New from Example</string>
 									<string key="NSKeyEquiv"/>
 									<int key="NSMnemonicLoc">2147483647</int>
 									<reference key="NSOnImage" ref="1033313550"/>
 									<reference key="NSMixedImage" ref="310636482"/>
 									<string key="NSAction">submenuAction:</string>
 									<object class="NSMenu" key="NSSubmenu" id="207361454">
-										<string key="NSTitle">Examples</string>
+										<string key="NSTitle">New from Example</string>
 										<object class="NSMutableArray" key="NSMenuItems">
 											<bool key="EncodedWithXMLCoder">YES</bool>
 											<object class="NSMenuItem" id="21161241">
