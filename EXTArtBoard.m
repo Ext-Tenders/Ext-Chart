@@ -126,7 +126,7 @@ static const NSSize _EXTArtBoardDrawingInset = {-4.0, -4.0};
 
     // Inner rectangle
 
-    [view addCursorRect:NSInsetRect(_frame, length, length) cursor:[NSCursor openHandCursor]];
+    [view addCursorRect:NSInsetRect(_frame, halfLength, halfLength) cursor:[NSCursor openHandCursor]];
 }
 
 
