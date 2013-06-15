@@ -44,6 +44,7 @@
 		093AEADC13E10759003E9F58 /* EXTPair.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTPair.m; sourceTree = "<group>"; };
 		1058C7A7FEA54F5311CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		13E42FBA07B3F13500E4EEF1 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
+		149A0EA6176C409C006F6142 /* NSCursor+EXTApplePrivate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSCursor+EXTApplePrivate.h"; sourceTree = "<group>"; };
 		14EF1A651756EE3C0012DD3C /* SelectTool.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = SelectTool.pdf; path = Images/SelectTool.pdf; sourceTree = "<group>"; };
 		14EF1A6917584C080012DD3C /* EXTDocumentWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTDocumentWindowController.h; sourceTree = "<group>"; };
 		14EF1A6A17584C080012DD3C /* EXTDocumentWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTDocumentWindowController.m; sourceTree = "<group>"; };
@@ -121,6 +122,14 @@
 				2A37F4C5FDCFA73011CA2CEA /* Foundation.framework */,
 			);
 			name = "Other Frameworks";
+			sourceTree = "<group>";
+		};
+		149A0EA5176C4065006F6142 /* System Categories */ = {
+			isa = PBXGroup;
+			children = (
+				149A0EA6176C409C006F6142 /* NSCursor+EXTApplePrivate.h */,
+			);
+			name = "System Categories";
 			sourceTree = "<group>";
 		};
 		14C13C4D174FE39A001BE9F9 /* Model */ = {
@@ -231,6 +240,7 @@
 				14C13C4F174FE410001BE9F9 /* Controllers */,
 				14C13C4E174FE3B3001BE9F9 /* Views */,
 				14C13C50174FE468001BE9F9 /* Documents */,
+				149A0EA5176C4065006F6142 /* System Categories */,
 				38F7830A17565F72009D207A /* LICENSE */,
 				38DDAA7A16EDA8990001841D /* README.md */,
 				318EC0681409385F005D21D4 /* to do list.rtf */,

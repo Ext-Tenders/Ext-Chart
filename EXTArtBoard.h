@@ -9,40 +9,23 @@
 #import <Cocoa/Cocoa.h>
 
 
-// i'm running into a dumb KVO complication having to do with declaring which rectangle is dirty after updating the artBoard.  The issues make it clear that the ivar to keep track of is the rectangle of the artboard, and not the xPosition, yPosition, etc.   So the way to do this is to make "bounds" an ivar, and have the view observe it.   Changes to "bounds" will give both the old and new bounds retangles, and we can just tell the view that those two rects are dirty.   I still need to have setters and getters for xPosition, yPostion, width, and height, so that the bounds can also be set by the panel.  But these "setters" will just be methods, which call [self setBounds].
+@interface EXTArtBoard : NSObject
+    /*!
+     @property frame
+     @abstract The location of the art board in its containing view coordinate space.
+     */
+    @property(nonatomic, assign) NSRect frame;
 
-extern NSString *EXTArtBoardBoundsKey;
-extern NSString *EXTArtBoardDrawingRectKey;
+    /*!
+     @property drawingRect
+     @abstract The rectangle used by the art board to draw itself in its containing view coordinate space.
+     @discussion The drawing rectangle extends the art board frame
+     */
+    @property(nonatomic, assign, readonly) NSRect drawingRect;
 
-@interface EXTArtBoard : NSObject {
-	NSRect bounds;
-	NSPoint anchor;
-	BOOL editing, moving;
-}
+    - (id)initWithFrame:(NSRect)frame;
 
-//@property(assign) CGFloat xPosition, yPosition, width, height;
-@property(assign) NSRect bounds;
-@property(assign) BOOL editing, moving;
-
-
-
--(void) fillRect;
--(void) strokeRect;
--(id) init;
--(id) initWithRect:(NSRect) rect;
--(void) buildCursorRects:(NSView *)sender;
-
-- (NSRect) drawingRect;
-
-- (CGFloat)xPosition;
-- (CGFloat)yPosition;
-- (CGFloat)width;
-- (CGFloat)height;
-
-- (void)setXPosition:(CGFloat)x;
-- (void)setYPosition:(CGFloat)y;
-- (void)setWidth:(CGFloat)w;
-- (void)setHeight:(CGFloat)h;
-
-
+    - (void)fillRect;
+    - (void)strokeRect;
+    - (void)buildCursorRectsInView:(NSView *)view;
 @end
