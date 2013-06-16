@@ -454,7 +454,7 @@ static void *_EXTViewArtBoardDrawingRectContext = &_EXTViewArtBoardDrawingRectCo
 - (void)moveArtBoardWithEvent:(NSEvent *)event {
 	// ripped off from sketch.   according to apple's document, it is better not to override the event loop like this.  Also, see the DragItemAround code for what I think is a better way to organize this.
 
-    [[NSCursor closedHandCursor] set];
+    [[NSCursor closedHandCursor] push];
 
 	NSPoint lastPoint, curPoint;
 	
@@ -496,6 +496,8 @@ static void *_EXTViewArtBoardDrawingRectContext = &_EXTViewArtBoardDrawingRectCo
         
 		lastPoint = curPoint;
 	}
+
+    [NSCursor pop];
 }
 
 
