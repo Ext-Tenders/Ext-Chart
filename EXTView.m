@@ -490,6 +490,8 @@ static void *_EXTViewArtBoardDrawingRectContext = &_EXTViewArtBoardDrawingRectCo
                 [self setNeedsDisplayInRect:NSUnionRect(previousArtBoardDrawingRect, [_artBoard drawingRect])];
             }
 
+            // Automatically scroll the view during mouse drag
+            [self autoscroll:event];
 		}
         
 		lastPoint = curPoint;
