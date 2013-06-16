@@ -454,6 +454,9 @@ static void *_EXTViewArtBoardDrawingRectContext = &_EXTViewArtBoardDrawingRectCo
 - (void)moveArtBoardWithEvent:(NSEvent *)event {
 	// ripped off from sketch.   according to apple's document, it is better not to override the event loop like this.  Also, see the DragItemAround code for what I think is a better way to organize this.
 
+    const NSRect originalArtBoardFrame = [_artBoard frame];
+    const NSRect originalVisibleRect = [[self enclosingScrollView] documentVisibleRect];
+
     [[NSCursor closedHandCursor] push];
 
 	NSPoint lastPoint, curPoint;
@@ -461,40 +464,54 @@ static void *_EXTViewArtBoardDrawingRectContext = &_EXTViewArtBoardDrawingRectCo
 	lastPoint = [self convertPoint:[event locationInWindow] fromView:nil];
 	
 	while ([event type] != NSLeftMouseUp) {
-		event = [[self window] nextEventMatchingMask:(NSLeftMouseDraggedMask | NSLeftMouseUpMask)];
-		curPoint = [self convertPoint:[event locationInWindow] fromView:nil];
-		
-		if (!NSEqualPoints(lastPoint, curPoint)) {
-            const NSRect previousArtBoardDrawingRect = [_artBoard drawingRect];
-            const NSRect previousArtBoardFrame = [_artBoard frame];
+		event = [[self window] nextEventMatchingMask:(NSLeftMouseDraggedMask | NSLeftMouseUpMask | NSKeyDownMask)];
 
-            const NSPoint artBoardOffset = {
-                .x = lastPoint.x - previousArtBoardFrame.origin.x,
-                .y = lastPoint.y - previousArtBoardFrame.origin.y,
-            };
-			
-			NSPoint gridPoint = {
-                .x = curPoint.x - artBoardOffset.x,
-                .y = curPoint.y - artBoardOffset.y,
-            };
+        switch ([event type]) {
+            case NSLeftMouseDragged:
+                curPoint = [self convertPoint:[event locationInWindow] fromView:nil];
 
-			gridPoint = [_grid nearestGridPoint:gridPoint];
+                if (!NSEqualPoints(lastPoint, curPoint)) {
+                    const NSRect previousArtBoardDrawingRect = [_artBoard drawingRect];
+                    const NSRect previousArtBoardFrame = [_artBoard frame];
 
-			curPoint.x = gridPoint.x + artBoardOffset.x;
-			curPoint.y = gridPoint.y + artBoardOffset.y;
+                    const NSPoint artBoardOffset = {
+                        .x = lastPoint.x - previousArtBoardFrame.origin.x,
+                        .y = lastPoint.y - previousArtBoardFrame.origin.y,
+                    };
 
-            // Since we’re snapping to the grid, it is possible that the mouse offset doesn’t actually
-            // change the art board origin, so we avoid firing KVO, view invalidation and cursor invalidation
-            if (!NSEqualPoints(previousArtBoardFrame.origin, gridPoint)) {
-                [_artBoard setFrame:(NSRect){gridPoint, previousArtBoardFrame.size}];
-                [self setNeedsDisplayInRect:NSUnionRect(previousArtBoardDrawingRect, [_artBoard drawingRect])];
-            }
+                    NSPoint gridPoint = {
+                        .x = curPoint.x - artBoardOffset.x,
+                        .y = curPoint.y - artBoardOffset.y,
+                    };
 
-            // Automatically scroll the view during mouse drag
-            [self autoscroll:event];
-		}
-        
-		lastPoint = curPoint;
+                    gridPoint = [_grid nearestGridPoint:gridPoint];
+
+                    curPoint.x = gridPoint.x + artBoardOffset.x;
+                    curPoint.y = gridPoint.y + artBoardOffset.y;
+
+                    // Since we’re snapping to the grid, it is possible that the mouse offset doesn’t actually
+                    // change the art board origin, so we avoid firing KVO, view invalidation and cursor invalidation
+                    if (!NSEqualPoints(previousArtBoardFrame.origin, gridPoint)) {
+                        [_artBoard setFrame:(NSRect){gridPoint, previousArtBoardFrame.size}];
+                        [self setNeedsDisplayInRect:NSUnionRect(previousArtBoardDrawingRect, [_artBoard drawingRect])];
+                    }
+                    
+                    // Automatically scroll the view during mouse drag
+                    [self autoscroll:event];
+                }
+                
+                lastPoint = curPoint;
+                break;
+
+            case NSKeyDown:
+                // Since we are sequestering event loop processing, check for the Escape key here to cancel the drag operation
+                if ([event keyCode] == 53) {
+                    const NSRect artBoardCurrentDragFrame = [_artBoard frame];
+                    [_artBoard setFrame:originalArtBoardFrame];
+                    [self setNeedsDisplayInRect:artBoardCurrentDragFrame];
+                    [self scrollRectToVisible:originalVisibleRect];
+                }
+        }
 	}
 
     [NSCursor pop];
