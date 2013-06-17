@@ -8,6 +8,7 @@
 
 #import "EXTSpectralSequence.h"
 #import "EXTPair.h"
+#import "EXTTriple.h"
 #import "EXTterm.h"
 #import "EXTdifferential.h"
 #import "EXTMultiplicationTables.h"
@@ -459,6 +460,21 @@
     [ret.differentials addObject:diff];
     
     ret = [ret tensorWithPolyClass:@"eta" location:[EXTPair pairWithA:1 B:1] upTo:5];
+    
+    return ret;
+}
+
++(EXTSpectralSequence*) A1MSSDemo {
+    EXTSpectralSequence *ret = [EXTSpectralSequence sSeqWithUnit:[EXTTriple class]];
+    
+    // add the three polynomial generators to the sseq: h10, h11, h20
+    ret = [ret tensorWithPolyClass:@"h10" location:[EXTTriple tripleWithA:0 B:1 C:0] upTo:3];
+    ret = [ret tensorWithPolyClass:@"h11" location:[EXTTriple tripleWithA:1 B:1 C:1] upTo:3];
+    ret = [ret tensorWithPolyClass:@"h20" location:[EXTTriple tripleWithA:2 B:1 C:0] upTo:3];
+    
+    // d1(h20) = h10 h11
+    
+    // d3(h20^2) = h11^3
     
     return ret;
 }
