@@ -560,6 +560,21 @@
     return @[leftinclusion, rightinclusion];
 }
 
++(EXTMatrix*) sum:(EXTMatrix*)a with:(EXTMatrix*)b {
+    EXTMatrix *ret = [EXTMatrix matrixWidth:a.width height:b.height];
+    
+    for (int i = 0; i < a.width; i++) {
+        NSMutableArray *acol = a.presentation[i],
+                       *bcol = b.presentation[i],
+                     *retcol = ret.presentation[i];
+        
+        for (int j = 0; j < a.height; j++)
+            retcol[j] = @([acol[j] intValue] + [bcol[j] intValue]);
+    }
+    
+    return ret;
+}
+
 // debug routine to dump the matrix to the console.
 -(void) log {
     for (int i = 0; i < width; i++) {

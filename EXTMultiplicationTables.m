@@ -207,64 +207,75 @@
                     *d2 = [self.sSeq findDifflWithSource:loc2 onPage:page];
     NSMutableArray *actions = [NSMutableArray array];
     
-    // quick sanity check
-    if (!sumterm || !targetterm)
+    // if we don't have differentials to work with, then skip this entirely.
+    if (!sumterm || !targetterm || !d1 || !d2)
         return;
     
-    for (NSNumber *hadamardPosition in indices) {
-        int unwrappedPosition = [hadamardPosition intValue];
+    // if we're here, then we have all the fixin's we need to construct some
+    // more partial differential definitions.  let's find a place to put them.
+    EXTDifferential *dsum = [self.sSeq findDifflWithSource:sumterm.location
+                                                    onPage:page];
+    if (!dsum) {
+        dsum = [EXTDifferential differential:sumterm end:targetterm page:page];
+        [sSeq.differentials addObject:dsum];
+    }
+    
+    for (EXTPartialDefinition *partial1 in d1.partialDefinitions)
+    for (EXTPartialDefinition *partial2 in d2.partialDefinitions) {
+        // find the relevant multiplication laws
+        EXTMultiplicationEntry
+            *XBmults = [self performLookup:[[loc1 class] followDiffl:loc1 page:page] with:loc2],
+            *AYmults = [self performLookup:loc1 with:[[loc2 class] followDiffl:loc2 page:page]];
+        if (!XBmults || !AYmults)
+            continue;
         
-        // extract the actual en | fm pure tensor term
-        int f = unwrappedPosition % [term1 names].count,
-            e = unwrappedPosition - f * [term1 names].count;
-        
-        // assemble vectors expressing en and fm
-        NSMutableArray *en = [NSMutableArray array];
-        for (int i = 0; i < [term1 names].count; i++) {
-            if (i == e)
-                [en setObject:@(1) atIndexedSubscript:i];
-            else
-                [en setObject:@(0) atIndexedSubscript:i];
+        // iterate through the partial multiplication definitions
+        for (EXTPartialDefinition *XBmult in XBmults.partialDefinitions)
+        for (EXTPartialDefinition *AYmult in AYmults.partialDefinitions) {
+            // we have access to the differential cospans A <-< I --> X and
+            // B <-< J --> Y, and to the multiplication cospans A|Y <-< K --> Z
+            // and X|B <-< L --> Z.  define these so we have access to them.
+            EXTMatrix *i = partial1.inclusion, *partialI = partial1.differential,
+                      *j = partial2.inclusion, *partialJ = partial2.differential,
+                      *k = AYmult.inclusion, *muK = AYmult.differential,
+                      *l = XBmult.inclusion, *muL = XBmult.differential;
+            
+            // first, we'll produce the tensored up cospan A|B <-< I|B --> X|B.
+            EXTMatrix *iId = [EXTMatrix hadamardProduct:i
+                                            with:[EXTMatrix identity:j.height]],
+               *partialIId = [EXTMatrix hadamardProduct:partialI
+                                            with:[EXTMatrix identity:j.height]];
+            
+            // this shares a target to get A|B <-< I|B --> X|B <-< L --> Z, and
+            // we take the intersection span to get a big cospan A|B <-< U --> Z
+            NSArray *XBspan = [EXTMatrix formIntersection:partialIId with:l];
+            EXTMatrix *u = [EXTMatrix newMultiply:iId by:XBspan[0]],
+               *partialU = [EXTMatrix newMultiply:muL by:XBspan[1]];
+            
+            // then, do the same thing for A|B <-< A|J --> A|Y <-< K --> Z to
+            // get a pulled back cospan A|B <-< V --> Z.
+            EXTMatrix *Idj = [EXTMatrix hadamardProduct:[EXTMatrix identity:i.height] with:j],
+               *IdpartialJ = [EXTMatrix hadamardProduct:[EXTMatrix identity:i.height] with:partialJ];
+            NSArray *AYspan = [EXTMatrix formIntersection:IdpartialJ with:k];
+            EXTMatrix *v = [EXTMatrix newMultiply:Idj by:AYspan[0]],
+               *partialV = [EXTMatrix newMultiply:muK by:AYspan[1]];
+            
+            // lastly, take the intersection span of U >-> A|B <-< V to get a
+            // shared subspace W, hence a pair of cospans both of the form
+            // A|B <-< W --> Z.
+            //
+            // sum the two right-hand maps to get d(ab) = da*b + a*db.
+            NSArray *ABspan = [EXTMatrix formIntersection:u with:v];
+            EXTMatrix *w = [EXTMatrix newMultiply:u by:ABspan[0]],
+               *partialW = [EXTMatrix
+                            sum:[EXTMatrix newMultiply:partialU by:ABspan[0]]
+                            with:[EXTMatrix newMultiply:partialV by:ABspan[1]]];
+            
+            // store this to a list of partial definitions.
+            EXTPartialDefinition *partial = [EXTPartialDefinition new];
+            partial.inclusion = w; partial.differential = partialW;
+            [dsum.partialDefinitions addObject:partial];
         }
-        
-        NSMutableArray *fm = [NSMutableArray array];
-        for (int j = 0; j < [term2 names].count; j++) {
-            if (j == f)
-                [fm setObject:@(1) atIndexedSubscript:j];
-            else
-                [fm setObject:@(0) atIndexedSubscript:j];
-        }
-        
-        // apply the differential matrices to them individually.
-        // we have to be careful here --- missing differentials are implicit 0s.
-        //
-        // XXX: how do we know that these are up-to-date?  should EXTDiff'l
-        // automatically try to compute a presentation when it's accessed?
-        NSMutableArray *summand1 = [NSMutableArray array],
-                       *summand2 = [NSMutableArray array];
-        if (d1) {
-            NSMutableArray *den = [[d1 presentation] actOn:en];
-            summand1 = [self multiplyClass:den at:[d1 end].location
-                                      with:fm at:loc2];
-        } else
-            for (int i = 0; i < sumterm.names.count; i++)
-                [summand1 setObject:@(0) atIndexedSubscript:i];
-        if (d2) {
-            NSMutableArray *dfm = [[d2 presentation] actOn:fm];
-            summand2 = [self multiplyClass:en at:loc1
-                                      with:dfm at:[d2 end].location];
-        } else
-            for (int i = 0; i < sumterm.names.count; i++)
-                [summand2 setObject:@(0) atIndexedSubscript:i];
-        
-        // sum and store to the list of actions.
-        NSMutableArray *sum = [NSMutableArray array];
-        for (int i = 0; i < summand1.count; i++)
-            [sum setObject:@(([[summand1 objectAtIndex:i] intValue] +
-                             [[summand2 objectAtIndex:i] intValue])%2)
-                 atIndexedSubscript:i];
-        
-        [actions addObject:sum];
     }
     
     // store the array actions as the acting matrix for a partial definition.
