@@ -230,8 +230,8 @@
     for (EXTPartialDefinition *partial2 in d2.partialDefinitions) {
         // find the relevant multiplication laws
         EXTMultiplicationEntry
-            *XBmults = [self performLookup:[[loc1 class] followDiffl:loc1 page:page] with:loc2],
-            *AYmults = [self performLookup:loc1 with:[[loc2 class] followDiffl:loc2 page:page]];
+            *XBmults = [self performSoftLookup:[[loc1 class] followDiffl:loc1 page:page] with:loc2],
+            *AYmults = [self performSoftLookup:loc1 with:[[loc2 class] followDiffl:loc2 page:page]];
         if (!XBmults || !AYmults)
             continue;
         
@@ -283,6 +283,8 @@
             [dsum.partialDefinitions addObject:partial];
         }
     }
+    
+    [dsum stripDuplicates];
     
     return;
 }

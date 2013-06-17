@@ -34,8 +34,9 @@
     +(id) newDifferential:(EXTTerm *)start end:(EXTTerm *)end page:(int)page;
     +(id) differential:(EXTTerm *)start end:(EXTTerm *)end page:(int)page;
 
-    // deal wih its
+    // deal with its
     -(void) assemblePresentation;
+    -(void) stripDuplicates;
 
     // UI messages
     -(void) drawWithSpacing:(CGFloat)spacing;

@@ -539,10 +539,12 @@
         [ret.multTables computeLeibniz:[beta2 location]
                                   with:[term location]
                                 onPage:3];
-    for (EXTTerm *term in ret.terms)
+    for (int i = ret.terms.count - 1; i >= 0; i--) {
+        EXTTerm *term = ret.terms[i];
         [ret.multTables computeLeibniz:[betaneg2 location]
                                   with:[term location]
                                 onPage:3];
+    }
     
     return ret;
 }

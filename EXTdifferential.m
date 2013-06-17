@@ -19,6 +19,8 @@
 @property(strong) NSMutableArray *partialDefinitions;
 @property(strong) EXTMatrix *presentation;
 
+-(BOOL) isEqual:(id)object;
+
 @end
 
 
@@ -74,6 +76,27 @@
                         sourceDimension:self.start.names.count
                         targetDimension:self.end.names.count];
     return;
+}
+
+-(void) stripDuplicates {
+    NSMutableArray *reducedPartials = [NSMutableArray array];
+    
+    for (EXTPartialDefinition *partial1 in self.partialDefinitions) {
+        bool discardThis = false;
+        
+        for (EXTPartialDefinition *partial2 in reducedPartials) {
+            if ([partial2 isEqual:partial1])
+                discardThis = true;
+            break;
+        }
+        
+        if (discardThis)
+            continue;
+        
+        [reducedPartials addObject:partial1];
+    }
+    
+    self.partialDefinitions = reducedPartials;
 }
 
 +(id) dealWithClick:(NSPoint)location document:(EXTDocument *)document {

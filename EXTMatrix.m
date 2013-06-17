@@ -27,6 +27,15 @@
     return self;
 }
 
+-(BOOL) isEqual:(id)object {
+    if ([object class] != [EXTPartialDefinition class])
+        return false;
+    
+    EXTPartialDefinition *target = (EXTPartialDefinition*)object;
+    
+    return ([self.differential isEqual:target.differential] && [self.inclusion isEqual:target.inclusion]);
+}
+
 // TODO: make the boolean flag into (change to true)-only, like a dirty flag.
 // use this to decide whether to prompt the user when deleting partial
 // definitions, or generally when performing any other destructive operation.
@@ -43,6 +52,24 @@
 // the presentation, just when it's somehow "dirty"...
 @synthesize height, width;
 @synthesize presentation;
+
+-(BOOL) isEqual:(id)object {
+    if ([object class] != [EXTMatrix class])
+        return false;
+    
+    EXTMatrix *mat = (EXTMatrix*)object;
+    
+    if ((mat.width != self.width) || (mat.height != self.height))
+        return false;
+    
+    for (int i = 0; i < self.width; i++)
+        for (int j = 0; j < self.height; j++)
+            if ([((NSMutableArray*)self.presentation[i])[j] intValue] !=
+                [((NSMutableArray*)mat.presentation[i])[j] intValue])
+                return false;
+    
+    return true;
+}
 
 // initializes an EXTMatrix object and allocates all the NSMutableArrays
 // used in the presentation.

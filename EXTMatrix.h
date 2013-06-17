@@ -28,6 +28,8 @@
 @property (retain) EXTMatrix *differential;
 @property (assign) bool automaticallyGenerated;
 
+-(BOOL) isEqual:(id)object;
+
 @end
 
 
