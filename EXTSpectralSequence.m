@@ -496,7 +496,9 @@
     [ret computeGroupsForPage:1];
     [ret computeGroupsForPage:2];
     
-    // there is a d3 differential d3(beta^2) = eta^3
+    // there are three d3 differentials...
+    
+    // d3(beta^2) = eta^3
     EXTTerm *beta2 = [ret findTerm:[EXTPair pairWithA:4 B:0]];
     EXTDifferential *diff = [EXTDifferential differential:beta2 end:[ret findTerm:[EXTPair pairWithA:3 B:3]] page:3];
     EXTPartialDefinition *diffdefn = [EXTPartialDefinition new];
@@ -505,7 +507,7 @@
     [diff.partialDefinitions addObject:diffdefn];
     [ret.differentials addObject:diff];
     
-    // there is also a d3 differential d3(eta) = 0
+    // d3(eta) = 0
     EXTTerm *eta = [ret findTerm:[EXTPair pairWithA:1 B:1]];
     EXTDifferential *diff2 = [EXTDifferential differential:eta end:[ret findTerm:[EXTPair pairWithA:0 B:4]] page:3];
     EXTPartialDefinition *diff2defn = [EXTPartialDefinition new];
@@ -514,6 +516,15 @@
     diff2defn.inclusion = one;
     [diff2.partialDefinitions addObject:diff2defn];
     [ret.differentials addObject:diff2];
+    
+    // d3(beta^-2) = beta^-4 eta^3
+    EXTTerm *betaneg2 = [ret findTerm:[EXTPair pairWithA:-4 B:0]];
+    EXTDifferential *diff3 = [EXTDifferential differential:betaneg2 end:[ret findTerm:[EXTPair pairWithA:-5 B:3]] page:3];
+    EXTPartialDefinition *diff3defn = [EXTPartialDefinition new];
+    diff3defn.differential = one;
+    diff3defn.inclusion = one;
+    [diff3.partialDefinitions addObject:diff3defn];
+    [ret.differentials addObject:diff3];
     
     // propagate NAIVELY using the Leibniz rule
     for (EXTTerm *term in ret.terms)
@@ -524,9 +535,10 @@
         [ret.multTables computeLeibniz:[beta2 location]
                                   with:[term location]
                                 onPage:3];
-    
-    [ret computeGroupsForPage:3];
-    [ret computeGroupsForPage:4];
+    for (EXTTerm *term in ret.terms)
+        [ret.multTables computeLeibniz:[betaneg2 location]
+                                  with:[term location]
+                                onPage:3];
     
     return ret;
 }

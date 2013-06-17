@@ -199,15 +199,13 @@
     // XXX: deal with sign errors here.
     EXTLocation *sumloc = [[loc1 class] addLocation:loc1 to:loc2],
              *targetLoc = [[loc1 class] followDiffl:sumloc page:page];
-    EXTTerm *term1 = [self.sSeq findTerm:loc1],
-            *term2 = [self.sSeq findTerm:loc2],
-          *sumterm = [self.sSeq findTerm:sumloc],
-       *targetterm = [self.sSeq findTerm:targetLoc];
+    EXTTerm *sumterm = [self.sSeq findTerm:sumloc],
+         *targetterm = [self.sSeq findTerm:targetLoc];
     EXTDifferential *d1 = [self.sSeq findDifflWithSource:loc1 onPage:page],
                     *d2 = [self.sSeq findDifflWithSource:loc2 onPage:page];
-    NSMutableArray *actions = [NSMutableArray array];
     
     // if we don't have differentials to work with, then skip this entirely.
+    // XXX: DEAL WITH DIFFERENTIALS WITHOUT A VALID TARGET
     if (!sumterm || !targetterm || !d1 || !d2)
         return;
     
