@@ -268,7 +268,6 @@
                 *rightTerm = rightPair[0];
         NSMutableArray *leftSummands = leftPair[1],
                       *rightSummands = rightPair[1];
-        EXTMultiplicationEntry *tensorMult = [ret.multTables performLookup:leftTerm.location with:rightTerm.location];
         
         // iterate over pairs of old terms which belong to splicedVectorTerms
         for (NSMutableArray *leftSummand in leftSummands)
@@ -276,9 +275,15 @@
             EXTTerm *A = leftSummand[1], *P = leftSummand[2],
                     *B = rightSummand[1], *Q = rightSummand[2];
             
+            EXTMultiplicationEntry
+                *leftEntry = [self.multTables performSoftLookup:A.location with:B.location],
+                *rightEntry = [p.multTables performSoftLookup:P.location with:Q.location];
+            if (!leftEntry || !rightEntry)
+                continue;
+            
             NSMutableArray
-                *leftPartials = [self.multTables performLookup:A.location with:B.location].partialDefinitions,
-                *rightPartials = [p.multTables performLookup:P.location with:Q.location].partialDefinitions;
+                *leftPartials = leftEntry.partialDefinitions,
+                *rightPartials = rightEntry.partialDefinitions;
             
             // look up the target term, which we need for indexing purposes.
             EXTTerm *C = [self findTerm:[[A.location class] addLocation:A.location to:B.location]],
@@ -376,7 +381,7 @@
         EXTLocation *workingLoc = [locClass scale:loc by:i];
         EXTTerm *workingTerm = [EXTTerm term:workingLoc andNames:
                                 [NSMutableArray arrayWithObject:
-                                 [NSString stringWithFormat:@"{%@}^{%d}",
+                                 [NSString stringWithFormat:@"(%@)^{%d}",
                                   name, i]]];
         [l.terms addObject:workingTerm];
     }
@@ -386,8 +391,7 @@
     for (EXTTerm *rightTerm in l.terms) {
         EXTTerm *targetTerm = [l findTerm:[locClass addLocation:leftTerm.location to:rightTerm.location]];
         if (targetTerm) {
-            EXTMatrix *product = [EXTMatrix matrixWidth:1 height:1];
-            product.presentation[0] = [NSMutableArray arrayWithObject:@1];
+            EXTMatrix *product = [EXTMatrix identity:1];
             EXTPartialDefinition *def = [EXTPartialDefinition new];
             def.inclusion = def.differential = product;
             [l.multTables addPartialDefinition:def to:leftTerm.location

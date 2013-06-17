@@ -61,21 +61,27 @@
     return ret;
 }
 
--(EXTMultiplicationEntry*) performLookup:(EXTLocation*)loc1
-                                    with:(EXTLocation*)loc2 {
+// this performs a lookup without instantiating a new entry if it's not found.
+-(EXTMultiplicationEntry*) performSoftLookup:(EXTLocation*)loc1
+                                        with:(EXTLocation*)loc2 {
     // start by trying to pull the matrix out of the dictionary.
     NSString *key = [NSString stringWithFormat:@"%@ %@",
                      [loc1 description], [loc2 description]];
-    EXTMultiplicationEntry *ret = [tables objectForKey:key];
-    
-    // find all the relevant EXTTerms, so we can calculate the right size
-    Class<EXTLocation> locClass = [loc1 class];
-    EXTTerm *term1 = [self.sSeq findTerm:loc1],
-    *term2 = [self.sSeq findTerm:loc2],
-    *targetterm = [self.sSeq findTerm:[locClass addLocation:loc1 to:loc2]];
+    return [tables objectForKey:key];
+}
+
+-(EXTMultiplicationEntry*) performLookup:(EXTLocation*)loc1
+                                    with:(EXTLocation*)loc2 {
+    EXTMultiplicationEntry *ret = [self performSoftLookup:loc1 with:loc2];
     
     // if we can't find it, then we should instantiate it.
     if (!ret) {
+        // find all the relevant EXTTerms, so we can calculate the right size
+        Class<EXTLocation> locClass = [loc1 class];
+        EXTTerm *term1 = [self.sSeq findTerm:loc1],
+                *term2 = [self.sSeq findTerm:loc2],
+           *targetterm = [self.sSeq findTerm:[locClass addLocation:loc1 to:loc2]];
+        
         // instantiate the matrix
         ret = [EXTMultiplicationEntry entry];
         ret.presentation =
@@ -83,6 +89,8 @@
                             height:[targetterm names].count];
         
         // and store it to the tables
+        NSString *key = [NSString stringWithFormat:@"%@ %@",
+                            [loc1 description], [loc2 description]];
         [tables setObject:ret forKey:key];
     }
     
