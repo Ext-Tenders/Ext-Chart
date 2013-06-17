@@ -278,30 +278,6 @@
         }
     }
     
-    // store the array actions as the acting matrix for a partial definition.
-    EXTDifferential *diffl = [self.sSeq findDifflWithSource:sumloc onPage:page];
-    // if the differential we're trying to write to doesn't yet exist, build it.
-    if (!diffl) {
-        EXTTerm *targetterm = [self.sSeq findTerm:
-                                 [[sumloc class] followDiffl:sumloc page:page]];
-        diffl = [EXTDifferential differential:sumterm end:targetterm page:page];
-        [[self.sSeq differentials] addObject:diffl];
-    }
-    
-    // set up the partial definition matrices
-    EXTPartialDefinition *partial = [EXTPartialDefinition new];
-    EXTMatrix *differential = [EXTMatrix matrixWidth:actions.count
-                                              height:[actions[0] count]],
-              *inclusion = [EXTMatrix matrixWidth:actions.count
-                                           height:[actions[0] count]];
-    differential.presentation = actions;
-    inclusion.presentation = image;
-    partial.differential = differential;
-    partial.inclusion = inclusion;
-    
-    // and, finally, add it to the list of partial definitions. :)
-    [[diffl partialDefinitions] addObject:partial];
-    
     return;
 }
 
