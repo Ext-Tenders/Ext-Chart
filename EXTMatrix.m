@@ -512,6 +512,54 @@
     return stdDifferential;
 }
 
+// returns a scaled matrix
+-(EXTMatrix*) scale:(int)scalar {
+    EXTMatrix *ret = [self copy];
+    
+    for (int i = 0; i < ret.presentation.count; i++) {
+        NSMutableArray *col = ret.presentation[i];
+        for (int j = 0; j < col.count; j++)
+            col[j] = @(scalar * [col[j] intValue]);
+    }
+    
+    return ret;
+}
+
+// given a cospan A --> C <-- B, this routine forms the pullback span.
++(NSArray*) formIntersection:(EXTMatrix*)left with:(EXTMatrix*)right {
+    // form the matrix [P, -Q]
+    EXTMatrix *sum = [EXTMatrix matrixWidth:(left.width + right.width)
+                                     height:left.height];
+    sum.presentation = [NSMutableArray arrayWithArray:left.presentation];
+    [sum.presentation addObjectsFromArray:[right scale:(-1)].presentation];
+    
+    // the nullspace of [P, -Q] is a vertical sum [I; J] of the two inclusions
+    // we want, since the nullspace of P (+) -Q are the pairs (x; y) such that
+    // Px - Qy = 0 <~~~~> Px = Qy.
+    NSMutableArray *nullspace = [sum kernel];
+    
+    EXTMatrix *leftinclusion = [EXTMatrix matrixWidth:nullspace.count
+                                               height:left.width],
+              *rightinclusion = [EXTMatrix matrixWidth:nullspace.count
+                                                height:right.width];
+    
+    for (int i = 0; i < nullspace.count; i++) {
+        NSArray *col = nullspace[i];
+        
+        for (int j = 0; j < left.width; j++) {
+            NSMutableArray *leftcol = leftinclusion.presentation[i];
+            leftcol[j] = col[j];
+        }
+        
+        for (int j = 0; j < right.width; j++) {
+            NSMutableArray *rightcol = rightinclusion.presentation[i];
+            rightcol[j] = col[j + left.width];
+        }
+    }
+    
+    return @[leftinclusion, rightinclusion];
+}
+
 // debug routine to dump the matrix to the console.
 -(void) log {
     for (int i = 0; i < width; i++) {

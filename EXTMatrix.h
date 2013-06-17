@@ -61,6 +61,10 @@
 -(NSMutableArray*) image;
 -(NSMutableArray*) actOn:(NSMutableArray*)vector;
 -(int) rank;
+-(EXTMatrix*) scale:(int)scalar;
+
+// @[left inclusion, right inclusion]
++(NSArray*) formIntersection:(EXTMatrix*)left with:(EXTMatrix*)right;
 
 +(EXTMatrix*) assemblePresentation:(NSMutableArray*)partialDefinitions
                    sourceDimension:(int)sourceDimension
