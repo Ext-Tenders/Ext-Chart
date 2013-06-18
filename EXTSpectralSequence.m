@@ -61,7 +61,8 @@
             
             EXTTerm *t1t2 = [EXTTerm term:loc andNames:names];
             
-            [tensorTerms addObject:@[t1t2, t1, t2, @false]];
+            [tensorTerms addObject:
+                [NSMutableArray arrayWithArray:@[t1t2, t1, t2, @false]]];
         }
     }
     
@@ -79,8 +80,10 @@
         // iterate through all the terms, finding all the ones which share loc
         NSMutableArray *atThisLoc = [NSMutableArray array];
         for (NSMutableArray *workingTerm in tensorTerms)
-            if ([[(EXTTerm*)workingTerm[0] location] isEqual:loc])
+            if ([[(EXTTerm*)workingTerm[0] location] isEqual:loc]) {
                 [atThisLoc addObject:workingTerm];
+                workingTerm[3] = @true;
+            }
         
         // now, we sum them together. we want a list of names.
         NSMutableArray *sumNames = [NSMutableArray array];
@@ -276,8 +279,10 @@
                     *B = rightSummand[1], *Q = rightSummand[2];
             
             EXTMultiplicationEntry
-                *leftEntry = [self.multTables performSoftLookup:A.location with:B.location],
-                *rightEntry = [p.multTables performSoftLookup:P.location with:Q.location];
+                *leftEntry = [self.multTables performSoftLookup:A.location
+                                                           with:B.location],
+                *rightEntry = [p.multTables performSoftLookup:P.location
+                                                         with:Q.location];
             if (!leftEntry || !rightEntry)
                 continue;
             
@@ -445,7 +450,7 @@
 #pragma mark - built-in demos
 
 +(EXTSpectralSequence*) workingDemo {
-    return [EXTSpectralSequence KUhC2Demo];
+    return [EXTSpectralSequence A1MSSDemo];
 }
 
 +(EXTSpectralSequence*) ladderDemo {
