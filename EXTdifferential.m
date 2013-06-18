@@ -78,6 +78,10 @@
     return;
 }
 
+// TODO: ideally, this would check for definitional overlap, rather than literal
+// partial-by-partial equality.  it would also ideally be moved into a place
+// where it can also act on EXTMultiplicationEntry; there's nothing specific
+// about this routine to EXTDifferential.
 -(void) stripDuplicates {
     NSMutableArray *reducedPartials = [NSMutableArray array];
     

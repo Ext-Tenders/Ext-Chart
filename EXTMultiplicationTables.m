@@ -31,7 +31,10 @@
 
 
 
-
+// TODO: possibly this should be a subclass of some interface along the lines of
+// EXTMultiplicativeStructure.  that might give us the flexibility to implement
+// fast specific versions, like pure polynomial algebras, and also compensate
+// for things like a Steenrod algebra action.
 @implementation EXTMultiplicationTables
 
 @synthesize tables;
