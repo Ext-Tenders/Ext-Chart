@@ -9,6 +9,18 @@
 #import <Cocoa/Cocoa.h>
 
 
+typedef enum : NSUInteger {
+    EXTArtBoardMouseDragOperationNone = 0,
+    EXTArtBoardMouseDragOperationMove = 1u << 0,
+    EXTArtBoardMouseDragOperationResize = 1u << 1,
+
+    EXTArtBoardMouseDragOperationResizeTop = EXTArtBoardMouseDragOperationResize | 1u << 2,
+    EXTArtBoardMouseDragOperationResizeBottom = EXTArtBoardMouseDragOperationResize | 1u << 3,
+    EXTArtBoardMouseDragOperationResizeLeft = EXTArtBoardMouseDragOperationResize | 1u << 4,
+    EXTArtBoardMouseDragOperationResizeRight = EXTArtBoardMouseDragOperationResize | 1u << 5,
+} EXTArtBoardMouseDragOperation;
+
+
 @interface EXTArtBoard : NSObject
     /*!
      @property frame
@@ -28,4 +40,10 @@
     - (void)fillRect;
     - (void)strokeRect;
     - (void)buildCursorRectsInView:(NSView *)view;
+
+    - (EXTArtBoardMouseDragOperation)mouseDragOperationAtPoint:(NSPoint)point;
+    - (void)startDragOperationAtPoint:(NSPoint)originalPoint;
+    - (void)performDragOperationWithPoint:(NSPoint)point;
+    - (void)finishDragOperation;
+    - (void)cancelDragOperation;
 @end

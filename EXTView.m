@@ -451,79 +451,51 @@ static void *_EXTViewArtBoardDrawingRectContext = &_EXTViewArtBoardDrawingRectCo
 //	}
 //}
 
-- (void)moveArtBoardWithEvent:(NSEvent *)event {
+- (void)_extDragArtBoardWithEvent:(NSEvent *)event {
 	// ripped off from sketch.   according to apple's document, it is better not to override the event loop like this.  Also, see the DragItemAround code for what I think is a better way to organize this.
 
-    const NSRect originalArtBoardFrame = [_artBoard frame];
     const NSRect originalVisibleRect = [[self enclosingScrollView] documentVisibleRect];
+    NSPoint lastPoint = [self convertPoint:[event locationInWindow] fromView:nil];
 
-    [[NSCursor closedHandCursor] push];
+    [_artBoard startDragOperationAtPoint:lastPoint];
 
-	NSPoint lastPoint, curPoint;
-	
-	lastPoint = [self convertPoint:[event locationInWindow] fromView:nil];
-	
 	while ([event type] != NSLeftMouseUp) {
 		event = [[self window] nextEventMatchingMask:(NSLeftMouseDraggedMask | NSLeftMouseUpMask | NSKeyDownMask)];
+        const NSPoint currentPoint = [_grid nearestGridPoint:[self convertPoint:[event locationInWindow] fromView:nil]];
 
         switch ([event type]) {
-            case NSLeftMouseDragged:
-                curPoint = [self convertPoint:[event locationInWindow] fromView:nil];
-
-                if (!NSEqualPoints(lastPoint, curPoint)) {
-                    const NSRect previousArtBoardDrawingRect = [_artBoard drawingRect];
-                    const NSRect previousArtBoardFrame = [_artBoard frame];
-
-                    const NSPoint artBoardOffset = {
-                        .x = lastPoint.x - previousArtBoardFrame.origin.x,
-                        .y = lastPoint.y - previousArtBoardFrame.origin.y,
-                    };
-
-                    NSPoint gridPoint = {
-                        .x = curPoint.x - artBoardOffset.x,
-                        .y = curPoint.y - artBoardOffset.y,
-                    };
-
-                    gridPoint = [_grid nearestGridPoint:gridPoint];
-
-                    curPoint.x = gridPoint.x + artBoardOffset.x;
-                    curPoint.y = gridPoint.y + artBoardOffset.y;
-
-                    // Since we’re snapping to the grid, it is possible that the mouse offset doesn’t actually
-                    // change the art board origin, so we avoid firing KVO, view invalidation and cursor invalidation
-                    if (!NSEqualPoints(previousArtBoardFrame.origin, gridPoint)) {
-                        [_artBoard setFrame:(NSRect){gridPoint, previousArtBoardFrame.size}];
-                        [self setNeedsDisplayInRect:NSUnionRect(previousArtBoardDrawingRect, [_artBoard drawingRect])];
-                    }
-                    
-                    // Automatically scroll the view during mouse drag
-                    [self autoscroll:event];
-                }
-                
-                lastPoint = curPoint;
+            case NSLeftMouseDragged: {
+                if (! NSEqualPoints(lastPoint, currentPoint))
+                    [_artBoard performDragOperationWithPoint:currentPoint];
+                [self autoscroll:event];
                 break;
+            }
 
             case NSKeyDown:
                 // Since we are sequestering event loop processing, check for the Escape key here to cancel the drag operation
                 if ([event keyCode] == 53) {
-                    const NSRect artBoardCurrentDragFrame = [_artBoard frame];
-                    [_artBoard setFrame:originalArtBoardFrame];
-                    [self setNeedsDisplayInRect:artBoardCurrentDragFrame];
+                    [_artBoard cancelDragOperation];
                     [self scrollRectToVisible:originalVisibleRect];
+                    return;
                 }
+                break;
         }
+
+        lastPoint = currentPoint;
 	}
 
-    [NSCursor pop];
+    [_artBoard finishDragOperation];
 }
 
 
--(void) mouseDown:(NSEvent *)theEvent{
-	NSPoint locationPoint = [self convertPoint:[theEvent locationInWindow] fromView:nil];
-	if (_editingArtBoards && NSPointInRect(locationPoint, [_artBoard frame])) {
-		[self moveArtBoardWithEvent:theEvent];
-	} else if (currentTool) 
-	{
+- (void)mouseDown:(NSEvent *)event {
+	const NSPoint locationPoint = [self convertPoint:[event locationInWindow] fromView:nil];
+    const EXTArtBoardMouseDragOperation artBoardDragOperation = [_artBoard mouseDragOperationAtPoint:locationPoint];
+
+    if (_editingArtBoards && artBoardDragOperation != EXTArtBoardMouseDragOperationNone) {
+		[self _extDragArtBoardWithEvent:event];
+	}
+    else if (currentTool) {
         // TODO: reenable clicks.  the idea is that both terms and differentials
         // present the same 'insertable' interface, which is called here.
         
