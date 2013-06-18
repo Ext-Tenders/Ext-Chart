@@ -11,16 +11,13 @@
 #import "EXTterm.h"
 #import "EXTdifferential.h"
 #import "EXTView.h"
-#import "EXTArtBoard.h"
 #import "EXTGrid.h"
 #import "EXTSpectralSequence.h"
 
 @interface EXTDocumentWindowController ()
 @property(nonatomic, weak) IBOutlet EXTView *extView;
 @property(nonatomic, strong) IBOutlet EXTGrid *grid;
-@property(nonatomic, strong) EXTArtBoard *artBoard;
 
-@property(nonatomic, assign) CGFloat artboardRectX;
 @property(nonatomic, assign) NSUInteger maxPage;
 
 @property(nonatomic, readonly) EXTDocument *extDocument;
@@ -49,8 +46,6 @@
 {
     [super windowDidLoad];
 
-    self.artBoard = [[EXTArtBoard alloc] initWithRect:NSMakeRect(0, 0, 792, 612)];
-    
 	// the big board is the bounds rectangle of the EXTView object, and is set in the xib file, so we initialize theGrid in the windowControllerDidLoadNib function.   HOWEVER, it screws up the binding of the text cell on the main document.  see the console
 
     //	theGrid = [EXTGrid alloc];
@@ -61,12 +56,8 @@
     // The analogue of these next settings 	 are done with bindings in Sketch.   I'm not sure what the difference is.
     self.extView.sseq = [self.document sseq];
     self.extView.delegate = self;
-    self.extView.artBoard = self.artBoard;
     self.extView._grid = self.grid;
 
-    // since the frame extends past the bounds rectangle, we need observe the drawingRect in order to know what to refresh when the artBoard changes
-
-	[self.artBoard addObserver:self.extView forKeyPath:EXTArtBoardDrawingRectKey options:(NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld) context:nil];
 	[self.grid addObserver:self.extView forKeyPath:EXTGridAnyKey options:0 context:nil];
 
     //	[self setEmphasisGridSpacing:8];
