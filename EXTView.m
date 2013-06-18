@@ -30,6 +30,7 @@ NSString * const EXTViewSelectedPageIndexBindingName = @"selectedPageIndex";
 
 static void *_EXTViewSseqContext = &_EXTViewSseqContext;
 static void *_EXTViewSelectedPageIndexContext = &_EXTViewSelectedPageIndexContext;
+static void *_EXTViewArtBoardDrawingRectContext = &_EXTViewArtBoardDrawingRectContext;
 
 
 @implementation EXTView
@@ -38,8 +39,7 @@ static void *_EXTViewSelectedPageIndexContext = &_EXTViewSelectedPageIndexContex
 }
 
 @synthesize gridSpacing;
-@synthesize showGrid, editMode, showPages, editingArtBoards;
-@synthesize artBoard;
+@synthesize showGrid, editMode, showPages;
 @synthesize _grid;
 @synthesize highlighting;
 @synthesize highlightPath;
@@ -60,11 +60,15 @@ static void *_EXTViewSelectedPageIndexContext = &_EXTViewSelectedPageIndexContex
 		showPages = YES;
 		editMode = NO;
 		gridSpacing = 9.0;
-		editingArtBoards = NO;
+
+		_editingArtBoards = NO;
+        _artBoard = [EXTArtBoard new];
+        [_artBoard addObserver:self forKeyPath:@"drawingRect" options:NSKeyValueObservingOptionOld context:_EXTViewArtBoardDrawingRectContext];
 
         _bindings = [NSMutableDictionary dictionary];
 
-		[self setArtBoard:[[EXTArtBoard alloc] initWithRect:NSZeroRect]];
+        // since the frame extends past the bounds rectangle, we need observe the drawingRect in order to know what to refresh when the artBoard changes
+
 		[self set_grid:[[EXTGrid alloc] initWithRect:NSZeroRect]];
 		
 		// the tracking area should be set to the dataRect, which is still not implemented.
@@ -94,13 +98,13 @@ static void *_EXTViewSelectedPageIndexContext = &_EXTViewSelectedPageIndexContex
 		
 		currentTool = EXTToolPaletteController.sharedToolPaletteController.currentToolClass;
 		 
-		 }
+    }
 
 	return self;
 }
 
 -(void)awakeFromNib	{
-	[self scrollRectToVisible:[artBoard bounds]];
+	[self scrollRectToVisible:[_artBoard frame]];
 	NSScrollView *scroller = [self enclosingScrollView];
 	
 	[scroller setHasHorizontalRuler:YES];
@@ -114,6 +118,11 @@ static void *_EXTViewSelectedPageIndexContext = &_EXTViewSelectedPageIndexContex
     [vertRuler setOriginOffset: - [self bounds].origin.y];
 	
 	[scroller setRulersVisible:YES];	
+}
+
+- (void)dealloc {
+    [_artBoard removeObserver:self forKeyPath:@"drawingRect"];
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 
@@ -142,7 +151,7 @@ static void *_EXTViewSelectedPageIndexContext = &_EXTViewSelectedPageIndexContex
 	
 	// fill the artBoard(s) --- we're ignoring "rect" and filling the entire artboard.   we should intersect it with rect.
 	
-	[artBoard fillRect];	
+	[_artBoard fillRect];
 	
 	// draw the grid.  
 	
@@ -152,7 +161,7 @@ static void *_EXTViewSelectedPageIndexContext = &_EXTViewSelectedPageIndexContex
 	
 	// draw the artboard(s), shaded, around the document background.
 	
-	[artBoard strokeRect];   // we're drawing the entire artboard frame.   probably OK.   
+	[_artBoard strokeRect];   // we're drawing the entire artboard frame.   probably OK.
 	
 	//draw the axes
 	
@@ -260,6 +269,13 @@ static void *_EXTViewSelectedPageIndexContext = &_EXTViewSelectedPageIndexContex
     }
 }
 
+- (void)setEditingArtBoards:(BOOL)editingArtBoards {
+    if (editingArtBoards != _editingArtBoards) {
+        _editingArtBoards = editingArtBoards;
+        [[self window] invalidateCursorRectsForView:self];
+    }
+}
+
 #pragma mark *** paging ***
 
 // TODO: this gets called when the Compute Homology button is pressed. this
@@ -329,21 +345,11 @@ static void *_EXTViewSelectedPageIndexContext = &_EXTViewSelectedPageIndexContex
 #pragma mark - Bindings & KVO
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context{
-	if ([keyPath isEqualToString:EXTArtBoardDrawingRectKey]){
-		// this is not the right thing, I don't think.   It should be done with the mousUp code.  Also, it looks like the new way to do cursorRects is with tracking areas.   
-		[[[self enclosingScrollView] window] invalidateCursorRectsForView:self];
-		
-		NSRect dirtyRect;
-		// I guess the [change ...] returns an NSValue object, whose rectValue is bounds.
-   
-		dirtyRect = [[change objectForKey:NSKeyValueChangeNewKey] rectValue];
-
-		[self setNeedsDisplayInRect:dirtyRect];
-		dirtyRect = [[change objectForKey:NSKeyValueChangeOldKey] rectValue];
-		[self setNeedsDisplayInRect:dirtyRect];
+	if (context == _EXTViewArtBoardDrawingRectContext) {
+        [self setNeedsDisplayInRect:NSUnionRect([change[NSKeyValueChangeOldKey] rectValue], [_artBoard drawingRect])];
+        if (_editingArtBoards)
+            [[self window] invalidateCursorRectsForView:self];
 	}
-		
-		//		[self setNeedsDisplay:YES];	
 	else if ([keyPath isEqualToString:EXTGridAnyKey]){
 		// control never reaches this point.  both strings are substitutes for "ANY".  But nevertheless the grid spacing is getting reset.   Ugh.
 		// the next line is a hack, and results in a few  redundant settings of gridSpacing.   It should be do-able with a simple binding, binding the value of gridSpacing to the one in the grid object.   But furthermore, there shouldn't be a gridSpacing variable in the EXTView class.
@@ -422,14 +428,11 @@ static void *_EXTViewSelectedPageIndexContext = &_EXTViewSelectedPageIndexContex
 
 -(void)resetCursorRects
 {
-	// this method is called automatically from invalidateCursorRectsForView: which should be called in the mouseUp implementation.  It is getting called, but I'm not sure where.
 	[self discardCursorRects];
 	//	need to clip the artBoards cursor rects to the visible portion.   I haven't implemented this yet. The "visibleRect" command is supposed to make this easier.   I just checked with some log statements, and it indeed does report, in the bounds coordinates, the clipView's rectangle.    Sweet.
 	
-	// this if thing isn't working right.   It doesn't switch on automatically.
-	if (editingArtBoards){
-		[artBoard buildCursorRects:self];	
-	}
+	if (_editingArtBoards)
+		[_artBoard buildCursorRectsInView:self];
 }
 
 
@@ -448,52 +451,51 @@ static void *_EXTViewSelectedPageIndexContext = &_EXTViewSelectedPageIndexContex
 //	}
 //}
 
-- (void)moveArtBoardWithEvent:(NSEvent *)event {
+- (void)_extDragArtBoardWithEvent:(NSEvent *)event {
 	// ripped off from sketch.   according to apple's document, it is better not to override the event loop like this.  Also, see the DragItemAround code for what I think is a better way to organize this.
-	NSPoint lastPoint, curPoint;
-	
-	lastPoint = [self convertPoint:[event locationInWindow] fromView:nil];
-	
+
+    const NSRect originalVisibleRect = [[self enclosingScrollView] documentVisibleRect];
+    NSPoint lastPoint = [self convertPoint:[event locationInWindow] fromView:nil];
+
+    [_artBoard startDragOperationAtPoint:lastPoint];
+
 	while ([event type] != NSLeftMouseUp) {
-		event = [[self window] nextEventMatchingMask:(NSLeftMouseDraggedMask | NSLeftMouseUpMask)];
-		curPoint = [self convertPoint:[event locationInWindow] fromView:nil];
-		
-		if (!NSEqualPoints(lastPoint, curPoint)) {
-			
-			[self setNeedsDisplayInRect:[artBoard drawingRect]];
-			
-			NSPoint gridPoint, artBoardOffset;
-			
-			artBoardOffset.x = lastPoint.x - [artBoard xPosition];
-			artBoardOffset.y = lastPoint.y - [artBoard yPosition];
-			
-			 
-			gridPoint.x = curPoint.x - artBoardOffset.x;
-			gridPoint.y = curPoint.y - artBoardOffset.y;
-			
-			gridPoint = [_grid nearestGridPoint:gridPoint];
-			 
-			[artBoard setXPosition:gridPoint.x];
-			[artBoard setYPosition:gridPoint.y];	
-			
-			curPoint.x = gridPoint.x + artBoardOffset.x;
-			curPoint.y = gridPoint.y + artBoardOffset.y;
+		event = [[self window] nextEventMatchingMask:(NSLeftMouseDraggedMask | NSLeftMouseUpMask | NSKeyDownMask)];
+        const NSPoint currentPoint = [_grid nearestGridPoint:[self convertPoint:[event locationInWindow] fromView:nil]];
 
-			[self setNeedsDisplayInRect:[artBoard drawingRect]];
+        switch ([event type]) {
+            case NSLeftMouseDragged: {
+                if (! NSEqualPoints(lastPoint, currentPoint))
+                    [_artBoard performDragOperationWithPoint:currentPoint];
+                [self autoscroll:event];
+                break;
+            }
 
-		}
-		lastPoint = curPoint;
+            case NSKeyDown:
+                // Since we are sequestering event loop processing, check for the Escape key here to cancel the drag operation
+                if ([event keyCode] == 53) {
+                    [_artBoard cancelDragOperation];
+                    [self scrollRectToVisible:originalVisibleRect];
+                    return;
+                }
+                break;
+        }
+
+        lastPoint = currentPoint;
 	}
-	// somehow the mouseUp override is supposed to call invalidateCursorRectsForview:self.   I'm not sure how resetCursorRects is getting called.  (I had it coded in the observe... stuff, oops).
+
+    [_artBoard finishDragOperation];
 }
 
 
--(void) mouseDown:(NSEvent *)theEvent{
-	NSPoint locationPoint = [self convertPoint:[theEvent locationInWindow] fromView:nil];
-	if (editingArtBoards && NSPointInRect(locationPoint, [artBoard bounds])) {
-		[self moveArtBoardWithEvent:theEvent];
-	} else if (currentTool) 
-	{
+- (void)mouseDown:(NSEvent *)event {
+	const NSPoint locationPoint = [self convertPoint:[event locationInWindow] fromView:nil];
+    const EXTArtBoardMouseDragOperation artBoardDragOperation = [_artBoard mouseDragOperationAtPoint:locationPoint];
+
+    if (_editingArtBoards && artBoardDragOperation != EXTArtBoardMouseDragOperationNone) {
+		[self _extDragArtBoardWithEvent:event];
+	}
+    else if (currentTool) {
         // TODO: reenable clicks.  the idea is that both terms and differentials
         // present the same 'insertable' interface, which is called here.
         
