@@ -7,161 +7,251 @@
 //
 
 #import "EXTArtBoard.h"
+#import "NSCursor+EXTApplePrivate.h"
 
-NSString *EXTArtBoardBoundsKey = @"bounds";
-NSString *EXTArtBoardDrawingRectKey = @"drawingRect";
 
-@implementation EXTArtBoard
+#pragma mark - Private variables
 
-//@synthesize xPosition, yPosition, width, height;
-@synthesize bounds;
-@synthesize editing, moving;
+static const NSSize _EXTArtBoardDefaultSize = {792, 612};
+static const NSSize _EXTArtBoardMinimumSize = {50, 50};
+static NSColor *_EXTArtBoardBackgroundColour = nil;
+static NSColor *_EXTArtBoardBorderColour = nil;
+static const CGFloat _EXTArtBoardBorderWidth = 1.0;
 
-#pragma mark ** initialization ***
+static NSShadow *_EXTArtBoardShadow = nil;
+static NSColor *_EXTArtBoardShadowColour = nil;
+static const NSSize _EXTArtBoardShadowOffset = {-1.0, -2.0};
+static const CGFloat _EXTArtBoardShadowBlurRadius = 2.0;
 
--(id) init{
-	if (!(self = [self initWithRect:NSMakeRect(0, 0, 792, 612)])) return nil;
-	return self;
+static const CGFloat _EXTArtBoardResizeCursorHotSpotLength = 8.0;
+static const CGFloat _EXTArtBoardResizeCursorHotSpotHalfLength = 4.0;
+
+static const NSSize _EXTArtBoardDrawingInset = {-4.0, -4.0};
+
+
+NS_INLINE void EXTArtBoardComputeHotSpotFrames(const NSRect frame,
+                                               NSRect *restrict innerFrame, // output parameters
+                                               NSRect *restrict leftFrame,
+                                               NSRect *restrict rightFrame,
+                                               NSRect *restrict topFrame,
+                                               NSRect *restrict bottomFrame)
+{
+    const CGFloat len = _EXTArtBoardResizeCursorHotSpotLength;
+    const CGFloat halfLen = _EXTArtBoardResizeCursorHotSpotHalfLength;
+    const NSRect hotSpotFrame = NSInsetRect(frame, -halfLen, -halfLen); // expands the frame to include extra hot spot borders
+    const CGFloat minX = NSMinX(hotSpotFrame);
+    const CGFloat maxX = NSMaxX(hotSpotFrame);
+    const CGFloat minY = NSMinY(hotSpotFrame);
+    const CGFloat maxY = NSMaxY(hotSpotFrame);
+    
+
+    if (innerFrame) *innerFrame = NSInsetRect(frame, halfLen, halfLen);
+
+    if (leftFrame) *leftFrame = (NSRect){{minX, minY}, {len, hotSpotFrame.size.height}};
+    if (rightFrame) *rightFrame = (NSRect){{maxX - len, minY}, {len, hotSpotFrame.size.height}};
+    if (topFrame) *topFrame = (NSRect){{minX, maxY - len}, {hotSpotFrame.size.width, len}};
+    if (bottomFrame) *bottomFrame = (NSRect){{minX, minY}, {hotSpotFrame.size.width, len}};
 }
 
--(id) initWithRect:(NSRect) rect{
-	if (self = [super init]) {
-		// not supposed to used these setters in init.   But I'm not sure if the object synced to them work.
-		bounds = rect;		
-		anchor =  NSZeroPoint;
-	}
-	return self;
+@implementation EXTArtBoard {
+    EXTArtBoardMouseDragOperation _dragOperation;
+    NSPoint _initialDragPoint;
+    NSRect _initialDragFrame;
 }
 
-#pragma mark *** drawing ***
+#pragma mark - Life cycle
 
--(void) fillRect{
-	NSBezierPath *documentRectanglePath = [NSBezierPath bezierPathWithRect:bounds];
-	[[NSColor whiteColor] set];
++ (void)initialize {
+    if (self == [EXTArtBoard class]) {
+        _EXTArtBoardBackgroundColour = [NSColor whiteColor];
+        _EXTArtBoardBorderColour = [NSColor blackColor];
+        _EXTArtBoardShadowColour = [[NSColor blackColor] colorWithAlphaComponent:0.3];
+
+        _EXTArtBoardShadow = [NSShadow new];
+        [_EXTArtBoardShadow setShadowColor:_EXTArtBoardShadowColour];
+        [_EXTArtBoardShadow setShadowOffset:_EXTArtBoardShadowOffset];
+        [_EXTArtBoardShadow setShadowBlurRadius:_EXTArtBoardShadowBlurRadius];
+    }
+}
+
+- (id)init {
+    return [self initWithFrame:(NSRect){NSZeroPoint, _EXTArtBoardDefaultSize}];
+}
+
+- (id)initWithFrame:(NSRect)frame {
+    self = [super init];
+    if (self) {
+        _frame = frame;
+    }
+    return self;
+}
+
+#pragma mark - Drawing
+
+- (void)fillRect {
+	NSBezierPath *documentRectanglePath = [NSBezierPath bezierPathWithRect:_frame];
+    [_EXTArtBoardBackgroundColour set];
 	[documentRectanglePath fill];
 }
 
--(void) strokeRect{
-	NSBezierPath *documentRectanglePath = [NSBezierPath bezierPathWithRect:bounds];
+- (void)strokeRect {
+	NSBezierPath *documentRectanglePath = [NSBezierPath bezierPathWithRect:_frame];
 
 	[NSGraphicsContext saveGraphicsState];
-	
-	[documentRectanglePath setLineWidth:1.0];
-	[[NSColor blackColor] set];
-	
-	NSShadow *theShadow = [NSShadow new];
-	[theShadow setShadowOffset:NSMakeSize(-1.0, -2.0)];
-	[theShadow setShadowBlurRadius:2.0];
-	[theShadow setShadowColor:[[NSColor blackColor]
-							   colorWithAlphaComponent:0.3]];
-	[theShadow set];
-	
-	[documentRectanglePath stroke];
+	{
+        [documentRectanglePath setLineWidth:_EXTArtBoardBorderWidth];
+        [_EXTArtBoardBorderColour set];
+        [_EXTArtBoardShadow set];
+        [documentRectanglePath stroke];
+    }
 	[NSGraphicsContext restoreGraphicsState];
 }
 
-#pragma mark *** the setters and getters for the components of bounds, and the drawingRect ***
+#pragma mark - Mouse dragging
 
-- (CGFloat)xPosition{
-	return [self bounds].origin.x;
+- (EXTArtBoardMouseDragOperation)mouseDragOperationAtPoint:(NSPoint)point {
+    if (! NSPointInRect(point, [self drawingRect]))
+        return EXTArtBoardMouseDragOperationNone;
+
+    NSRect innerFrame, topFrame, bottomFrame, leftFrame, rightFrame;
+    EXTArtBoardComputeHotSpotFrames(_frame, &innerFrame, &leftFrame, &rightFrame, &topFrame, &bottomFrame);
+
+    if (NSPointInRect(point, innerFrame))
+        return EXTArtBoardMouseDragOperationMove;
+
+    EXTArtBoardMouseDragOperation dragOperation = EXTArtBoardMouseDragOperationResize;
+
+    if (NSPointInRect(point, leftFrame))
+        dragOperation |= EXTArtBoardMouseDragOperationResizeLeft;
+    else if (NSPointInRect(point, rightFrame))
+        dragOperation |= EXTArtBoardMouseDragOperationResizeRight;
+
+    if (NSPointInRect(point, topFrame))
+        dragOperation |= EXTArtBoardMouseDragOperationResizeTop;
+    else if (NSPointInRect(point, bottomFrame))
+        dragOperation |= EXTArtBoardMouseDragOperationResizeBottom;
+
+    return dragOperation;
 }
 
-- (CGFloat)yPosition{
-	return [self bounds].origin.y;
+- (void)startDragOperationAtPoint:(NSPoint)originalPoint {
+    _dragOperation = [self mouseDragOperationAtPoint:originalPoint];
+    if (_dragOperation == EXTArtBoardMouseDragOperationNone)
+        return;
+    
+    _initialDragPoint = originalPoint;
+    _initialDragFrame = _frame;
+
+    if (_dragOperation == EXTArtBoardMouseDragOperationMove)
+        [[NSCursor closedHandCursor] push];
 }
 
-- (CGFloat)width{
-	return [self bounds].size.width;	
+- (void)performDragOperationWithPoint:(NSPoint)point {
+    const NSSize mouseOffset = {
+        .width = point.x - _initialDragPoint.x,
+        .height = point.y - _initialDragPoint.y,
+    };
+
+    NSRect targetFrame = _frame;
+
+    if (_dragOperation == EXTArtBoardMouseDragOperationMove) {
+        targetFrame = NSOffsetRect(_initialDragFrame, mouseOffset.width, mouseOffset.height);
+    }
+    else if ((_dragOperation & EXTArtBoardMouseDragOperationResize) == EXTArtBoardMouseDragOperationResize) {
+        if ((_dragOperation & EXTArtBoardMouseDragOperationResizeTop) == EXTArtBoardMouseDragOperationResizeTop) {
+            const CGFloat targetHeight = _initialDragFrame.size.height + mouseOffset.height;
+
+            if (targetHeight >= _EXTArtBoardMinimumSize.height)
+                targetFrame.size.height = targetHeight;
+        }
+        else if ((_dragOperation & EXTArtBoardMouseDragOperationResizeBottom) == EXTArtBoardMouseDragOperationResizeBottom) {
+            const CGFloat targetHeight = _initialDragFrame.size.height - mouseOffset.height;
+
+            if (targetHeight >= _EXTArtBoardMinimumSize.height) {
+                targetFrame.size.height = targetHeight;
+                targetFrame.origin.y = _initialDragFrame.origin.y + mouseOffset.height;
+            }
+        }
+
+        if ((_dragOperation & EXTArtBoardMouseDragOperationResizeLeft) == EXTArtBoardMouseDragOperationResizeLeft) {
+            const CGFloat targetWidth = _initialDragFrame.size.width - mouseOffset.width;
+
+            if (targetWidth >= _EXTArtBoardMinimumSize.width) {
+                targetFrame.size.width = targetWidth;
+                targetFrame.origin.x = _initialDragFrame.origin.x + mouseOffset.width;
+            }
+        }
+        else if ((_dragOperation & EXTArtBoardMouseDragOperationResizeRight) == EXTArtBoardMouseDragOperationResizeRight) {
+            const CGFloat targetWidth = _initialDragFrame.size.width + mouseOffset.width;
+
+            if (targetWidth >= _EXTArtBoardMinimumSize.width)
+                targetFrame.size.width = targetWidth;
+        }
+    }
+
+    if (! NSEqualRects(_frame, targetFrame))
+        [self setFrame:targetFrame];
 }
 
-- (CGFloat)height{
-	return [self bounds].size.height;	
-}
-		
+- (void)finishDragOperation {
+    if (_dragOperation == EXTArtBoardMouseDragOperationMove)
+        [NSCursor pop];
 
-// I'm not sure if the [self setBounds:bounds] is really necessary.   Above we say that xPosition, yPosition, width, and height are keys affecting the bounds key, so they should trigger a change, I think.   Unless they aren't "exposed bindings."
-
- 
-
-// also, SKTGraphic.m defines these setters by     
-//NSRect bounds = [self bounds]; 
-//bounds.origin.x = xPosition; 
-//[self setBounds:bounds];
-// my method looks kind of kludgy, but it seems to work.  I'll probably change it. 
-
-// followup:  as you can see below, the setXPosition method doesn't call setBounds, and it seems to work.  
-			
-- (void)setXPosition:(CGFloat)x{
-	bounds.origin.x = x;
-//	[self setBounds:bounds];
-}
-- (void)setYPosition:(CGFloat)y{
-	bounds.origin.y = y;
-	[self setBounds:bounds];
-}
-- (void)setWidth:(CGFloat)w{
-	bounds.size.width = w;
-	[self setBounds:bounds];
+    _dragOperation = EXTArtBoardMouseDragOperationNone;
 }
 
-- (void)setHeight:(CGFloat)h{
-	bounds.size.height = h;
-	[self setBounds:bounds];	
-}
-			
-						
-- (NSRect)drawingRect{
-	return NSInsetRect(bounds, -4, -4);
+- (void)cancelDragOperation {
+    if (_dragOperation != EXTArtBoardMouseDragOperationNone)
+        [self setFrame:_initialDragFrame];
+    
+    [self finishDragOperation];
 }
 
-#pragma mark *** KVO stuff ***
 
-+(NSSet *)keyPathsForValuesAffectingBounds{
-	return [NSSet setWithObjects:@"xPosition", @"yPosition", @"width", @"height", nil];
+#pragma mark - Properties
+
+- (NSRect)drawingRect {
+	return NSInsetRect(_frame, _EXTArtBoardDrawingInset.width, _EXTArtBoardDrawingInset.height);
 }
 
-+(NSSet *)keyPathsForValuesAffectingDrawingRect{
-	return [NSSet setWithObjects:@"xPosition", @"yPosition", @"width", @"height", nil];
+#pragma mark - Key-value observing
+
++ (NSSet *)keyPathsForValuesAffectingDrawingRect {
+    return [NSSet setWithObject:@"frame"];
 }
 
-#pragma mark *** cursor rectangles ***
+#pragma mark - Cursors
 
--(void) buildCursorRects:(NSView *)sender{
-	
-// the 4 little squares
-	
-	short halfWidth = 4.0;
-	
-	NSRect bottomLeftSquare = NSMakeRect(bounds.origin.x-halfWidth, bounds.origin.y-halfWidth, 2*halfWidth, 2*halfWidth);
-	NSRect bottomRightSquare = NSMakeRect(bounds.origin.x+bounds.size.width-halfWidth, bounds.origin.y-halfWidth, 2*halfWidth, 2*halfWidth);
-	NSRect upperLeftSquare = NSMakeRect(bounds.origin.x-halfWidth, bounds.origin.y+bounds.size.height-halfWidth, 2*halfWidth, 2*halfWidth);
-	NSRect upperRightSquare = NSMakeRect(bounds.origin.x+bounds.size.width-halfWidth, bounds.origin.y+bounds.size.height-halfWidth, 2*halfWidth, 2*halfWidth);
-	
-	
-	[sender addCursorRect:bottomLeftSquare cursor:[NSCursor crosshairCursor]];
-	[sender addCursorRect:bottomRightSquare cursor:[NSCursor crosshairCursor]];
-	[sender addCursorRect:upperLeftSquare cursor:[NSCursor crosshairCursor]];
-	[sender addCursorRect:upperRightSquare cursor:[NSCursor crosshairCursor]];
-	
-// the 4 long rectangles, and the inner rectangle
-	
-	NSRect leftSide = NSMakeRect(bounds.origin.x - halfWidth, bounds.origin.y + halfWidth, 2*halfWidth, bounds.size.height - 2*halfWidth);
-	NSRect bottom = NSMakeRect(bounds.origin.x + halfWidth, bounds.origin.y - halfWidth, bounds.size.width -  2*halfWidth , 2*halfWidth);
-	NSRect rightSide = NSMakeRect(bounds.origin.x + bounds.size.width - halfWidth, bounds.origin.y + halfWidth, 2*halfWidth, bounds.size.height - 2*halfWidth);
-	NSRect	top = NSMakeRect(bounds.origin.x+halfWidth, bounds.origin.y+bounds.size.height-halfWidth, bounds.size.width-2*halfWidth, 2*halfWidth);
-//	NSRect innerRect = NSInsetRect(bounds, halfWidth, halfWidth);
-	
-	[sender addCursorRect:leftSide cursor:[NSCursor resizeLeftRightCursor]];
-	[sender addCursorRect:bottom cursor:[NSCursor resizeUpDownCursor]];
-	[sender addCursorRect:rightSide cursor:[NSCursor resizeLeftRightCursor]];
-	[sender addCursorRect:top cursor:[NSCursor resizeUpDownCursor]];
+- (void)buildCursorRectsInView:(NSView *)view {
+    
+    NSRect innerFrame, topFrame, bottomFrame, leftFrame, rightFrame;
+    EXTArtBoardComputeHotSpotFrames(_frame, &innerFrame, &leftFrame, &rightFrame, &topFrame, &bottomFrame);
 
-//	[sender addCursorRect:innerRect cursor:[NSCursor openHandCursor]];
+    // Compute corner hot spots
 
-	
+    const NSRect topLeftFrame = NSIntersectionRect(topFrame, leftFrame);
+    const NSRect topRightFrame = NSIntersectionRect(topFrame, rightFrame);
+    const NSRect bottomLeftFrame = NSIntersectionRect(bottomFrame, leftFrame);
+    const NSRect bottomRightFrame = NSIntersectionRect(bottomFrame, rightFrame);
+
+    // Subtract corner hot spots from the edges
+
+    topFrame = NSInsetRect(topFrame, _EXTArtBoardResizeCursorHotSpotLength, 0);
+    bottomFrame = NSInsetRect(bottomFrame, _EXTArtBoardResizeCursorHotSpotLength, 0);
+    leftFrame = NSInsetRect(leftFrame, 0, _EXTArtBoardResizeCursorHotSpotLength);
+    rightFrame = NSInsetRect(rightFrame, 0, _EXTArtBoardResizeCursorHotSpotLength);
+
+    // Set cursors
+    // TODO: maybe use limited resize cursors
+    [view addCursorRect:innerFrame cursor:[NSCursor openHandCursor]];
+	[view addCursorRect:leftFrame cursor:[NSCursor resizeLeftRightCursor]];
+	[view addCursorRect:rightFrame cursor:[NSCursor resizeLeftRightCursor]];
+	[view addCursorRect:bottomFrame cursor:[NSCursor resizeUpDownCursor]];
+	[view addCursorRect:topFrame cursor:[NSCursor resizeUpDownCursor]];
+	[view addCursorRect:topLeftFrame cursor:[NSCursor _topLeftResizeCursor]];
+	[view addCursorRect:topRightFrame cursor:[NSCursor _topRightResizeCursor]];
+	[view addCursorRect:bottomLeftFrame cursor:[NSCursor _bottomLeftResizeCursor]];
+	[view addCursorRect:bottomRightFrame cursor:[NSCursor _bottomRightResizeCursor]];
 }
 
-#pragma mark *** mouse handling ***
-
-	
 @end
