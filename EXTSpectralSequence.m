@@ -79,11 +79,12 @@
         EXTLocation *loc = [(EXTTerm*)term[0] location];
         // iterate through all the terms, finding all the ones which share loc
         NSMutableArray *atThisLoc = [NSMutableArray array];
-        for (NSMutableArray *workingTerm in tensorTerms)
+        for (NSMutableArray *workingTerm in tensorTerms) {
             if ([[(EXTTerm*)workingTerm[0] location] isEqual:loc]) {
                 [atThisLoc addObject:workingTerm];
                 workingTerm[3] = @true;
             }
+        }
         
         // now, we sum them together. we want a list of names.
         NSMutableArray *sumNames = [NSMutableArray array];
@@ -481,9 +482,50 @@
     ret = [ret tensorWithPolyClass:@"h11" location:[EXTTriple tripleWithA:1 B:1 C:1] upTo:3];
     ret = [ret tensorWithPolyClass:@"h20" location:[EXTTriple tripleWithA:2 B:1 C:0] upTo:3];
     
-    // d1(h20) = h10 h11
+    // some basic partial definitions
+    EXTPartialDefinition *diffone = [EXTPartialDefinition new];
+    EXTMatrix *one = [EXTMatrix identity:1];
+    diffone.differential = diffone.inclusion = one;
     
+    EXTPartialDefinition *diffzero = [EXTPartialDefinition new];
+    EXTMatrix *zero = [EXTMatrix matrixWidth:1 height:1];
+    diffzero.differential = zero; diffzero.inclusion = one;
+    
+    // d1(h10) = 0
+    [ret.differentials addObject:[EXTDifferential differential:[ret findTerm:[EXTTriple tripleWithA:0 B:1 C:0]] end:nil page:1]];
+    // d1(h11) = 0
+    [ret.differentials addObject:[EXTDifferential differential:[ret findTerm:[EXTTriple tripleWithA:1 B:1 C:1]] end:nil page:1]];
+    // d1(h20) = h10 h11
+    EXTTerm *h20 = [ret findTerm:[EXTTriple tripleWithA:2 B:1 C:0]];
+    EXTDifferential *diff = [EXTDifferential differential:h20 end:[ret findTerm:[EXTTriple tripleWithA:1 B:2 C:1]] page:1];
+    [diff.partialDefinitions addObject:diffone];
+    [ret.differentials addObject:diff];
+    
+    // now, do leibniz propagation.
+    for (EXTTerm *term in ret.terms)
+        [ret.multTables computeLeibniz:[EXTTriple tripleWithA:0 B:1 C:0] with:[term location] onPage:1];
+    for (EXTTerm *term in ret.terms)
+        [ret.multTables computeLeibniz:[EXTTriple tripleWithA:1 B:1 C:1] with:[term location] onPage:1];
+    for (EXTTerm *term in ret.terms)
+        [ret.multTables computeLeibniz:[EXTTriple tripleWithA:1 B:2 C:1] with:[term location] onPage:1];
+    
+    // d3(h10) = 0
+    [ret.differentials addObject:[EXTDifferential differential:[ret findTerm:[EXTTriple tripleWithA:0 B:1 C:0]] end:nil page:3]];
+    // d3(h11) = 0
+    [ret.differentials addObject:[EXTDifferential differential:[ret findTerm:[EXTTriple tripleWithA:0 B:1 C:0]] end:nil page:3]];
     // d3(h20^2) = h11^3
+    EXTTerm *h20square = [ret findTerm:[EXTTriple tripleWithA:4 B:2 C:0]];
+    EXTDifferential *diff2 = [EXTDifferential differential:h20square end:[ret findTerm:[EXTTriple tripleWithA:3 B:3 C:3]] page:3];
+    [diff2.partialDefinitions addObject:diffone];
+    [ret.differentials addObject:diff2];
+    
+    // leibniz again, on the new terms.
+    for (EXTTerm *term in ret.terms)
+        [ret.multTables computeLeibniz:[EXTTriple tripleWithA:0 B:1 C:0] with:[term location] onPage:3];
+    for (EXTTerm *term in ret.terms)
+        [ret.multTables computeLeibniz:[EXTTriple tripleWithA:1 B:1 C:1] with:[term location] onPage:3];
+    for (EXTTerm *term in ret.terms)
+        [ret.multTables computeLeibniz:[EXTTriple tripleWithA:2 B:4 C:2] with:[term location] onPage:3];
     
     return ret;
 }

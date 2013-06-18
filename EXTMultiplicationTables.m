@@ -217,7 +217,7 @@
     
     // if we don't have differentials to work with, then skip this entirely.
     // XXX: DEAL WITH DIFFERENTIALS WITHOUT A VALID TARGET
-    if (!sumterm || !targetterm || !d1 || !d2)
+    if (!d1 || !d2)
         return;
     
     // if we're here, then we have all the fixin's we need to construct some

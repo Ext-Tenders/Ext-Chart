@@ -25,7 +25,7 @@
 + (EXTSpectralSequence*) spectralSequence;
 - (EXTSpectralSequence*) tensorWithSSeq:(EXTSpectralSequence*)p;
 
-// these are misleading names
+// TODO: these are misleading names, as they are nondestructive.
 -(EXTSpectralSequence*) tensorWithPolyClass:(NSString*)name
                                    location:(EXTLocation*)loc
                                        upTo:(int)upTo;
