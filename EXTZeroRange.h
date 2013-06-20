@@ -15,6 +15,7 @@
 #import <Foundation/Foundation.h>
 #import "EXTLocation.h"
 #import "EXTPair.h"
+#import "EXTTriple.h"
 
 
 @protocol EXTZeroRange <NSObject, NSCopying, NSCoding>
@@ -26,6 +27,7 @@
 typedef NSObject<EXTZeroRange> EXTZeroRange;
 
 
+#pragma mark --- some specific implementations ---
 
 
 @interface EXTZeroRangePair : NSObject <EXTZeroRange>
@@ -33,5 +35,14 @@ typedef NSObject<EXTZeroRange> EXTZeroRange;
 @property int leftEdge, rightEdge, topEdge, bottomEdge;
 
 -(BOOL) isInRange:(EXTPair*)loc;
+
+@end
+
+
+@interface EXTZeroRangeTriple : NSObject <EXTZeroRange>
+
+@property int leftEdge, rightEdge, topEdge, bottomEdge, backEdge, frontEdge;
+
+-(BOOL) isInRange:(EXTTriple*)loc;
 
 @end

@@ -20,3 +20,20 @@
 }
 
 @end
+
+
+
+@implementation EXTZeroRangeTriple
+
+@synthesize leftEdge, rightEdge, topEdge, bottomEdge, backEdge, frontEdge;
+
+-(BOOL) isInRange:(EXTTriple*)loc {
+    return ((loc.a >= leftEdge) &&
+            (loc.a <= rightEdge) &&
+            (loc.b >= bottomEdge) &&
+            (loc.b <= topEdge) &&
+            (loc.c >= backEdge) &&
+            (loc.c <= frontEdge));
+}
+
+@end
