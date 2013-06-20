@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "EXTLocation.h"
+#import "EXTZeroRange.h"
 // i guess objective C isn't particularly good at circular dependence
 //#import "EXTTerm.h"
 //#import "EXTdifferential.h"
@@ -21,6 +22,7 @@
 @property(nonatomic, strong) NSMutableArray *differentials;
 @property(nonatomic, strong) EXTMultiplicationTables *multTables;
 @property(nonatomic, assign) Class<EXTLocation> indexClass;
+@property(nonatomic, strong) NSMutableArray *zeroRanges;
 
 + (EXTSpectralSequence*) spectralSequence;
 - (EXTSpectralSequence*) tensorWithSSeq:(EXTSpectralSequence*)p;
@@ -45,5 +47,7 @@
 +(EXTSpectralSequence*) workingDemo;
 +(EXTSpectralSequence*) randomDemo;
 +(EXTSpectralSequence*) S5Demo;
+
+-(BOOL) isInZeroRanges:(EXTLocation*)loc;
 
 @end

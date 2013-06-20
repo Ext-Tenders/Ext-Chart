@@ -16,7 +16,7 @@
 
 @implementation EXTSpectralSequence
 
-@synthesize terms, differentials, multTables, indexClass;
+@synthesize terms, differentials, multTables, indexClass, zeroRanges;
 
 +(EXTSpectralSequence*) spectralSequence {
     EXTSpectralSequence *ret = [EXTSpectralSequence new];
@@ -29,6 +29,7 @@
     ret.differentials = [NSMutableArray array];
     ret.multTables = [EXTMultiplicationTables multiplicationTables:ret];
     ret.indexClass = [EXTPair class];
+    ret.zeroRanges = [NSMutableArray array];
 
     return ret;
 }
@@ -446,6 +447,15 @@
     }
     
     return;
+}
+
+-(BOOL) isInZeroRanges:(EXTLocation*)loc {
+    BOOL disjunction = false;
+    
+    for (EXTZeroRange* range in self.zeroRanges)
+        disjunction |= [range isInRange:loc];
+    
+    return disjunction;
 }
 
 #pragma mark - built-in demos
