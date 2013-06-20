@@ -86,13 +86,15 @@
 #pragma mark *** drawing; TODO: SEPARATE THIS OUT ***
 
 // TODO: separate out these magic constants
-- (void) drawWithSpacing:(CGFloat)spacing page:(int)page {
+- (void) drawWithSpacing:(CGFloat)spacing page:(int)page offset:(int)offset {
     NSBezierPath* path = [NSBezierPath new];
     NSPoint point = [[self location] makePoint];
     CGFloat x = (point.x)*spacing,
             y = (point.y)*spacing;
     
-    for (int j = 0; j < [self dimension:page]; j++) {
+    for (int i = 0; i < [self dimension:page]; i++) {
+        int j = i + offset;
+        
         NSRect dotPosition =
             NSMakeRect(x + 3.5/9*spacing + ((CGFloat)((j%3)-1)*2)/9*spacing,
                        y+3.5/9*spacing + ((CGFloat)((1+j%4)-2)*2)/9*spacing,

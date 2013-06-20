@@ -95,19 +95,23 @@
 -(void) drawPageNumber:(NSUInteger)pageNumber ll:(NSPoint)lowerLeft
                     ur:(NSPoint)upperRight withSpacing:(CGFloat)withSpacing {
 
-    // iterate through the available terms
-    for (EXTTerm *term in self.extDocument.sseq.terms) {
-        // if we're out of the viewing rectangle, then skip it
-        NSPoint point = [[term location] makePoint];
-        if ((point.x <= lowerLeft.x)  ||
-            (point.y <= lowerLeft.y)  ||
-            (point.x >= upperRight.x) ||
-            (point.y >= upperRight.y))
-            continue;
-
-        // otherwise, we're obligated to try to draw it
-        // TODO: this still seems like it's put in the wrong place...
-        [term drawWithSpacing:withSpacing page:pageNumber];
+    // iterate through the available grid locations in the view. it's too bad
+    // that this is slow.
+    for (int s = (int)floor(lowerLeft.x); s < ceil(upperRight.x); s++)
+    for (int t = (int)floor(lowerLeft.y); t < ceil(upperRight.y); t++) {
+        // tell each cycle in this location to draw, but we remember previously
+        // drawn cycles so that they don't overlap in projected views.
+        int cyclesDrawnSoFar = 0;
+        
+        for (EXTTerm *term in self.extDocument.sseq.terms) {
+            NSPoint point = [[term location] makePoint];
+            if (((int)point.x != s) || ((int)point.y != t))
+                continue;
+            
+            [term drawWithSpacing:withSpacing page:pageNumber offset:cyclesDrawnSoFar];
+            
+            cyclesDrawnSoFar += [term dimension:pageNumber];
+        }
     }
 
     // iterate also through the available differentials

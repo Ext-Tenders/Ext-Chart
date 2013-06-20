@@ -56,7 +56,7 @@
 
     // TODO: here are some other routines that i haven't investigated yet.
     // TODO: this drawing code must be offloaded into some other module!!
-    -(void)drawWithSpacing:(CGFloat)spacing page:(int)page;
+    -(void)drawWithSpacing:(CGFloat)spacing page:(int)page offset:(int)offset;
     + (NSBezierPath *)makeHighlightPathAtPoint:(NSPoint)point onGrid:(EXTGrid *)theGrid onPage:(NSInteger)page;
     - (void)addSelfToSS:(EXTDocument*)theDocument;
 @end
