@@ -26,13 +26,12 @@
 
 
 // tracks a single multiplicative structure
-@interface EXTMultiplicationTables : NSObject
-    {
-        NSMutableDictionary *tables;
-        EXTDocument *document;
-        EXTTerm *unitTerm;
-        NSMutableArray *unitClass;
-    }
+@interface EXTMultiplicationTables : NSObject {
+    NSMutableDictionary *tables;
+    EXTDocument *document;
+    EXTTerm *unitTerm;
+    NSMutableArray *unitClass;
+}
 
 @property(strong) NSMutableDictionary *tables;
 @property(strong) EXTSpectralSequence* sSeq;

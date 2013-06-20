@@ -27,6 +27,15 @@
 
 @synthesize leftEdge, rightEdge, topEdge, bottomEdge, backEdge, frontEdge;
 
++(EXTZeroRangeTriple*) firstOctant {
+    EXTZeroRangeTriple *ret = [EXTZeroRangeTriple new];
+    
+    ret.leftEdge = ret.bottomEdge = ret.backEdge = 0;
+    ret.rightEdge = ret.topEdge = ret.frontEdge = INT_MAX;
+    
+    return ret;
+}
+
 -(BOOL) isInRange:(EXTTriple*)loc {
     return ((loc.a >= leftEdge) &&
             (loc.a <= rightEdge) &&

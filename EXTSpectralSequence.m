@@ -42,6 +42,10 @@
 // a language with strong typing and an easy production of tuple types, neither
 // of which is quite true in Objective-C.  i'm not about to make a zillion
 // helper classes, though.
+//
+// XXX: each of these pieces should deal with the respective zero ranges in some
+// way. this means both computing the zero range of the tensor and handling
+// the existing ranges well when computing e.g. the leibniz rule.
 -(EXTSpectralSequence*) tensorWithSSeq:(EXTSpectralSequence *)p {
     // what we'll eventually be returning.
     EXTSpectralSequence *ret = [EXTSpectralSequence spectralSequence];
@@ -486,11 +490,15 @@
 
 +(EXTSpectralSequence*) A1MSSDemo {
     EXTSpectralSequence *ret = [EXTSpectralSequence sSeqWithUnit:[EXTTriple class]];
-    
+        
     // add the three polynomial generators to the sseq: h10, h11, h20
     ret = [ret tensorWithPolyClass:@"h10" location:[EXTTriple tripleWithA:0 B:1 C:0] upTo:3];
     ret = [ret tensorWithPolyClass:@"h11" location:[EXTTriple tripleWithA:1 B:1 C:1] upTo:3];
     ret = [ret tensorWithPolyClass:@"h20" location:[EXTTriple tripleWithA:2 B:1 C:0] upTo:3];
+    
+    // set up the zero range.  TODO: this should come before the tensor calls,
+    // and they should handle it well. :)
+    [ret.zeroRanges addObject:[EXTZeroRangeTriple firstOctant]];
     
     // some basic partial definitions
     EXTPartialDefinition *diffone = [EXTPartialDefinition new];

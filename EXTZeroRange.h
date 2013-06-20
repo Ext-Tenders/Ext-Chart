@@ -43,6 +43,8 @@ typedef NSObject<EXTZeroRange> EXTZeroRange;
 
 @property int leftEdge, rightEdge, topEdge, bottomEdge, backEdge, frontEdge;
 
++(EXTZeroRangeTriple*) firstOctant;
+
 -(BOOL) isInRange:(EXTTriple*)loc;
 
 @end

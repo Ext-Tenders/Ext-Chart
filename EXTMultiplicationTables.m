@@ -173,41 +173,11 @@
     return [productRule actOn:hadamardVector];
 }
 
+// compute the action of the differentials on each factor in the product
+// decomposition: d(xy) = dx y + x dy.
 -(void) computeLeibniz:(EXTLocation *)loc1
                   with:(EXTLocation *)loc2
                 onPage:(int)page {
-    // find a basis for the image of the product map, and select which vectors
-    // we need to multiply to get them.
-    EXTMatrix *product = [self getMatrixFor:loc1 with:loc2];
-    NSMutableArray *image = [product image];
-    
-    if (image.count == 0)
-        return;
-    
-    // extract which columns contributed to the image of the product map
-    NSMutableArray *indices = [NSMutableArray array];
-    for (NSMutableArray *column in image) {
-        for (int i = 0; i < product.presentation.count; i++) {
-            bool isThisOne = true;
-            for (int j = 0; j < [product.presentation[i] count]; j++) {
-                if ([[[product.presentation objectAtIndex:i] objectAtIndex:j] intValue] != [[column objectAtIndex:j] intValue]) {
-                    isThisOne = false;
-                    
-                    break;
-                }
-            }
-            
-            if (!isThisOne) // if the image col mismatched the working col...
-                continue;   // then skip to the next working column.
-            
-            [indices addObject:@(i)]; // otherwise, add this index to the array
-            break;                    // and skip to the next image column.
-        }
-    }
-    
-    // compute the action of the differentials on each factor in the
-    // product decomposition: d(xy) = dx y + x dy.
-    // XXX: deal with sign errors here.
     EXTLocation *sumloc = [[loc1 class] addLocation:loc1 to:loc2],
              *targetLoc = [[loc1 class] followDiffl:sumloc page:page];
     EXTTerm *sumterm = [self.sSeq findTerm:sumloc],
