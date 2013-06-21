@@ -7,6 +7,7 @@
 //
 
 #import "EXTZeroRange.h"
+#import "EXTSpectralSequence.h"
 
 @implementation EXTZeroRangePair
 
@@ -43,6 +44,29 @@
             (loc.b <= topEdge) &&
             (loc.c >= backEdge) &&
             (loc.c <= frontEdge));
+}
+
+@end
+
+
+
+@implementation EXTZeroRangeStrict
+
+@synthesize sSeq;
+
++(EXTZeroRangeStrict*) newWithSSeq:(EXTSpectralSequence*)sSeq {
+    EXTZeroRangeStrict *ret = [EXTZeroRangeStrict new];
+    
+    ret.sSeq = sSeq;
+    
+    return ret;
+}
+
+-(BOOL) isInRange:(NSObject<EXTLocation> *)loc {
+    if ([self.sSeq findTerm:loc])
+        return false;
+    
+    return true;
 }
 
 @end

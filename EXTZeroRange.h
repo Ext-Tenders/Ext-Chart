@@ -17,6 +17,7 @@
 #import "EXTPair.h"
 #import "EXTTriple.h"
 
+@class EXTSpectralSequence;
 
 @protocol EXTZeroRange <NSObject, NSCopying, NSCoding>
 
@@ -46,5 +47,16 @@ typedef NSObject<EXTZeroRange> EXTZeroRange;
 +(EXTZeroRangeTriple*) firstOctant;
 
 -(BOOL) isInRange:(EXTTriple*)loc;
+
+@end
+
+
+@interface EXTZeroRangeStrict : NSObject <EXTZeroRange>
+
+@property (nonatomic, strong) EXTSpectralSequence *sSeq;
+
++(EXTZeroRangeStrict*) newWithSSeq:(EXTSpectralSequence*)sSeq;
+
+-(BOOL) isInRange:(NSObject<EXTLocation> *)loc;
 
 @end
