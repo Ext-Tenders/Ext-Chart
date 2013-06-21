@@ -520,12 +520,9 @@
     [ret.differentials addObject:diff];
     
     // now, do leibniz propagation.
-    for (EXTTerm *term in ret.terms)
-        [ret.multTables computeLeibniz:[EXTTriple tripleWithA:0 B:1 C:0] with:[term location] onPage:1];
-    for (EXTTerm *term in ret.terms)
-        [ret.multTables computeLeibniz:[EXTTriple tripleWithA:1 B:1 C:1] with:[term location] onPage:1];
-    for (EXTTerm *term in ret.terms)
-        [ret.multTables computeLeibniz:[EXTTriple tripleWithA:1 B:2 C:1] with:[term location] onPage:1];
+    [ret.multTables naivelyPropagateLeibniz:[EXTTriple tripleWithA:0 B:1 C:0] page:1];
+    [ret.multTables naivelyPropagateLeibniz:[EXTTriple tripleWithA:1 B:1 C:1] page:1];
+    [ret.multTables naivelyPropagateLeibniz:[EXTTriple tripleWithA:1 B:2 C:1] page:1];
     
     // d3(h10) = 0
     [ret.differentials addObject:[EXTDifferential differential:[ret findTerm:[EXTTriple tripleWithA:0 B:1 C:0]] end:nil page:3]];
@@ -538,12 +535,9 @@
     [ret.differentials addObject:diff2];
     
     // leibniz again, on the new terms.
-    for (EXTTerm *term in ret.terms)
-        [ret.multTables computeLeibniz:[EXTTriple tripleWithA:0 B:1 C:0] with:[term location] onPage:3];
-    for (EXTTerm *term in ret.terms)
-        [ret.multTables computeLeibniz:[EXTTriple tripleWithA:1 B:1 C:1] with:[term location] onPage:3];
-    for (EXTTerm *term in ret.terms)
-        [ret.multTables computeLeibniz:[EXTTriple tripleWithA:2 B:4 C:2] with:[term location] onPage:3];
+    [ret.multTables naivelyPropagateLeibniz:[EXTTriple tripleWithA:0 B:1 C:0] page:3];
+    [ret.multTables naivelyPropagateLeibniz:[EXTTriple tripleWithA:1 B:1 C:1] page:3];
+    [ret.multTables naivelyPropagateLeibniz:[EXTTriple tripleWithA:2 B:4 C:2] page:3];
     
     return ret;
 }

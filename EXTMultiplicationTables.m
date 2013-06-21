@@ -173,6 +173,13 @@
     return [productRule actOn:hadamardVector];
 }
 
+-(void) naivelyPropagateLeibniz:(EXTLocation*)loc page:(int)page {
+    for (EXTTerm *t in sSeq.terms)
+        [self computeLeibniz:loc with:t.location onPage:page];
+    
+    return;
+}
+
 // compute the action of the differentials on each factor in the product
 // decomposition: d(xy) = dx y + x dy.
 -(void) computeLeibniz:(EXTLocation *)loc1
@@ -186,10 +193,10 @@
                     *d2 = [self.sSeq findDifflWithSource:loc2 onPage:page];
     
     // if we don't have differentials to work with, then skip this entirely.
-    // XXX: DEAL WITH DIFFERENTIALS WITHOUT A VALID TARGET
-    if (!d1 || !d2)
+    // XXX: i'm not sure this condition is quite right.
+    if ((!d1 && ![sSeq isInZeroRanges:[[loc1 class] followDiffl:loc1 page:page]]) || (!d2 && ![sSeq isInZeroRanges:[[loc2 class] followDiffl:loc2 page:page]]) || !targetterm || [sSeq isInZeroRanges:sumloc])
         return;
-    
+        
     // if we're here, then we have all the fixin's we need to construct some
     // more partial differential definitions.  let's find a place to put them.
     EXTDifferential *dsum = [self.sSeq findDifflWithSource:sumterm.location
@@ -199,6 +206,7 @@
         [sSeq.differentials addObject:dsum];
     }
     
+    // XXX: CASE OUT DIFFERENTIALS LYING IN THE ZERO RANGE.
     for (EXTPartialDefinition *partial1 in d1.partialDefinitions)
     for (EXTPartialDefinition *partial2 in d2.partialDefinitions) {
         // find the relevant multiplication laws
