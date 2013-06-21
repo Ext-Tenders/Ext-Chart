@@ -31,7 +31,7 @@
 
 // more generally, maybe this could be replaced with an arbitrary projection mtx
 -(NSPoint) makePoint {
-    return NSMakePoint([self a], [self b]);
+    return NSMakePoint([self b] - [self a], [self a]);
 }
 
 -(NSString*) description {
@@ -61,11 +61,11 @@
 }
 
 +(EXTTriple*) followDiffl:(EXTTriple *)a page:(int)page {
-    return [EXTTriple tripleWithA:(a.a - 1) B:(a.b + 1) C:(a.c - page)];
+    return [EXTTriple tripleWithA:(a.a + 1) B:(a.b) C:(a.c + 1 - page)];
 }
 
 +(EXTTriple*) reverseDiffl:(EXTTriple *)a page:(int)page {
-    return [EXTTriple tripleWithA:(a.a + 1) B:(a.b - 1) C:(a.c + page)];
+    return [EXTTriple tripleWithA:(a.a - 1) B:(a.b) C:(a.c - 1 + page)];
 }
 
 -(EXTTriple*) copyWithZone:(NSZone*)zone {

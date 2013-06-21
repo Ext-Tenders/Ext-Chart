@@ -130,7 +130,9 @@
 // that makes most sense.  :)
 - (void) drawWithSpacing:(CGFloat)spacing {
     // if this differential is actually empty, then don't draw it.
-    if ([self.presentation image].count == 0)
+    if (([self.presentation image].count == 0) ||
+        ([self.start dimension:self.page] == 0) ||
+        ([self.end dimension:self.page] == 0))
         return;
     
     NSPoint pointStart = [start.location makePoint],

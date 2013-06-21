@@ -185,16 +185,25 @@
 -(void) computeLeibniz:(EXTLocation *)loc1
                   with:(EXTLocation *)loc2
                 onPage:(int)page {
-    EXTLocation *sumloc = [[loc1 class] addLocation:loc1 to:loc2],
-             *targetLoc = [[loc1 class] followDiffl:sumloc page:page];
-    EXTTerm *sumterm = [self.sSeq findTerm:sumloc],
-         *targetterm = [self.sSeq findTerm:targetLoc];
+    EXTLocation *sumLoc = [[loc1 class] addLocation:loc1 to:loc2],
+             *targetLoc = [[loc1 class] followDiffl:sumLoc page:page];
+    EXTTerm *sumterm = [self.sSeq findTerm:sumLoc],
+         *targetterm = [self.sSeq findTerm:targetLoc],
+                  *A = [self.sSeq findTerm:loc1],
+                  *B = [self.sSeq findTerm:loc2];
     EXTDifferential *d1 = [self.sSeq findDifflWithSource:loc1 onPage:page],
                     *d2 = [self.sSeq findDifflWithSource:loc2 onPage:page];
     
     // if we don't have differentials to work with, then skip this entirely.
     // XXX: i'm not sure this condition is quite right.
-    if ((!d1 && ![sSeq isInZeroRanges:[[loc1 class] followDiffl:loc1 page:page]]) || (!d2 && ![sSeq isInZeroRanges:[[loc2 class] followDiffl:loc2 page:page]]) || !targetterm || [sSeq isInZeroRanges:sumloc])
+    BOOL d1Zero = [sSeq isInZeroRanges:[[loc1 class] followDiffl:loc1 page:page]],
+         d2Zero = [sSeq isInZeroRanges:[[loc2 class] followDiffl:loc2 page:page]];
+    if ((!d1 && !d1Zero) ||
+        (!d2 && !d2Zero) ||
+        !targetterm ||
+        [sSeq isInZeroRanges:sumLoc] ||
+        !sumterm ||
+        [sSeq isInZeroRanges:targetLoc])
         return;
         
     // if we're here, then we have all the fixin's we need to construct some
@@ -206,62 +215,146 @@
         [sSeq.differentials addObject:dsum];
     }
     
-    // XXX: CASE OUT DIFFERENTIALS LYING IN THE ZERO RANGE.
-    for (EXTPartialDefinition *partial1 in d1.partialDefinitions)
-    for (EXTPartialDefinition *partial2 in d2.partialDefinitions) {
-        // find the relevant multiplication laws
-        EXTMultiplicationEntry
-            *XBmults = [self performSoftLookup:[[loc1 class] followDiffl:loc1 page:page] with:loc2],
-            *AYmults = [self performSoftLookup:loc1 with:[[loc2 class] followDiffl:loc2 page:page]];
-        if (!XBmults || !AYmults)
-            continue;
-        
-        // iterate through the partial multiplication definitions
-        for (EXTPartialDefinition *XBmult in XBmults.partialDefinitions)
-        for (EXTPartialDefinition *AYmult in AYmults.partialDefinitions) {
-            // we have access to the differential cospans A <-< I --> X and
-            // B <-< J --> Y, and to the multiplication cospans A|Y <-< K --> Z
-            // and X|B <-< L --> Z.  define these so we have access to them.
-            EXTMatrix *i = partial1.inclusion, *partialI = partial1.differential,
-                      *j = partial2.inclusion, *partialJ = partial2.differential,
-                      *k = AYmult.inclusion, *muK = AYmult.differential,
-                      *l = XBmult.inclusion, *muL = XBmult.differential;
+    // depending upon whether a differential lands in the zero range, we need to
+    // take various actions.  TODO: it would be great if there were some way of
+    // silently propagating a default 'zero value', but this seems really hard
+    // when getting, like, domains and ranges to line up properly.  if i had
+    // encapsulated vectors into a class instead of just using NSMutableArray's,
+    // it might be possible, but as it stands it's really uncomfortable.
+    //
+    // XXX: in the meantime, this contains a lot of duplicated code. mea culpa.
+    if (d1Zero && d2Zero) {
+        // in the case that both differentials are zero, no matter what happens
+        // we're going to end up with the zero differential off the source.
+        EXTPartialDefinition *allZero = [EXTPartialDefinition new];
+        allZero.inclusion = [EXTMatrix identity:sumterm.names.count];
+        allZero.differential = [EXTMatrix matrixWidth:sumterm.names.count
+                                               height:targetterm.names.count];
+        [dsum.partialDefinitions addObject:allZero];
+    } else if (d1Zero && !d2Zero) {
+        for (EXTPartialDefinition *partial2 in d2.partialDefinitions) {
+            // find the relevant multiplication laws
+            EXTMultiplicationEntry *AYmults = [self performSoftLookup:loc1 with:[[loc2 class] followDiffl:loc2 page:page]];
+            if (!AYmults)
+                continue;
             
-            // first, we'll produce the tensored up cospan A|B <-< I|B --> X|B.
-            EXTMatrix *iId = [EXTMatrix hadamardProduct:i
-                                            with:[EXTMatrix identity:j.height]],
-               *partialIId = [EXTMatrix hadamardProduct:partialI
-                                            with:[EXTMatrix identity:j.height]];
+            // iterate through the partial multiplication definitions
+            for (EXTPartialDefinition *AYmult in AYmults.partialDefinitions) {
+                // we have access to the differential cospan B <-< J --> Y and
+                // to the multiplication cospan A|Y <-< K --> Z.  define these
+                // so we have access to them.
+                EXTMatrix
+                    *j = partial2.inclusion, *partialJ = partial2.differential,
+                    *k = AYmult.inclusion, *muK = AYmult.differential;
+                
+                // from A|B <-< A|J --> A|Y <-< K --> Z, build the pullback
+                // cospan A|B <-< V --> Z.
+                EXTMatrix
+                    *Idj = [EXTMatrix hadamardProduct:[EXTMatrix identity:A.names.count] with:j],
+                    *IdpartialJ = [EXTMatrix hadamardProduct:[EXTMatrix identity:A.names.count] with:partialJ];
+                NSArray *AYspan = [EXTMatrix formIntersection:IdpartialJ with:k];
+                EXTMatrix *v = [EXTMatrix newMultiply:Idj by:AYspan[0]],
+                *partialV = [EXTMatrix newMultiply:muK by:AYspan[1]];
+                        
+                // store this to a list of partial definitions.
+                EXTPartialDefinition *partial = [EXTPartialDefinition new];
+                partial.inclusion = v; partial.differential = partialV;
+                [dsum.partialDefinitions addObject:partial];
+            }
+        }
+    } else if (!d1Zero && d2Zero) {
+        for (EXTPartialDefinition *partial1 in d1.partialDefinitions) {
+            // find the relevant multiplication laws
+            EXTMultiplicationEntry *XBmults = [self performSoftLookup:[[loc1 class] followDiffl:loc1 page:page] with:loc2];
+            if (!XBmults)
+                continue;
             
-            // this shares a target to get A|B <-< I|B --> X|B <-< L --> Z, and
-            // we take the intersection span to get a big cospan A|B <-< U --> Z
-            NSArray *XBspan = [EXTMatrix formIntersection:partialIId with:l];
-            EXTMatrix *u = [EXTMatrix newMultiply:iId by:XBspan[0]],
-               *partialU = [EXTMatrix newMultiply:muL by:XBspan[1]];
+            // iterate through the partial multiplication definitions
+            for (EXTPartialDefinition *XBmult in XBmults.partialDefinitions) {
+                // we have access to the differential cospans A <-< I --> X and
+                // B <-< J --> Y, and to the multiplication cospans
+                // A|Y <-< K --> Z and X|B <-< L --> Z.  define these so we have
+                // access to them.
+                EXTMatrix
+                    *i = partial1.inclusion, *partialI = partial1.differential,
+                    *l = XBmult.inclusion, *muL = XBmult.differential;
+                        
+                // first, produce the tensored up cospan A|B <-< I|B --> X|B.
+                EXTMatrix
+                    *iId = [EXTMatrix hadamardProduct:i with:[EXTMatrix identity:B.names.count]],
+                    *partialIId = [EXTMatrix hadamardProduct:partialI with:[EXTMatrix identity:B.names.count]];
+                        
+                // this shares a target to get A|B <-< I|B --> X|B <-< L --> Z,
+                // so intersect to get a big cospan A|B <-< U --> Z.
+                NSArray *XBspan = [EXTMatrix formIntersection:partialIId with:l];
+                EXTMatrix *u = [EXTMatrix newMultiply:iId by:XBspan[0]],
+                        *partialU = [EXTMatrix newMultiply:muL by:XBspan[1]];
+                        
+                // store this to a list of partial definitions.
+                EXTPartialDefinition *partial = [EXTPartialDefinition new];
+                partial.inclusion = u; partial.differential = partialU;
+                [dsum.partialDefinitions addObject:partial];
+            }
+        }
+    } else {
+        for (EXTPartialDefinition *partial1 in d1.partialDefinitions)
+        for (EXTPartialDefinition *partial2 in d2.partialDefinitions) {
+            // find the relevant multiplication laws
+            EXTMultiplicationEntry
+                *XBmults = [self performSoftLookup:[[loc1 class] followDiffl:loc1 page:page] with:loc2],
+                *AYmults = [self performSoftLookup:loc1 with:[[loc2 class] followDiffl:loc2 page:page]];
+            if (!XBmults || !AYmults)
+                continue;
             
-            // then, do the same thing for A|B <-< A|J --> A|Y <-< K --> Z to
-            // get a pulled back cospan A|B <-< V --> Z.
-            EXTMatrix *Idj = [EXTMatrix hadamardProduct:[EXTMatrix identity:i.height] with:j],
-               *IdpartialJ = [EXTMatrix hadamardProduct:[EXTMatrix identity:i.height] with:partialJ];
-            NSArray *AYspan = [EXTMatrix formIntersection:IdpartialJ with:k];
-            EXTMatrix *v = [EXTMatrix newMultiply:Idj by:AYspan[0]],
-               *partialV = [EXTMatrix newMultiply:muK by:AYspan[1]];
-            
-            // lastly, take the intersection span of U >-> A|B <-< V to get a
-            // shared subspace W, hence a pair of cospans both of the form
-            // A|B <-< W --> Z.
-            //
-            // sum the two right-hand maps to get d(ab) = da*b + a*db.
-            NSArray *ABspan = [EXTMatrix formIntersection:u with:v];
-            EXTMatrix *w = [EXTMatrix newMultiply:u by:ABspan[0]],
-               *partialW = [EXTMatrix
-                            sum:[EXTMatrix newMultiply:partialU by:ABspan[0]]
+            // iterate through the partial multiplication definitions
+            for (EXTPartialDefinition *XBmult in XBmults.partialDefinitions)
+            for (EXTPartialDefinition *AYmult in AYmults.partialDefinitions) {
+                // we have access to the differential cospans A <-< I --> X and
+                // B <-< J --> Y, and to the multiplication cospans
+                // A|Y <-< K --> Z and X|B <-< L --> Z.  define these so we have
+                // access to them.
+                EXTMatrix
+                    *i = partial1.inclusion, *partialI = partial1.differential,
+                    *j = partial2.inclusion, *partialJ = partial2.differential,
+                    *k = AYmult.inclusion, *muK = AYmult.differential,
+                    *l = XBmult.inclusion, *muL = XBmult.differential;
+                        
+                // first, produce the tensored up cospan A|B <-< I|B --> X|B.
+                EXTMatrix
+                    *iId = [EXTMatrix hadamardProduct:i with:[EXTMatrix identity:j.height]],
+                    *partialIId = [EXTMatrix hadamardProduct:partialI with:[EXTMatrix identity:j.height]];
+                        
+                // this shares a target to get A|B <-< I|B --> X|B <-< L --> Z,
+                // so intersect to get a big cospan A|B <-< U --> Z.
+                NSArray *XBspan = [EXTMatrix formIntersection:partialIId with:l];
+                EXTMatrix *u = [EXTMatrix newMultiply:iId by:XBspan[0]],
+                        *partialU = [EXTMatrix newMultiply:muL by:XBspan[1]];
+                        
+                // then, do the same thing for A|B <-< A|J --> A|Y <-< K --> Z
+                // to get a pulled back cospan A|B <-< V --> Z.
+                EXTMatrix
+                    *Idj = [EXTMatrix hadamardProduct:[EXTMatrix identity:i.height] with:j],
+                    *IdpartialJ = [EXTMatrix hadamardProduct:[EXTMatrix identity:i.height] with:partialJ];
+                NSArray *AYspan = [EXTMatrix formIntersection:IdpartialJ with:k];
+                EXTMatrix *v = [EXTMatrix newMultiply:Idj by:AYspan[0]],
+                *partialV = [EXTMatrix newMultiply:muK by:AYspan[1]];
+                        
+                // lastly, take the intersection span of U >-> A|B <-< V to get
+                // a shared subspace W, hence a pair of cospans both of the form
+                // A|B <-< W --> Z.
+                //
+                // sum the two right-hand maps to get d(ab) = da*b + a*db.
+                NSArray *ABspan = [EXTMatrix formIntersection:u with:v];
+                EXTMatrix *w = [EXTMatrix newMultiply:u by:ABspan[0]],
+                *partialW = [EXTMatrix
+                             sum:[EXTMatrix newMultiply:partialU by:ABspan[0]]
                             with:[EXTMatrix newMultiply:partialV by:ABspan[1]]];
-            
-            // store this to a list of partial definitions.
-            EXTPartialDefinition *partial = [EXTPartialDefinition new];
-            partial.inclusion = w; partial.differential = partialW;
-            [dsum.partialDefinitions addObject:partial];
+                        
+                // store this to a list of partial definitions.
+                EXTPartialDefinition *partial = [EXTPartialDefinition new];
+                partial.inclusion = w; partial.differential = partialW;
+                [dsum.partialDefinitions addObject:partial];
+            }
         }
     }
     

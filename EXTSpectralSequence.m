@@ -492,13 +492,13 @@
     EXTSpectralSequence *ret = [EXTSpectralSequence sSeqWithUnit:[EXTTriple class]];
         
     // add the three polynomial generators to the sseq: h10, h11, h20
-    ret = [ret tensorWithPolyClass:@"h10" location:[EXTTriple tripleWithA:0 B:1 C:0] upTo:3];
-    ret = [ret tensorWithPolyClass:@"h11" location:[EXTTriple tripleWithA:1 B:1 C:1] upTo:3];
-    ret = [ret tensorWithPolyClass:@"h20" location:[EXTTriple tripleWithA:2 B:1 C:0] upTo:3];
+    ret = [ret tensorWithPolyClass:@"h10" location:[EXTTriple tripleWithA:1 B:1 C:1] upTo:4];
+    ret = [ret tensorWithPolyClass:@"h11" location:[EXTTriple tripleWithA:1 B:2 C:1] upTo:4];
+    ret = [ret tensorWithPolyClass:@"h20" location:[EXTTriple tripleWithA:1 B:3 C:2] upTo:4];
     
     // set up the zero range.  TODO: this should come before the tensor calls,
     // and they should handle it well. :)
-    [ret.zeroRanges addObject:[EXTZeroRangeTriple firstOctant]];
+    [ret.zeroRanges addObject:[EXTZeroRangeStrict newWithSSeq:ret]];
     
     // some basic partial definitions
     EXTPartialDefinition *diffone = [EXTPartialDefinition new];
@@ -509,35 +509,28 @@
     EXTMatrix *zero = [EXTMatrix matrixWidth:1 height:1];
     diffzero.differential = zero; diffzero.inclusion = one;
     
-    // d1(h10) = 0
-    [ret.differentials addObject:[EXTDifferential differential:[ret findTerm:[EXTTriple tripleWithA:0 B:1 C:0]] end:nil page:1]];
-    // d1(h11) = 0
-    [ret.differentials addObject:[EXTDifferential differential:[ret findTerm:[EXTTriple tripleWithA:1 B:1 C:1]] end:nil page:1]];
+    EXTTriple *h10 = [EXTTriple tripleWithA:1 B:1 C:1],
+              *h11 = [EXTTriple tripleWithA:1 B:2 C:1],
+              *h20 = [EXTTriple tripleWithA:1 B:3 C:2];
+    
     // d1(h20) = h10 h11
-    EXTTerm *h20 = [ret findTerm:[EXTTriple tripleWithA:2 B:1 C:0]];
-    EXTDifferential *diff = [EXTDifferential differential:h20 end:[ret findTerm:[EXTTriple tripleWithA:1 B:2 C:1]] page:1];
+    EXTDifferential *diff = [EXTDifferential differential:[ret findTerm:h20] end:[ret findTerm:[EXTTriple followDiffl:h20 page:1]] page:1];
     [diff.partialDefinitions addObject:diffone];
     [ret.differentials addObject:diff];
+    // d1(h11) = 0 is automatic.
+    // d1(h10) = 0 is automatic.
     
     // now, do leibniz propagation.
-    [ret.multTables naivelyPropagateLeibniz:[EXTTriple tripleWithA:0 B:1 C:0] page:1];
-    [ret.multTables naivelyPropagateLeibniz:[EXTTriple tripleWithA:1 B:1 C:1] page:1];
-    [ret.multTables naivelyPropagateLeibniz:[EXTTriple tripleWithA:1 B:2 C:1] page:1];
-    
-    // d3(h10) = 0
-    [ret.differentials addObject:[EXTDifferential differential:[ret findTerm:[EXTTriple tripleWithA:0 B:1 C:0]] end:nil page:3]];
-    // d3(h11) = 0
-    [ret.differentials addObject:[EXTDifferential differential:[ret findTerm:[EXTTriple tripleWithA:0 B:1 C:0]] end:nil page:3]];
+    [ret.multTables naivelyPropagateLeibniz:h20 page:1];
+
     // d3(h20^2) = h11^3
-    EXTTerm *h20square = [ret findTerm:[EXTTriple tripleWithA:4 B:2 C:0]];
-    EXTDifferential *diff2 = [EXTDifferential differential:h20square end:[ret findTerm:[EXTTriple tripleWithA:3 B:3 C:3]] page:3];
+    EXTLocation *h20squared = [[h20 class] scale:h20 by:2];
+    EXTDifferential *diff2 = [EXTDifferential differential:[ret findTerm:h20squared] end:[ret findTerm:[[h11 class] scale:h11 by:3]] page:2];
     [diff2.partialDefinitions addObject:diffone];
     [ret.differentials addObject:diff2];
     
     // leibniz again, on the new terms.
-    [ret.multTables naivelyPropagateLeibniz:[EXTTriple tripleWithA:0 B:1 C:0] page:3];
-    [ret.multTables naivelyPropagateLeibniz:[EXTTriple tripleWithA:1 B:1 C:1] page:3];
-    [ret.multTables naivelyPropagateLeibniz:[EXTTriple tripleWithA:2 B:4 C:2] page:3];
+    [ret.multTables naivelyPropagateLeibniz:h20squared page:2];
     
     return ret;
 }
