@@ -490,8 +490,8 @@
     EXTSpectralSequence *ret = [EXTSpectralSequence sSeqWithUnit:[EXTTriple class]];
         
     // add the three polynomial generators to the sseq: h10, h11, h20
-    ret = [ret tensorWithPolyClass:@"h10" location:[EXTTriple tripleWithA:1 B:1 C:1] upTo:4];
-    ret = [ret tensorWithPolyClass:@"h11" location:[EXTTriple tripleWithA:1 B:2 C:1] upTo:4];
+    ret = [ret tensorWithPolyClass:@"h10" location:[EXTTriple tripleWithA:1 B:1 C:1] upTo:8];
+    ret = [ret tensorWithPolyClass:@"h11" location:[EXTTriple tripleWithA:1 B:2 C:1] upTo:7];
     ret = [ret tensorWithPolyClass:@"h20" location:[EXTTriple tripleWithA:1 B:3 C:2] upTo:4];
     
     // set up the zero range.  TODO: this should come before the tensor calls,

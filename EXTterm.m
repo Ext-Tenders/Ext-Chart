@@ -122,10 +122,6 @@
 // this assumes that the cycles from the page before have already been computed.
 // this may or may not be a desirable trait, but for the moment, that's the way
 // things are.
-//
-// XXX: something about this logic is wrong; it should be, like, taking inter-
-// sections of cycle groups across pages or something... or right-multiplying
-// in the old cycle group and interpreting the results... or something.
 -(void) computeCycles:(int)whichPage // (the page we're moving *to*)
                  sSeq:(EXTSpectralSequence*)sSeq {
     // if we're at the bottom page, then there are no differentials to test.
@@ -156,21 +152,28 @@
     // before touching the differential, we need to get it up-to-date.
     [differential assemblePresentation];
     
-    // ask for the kernel of this differential
-    EXTMatrix *cycleMatrix = [EXTMatrix matrixWidth:oldCycles.count height:names.count];
-    [cycleMatrix setPresentation:oldCycles];
+    // we have the cospan B^{r-1}_{s,t} --> E^1_{s,t} <-d-- Z^{r-1}_{s+1,t-r+2}.
+    // the pullback span encodes those elements of the right-hand source which
+    // lie in B^{r-1}_{s,t} --- i.e., those elements which lie in the kernel of
+    // the projection B^{r-1}_{s, t} --> Z^{r-1}_{s, t} --> E^r_{s, t}.  these
+    // are the elements of Z^r_{s+1, t-r+2} which we want.  following the
+    // composite Z^r_{s+1, t-r+2} --> Z^{r-1}_{s+1, t-r+2} --> E^1_{s+1, t-r+2}
+    // gives the cycle matrix in the form we've been expecting it.
+    EXTMatrix *left = [EXTMatrix matrixWidth:[[differential.end.boundaries objectAtIndex:(whichPage-1)] count] height:differential.end.names.count];
+    left.presentation = [differential.end.boundaries objectAtIndex:(whichPage-1)];
+    EXTMatrix *incomingCycles = [EXTMatrix matrixWidth:[cycles[whichPage-1] count] height:names.count];
+    incomingCycles.presentation = cycles[whichPage-1];
+    EXTMatrix *right = [EXTMatrix newMultiply:differential.presentation by:incomingCycles];
     
-    // postcompose with the differential
-    EXTMatrix *restricted = [EXTMatrix newMultiply:differential.presentation by:cycleMatrix];
+    // this is the span B^{r-1}_{s, t} <-- S --> Z^{r-1}_{s+1, t-r+2}.
+    NSArray *span = [EXTMatrix formIntersection:left with:right];
     
-    // extract the kernel of the composition
-    NSMutableArray *kernel = [restricted kernel];
-    EXTMatrix *kernelMatrix = [EXTMatrix matrixWidth:[kernel count] height:[oldCycles count]];
-    [kernelMatrix setPresentation:kernel];
-    EXTMatrix *newCycleMatrix = [EXTMatrix newMultiply:cycleMatrix by:kernelMatrix];
+    // the composition of the two inclusions S >-> Z^{r-1}_{s+1, t-r+2} >-> ...
+    // ... >-> E^1_{s+1, t-r+2} has image the cycle group Z^r_{s+1,t-r+2}.
+    EXTMatrix *cycleComposite = [EXTMatrix newMultiply:incomingCycles by:span[1]];
     
     // store it to the cycles list
-    [cycles setObject:newCycleMatrix.presentation atIndexedSubscript:whichPage];
+    [cycles setObject:cycleComposite.presentation atIndexedSubscript:whichPage];
         
     return;
 }
@@ -201,6 +204,7 @@
     
     // remove duplicate boundaries by getting a minimum spanning set, then store
     EXTMatrix *boundaryMat = [EXTMatrix matrixWidth:newBoundaries.count height:self.names.count];
+    boundaryMat.presentation = newBoundaries;
     [boundaries setObject:[boundaryMat image] atIndexedSubscript:whichPage];
     
     return;
