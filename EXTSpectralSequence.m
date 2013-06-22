@@ -444,10 +444,8 @@
 
 -(void) computeGroupsForPage:(int)page {
     for (EXTTerm *term in self.terms) {
-        [term computeCycles:page
-          differentialArray:self.differentials];
-        [term computeBoundaries:page
-              differentialArray:self.differentials];
+        [term computeCycles:page sSeq:self];
+        [term computeBoundaries:page sSeq:self];
     }
     
     return;
@@ -531,6 +529,11 @@
     
     // leibniz again, on the new terms.
     [ret.multTables naivelyPropagateLeibniz:h20squared page:2];
+    
+    [ret computeGroupsForPage:0];
+    [ret computeGroupsForPage:1];
+    [ret computeGroupsForPage:2];
+    [ret computeGroupsForPage:3];
     
     return ret;
 }

@@ -29,27 +29,13 @@
 
     // if it succeeds, then initialize the members
     [self setLocation:whichLocation];
-    [self setBoundaries:[NSMutableArray arrayWithObjects: nil]];
-    [self setCycles:[NSMutableArray arrayWithObjects: nil]];
+    [self setBoundaries:[NSMutableArray array]];
+    [self setCycles:[NSMutableArray array]];
 
     [self setNames:whichNames];
 
     // initialize the cycles to contain everything.
-    // XXX: change the array upper bound when we stop randomizing.
-    NSMutableArray *initialCycles = [NSMutableArray
-                                     arrayWithCapacity:[whichNames count]];
-    for (int j = 0; j < whichNames.count; j++) {
-        NSMutableArray *column = [NSMutableArray array];
-        for (int i = 0; i < whichNames.count; i++) {
-            if (i == j)
-                [column setObject:@(1) atIndexedSubscript:i];
-            else
-                [column setObject:@(0) atIndexedSubscript:i];
-        }
-
-        [initialCycles addObject:column];
-    }
-    [cycles addObject:initialCycles];
+    [cycles addObject:[EXTMatrix identity:whichNames.count].presentation];
 
     // and we start with no boundaries.
     [boundaries addObject:@[]];
@@ -97,7 +83,7 @@
         
         NSRect dotPosition =
             NSMakeRect(x + 3.5/9*spacing + ((CGFloat)((j%3)-1)*2)/9*spacing,
-                       y+3.5/9*spacing + ((CGFloat)((1+j%4)-2)*2)/9*spacing,
+                       y+3.5/9*spacing + ((CGFloat)(((1+j)%4)-2)*2)/9*spacing,
                        2.0*spacing/9,
                        2.0*spacing/9);
         
@@ -140,15 +126,15 @@
 // XXX: something about this logic is wrong; it should be, like, taking inter-
 // sections of cycle groups across pages or something... or right-multiplying
 // in the old cycle group and interpreting the results... or something.
--(void) computeCycles:(int)whichPage
-    differentialArray:(NSArray *)differentials {
-    
-    // if we're at the bottom page, then do nothing --- there are no
-    // differentials available to study, and we don't want to fuck up our copies.
-    if (whichPage == 0)
+-(void) computeCycles:(int)whichPage // (the page we're moving *to*)
+                 sSeq:(EXTSpectralSequence*)sSeq {
+    // if we're at the bottom page, then there are no differentials to test.
+    if (whichPage == 0) {
+        [cycles setObject:[EXTMatrix identity:self.names.count].presentation atIndexedSubscript:0];
         return;
+    }
 
-    NSMutableArray *newCycles = [NSMutableArray array];
+    // otherwise...
     NSMutableArray *oldCycles = [cycles objectAtIndex:(whichPage-1)];
 
     // if the EXTTerm has already been emptied, don't even bother computing any
@@ -158,84 +144,66 @@
         return;
     }
     
-    // iterate through the differentials, looking for more cycles
-    //
-    // XXX: USE EXTRACTED FIND-DIFFERENTIAL ROUTINE
-    for (EXTDifferential *differential in differentials) {
-        if (([differential start] != self) ||     // if we're not the source...
-            ([differential page]+1 != whichPage)) // ...or this isn't the page...
-            continue;                             // then skip this differential.
-        
-        // before touching the differential, we need to get it up-to-date.
-        [differential assemblePresentation];
-        
-        // ask for the kernel of this differential
-        EXTMatrix *cycleMatrix = [EXTMatrix matrixWidth:oldCycles.count height:names.count];
-        [cycleMatrix setPresentation:oldCycles];
-        
-        EXTMatrix *restricted = [EXTMatrix newMultiply:differential.presentation by:cycleMatrix];
-        
-        NSMutableArray *kernel = [restricted kernel];
-        EXTMatrix *kernelMatrix = [EXTMatrix matrixWidth:[kernel count] height:[oldCycles count]];
-        [kernelMatrix setPresentation:kernel];
-        
-        EXTMatrix *newCycleMatrix = [EXTMatrix newMultiply:cycleMatrix by:kernelMatrix];
-        
-        // and add it to the cycles
-        [newCycles addObjectsFromArray:newCycleMatrix.presentation];
-        
-        // release all this ridiculous stuff we've allocated
-        
-        // there should really only be one differential attached to a given
-        // EXTTerm on a given page.  so, at this point we should return.
-        //
-        // XXX: if this were smarter, it would continue thumbing through the
-        // differentials and throw an error if there were more than one.
-        [cycles setObject:newCycles atIndexedSubscript:whichPage];
-        
+    // try to find a freshly acting differential
+    EXTDifferential *differential = [sSeq findDifflWithSource:self.location onPage:(whichPage-1)];
+    
+    // if no differentials act, then copy the old cycles anew.
+    if (!differential) {
+        [cycles setObject:[[cycles objectAtIndex:(whichPage-1)] copy] atIndexedSubscript:whichPage];
         return;
     }
     
-    // if there weren't any differentials acting, then really the zero
-    // differential acted, and we should carry over the same cycles as from
-    // last time.
-    newCycles = [[cycles objectAtIndex:(whichPage-1)] copy];
+    // before touching the differential, we need to get it up-to-date.
+    [differential assemblePresentation];
     
-    [cycles setObject:newCycles atIndexedSubscript:whichPage];
+    // ask for the kernel of this differential
+    EXTMatrix *cycleMatrix = [EXTMatrix matrixWidth:oldCycles.count height:names.count];
+    [cycleMatrix setPresentation:oldCycles];
+    
+    // postcompose with the differential
+    EXTMatrix *restricted = [EXTMatrix newMultiply:differential.presentation by:cycleMatrix];
+    
+    // extract the kernel of the composition
+    NSMutableArray *kernel = [restricted kernel];
+    EXTMatrix *kernelMatrix = [EXTMatrix matrixWidth:[kernel count] height:[oldCycles count]];
+    [kernelMatrix setPresentation:kernel];
+    EXTMatrix *newCycleMatrix = [EXTMatrix newMultiply:cycleMatrix by:kernelMatrix];
+    
+    // store it to the cycles list
+    [cycles setObject:newCycleMatrix.presentation atIndexedSubscript:whichPage];
+        
+    return;
 }
 
-// TODO: this is a duplicate of the code above. it would be nice to fix that.
--(void) computeBoundaries:(int)whichPage
-        differentialArray:(NSArray *)differentials {
-    
-    if (whichPage == 0)
+-(void) computeBoundaries:(int)whichPage sSeq:(EXTSpectralSequence*)sSeq {
+    // if this is page 0, we have a default value to start with.
+    if (whichPage == 0) {
+        [boundaries setObject:@[] atIndexedSubscript:0];
         return;
-    
-    NSMutableArray *newBoundaries = [NSMutableArray array];
-    
-    // XXX: USE BUILT-IN FIND-DIFFERENTIAL ROUTINE.
-    for (EXTDifferential *differential in differentials) {
-        if (([differential end] != self) ||
-            ([differential page]+1 != whichPage))
-            continue;
-        
-        // clean up the differential's presentation before touching it
-        [differential assemblePresentation];
-        
-        // XXX: maybe we should right-multiply by the cycle matrix first?
-        NSMutableArray *image = [[differential presentation] image];
-        
-        // and add it to the new boundaries
-        [newBoundaries addObjectsFromArray:image];
-        
-        break;
     }
     
-    if (newBoundaries.count == 0)
-        [newBoundaries addObjectsFromArray:
-            [boundaries objectAtIndex:(whichPage-1)]];
+    NSMutableArray *newBoundaries = [NSMutableArray arrayWithArray:self.boundaries[whichPage-1]];
     
-    [boundaries setObject:newBoundaries atIndexedSubscript:whichPage];
+    // try to get a differential on this page.
+    EXTDifferential *differential = [sSeq findDifflWithTarget:self.location onPage:whichPage-1];
+    
+    // if we couldn't find a differential, just keep the old boundaries.
+    if (!differential) {
+        self.boundaries[whichPage] = newBoundaries;
+        return;
+    }
+    
+    // clean up the differential's presentation before touching it
+    [differential assemblePresentation];
+    
+    // and add it to the new boundaries
+    [newBoundaries addObjectsFromArray:differential.presentation.presentation];
+    
+    // remove duplicate boundaries by getting a minimum spanning set, then store
+    EXTMatrix *boundaryMat = [EXTMatrix matrixWidth:newBoundaries.count height:self.names.count];
+    [boundaries setObject:[boundaryMat image] atIndexedSubscript:whichPage];
+    
+    return;
 }
 
 -(int) dimension:(int)whichPage {

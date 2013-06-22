@@ -88,6 +88,9 @@
     for (EXTPartialDefinition *partial1 in self.partialDefinitions) {
         bool discardThis = false;
         
+        [partial1.inclusion modularReduction];
+        [partial1.differential modularReduction];
+        
         for (EXTPartialDefinition *partial2 in reducedPartials) {
             if ([partial2 isEqual:partial1])
                 discardThis = true;

@@ -49,10 +49,8 @@
     +(id) dealWithClick:(NSPoint)location document:(EXTDocument*)document;
 
     -(int) dimension:(int)whichPage; // useful for drawing
-    -(void) computeCycles:(int)whichPage
-        differentialArray:(NSArray *)differentials;
-    -(void) computeBoundaries:(int)whichPage
-        differentialArray:(NSArray *)differentials;
+    -(void) computeCycles:(int)whichPage sSeq:(EXTSpectralSequence*)sSeq;
+    -(void) computeBoundaries:(int)whichPage sSeq:(EXTSpectralSequence*)sSeq;
 
     // TODO: here are some other routines that i haven't investigated yet.
     // TODO: this drawing code must be offloaded into some other module!!
