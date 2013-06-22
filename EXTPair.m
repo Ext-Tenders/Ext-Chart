@@ -62,7 +62,7 @@
 /// NSCoder, NSCopying routines ///
 
 -(EXTPair*) copyWithZone:(NSZone*)zone {
-    return [EXTPair pairWithA:self.a B:self.b];
+    return [[EXTPair allocWithZone:zone] initWithA:self.a B:self.b];
 }
 
 - (NSUInteger) hash {
@@ -81,7 +81,7 @@
     if ([other class] != [EXTPair class])
         return FALSE;
     
-	return [other a] == [self a] && [other b] == [self b];
+	return (([other a] == [self a]) && ([other b] == [self b]));
 }
 
 -(NSString *) description {

@@ -42,8 +42,6 @@
 +(id) multiplicationTables:(EXTSpectralSequence*)sseq;
 
 -(EXTMatrix*) getMatrixFor:(EXTLocation*)loc1 with:(EXTLocation*)loc2;
--(EXTMatrix*) getMatrixWithoutRecomputingFor:(EXTLocation*)loc1
-                                        with:(EXTLocation*)loc2;
 
 -(void) addPartialDefinition:(EXTPartialDefinition*)partial
                           to:(EXTLocation*)loc1

@@ -11,6 +11,41 @@
 #import "EXTdifferential.h"
 
 
+@interface EXTMultiplicationKey : NSObject <NSCopying>
+@property(strong) EXTLocation *left;
+@property(strong) EXTLocation *right;
++(EXTMultiplicationKey*) newWith:(EXTLocation*)left and:(EXTLocation*)right;
+@end
+
+@implementation EXTMultiplicationKey
+@synthesize left, right;
++(EXTMultiplicationKey*) newWith:(EXTLocation*)newLeft
+                             and:(EXTLocation*)newRight {
+    EXTMultiplicationKey *ret = [EXTMultiplicationKey new];
+    ret.left = [newLeft copy]; ret.right = [newRight copy];
+    return ret;
+}
+-(BOOL) isEqual:(id)object {
+    if ([object class] != [EXTMultiplicationKey class])
+        return false;
+    EXTMultiplicationKey *input = (EXTMultiplicationKey*)object;
+    
+    NSString *label = [NSString stringWithFormat:@"%@, %@ | %@, %@", input.left.description, left.description, input.right.description, right.description];
+    BOOL truth = ([self.left isEqual:input.left] && [self.right isEqual:input.right]);
+    
+    0;
+    
+    return truth;
+}
+-(EXTMultiplicationKey*) copyWithZone:(NSZone*)zone {
+    EXTMultiplicationKey *ret = [[EXTMultiplicationKey allocWithZone:zone] init];
+    ret.left = [self.left copyWithZone:zone];
+    ret.right = [self.right copyWithZone:zone];
+    return ret;
+}
+@end
+
+
 @implementation EXTMultiplicationEntry
 @synthesize presentation, partialDefinitions;
 
@@ -68,9 +103,7 @@
 -(EXTMultiplicationEntry*) performSoftLookup:(EXTLocation*)loc1
                                         with:(EXTLocation*)loc2 {
     // start by trying to pull the matrix out of the dictionary.
-    NSString *key = [NSString stringWithFormat:@"%@ %@",
-                     [loc1 description], [loc2 description]];
-    return [tables objectForKey:key];
+    return [tables objectForKey:[EXTMultiplicationKey newWith:loc1 and:loc2]];
 }
 
 -(EXTMultiplicationEntry*) performLookup:(EXTLocation*)loc1
@@ -92,9 +125,7 @@
                             height:[targetterm names].count];
         
         // and store it to the tables
-        NSString *key = [NSString stringWithFormat:@"%@ %@",
-                            [loc1 description], [loc2 description]];
-        [tables setObject:ret forKey:key];
+        [tables setObject:ret forKey:[EXTMultiplicationKey newWith:loc1 and:loc2]];
     }
     
     return ret;
@@ -128,16 +159,6 @@
     entry.presentation = [EXTMatrix assemblePresentation:entry.partialDefinitions sourceDimension:width targetDimension:height];
     
     return entry.presentation;
-}
-
-// unsafe lookup
--(EXTMatrix*) getMatrixWithoutRecomputingFor:(EXTLocation*)loc1
-                                        with:(EXTLocation*)loc2 {
-    NSString *key = [NSString stringWithFormat:@"%@ %@",
-                     [loc1 description], [loc2 description]];
-    EXTMultiplicationEntry *ret = [tables objectForKey:key];
-    
-    return ret.presentation;
 }
 
 // return the hadamard product, so to speak, of two vectors.

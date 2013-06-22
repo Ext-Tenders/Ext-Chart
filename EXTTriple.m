@@ -69,16 +69,18 @@
 }
 
 -(EXTTriple*) copyWithZone:(NSZone*)zone {
-    return [EXTTriple tripleWithA:self.a B:self.b C:self.c];
+    return [[EXTTriple allocWithZone:zone] initWithA:self.a B:self.b C:self.c];
 }
 
 -(BOOL) isEqual:(id)other {
     if ([other class] != [EXTTriple class])
-        return FALSE;
+        return false;
     
-    return (([self a] == [other a]) &&
-            ([self b] == [other b]) &&
-            ([self c] == [other c]));
+    EXTTriple *input = (EXTTriple*)other;
+    
+    return (([self a] == [input a]) &&
+            ([self b] == [input b]) &&
+            ([self c] == [input c]));
 }
 
 @end
