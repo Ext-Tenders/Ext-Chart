@@ -99,11 +99,11 @@
 #pragma mark ***EXTTool class methods***
 
 - (void)addSelfToSS:(EXTDocument *)theDocument {
-    NSMutableArray *terms = [theDocument.sseq terms];
+    NSMutableDictionary *terms = [theDocument.sseq terms];
     
     // if we're not already added, add us.
-    if (![terms containsObject:self])
-        [[theDocument.sseq terms] addObject:self];
+    if (![[terms objectForKey:self.location] isEqual:self])
+        [terms setObject:self forKey:self.location];
 }
 
 + (NSBezierPath *) makeHighlightPathAtPoint: (NSPoint)point onGrid:(EXTGrid *)theGrid onPage:(NSInteger)thePage {
@@ -220,8 +220,8 @@
     EXTPair	*pointPair = [EXTPair pairWithA:(int)(location.x)
                                           B:(int)(location.y)];
     EXTTerm *term = [EXTTerm term:pointPair andNames:[NSMutableArray array]];
-
-    [[document.sseq terms] addObject:term];
+    
+    [document.sseq.terms setObject:term forKey:term.location];
     
     return term;
 }

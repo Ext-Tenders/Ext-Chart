@@ -18,7 +18,7 @@
 
 @interface EXTSpectralSequence : NSObject
 
-@property(nonatomic, strong) NSMutableArray *terms;
+@property(nonatomic, strong) NSMutableDictionary *terms;
 @property(nonatomic, strong) NSMutableArray *differentials;
 @property(nonatomic, strong) EXTMultiplicationTables *multTables;
 @property(nonatomic, assign) Class<EXTLocation> indexClass;

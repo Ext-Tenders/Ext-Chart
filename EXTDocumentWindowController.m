@@ -94,7 +94,6 @@
 // needs to be investigated and untangled... :(
 -(void) drawPageNumber:(NSUInteger)pageNumber ll:(NSPoint)lowerLeft
                     ur:(NSPoint)upperRight withSpacing:(CGFloat)withSpacing {
-
     // iterate through the available grid locations in the view. it's too bad
     // that this is slow.
     for (int s = (int)floor(lowerLeft.x); s < ceil(upperRight.x); s++)
@@ -103,7 +102,7 @@
         // drawn cycles so that they don't overlap in projected views.
         int cyclesDrawnSoFar = 0;
         
-        for (EXTTerm *term in self.extDocument.sseq.terms) {
+        for (EXTTerm *term in self.extDocument.sseq.terms.allValues) {
             NSPoint point = [[term location] makePoint];
             if (((int)point.x != s) || ((int)point.y != t))
                 continue;

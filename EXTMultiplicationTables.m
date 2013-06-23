@@ -203,7 +203,7 @@
 }
 
 -(void) naivelyPropagateLeibniz:(EXTLocation*)loc page:(int)page {
-    for (EXTTerm *t in sSeq.terms)
+    for (EXTTerm *t in sSeq.terms.allValues)
         [self computeLeibniz:loc with:t.location onPage:page];
     
     return;

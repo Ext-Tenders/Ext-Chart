@@ -25,7 +25,7 @@
         return nil;
     
     // and allocate the internal parts of things
-    ret.terms = [NSMutableArray array];
+    ret.terms = [NSMutableDictionary dictionary];
     ret.differentials = [NSMutableArray array];
     ret.multTables = [EXTMultiplicationTables multiplicationTables:ret];
     ret.indexClass = [EXTPair class];
@@ -53,8 +53,8 @@
     NSMutableArray *tensorTerms = [NSMutableArray array];
     
     // we need to do a bunch of manipulations over pairs of classes.
-    for (EXTTerm *t1 in self.terms) {
-        for (EXTTerm *t2 in p.terms) {
+    for (EXTTerm *t1 in self.terms.allValues) {
+        for (EXTTerm *t2 in p.terms.allValues) {
             // build EXTTerm's for all the tensor pairs A (x) P, and store
             // these in a separate list.
             EXTLocation *loc = [[t1.location class] addLocation:t1.location
@@ -102,7 +102,7 @@
     
     // store these terms into the returning spectral sequence.
     for (NSMutableArray* tuple in splicedTensorTerms) {
-        [ret.terms addObject:tuple[0]];
+        [ret.terms setObject:tuple[0] forKey:((EXTTerm*)tuple[0]).location];
     }
     
     // XXX: i don't think that this is **summing** differentials correctly...
@@ -394,12 +394,12 @@
                                 [NSMutableArray arrayWithObject:
                                  [NSString stringWithFormat:@"(%@)^{%d}",
                                   name, i]]];
-        [l.terms addObject:workingTerm];
+        [l.terms setObject:workingTerm forKey:workingLoc];
     }
     
     // now we throw in the internal multiplicative structure
-    for (EXTTerm *leftTerm in l.terms)
-    for (EXTTerm *rightTerm in l.terms) {
+    for (EXTTerm *leftTerm in l.terms.allValues)
+    for (EXTTerm *rightTerm in l.terms.allValues) {
         EXTTerm *targetTerm = [l findTerm:[locClass addLocation:leftTerm.location to:rightTerm.location]];
         if (targetTerm) {
             EXTMatrix *product = [EXTMatrix identity:1];
@@ -418,12 +418,7 @@
 }
 
 -(EXTTerm*) findTerm:(EXTLocation *)loc {
-    for (EXTTerm *term in self.terms) {
-        if ([loc isEqual:[term location]])
-            return term;
-    }
-    
-    return nil;
+    return [terms objectForKey:loc];
 }
 
 -(EXTDifferential*) findDifflWithSource:(EXTLocation *)loc onPage:(int)page {
@@ -443,7 +438,7 @@
 }
 
 -(void) computeGroupsForPage:(int)page {
-    for (EXTTerm *term in self.terms) {
+    for (EXTTerm *term in self.terms.allValues) {
         [term computeCycles:page sSeq:self];
         [term computeBoundaries:page sSeq:self];
     }
@@ -472,8 +467,8 @@
     EXTTerm *start = [EXTTerm term:[EXTPair pairWithA:1 B:0] andNames:[NSMutableArray arrayWithObject:@"e"]],
             *end = [EXTTerm term:[EXTPair pairWithA:0 B:1] andNames:[NSMutableArray arrayWithObject:@"x"]];
     
-    [ret.terms addObjectsFromArray:@[start, end]];
-    
+    ret.terms = [NSMutableDictionary dictionaryWithObjects:@[start, end] forKeys:@[start.location, end.location]];
+        
     EXTDifferential *diff = [EXTDifferential differential:start end:end page:1];
     EXTPartialDefinition *partial = [EXTPartialDefinition new];
     EXTMatrix *mat = [EXTMatrix identity:1];
@@ -586,20 +581,10 @@
     [ret.differentials addObject:diff3];
     
     // propagate NAIVELY using the Leibniz rule
-    for (EXTTerm *term in ret.terms)
-        [ret.multTables computeLeibniz:[eta location]
-                                  with:[term location]
-                                onPage:3];
-    for (EXTTerm *term in ret.terms)
-        [ret.multTables computeLeibniz:[beta2 location]
-                                  with:[term location]
-                                onPage:3];
-    for (int i = ret.terms.count - 1; i >= 0; i--) {
-        EXTTerm *term = ret.terms[i];
-        [ret.multTables computeLeibniz:[betaneg2 location]
-                                  with:[term location]
-                                onPage:3];
-    }
+    
+    [ret.multTables naivelyPropagateLeibniz:[eta location] page:3];
+    [ret.multTables naivelyPropagateLeibniz:[beta2 location] page:3];
+    [ret.multTables naivelyPropagateLeibniz:[betaneg2 location] page:3];
     
     return ret;
 }
@@ -643,7 +628,7 @@
         
         EXTTerm *term = [EXTTerm term:location andNames:[NSMutableArray arrayWithArray:names]];
         
-        [ret.terms addObject:term];
+        [ret.terms setObject:term forKey:term.location];
     }
     
     return ret;
@@ -666,7 +651,7 @@
     *one = [EXTTerm term:[EXTPair pairWithA:0 B:0]
                 andNames:[NSMutableArray arrayWithArray:@[@"1"]]];
     
-    [ret.terms addObjectsFromArray:@[one,e,x,ex,x2,ex2]];
+    ret.terms = [NSMutableDictionary dictionaryWithObjects:@[one,e,x,ex,x2,ex2] forKeys:@[one.location,e.location,x.location,ex.location,x2.location,ex2.location]];
     
     // you're not allowed to add differentials to pages which you haven't "seen"
     [ret computeGroupsForPage:0];
