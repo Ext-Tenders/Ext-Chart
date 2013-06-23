@@ -15,6 +15,7 @@
 @property(strong) EXTLocation *left;
 @property(strong) EXTLocation *right;
 +(EXTMultiplicationKey*) newWith:(EXTLocation*)left and:(EXTLocation*)right;
+-(NSUInteger) hash;
 @end
 
 @implementation EXTMultiplicationKey
@@ -30,18 +31,25 @@
         return false;
     EXTMultiplicationKey *input = (EXTMultiplicationKey*)object;
     
-    NSString *label = [NSString stringWithFormat:@"%@, %@ | %@, %@", input.left.description, left.description, input.right.description, right.description];
-    BOOL truth = ([self.left isEqual:input.left] && [self.right isEqual:input.right]);
-    
-    0;
-    
-    return truth;
+    return ([self.left isEqual:input.left] && [self.right isEqual:input.right]);
 }
 -(EXTMultiplicationKey*) copyWithZone:(NSZone*)zone {
     EXTMultiplicationKey *ret = [[EXTMultiplicationKey allocWithZone:zone] init];
     ret.left = [self.left copyWithZone:zone];
     ret.right = [self.right copyWithZone:zone];
     return ret;
+}
+
+- (NSUInteger) hash {
+	long long key = [left hash];
+	key = (~key) + (key << 18); // key = (key << 18) - key - 1;
+    key += [right hash];
+	key = key ^ (key >> 31);
+	key = key * 21; // key = (key + (key << 2)) + (key << 4);
+	key = key ^ (key >> 11);
+	key = key + (key << 6);
+	key = key ^ (key >> 22);
+	return (int) key;
 }
 @end
 

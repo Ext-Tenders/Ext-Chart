@@ -15,8 +15,8 @@
 
 - (id) initWithA:(int)aa B:(int)bb {
 	if (self = [super init]) {
-		[self setA:aa];
-		[self setB:bb];
+		a = aa;
+        b = bb;
 	}
 	return self;
 }
@@ -91,8 +91,8 @@
 - (id) initWithCoder: (NSCoder*) coder {
 	if (self = [super init])
 	{
-		[self setA:[coder decodeIntForKey:@"a"]];
-		[self setB:[coder decodeIntForKey:@"b"]];
+		a = [coder decodeIntForKey:@"a"];
+		b = [coder decodeIntForKey:@"b"];
 	}
 	return self;
 }

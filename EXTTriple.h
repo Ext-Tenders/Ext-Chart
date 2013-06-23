@@ -12,9 +12,9 @@
 @interface EXTTriple : NSObject <EXTLocation> {
     int a, b, c;
 }
-@property int a;
-@property int b;
-@property int c;
+@property(readonly, assign) int a;
+@property(readonly, assign) int b;
+@property(readonly, assign) int c;
 
 -(id) initWithA:(int)aa B:(int)bb C:(int)cc;
 +(id) tripleWithA:(int)aa B:(int)bb C:(int)cc;

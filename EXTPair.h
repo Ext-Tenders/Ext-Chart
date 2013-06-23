@@ -12,8 +12,8 @@
 @interface EXTPair : NSObject <EXTLocation> {
 	int a, b;
 }
-@property int a;
-@property int b;
+@property(readonly, assign) int a;
+@property(readonly, assign) int b;
 -(id) initWithA:(int)aa B:(int)bb;
 +(id) pairWithA:(int)aa B:(int)bb;
 

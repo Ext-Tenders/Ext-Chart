@@ -17,9 +17,7 @@
 
 - (id) initWithA:(int)aa B:(int)bb C:(int)cc {
 	if (self = [super init]) {
-		[self setA:aa];
-		[self setB:bb];
-        [self setC:cc];
+		a = aa; b = bb; c = cc;
 	}
 	return self;
 }
@@ -72,12 +70,25 @@
     return [[EXTTriple allocWithZone:zone] initWithA:self.a B:self.b C:self.c];
 }
 
+- (NSUInteger) hash {
+	long long key = [self a];
+	key += [self b];
+	key = (~key) + (key << 18); // key = (key << 18) - key - 1;
+    key += [self c];
+	key = key ^ (key >> 31);
+	key = key * 21; // key = (key + (key << 2)) + (key << 4);
+	key = key ^ (key >> 11);
+	key = key + (key << 6);
+	key = key ^ (key >> 22);
+	return (int) key;
+}
+
 -(BOOL) isEqual:(id)other {
     if ([other class] != [EXTTriple class])
         return false;
     
     EXTTriple *input = (EXTTriple*)other;
-    
+        
     return (([self a] == [input a]) &&
             ([self b] == [input b]) &&
             ([self c] == [input c]));
