@@ -184,35 +184,47 @@
         [boundaries setObject:@[] atIndexedSubscript:0];
         return;
     }
-    
-    NSMutableArray *newBoundaries = [NSMutableArray arrayWithArray:self.boundaries[whichPage-1]];
-    
+        
     // try to get a differential on this page.
     EXTDifferential *differential = [sSeq findDifflWithTarget:self.location onPage:whichPage-1];
     
-    // if we couldn't find a differential, just keep the old boundaries.
+    // if we couldn't find a differential, then pretend that the differential is
+    // zero and just keep the old boundaries.
     if (!differential) {
-        self.boundaries[whichPage] = newBoundaries;
+        self.boundaries[whichPage] = self.boundaries[whichPage-1];
         return;
     }
     
     // clean up the differential's presentation before touching it
     [differential assemblePresentation];
     
-    // and add it to the new boundaries
-    [newBoundaries addObjectsFromArray:differential.presentation.presentation];
+    // restrict its action to the previous cycle group
+    EXTMatrix *restriction = [EXTMatrix matrixWidth:((NSMutableArray*)differential.start.cycles[whichPage-1]).count height:differential.start.names.count];
+    restriction.presentation = differential.start.cycles[whichPage-1];
+    EXTMatrix *restrictedDiff = [EXTMatrix newMultiply:differential.presentation by:restriction];
     
-    // remove duplicate boundaries by getting a minimum spanning set, then store
-    EXTMatrix *boundaryMat = [EXTMatrix matrixWidth:newBoundaries.count height:self.names.count];
-    boundaryMat.presentation = newBoundaries;
-    [boundaries setObject:[boundaryMat image] atIndexedSubscript:whichPage];
+    // add these to the old boundaries
+    NSMutableArray *newImage = [restrictedDiff image];
+    EXTMatrix *boundaryInclusion = [EXTMatrix matrixWidth:(newImage.count+((NSMutableArray*)boundaries[whichPage-1]).count) height:differential.end.names.count];
+    [newImage addObjectsFromArray:boundaries[whichPage-1]];
+    boundaryInclusion.presentation = [NSMutableArray arrayWithArray:newImage];
     
+    // find a minimum spanning set and store it
+    [boundaries setObject:[boundaryInclusion image] atIndexedSubscript:whichPage];
+
     return;
 }
 
 -(int) dimension:(int)whichPage {
-    return [[cycles objectAtIndex:whichPage] count] -
-           [[boundaries objectAtIndex:whichPage] count];
+    int dim = [[cycles objectAtIndex:whichPage] count] -
+                [[boundaries objectAtIndex:whichPage] count];
+    
+    if (dim < 0) {
+        DLog("term with name %@ has negative dimension on page %d", self.names[0], whichPage);
+        return 0;
+    }
+    
+    return dim;
 }
 
 // XXX: this should deal with EXTLocation in a sane way.
