@@ -25,7 +25,7 @@
 	CGFloat gridSpacing;
 	int pageInView;
 	
-	IBOutlet EXTGrid *_grid;
+	IBOutlet EXTGrid *grid;
 	
 	NSRect highlightRect;    // make this private?
 	NSColor *highlightRectColor;  // if this is not customizable, it should be a constant.   I couldn't make it work as a static or extern...
@@ -42,7 +42,7 @@
 @property(nonatomic, assign) BOOL showGrid;
 @property(nonatomic, assign) BOOL editMode, showPages, editingArtBoards, highlighting;
 @property(strong) EXTArtBoard *artBoard;
-@property(strong) EXTGrid *_grid;
+@property(strong) EXTGrid *grid;
 @property(strong) NSBezierPath *highlightPath;
 
 @property(nonatomic, strong) EXTSpectralSequence *sseq; // TODO: this should evolve to a copy property in order to avoid side effects

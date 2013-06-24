@@ -10,6 +10,6 @@
 #import "EXTView.h"
 
 @interface EXTDocumentWindowController : NSWindowController <EXTViewDelegate>
-- (void)drawPagesUpTo:(NSUInteger)pageNumber;
-- (void)drawPageNumber:(NSUInteger)pageNumber ll:(NSPoint)lowerLeftCoord ur:(NSPoint)upperRightCoord withSpacing:(CGFloat)gridSpacing;
+    - (void)drawPagesUpTo:(NSUInteger)pageNumber;
+    - (void)drawPageNumber:(NSUInteger)pageNumber ll:(NSPoint)lowerLeftCoord ur:(NSPoint)upperRightCoord withSpacing:(CGFloat)gridSpacing;
 @end
