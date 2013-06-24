@@ -18,11 +18,23 @@ NSString * const EXTGridAnyKey = @"anyGridKey";
 #pragma mark - Private variables
 
 static const CGFloat _EXTGridLineWidth = 0.25;
-
+static const CGFloat _EXTDefaultGridSpacing = 9.0;
+static const NSUInteger _EXTDefaultEmphasisSpacing = 8;
+static NSColor *_EXTDefaultGridColor = nil;
+static NSColor *_EXTDefaultEmphasisGridColor = nil;
+static NSColor *_EXTDefaultAxisColor = nil;
 
 @implementation EXTGrid
 
 #pragma mark - Life cycle
+
++ (void)initialize {
+    if (self == [EXTGrid class]) {
+        _EXTDefaultGridColor = [NSColor lightGrayColor];
+        _EXTDefaultEmphasisGridColor = [NSColor darkGrayColor];
+        _EXTDefaultAxisColor = [NSColor blueColor];
+    }
+}
 
 - (id)init {
     self = [super init];
@@ -31,12 +43,12 @@ static const CGFloat _EXTGridLineWidth = 0.25;
 
 	_boundsRect = NSZeroRect;
 
-	_gridSpacing = 9.0;
-	_emphasisSpacing = 8;
+	_gridSpacing = _EXTDefaultGridSpacing;
+	_emphasisSpacing = _EXTDefaultEmphasisSpacing;
 
-	_gridColor = [NSColor lightGrayColor];
-	_emphasisGridColor = [NSColor darkGrayColor];
-	_axisColor = [NSColor blueColor];
+	_gridColor = _EXTDefaultGridColor;
+	_emphasisGridColor = _EXTDefaultEmphasisGridColor;
+	_axisColor = _EXTDefaultAxisColor;
 
 	_gridPath = [self makeGridInRect:_boundsRect withFactor:1];
 	_emphasisGridPath = [self makeGridInRect:_boundsRect withFactor:_emphasisSpacing];
@@ -45,12 +57,12 @@ static const CGFloat _EXTGridLineWidth = 0.25;
 }
 
 - (void)resetToDefaults{
-	self.gridSpacing = 9.0;
-	self.emphasisSpacing = 8;
+	self.gridSpacing = _EXTDefaultGridSpacing;
+	self.emphasisSpacing = _EXTDefaultEmphasisSpacing;
 	
-	self.gridColor = [NSColor lightGrayColor];
-	self.emphasisGridColor = [NSColor darkGrayColor];
-	self.axisColor = [NSColor blueColor];
+	self.gridColor = _EXTDefaultGridColor;
+	self.emphasisGridColor = _EXTDefaultEmphasisGridColor;
+	self.axisColor = _EXTDefaultAxisColor;
 	
 }
 
