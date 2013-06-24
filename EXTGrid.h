@@ -10,16 +10,7 @@
 
 extern NSString * const EXTGridAnyKey;
 
-@interface EXTGrid : NSObject {
-
-	NSColor *gridColor, *emphasisGridColor, *axisColor;
-	CGFloat gridSpacing;
-	NSUInteger emphasisSpacing;
-	NSRect boundsRect;
-	
-	NSBezierPath *gridPath;
-	NSBezierPath *emphasisGridPath;
-}
+@interface EXTGrid : NSObject
 
 @property(strong) NSColor *gridColor, *emphasisGridColor, *axisColor;
 @property(nonatomic, assign) CGFloat gridSpacing;
@@ -41,4 +32,5 @@ extern NSString * const EXTGridAnyKey;
 
 - (NSRect)enclosingGridRect:(NSPoint)point;
 - (void) drawEnclosingRectAtPoint: (NSPoint)point;
+
 @end

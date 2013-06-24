@@ -22,9 +22,6 @@ static const CGFloat _EXTGridLineWidth = 0.25;
 
 @implementation EXTGrid
 
-@synthesize gridColor, emphasisGridColor, axisColor, gridSpacing, emphasisSpacing, boundsRect;
-@synthesize gridPath, emphasisGridPath;
-
 #pragma mark *** initializers ***
 
 - (id)init{
@@ -45,41 +42,41 @@ static const CGFloat _EXTGridLineWidth = 0.25;
 	if (self) {
 
 		// use the property setters here?  I think it's OK to write self.gridspacing = 9.0 instead of [self gridSpacing:9.0]
-		boundsRect = rect;
+		_boundsRect = rect;
 		
-		gridSpacing = 9.0;
-		emphasisSpacing = 8;
+		_gridSpacing = 9.0;
+		_emphasisSpacing = 8;
 		
 		// here's a problem.   to deal with KVO stuff we need to call the setter for gridSpacing (or remove the observer from the scrollview).   But we can't initialize with them because they rebuild the grid paths, and call undefined functions at this point.   Ugh.  I either need to check for null values into the grid path building function, and offer defaults, or..something.   see the error log
 		
 		// OK.  I've resolved this.   It was  a problem with the order in which files were loading.   I put a grid object in the nib file and put a default rectangle in the init method.   We probably want to remove the "emphasisGridSpacing" text field from the main view, in which case there is no real compelling reason to have the grid in the nib, except perhaps, to make it easier to bind some of the document ivars to ones in the grid.  tbc...		
 
 
-		gridColor = [NSColor lightGrayColor];
-		emphasisGridColor = [NSColor darkGrayColor];
-		axisColor = [NSColor blueColor];
+		_gridColor = [NSColor lightGrayColor];
+		_emphasisGridColor = [NSColor darkGrayColor];
+		_axisColor = [NSColor blueColor];
 		
-		gridPath = [self makeGridInRect:boundsRect withFactor:1];
+		_gridPath = [self makeGridInRect:_boundsRect withFactor:1];
 		
-		emphasisGridPath = [self makeGridInRect:boundsRect withFactor:emphasisSpacing];
+		_emphasisGridPath = [self makeGridInRect:_boundsRect withFactor:_emphasisSpacing];
 
 	}
 	return self;
 }
 
 -(void) awakeFromNib{
-	boundsRect = NSMakeRect(0, 0, 1, 1);
+	_boundsRect = NSMakeRect(0, 0, 1, 1);
 	
-	gridSpacing = 9.0;
-	emphasisSpacing = 8;
+	_gridSpacing = 9.0;
+	_emphasisSpacing = 8;
 		
-	gridColor = [NSColor lightGrayColor];
-	emphasisGridColor = [NSColor darkGrayColor];
-	axisColor = [NSColor blueColor];
+	_gridColor = [NSColor lightGrayColor];
+	_emphasisGridColor = [NSColor darkGrayColor];
+	_axisColor = [NSColor blueColor];
 	
-	gridPath = [self makeGridInRect:boundsRect withFactor:1];
+	_gridPath = [self makeGridInRect:_boundsRect withFactor:1];
 	
-	emphasisGridPath = [self makeGridInRect:boundsRect withFactor:emphasisSpacing];
+	_emphasisGridPath = [self makeGridInRect:_boundsRect withFactor:_emphasisSpacing];
 }
 
 - (void)resetToDefaults{
@@ -138,19 +135,19 @@ static const CGFloat _EXTGridLineWidth = 0.25;
 #pragma mark *** drawing ***
 
 -(void) drawGrid{
-	[gridColor set];
-	[gridPath stroke];
-	[emphasisGridColor set];
-	[emphasisGridPath stroke];
+	[_gridColor set];
+	[_gridPath stroke];
+	[_emphasisGridColor set];
+	[_emphasisGridPath stroke];
 }
 
 -(void) drawGridInRect:(NSRect)rect{
-	[gridColor set];
+	[_gridColor set];
 	NSBezierPath *localGridPath;
 	localGridPath = [self makeGridInRect:rect withFactor:1];
 	[localGridPath stroke];
-	[emphasisGridColor set];
-	localGridPath = [self makeGridInRect:rect withFactor:emphasisSpacing];
+	[_emphasisGridColor set];
+	localGridPath = [self makeGridInRect:rect withFactor:_emphasisSpacing];
 	[localGridPath stroke];
 }
 
@@ -158,11 +155,11 @@ static const CGFloat _EXTGridLineWidth = 0.25;
 -(void)drawAxes{
 	NSBezierPath *path = [NSBezierPath bezierPath];
 	[path setLineWidth:1.0];
-	[axisColor set];
-	[path moveToPoint:NSMakePoint(NSMidX(boundsRect), NSMinY(boundsRect))];
-	[path relativeLineToPoint:NSMakePoint(0.0, NSHeight(boundsRect))];
-	[path moveToPoint:NSMakePoint(NSMinX(boundsRect), NSMidY(boundsRect))];
-	[path relativeLineToPoint:NSMakePoint(NSWidth(boundsRect), 0.0)];
+	[_axisColor set];
+	[path moveToPoint:NSMakePoint(NSMidX(_boundsRect), NSMinY(_boundsRect))];
+	[path relativeLineToPoint:NSMakePoint(0.0, NSHeight(_boundsRect))];
+	[path moveToPoint:NSMakePoint(NSMinX(_boundsRect), NSMidY(_boundsRect))];
+	[path relativeLineToPoint:NSMakePoint(NSWidth(_boundsRect), 0.0)];
 	[path stroke];
 }
 
@@ -179,24 +176,24 @@ static const CGFloat _EXTGridLineWidth = 0.25;
 // because we need to regenerate the grid paths if these change.  An alternative would be to use KVO on self, but that seems kind of wrong to me.   Another methods would be to move the actual gridPath to the view, but then the drawing couldn't be done here, and I prefer that for reasons of better encapsulation.  
 
 - (void) setGridSpacing:(CGFloat) spacing{
-	gridSpacing = spacing;
+	_gridSpacing = spacing;
 	// regenerate the gridPath and the emphasisGridPath
-	self.gridPath = [self makeGridInRect:boundsRect withFactor:1];
-	self.emphasisGridPath = [self makeGridInRect:boundsRect withFactor:emphasisSpacing];
+	self.gridPath = [self makeGridInRect:_boundsRect withFactor:1];
+	self.emphasisGridPath = [self makeGridInRect:_boundsRect withFactor:_emphasisSpacing];
 
 }
 
 - (void) setEmphasisSpacing:(NSUInteger) spacing{
-	emphasisSpacing = spacing;	
+	_emphasisSpacing = spacing;	
 	// regenerate the emphasisGridPath
-	self.emphasisGridPath = [self makeGridInRect:boundsRect withFactor:emphasisSpacing];
+	self.emphasisGridPath = [self makeGridInRect:_boundsRect withFactor:_emphasisSpacing];
 }
 
 - (void) setBoundsRect:(NSRect) rect{
-	boundsRect = rect;
+	_boundsRect = rect;
 	// regenerate the gridPath and the emphasisGridPath
-	self.gridPath = [self makeGridInRect:boundsRect withFactor:1];
-	self.emphasisGridPath = [self makeGridInRect:boundsRect withFactor:emphasisSpacing];
+	self.gridPath = [self makeGridInRect:_boundsRect withFactor:1];
+	self.emphasisGridPath = [self makeGridInRect:_boundsRect withFactor:_emphasisSpacing];
 
 }
 
@@ -206,8 +203,8 @@ static const CGFloat _EXTGridLineWidth = 0.25;
 
 - (NSPoint)nearestGridPoint:(NSPoint)point {
 	NSPoint newPoint;
-	newPoint.x = floor((point.x / gridSpacing) + 0.5) * gridSpacing;
-	newPoint.y = floor((point.y / gridSpacing) + 0.5) * gridSpacing;
+	newPoint.x = floor((point.x / _gridSpacing) + 0.5) * _gridSpacing;
+	newPoint.y = floor((point.y / _gridSpacing) + 0.5) * _gridSpacing;
 //	newPoint.x = ceil((point.x / gridSpacing)) * gridSpacing;
 //	newPoint.y = ceil((point.y / gridSpacing)) * gridSpacing;
 
@@ -216,24 +213,24 @@ static const CGFloat _EXTGridLineWidth = 0.25;
 
 - (NSPoint)convertToGridCoordinates:(NSPoint)point{
 	NSPoint newPoint;
-	newPoint.x = floor(point.x/gridSpacing);
-	newPoint.y = floor(point.y/gridSpacing);
+	newPoint.x = floor(point.x/_gridSpacing);
+	newPoint.y = floor(point.y/_gridSpacing);
 	return newPoint;
 }
 
 - (NSPoint) lowerLeftGridPoint:(NSPoint)point{
 	NSPoint newPoint;
-	newPoint.x = floor(point.x/gridSpacing)*gridSpacing;
-	newPoint.y = floor(point.y/gridSpacing)*gridSpacing;
+	newPoint.x = floor(point.x/_gridSpacing)*_gridSpacing;
+	newPoint.y = floor(point.y/_gridSpacing)*_gridSpacing;
 	return newPoint;
 }
 
 - (NSRect)enclosingGridRect:(NSPoint)point {
 	NSRect enclosingRect;
-	enclosingRect.origin.x = floor(point.x/gridSpacing)*gridSpacing;
-	enclosingRect.origin.y = floor(point.y/gridSpacing)*gridSpacing;
-	enclosingRect.size.width = gridSpacing;
-	enclosingRect.size.height = gridSpacing;
+	enclosingRect.origin.x = floor(point.x/_gridSpacing)*_gridSpacing;
+	enclosingRect.origin.y = floor(point.y/_gridSpacing)*_gridSpacing;
+	enclosingRect.size.width = _gridSpacing;
+	enclosingRect.size.height = _gridSpacing;
 	
 	return enclosingRect;	
 }
