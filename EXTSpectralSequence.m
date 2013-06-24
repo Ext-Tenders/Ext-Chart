@@ -485,8 +485,8 @@
     EXTSpectralSequence *ret = [EXTSpectralSequence sSeqWithUnit:[EXTTriple class]];
         
     // add the three polynomial generators to the sseq: h10, h11, h20
-    ret = [ret tensorWithPolyClass:@"h10" location:[EXTTriple tripleWithA:1 B:1 C:1] upTo:6];
-    ret = [ret tensorWithPolyClass:@"h11" location:[EXTTriple tripleWithA:1 B:2 C:1] upTo:6];
+    ret = [ret tensorWithPolyClass:@"h10" location:[EXTTriple tripleWithA:1 B:1 C:1] upTo:8];
+    ret = [ret tensorWithPolyClass:@"h11" location:[EXTTriple tripleWithA:1 B:2 C:1] upTo:8];
     ret = [ret tensorWithPolyClass:@"h20" location:[EXTTriple tripleWithA:1 B:3 C:2] upTo:4];
     
     // set up the zero range.  TODO: this should come before the tensor calls,
@@ -514,7 +514,7 @@
     // d1(h10) = 0 is automatic.
     
     // now, do leibniz propagation.
-    [ret.multTables naivelyPropagateLeibniz:h20 page:1];
+    [ret.multTables propagateLeibniz:@[h20, h10, h11] page:1];
 
     // d3(h20^2) = h11^3
     EXTLocation *h20squared = [[h20 class] scale:h20 by:2];
@@ -523,12 +523,7 @@
     [ret.differentials addObject:diff2];
     
     // leibniz again, on the new terms.
-    [ret.multTables naivelyPropagateLeibniz:h20squared page:2];
-    
-    [ret computeGroupsForPage:0];
-    [ret computeGroupsForPage:1];
-    [ret computeGroupsForPage:2];
-    [ret computeGroupsForPage:3];
+    [ret.multTables propagateLeibniz:@[h10, h11, h20squared] page:2];
     
     return ret;
 }
