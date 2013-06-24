@@ -8,9 +8,16 @@
 
 #import "EXTGrid.h"
 
-// I guess a string constant is an exposed binding.  
 
+#pragma mark - Public variables
+
+// I guess a string constant is an exposed binding.
 NSString * const EXTGridAnyKey = @"anyGridKey";
+
+
+#pragma mark - Private variables
+
+static const CGFloat _EXTGridLineWidth = 0.25;
 
 
 @implementation EXTGrid
@@ -99,7 +106,7 @@ NSString * const EXTGridAnyKey = @"anyGridKey";
 
 	
 	NSBezierPath *path = [NSBezierPath bezierPath];
-	[path setLineWidth:GRID_LINE_WIDTH];
+	[path setLineWidth:_EXTGridLineWidth];
 	
 	NSPoint startingPoint;
 //	startingPoint.y =   rect.origin.y + fmod(rect.size.height/2, spacing);

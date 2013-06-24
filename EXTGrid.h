@@ -8,8 +8,6 @@
 
 #import <Cocoa/Cocoa.h>
 
-#define GRID_LINE_WIDTH 0.25
-
 extern NSString * const EXTGridAnyKey;
 
 @interface EXTGrid : NSObject {
