@@ -11,16 +11,12 @@
 #import "EXTterm.h"
 #import "EXTdifferential.h"
 #import "EXTView.h"
-#import "EXTGrid.h"
 #import "EXTSpectralSequence.h"
 
 @interface EXTDocumentWindowController ()
-@property(nonatomic, weak) IBOutlet EXTView *extView;
-@property(nonatomic, strong) IBOutlet EXTGrid *grid;
-
-@property(nonatomic, assign) NSUInteger maxPage;
-
-@property(nonatomic, readonly) EXTDocument *extDocument;
+    @property(nonatomic, weak) IBOutlet EXTView *extView;
+    @property(nonatomic, assign) NSUInteger maxPage;
+    @property(nonatomic, readonly) EXTDocument *extDocument;
 @end
 
 @implementation EXTDocumentWindowController
@@ -48,19 +44,9 @@
 
 	// the big board is the bounds rectangle of the EXTView object, and is set in the xib file, so we initialize theGrid in the windowControllerDidLoadNib function.   HOWEVER, it screws up the binding of the text cell on the main document.  see the console
 
-    //	theGrid = [EXTGrid alloc];
-    //	[theGrid initWithRect:[extview bounds]];
-
-    self.grid.boundsRect = self.extView.bounds;
-
     // The analogue of these next settings 	 are done with bindings in Sketch.   I'm not sure what the difference is.
     self.extView.sseq = [self.document sseq];
     self.extView.delegate = self;
-    self.extView._grid = self.grid;
-
-	[self.grid addObserver:self.extView forKeyPath:EXTGridAnyKey options:0 context:nil];
-
-    //	[self setEmphasisGridSpacing:8];
 
     [[self extView] bind:EXTViewSseqBindingName toObject:[self document] withKeyPath:@"sseq" options:nil];
 }

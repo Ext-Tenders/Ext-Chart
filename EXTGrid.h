@@ -8,28 +8,15 @@
 
 #import <Cocoa/Cocoa.h>
 
-#define GRID_LINE_WIDTH 0.25
+extern NSString * const EXTGridAnyKey;
 
-extern NSString *EXTGridAnyKey;
+@interface EXTGrid : NSObject
 
-@interface EXTGrid : NSObject {
-
-	NSColor *gridColor, *emphasisGridColor, *axisColor;
-	CGFloat gridSpacing;
-	NSUInteger emphasisSpacing;
-	NSRect boundsRect;
-	
-	NSBezierPath *gridPath;
-	NSBezierPath *emphasisGridPath;
-}
-
-@property(strong) NSColor *gridColor, *emphasisGridColor, *axisColor;
+@property(nonatomic, strong) NSColor *gridColor, *emphasisGridColor, *axisColor;
 @property(nonatomic, assign) CGFloat gridSpacing;
 @property(nonatomic, assign) NSUInteger emphasisSpacing;
 @property(nonatomic, assign) NSRect boundsRect;
-@property(strong) NSBezierPath *gridPath, *emphasisGridPath;
-
--(id) initWithRect:(NSRect) rect;
+@property(nonatomic, strong) NSBezierPath *gridPath, *emphasisGridPath;
 
 -(NSBezierPath *) makeGridInRect: (NSRect) rect withFactor:(NSUInteger) factor;
 
@@ -43,4 +30,5 @@ extern NSString *EXTGridAnyKey;
 
 - (NSRect)enclosingGridRect:(NSPoint)point;
 - (void) drawEnclosingRectAtPoint: (NSPoint)point;
+
 @end
