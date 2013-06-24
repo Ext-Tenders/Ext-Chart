@@ -10,7 +10,7 @@
 
 // I guess a string constant is an exposed binding.  
 
-NSString *EXTGridAnyKey = @"anyGridKey";
+NSString * const EXTGridAnyKey = @"anyGridKey";
 
 
 @implementation EXTGrid
