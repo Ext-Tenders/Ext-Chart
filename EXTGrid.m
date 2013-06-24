@@ -22,61 +22,26 @@ static const CGFloat _EXTGridLineWidth = 0.25;
 
 @implementation EXTGrid
 
-#pragma mark *** initializers ***
+#pragma mark - Life cycle
 
-- (id)init{
+- (id)init {
     self = [super init];
-    if (self) {
-		if (!(self = [self initWithRect:NSZeroRect])) return nil;
-	}
-    return self;
-}
+    if (!self)
+        return nil;
 
+	_boundsRect = NSZeroRect;
 
-// initWithRect: is the designated initializer
-
-// let's get rid of it.   Use a small default rect in the init method, and then use a setter method to set it.
-
--(id) initWithRect:(NSRect) rect{
-	self = [super init];
-	if (self) {
-
-		// use the property setters here?  I think it's OK to write self.gridspacing = 9.0 instead of [self gridSpacing:9.0]
-		_boundsRect = rect;
-		
-		_gridSpacing = 9.0;
-		_emphasisSpacing = 8;
-		
-		// here's a problem.   to deal with KVO stuff we need to call the setter for gridSpacing (or remove the observer from the scrollview).   But we can't initialize with them because they rebuild the grid paths, and call undefined functions at this point.   Ugh.  I either need to check for null values into the grid path building function, and offer defaults, or..something.   see the error log
-		
-		// OK.  I've resolved this.   It was  a problem with the order in which files were loading.   I put a grid object in the nib file and put a default rectangle in the init method.   We probably want to remove the "emphasisGridSpacing" text field from the main view, in which case there is no real compelling reason to have the grid in the nib, except perhaps, to make it easier to bind some of the document ivars to ones in the grid.  tbc...		
-
-
-		_gridColor = [NSColor lightGrayColor];
-		_emphasisGridColor = [NSColor darkGrayColor];
-		_axisColor = [NSColor blueColor];
-		
-		_gridPath = [self makeGridInRect:_boundsRect withFactor:1];
-		
-		_emphasisGridPath = [self makeGridInRect:_boundsRect withFactor:_emphasisSpacing];
-
-	}
-	return self;
-}
-
--(void) awakeFromNib{
-	_boundsRect = NSMakeRect(0, 0, 1, 1);
-	
 	_gridSpacing = 9.0;
 	_emphasisSpacing = 8;
-		
+
 	_gridColor = [NSColor lightGrayColor];
 	_emphasisGridColor = [NSColor darkGrayColor];
 	_axisColor = [NSColor blueColor];
-	
+
 	_gridPath = [self makeGridInRect:_boundsRect withFactor:1];
-	
 	_emphasisGridPath = [self makeGridInRect:_boundsRect withFactor:_emphasisSpacing];
+
+    return self;
 }
 
 - (void)resetToDefaults{

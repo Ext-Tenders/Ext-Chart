@@ -18,8 +18,6 @@ extern NSString * const EXTGridAnyKey;
 @property(nonatomic, assign) NSRect boundsRect;
 @property(nonatomic, strong) NSBezierPath *gridPath, *emphasisGridPath;
 
--(id) initWithRect:(NSRect) rect;
-
 -(NSBezierPath *) makeGridInRect: (NSRect) rect withFactor:(NSUInteger) factor;
 
 - (void) drawGridInRect:(NSRect)rect;

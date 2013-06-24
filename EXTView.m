@@ -69,7 +69,7 @@ static void *_EXTViewArtBoardDrawingRectContext = &_EXTViewArtBoardDrawingRectCo
 
         // since the frame extends past the bounds rectangle, we need observe the drawingRect in order to know what to refresh when the artBoard changes
 
-		[self set_grid:[[EXTGrid alloc] initWithRect:NSZeroRect]];
+		[self set_grid:[EXTGrid new]];
 		
 		// the tracking area should be set to the dataRect, which is still not implemented.
 		
