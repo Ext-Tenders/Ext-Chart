@@ -12,11 +12,11 @@ extern NSString * const EXTGridAnyKey;
 
 @interface EXTGrid : NSObject
 
-@property(strong) NSColor *gridColor, *emphasisGridColor, *axisColor;
+@property(nonatomic, strong) NSColor *gridColor, *emphasisGridColor, *axisColor;
 @property(nonatomic, assign) CGFloat gridSpacing;
 @property(nonatomic, assign) NSUInteger emphasisSpacing;
 @property(nonatomic, assign) NSRect boundsRect;
-@property(strong) NSBezierPath *gridPath, *emphasisGridPath;
+@property(nonatomic, strong) NSBezierPath *gridPath, *emphasisGridPath;
 
 -(id) initWithRect:(NSRect) rect;
 
