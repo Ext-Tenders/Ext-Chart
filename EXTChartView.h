@@ -1,5 +1,5 @@
 //
-//  EXTView.h
+//  EXTChartView.h
 //  Ext Chart
 //
 //  Created by Michael Hopkins on 7/20/11.
@@ -10,12 +10,12 @@
 #import <Cocoa/Cocoa.h>
 @class EXTScrollView, EXTArtBoard, EXTGrid, EXTDocument, EXTToolPaletteController, EXTTerm, EXTDifferential, EXTSpectralSequence;
 
-@protocol EXTViewDelegate <NSObject>
+@protocol EXTChartViewDelegate <NSObject>
     - (void)drawPageNumber:(NSUInteger)pageNumber ll:(NSPoint)lowerLeftCoord ur:(NSPoint)upperRightCoord withSpacing:(CGFloat)gridSpacing;
 @end
 
 
-@interface EXTView : NSView {
+@interface EXTChartView : NSView {
 	BOOL showGrid;
 	BOOL showPages;
 	BOOL editMode;
@@ -46,7 +46,7 @@
 @property(strong) NSBezierPath *highlightPath;
 
 @property(nonatomic, strong) EXTSpectralSequence *sseq; // TODO: this should evolve to a copy property in order to avoid side effects
-@property(nonatomic, weak) id<EXTViewDelegate> delegate;
+@property(nonatomic, weak) id<EXTChartViewDelegate> delegate;
 @property(nonatomic, assign) NSUInteger selectedPageIndex;
 
 
@@ -73,5 +73,5 @@
 
 #pragma mark - Exported variables
 
-extern NSString * const EXTViewSseqBindingName;
-extern NSString * const EXTViewSelectedPageIndexBindingName;
+extern NSString * const EXTChartViewSseqBindingName;
+extern NSString * const EXTChartViewSelectedPageIndexBindingName;

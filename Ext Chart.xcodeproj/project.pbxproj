@@ -15,7 +15,7 @@
 		1DDD582D0DA1D0D100B32029 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1DDD582A0DA1D0D100B32029 /* MainMenu.xib */; };
 		315BC80F140430B7007D49CA /* EXTToolPaletteController.m in Sources */ = {isa = PBXBuildFile; fileRef = 315BC80E140430B7007D49CA /* EXTToolPaletteController.m */; };
 		317707C413D784B0003475A2 /* EXTGrid.m in Sources */ = {isa = PBXBuildFile; fileRef = 317707C313D784B0003475A2 /* EXTGrid.m */; };
-		317707E113D7893A003475A2 /* EXTView.m in Sources */ = {isa = PBXBuildFile; fileRef = 317707E013D7893A003475A2 /* EXTView.m */; };
+		317707E113D7893A003475A2 /* EXTChartView.m in Sources */ = {isa = PBXBuildFile; fileRef = 317707E013D7893A003475A2 /* EXTChartView.m */; };
 		3187BA2713DC6C6C00C26803 /* EXTScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3187BA2413DC6C6C00C26803 /* EXTScrollView.m */; };
 		318EC0691409385F005D21D4 /* to do list.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 318EC0681409385F005D21D4 /* to do list.rtf */; };
 		31C77B8D13E43E3100E9DBFC /* Preferences.xib in Resources */ = {isa = PBXBuildFile; fileRef = 31C77B8C13E43E3100E9DBFC /* Preferences.xib */; };
@@ -64,8 +64,8 @@
 		315BC80E140430B7007D49CA /* EXTToolPaletteController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTToolPaletteController.m; sourceTree = "<group>"; };
 		317707C213D784B0003475A2 /* EXTGrid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTGrid.h; sourceTree = "<group>"; };
 		317707C313D784B0003475A2 /* EXTGrid.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTGrid.m; sourceTree = "<group>"; };
-		317707DF13D7893A003475A2 /* EXTView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTView.h; sourceTree = "<group>"; };
-		317707E013D7893A003475A2 /* EXTView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTView.m; sourceTree = "<group>"; };
+		317707DF13D7893A003475A2 /* EXTChartView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTChartView.h; sourceTree = "<group>"; };
+		317707E013D7893A003475A2 /* EXTChartView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTChartView.m; sourceTree = "<group>"; };
 		3187BA2313DC6C6C00C26803 /* EXTScrollView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTScrollView.h; sourceTree = "<group>"; };
 		3187BA2413DC6C6C00C26803 /* EXTScrollView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTScrollView.m; sourceTree = "<group>"; };
 		318EC0681409385F005D21D4 /* to do list.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; path = "to do list.rtf"; sourceTree = "<group>"; };
@@ -180,8 +180,8 @@
 				317707C313D784B0003475A2 /* EXTGrid.m */,
 				3187BA2313DC6C6C00C26803 /* EXTScrollView.h */,
 				3187BA2413DC6C6C00C26803 /* EXTScrollView.m */,
-				317707DF13D7893A003475A2 /* EXTView.h */,
-				317707E013D7893A003475A2 /* EXTView.m */,
+				317707DF13D7893A003475A2 /* EXTChartView.h */,
+				317707E013D7893A003475A2 /* EXTChartView.m */,
 			);
 			name = Views;
 			sourceTree = "<group>";
@@ -374,7 +374,7 @@
 				8D15AC310486D014006FF6A4 /* EXTDocument.m in Sources */,
 				8D15AC320486D014006FF6A4 /* main.m in Sources */,
 				317707C413D784B0003475A2 /* EXTGrid.m in Sources */,
-				317707E113D7893A003475A2 /* EXTView.m in Sources */,
+				317707E113D7893A003475A2 /* EXTChartView.m in Sources */,
 				31D403BB13DA0476006A8C06 /* EXTterm.m in Sources */,
 				31D403C013DA04D8006A8C06 /* EXTdifferential.m in Sources */,
 				3187BA2713DC6C6C00C26803 /* EXTScrollView.m in Sources */,

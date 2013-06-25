@@ -54,7 +54,7 @@
 				<nil key="NSUserInterfaceItemIdentifier"/>
 				<string key="NSWindowContentMinSize">{94, 86}</string>
 				<object class="NSView" key="NSWindowView" id="568628114">
-					<reference key="NSNextResponder"/>
+					<nil key="NSNextResponder"/>
 					<int key="NSvFlags">256</int>
 					<object class="NSMutableArray" key="NSSubviews">
 						<bool key="EncodedWithXMLCoder">YES</bool>
@@ -73,14 +73,12 @@
 											<int key="NSvFlags">301</int>
 											<string key="NSFrameSize">{7920, 7920}</string>
 											<reference key="NSSuperview" ref="646755221"/>
-											<reference key="NSWindow"/>
 											<reference key="NSNextKeyView" ref="542117803"/>
-											<string key="NSClassName">EXTView</string>
+											<string key="NSClassName">EXTChartView</string>
 										</object>
 									</object>
 									<string key="NSFrame">{{1, 1}, {1006, 559}}</string>
 									<reference key="NSSuperview" ref="598730152"/>
-									<reference key="NSWindow"/>
 									<reference key="NSNextKeyView" ref="869348958"/>
 									<reference key="NSDocView" ref="869348958"/>
 									<object class="NSColor" key="NSBGColor">
@@ -94,8 +92,6 @@
 									<int key="NSvFlags">256</int>
 									<string key="NSFrame">{{991, 1}, {16, 559}}</string>
 									<reference key="NSSuperview" ref="598730152"/>
-									<reference key="NSWindow"/>
-									<reference key="NSNextKeyView"/>
 									<bool key="NSEnabled">YES</bool>
 									<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 									<reference key="NSTarget" ref="598730152"/>
@@ -108,7 +104,6 @@
 									<int key="NSvFlags">256</int>
 									<string key="NSFrame">{{1, 544}, {1006, 16}}</string>
 									<reference key="NSSuperview" ref="598730152"/>
-									<reference key="NSWindow"/>
 									<reference key="NSNextKeyView" ref="69644717"/>
 									<bool key="NSEnabled">YES</bool>
 									<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
@@ -120,7 +115,6 @@
 							</object>
 							<string key="NSFrame">{{0, -1}, {1008, 561}}</string>
 							<reference key="NSSuperview" ref="568628114"/>
-							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="646755221"/>
 							<int key="NSsFlags">133362</int>
 							<reference key="NSVScroller" ref="69644717"/>
@@ -135,7 +129,6 @@
 							<int key="NSvFlags">268</int>
 							<string key="NSFrame">{{170, 574}, {41, 22}}</string>
 							<reference key="NSSuperview" ref="568628114"/>
-							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="239393340"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="849344446">
@@ -236,7 +229,6 @@
 							<int key="NSvFlags">268</int>
 							<string key="NSFrame">{{33, 576}, {121, 17}}</string>
 							<reference key="NSSuperview" ref="568628114"/>
-							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="608341678"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="989814006">
@@ -268,7 +260,6 @@
 							<int key="NSvFlags">268</int>
 							<string key="NSFrame">{{317, 576}, {38, 17}}</string>
 							<reference key="NSSuperview" ref="568628114"/>
-							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="463392880"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="104151774">
@@ -287,7 +278,6 @@
 							<int key="NSvFlags">268</int>
 							<string key="NSFrame">{{366, 574}, {31, 22}}</string>
 							<reference key="NSSuperview" ref="568628114"/>
-							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="131465093"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="759307716">
@@ -363,7 +353,6 @@
 							<int key="NSvFlags">268</int>
 							<string key="NSFrame">{{407, 571}, {19, 27}}</string>
 							<reference key="NSSuperview" ref="568628114"/>
-							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="774565633"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSStepperCell" key="NSCell" id="231918257">
@@ -381,7 +370,6 @@
 							<int key="NSvFlags">268</int>
 							<string key="NSFrame">{{705, 565}, {131, 32}}</string>
 							<reference key="NSSuperview" ref="568628114"/>
-							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="920198371"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="434322657">
@@ -404,7 +392,6 @@
 							<int key="NSvFlags">268</int>
 							<string key="NSFrame">{{611, 572}, {97, 18}}</string>
 							<reference key="NSSuperview" ref="568628114"/>
-							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="757040942"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="1005716734">
@@ -434,7 +421,6 @@
 							<int key="NSvFlags">268</int>
 							<string key="NSFrame">{{474, 572}, {111, 18}}</string>
 							<reference key="NSSuperview" ref="568628114"/>
-							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="575113243"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="877272513">
@@ -459,7 +445,6 @@
 							<int key="NSvFlags">268</int>
 							<string key="NSFrame">{{827, 565}, {166, 32}}</string>
 							<reference key="NSSuperview" ref="568628114"/>
-							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="598730152"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="881146232">
@@ -482,7 +467,6 @@
 							<int key="NSvFlags">268</int>
 							<string key="NSFrame">{{223, 575}, {78, 18}}</string>
 							<reference key="NSSuperview" ref="568628114"/>
-							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="595398695"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="449224307">
@@ -504,8 +488,6 @@
 						</object>
 					</object>
 					<string key="NSFrameSize">{1007, 608}</string>
-					<reference key="NSSuperview"/>
-					<reference key="NSWindow"/>
 					<reference key="NSNextKeyView" ref="1002089432"/>
 				</object>
 				<string key="NSScreenRect">{{0, 0}, {1920, 1058}}</string>
@@ -533,11 +515,11 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
-						<string key="label">extView</string>
+						<string key="label">chartView</string>
 						<reference key="source" ref="512844837"/>
 						<reference key="destination" ref="869348958"/>
 					</object>
-					<int key="connectionID">100189</int>
+					<int key="connectionID">100203</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
@@ -557,15 +539,15 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBBindingConnection" key="connection">
-						<string key="label">value: extView.grid.emphasisSpacing</string>
+						<string key="label">value: chartView.grid.emphasisSpacing</string>
 						<reference key="source" ref="608341678"/>
 						<reference key="destination" ref="512844837"/>
 						<object class="NSNibBindingConnector" key="connector">
 							<reference key="NSSource" ref="608341678"/>
 							<reference key="NSDestination" ref="512844837"/>
-							<string key="NSLabel">value: extView.grid.emphasisSpacing</string>
+							<string key="NSLabel">value: chartView.grid.emphasisSpacing</string>
 							<string key="NSBinding">value</string>
-							<string key="NSKeyPath">extView.grid.emphasisSpacing</string>
+							<string key="NSKeyPath">chartView.grid.emphasisSpacing</string>
 							<int key="NSNibBindingConnectorVersion">2</int>
 						</object>
 					</object>
@@ -573,15 +555,15 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBBindingConnection" key="connection">
-						<string key="label">value: extView.selectedPageIndex</string>
+						<string key="label">value: chartView.selectedPageIndex</string>
 						<reference key="source" ref="463392880"/>
 						<reference key="destination" ref="512844837"/>
 						<object class="NSNibBindingConnector" key="connector">
 							<reference key="NSSource" ref="463392880"/>
 							<reference key="NSDestination" ref="512844837"/>
-							<string key="NSLabel">value: extView.selectedPageIndex</string>
+							<string key="NSLabel">value: chartView.selectedPageIndex</string>
 							<string key="NSBinding">value</string>
-							<string key="NSKeyPath">extView.selectedPageIndex</string>
+							<string key="NSKeyPath">chartView.selectedPageIndex</string>
 							<int key="NSNibBindingConnectorVersion">2</int>
 						</object>
 					</object>
@@ -589,15 +571,15 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBBindingConnection" key="connection">
-						<string key="label">value: extView.selectedPageIndex</string>
+						<string key="label">value: chartView.selectedPageIndex</string>
 						<reference key="source" ref="131465093"/>
 						<reference key="destination" ref="512844837"/>
 						<object class="NSNibBindingConnector" key="connector">
 							<reference key="NSSource" ref="131465093"/>
 							<reference key="NSDestination" ref="512844837"/>
-							<string key="NSLabel">value: extView.selectedPageIndex</string>
+							<string key="NSLabel">value: chartView.selectedPageIndex</string>
 							<string key="NSBinding">value</string>
-							<string key="NSKeyPath">extView.selectedPageIndex</string>
+							<string key="NSKeyPath">chartView.selectedPageIndex</string>
 							<int key="NSNibBindingConnectorVersion">2</int>
 						</object>
 					</object>
@@ -605,15 +587,15 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBBindingConnection" key="connection">
-						<string key="label">value: extView.showPages</string>
+						<string key="label">value: chartView.showPages</string>
 						<reference key="source" ref="575113243"/>
 						<reference key="destination" ref="512844837"/>
 						<object class="NSNibBindingConnector" key="connector">
 							<reference key="NSSource" ref="575113243"/>
 							<reference key="NSDestination" ref="512844837"/>
-							<string key="NSLabel">value: extView.showPages</string>
+							<string key="NSLabel">value: chartView.showPages</string>
 							<string key="NSBinding">value</string>
-							<string key="NSKeyPath">extView.showPages</string>
+							<string key="NSKeyPath">chartView.showPages</string>
 							<int key="NSNibBindingConnectorVersion">2</int>
 						</object>
 					</object>
@@ -621,15 +603,15 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBBindingConnection" key="connection">
-						<string key="label">value: extView.editingArtBoards</string>
+						<string key="label">value: chartView.editingArtBoards</string>
 						<reference key="source" ref="774565633"/>
 						<reference key="destination" ref="512844837"/>
 						<object class="NSNibBindingConnector" key="connector">
 							<reference key="NSSource" ref="774565633"/>
 							<reference key="NSDestination" ref="512844837"/>
-							<string key="NSLabel">value: extView.editingArtBoards</string>
+							<string key="NSLabel">value: chartView.editingArtBoards</string>
 							<string key="NSBinding">value</string>
-							<string key="NSKeyPath">extView.editingArtBoards</string>
+							<string key="NSKeyPath">chartView.editingArtBoards</string>
 							<int key="NSNibBindingConnectorVersion">2</int>
 						</object>
 					</object>
@@ -637,15 +619,15 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBBindingConnection" key="connection">
-						<string key="label">value: extView.editingArtBoards</string>
+						<string key="label">value: chartView.editingArtBoards</string>
 						<reference key="source" ref="877272513"/>
 						<reference key="destination" ref="512844837"/>
 						<object class="NSNibBindingConnector" key="connector">
 							<reference key="NSSource" ref="877272513"/>
 							<reference key="NSDestination" ref="512844837"/>
-							<string key="NSLabel">value: extView.editingArtBoards</string>
+							<string key="NSLabel">value: chartView.editingArtBoards</string>
 							<string key="NSBinding">value</string>
-							<string key="NSKeyPath">extView.editingArtBoards</string>
+							<string key="NSKeyPath">chartView.editingArtBoards</string>
 							<int key="NSNibBindingConnectorVersion">2</int>
 						</object>
 					</object>
@@ -1011,7 +993,7 @@
 				<reference key="dict.values" ref="0"/>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">100202</int>
+			<int key="maxID">100203</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
