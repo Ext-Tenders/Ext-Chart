@@ -577,9 +577,7 @@
     
     // propagate NAIVELY using the Leibniz rule
     
-    [ret.multTables naivelyPropagateLeibniz:[eta location] page:3];
-    [ret.multTables naivelyPropagateLeibniz:[beta2 location] page:3];
-    [ret.multTables naivelyPropagateLeibniz:[betaneg2 location] page:3];
+    [ret.multTables propagateLeibniz:@[[eta location], [beta2 location], [betaneg2 location]] page:3];
     
     return ret;
 }
@@ -631,6 +629,8 @@
 
 +(EXTSpectralSequence*) S5Demo {
     EXTSpectralSequence *ret = [EXTSpectralSequence spectralSequence];
+    
+    [ret.zeroRanges addObject:[EXTZeroRangeStrict newWithSSeq:ret]];
     
     // add the terms in the SSS for S^1 --> S^5 --> CP^2
     EXTTerm *e   = [EXTTerm term:[EXTPair pairWithA:1 B:0]
