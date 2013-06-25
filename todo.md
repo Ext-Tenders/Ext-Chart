@@ -6,9 +6,9 @@ UI work
 
 backend work
 ============
-- [ ] add entire polynomial families at once, propagate products with existing classes
+- [x] add entire polynomial families at once, propagate products with existing classes
 - [ ] allow for a SS to be a module over another SS of algebras
-- [ ] allow for a partially defined multiplicative structure
+- [x] allow for a partially defined multiplicative structure
 - [ ] handle stretching the window well, i.e., make the recalculation of the newly uncovered part of the SS computationally unintensive
 - [ ] handle adding dimensions to the spectral sequence sanely --- right now the differentials and multiplicative structure matrices are unlinked in every real way to the EXTTerm they belong to, which means things can get badly out of sync.
 
@@ -43,17 +43,6 @@ When modifying the product structure of existing classes:
       + do nothing.
       + otherwise, ask what to do.
       + If we're told to accept a new definition, modify the differential and propagate.
-
-Introducing a polynomial class:
- + Build the truncated polynomial algebra separately, P.
- + Build EXTTerms for all the tensor pairs A (x) P.
-    ... and store these separately.
- + Iterate over pairs of existing terms;
-    use the old multiplication tables to build new ones: (a|p)(a'|p') = aa'|pp'
-    use old differentials to build new ones: d(a|p) = da|p + a|dp.
- + Discard / release all the old terms, differentials, tables.
- + Store the new ones.
- + Cycle through the pages to perform boundary/cycle computations.
  
 Keep in mind the tensor ordering convention:
     e1 | f1, e1 | f2, e2 | f1, e2 | f2.

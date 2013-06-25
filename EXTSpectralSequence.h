@@ -47,6 +47,8 @@
 +(EXTSpectralSequence*) workingDemo;
 +(EXTSpectralSequence*) randomDemo;
 +(EXTSpectralSequence*) S5Demo;
++(EXTSpectralSequence*) KUhC2Demo;
++(EXTSpectralSequence*) A1MSSDemo;
 
 -(BOOL) isInZeroRanges:(EXTLocation*)loc;
 

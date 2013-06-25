@@ -14,9 +14,10 @@
 
 
 typedef enum : NSInteger {
-    EXTAppControllerWorkingExampleTag = 1,
-    EXTAppControllerRandomExampleTag  = 2,
-    EXTAppControllerS5ExampleTag      = 3,
+    EXTAppControllerRandomExampleTag  = 0,
+    EXTAppControllerS5ExampleTag      = 1,
+    EXTAppControllerKUhC2ExampleTag   = 2,
+    EXTAppControllerA1MSSExampleTag   = 3
 } EXTAppControllerExampleTag;
 
 
@@ -53,16 +54,20 @@ typedef enum : NSInteger {
     EXTSpectralSequence *sseq;
 
     switch ((EXTAppControllerExampleTag)[sender tag]) {
-        case EXTAppControllerWorkingExampleTag:
-            sseq = [EXTSpectralSequence workingDemo];
-            break;
-
         case EXTAppControllerRandomExampleTag:
             sseq = [EXTSpectralSequence randomDemo];
             break;
 
         case EXTAppControllerS5ExampleTag:
             sseq = [EXTSpectralSequence S5Demo];
+            break;
+            
+        case EXTAppControllerKUhC2ExampleTag:
+            sseq = [EXTSpectralSequence KUhC2Demo];
+            break;
+            
+        case EXTAppControllerA1MSSExampleTag:
+            sseq = [EXTSpectralSequence A1MSSDemo];
             break;
 
         default:
