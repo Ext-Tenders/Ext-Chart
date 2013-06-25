@@ -10,11 +10,11 @@
 #import "EXTDocument.h"
 #import "EXTterm.h"
 #import "EXTdifferential.h"
-#import "EXTView.h"
+#import "EXTChartView.h"
 #import "EXTSpectralSequence.h"
 
 @interface EXTDocumentWindowController ()
-    @property(nonatomic, weak) IBOutlet EXTView *extView;
+    @property(nonatomic, weak) IBOutlet EXTChartView *chartView;
     @property(nonatomic, assign) NSUInteger maxPage;
     @property(nonatomic, readonly) EXTDocument *extDocument;
 @end
@@ -42,13 +42,13 @@
 {
     [super windowDidLoad];
 
-	// the big board is the bounds rectangle of the EXTView object, and is set in the xib file, so we initialize theGrid in the windowControllerDidLoadNib function.   HOWEVER, it screws up the binding of the text cell on the main document.  see the console
+	// the big board is the bounds rectangle of the EXTChartView object, and is set in the xib file, so we initialize theGrid in the windowControllerDidLoadNib function.   HOWEVER, it screws up the binding of the text cell on the main document.  see the console
 
     // The analogue of these next settings 	 are done with bindings in Sketch.   I'm not sure what the difference is.
-    self.extView.sseq = [self.document sseq];
-    self.extView.delegate = self;
+    self.chartView.sseq = [self.document sseq];
+    self.chartView.delegate = self;
 
-    [[self extView] bind:EXTViewSseqBindingName toObject:[self document] withKeyPath:@"sseq" options:nil];
+    [[self chartView] bind:EXTChartViewSseqBindingName toObject:[self document] withKeyPath:@"sseq" options:nil];
 }
 
 #pragma mark - Properties
@@ -59,12 +59,12 @@
 
     if (document != [self document]) {
         if ([self document])
-            [[self extView] unbind:EXTViewSseqBindingName];
+            [[self chartView] unbind:EXTChartViewSseqBindingName];
         
         [super setDocument:document];
 
         if (document)
-            [[self extView] bind:EXTViewSseqBindingName toObject:document withKeyPath:@"sseq" options:nil];
+            [[self chartView] bind:EXTChartViewSseqBindingName toObject:document withKeyPath:@"sseq" options:nil];
     }
 }
 
@@ -119,7 +119,7 @@
 
 - (IBAction)demoGroups:(id)sender {
     [[self document] runDemo];
-    [[self extView] setSelectedPageIndex:0];
+    [[self chartView] setSelectedPageIndex:0];
 }
 
 @end

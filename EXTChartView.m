@@ -1,12 +1,12 @@
 //
-//  EXTView.m
+//  EXTChartView.m
 //  Ext Chart
 //
 //  Created by Michael Hopkins on 7/20/11.
 //  Copyright 2011 Harvard University. All rights reserved.
 //
 
-#import "EXTView.h"
+#import "EXTChartView.h"
 #import "EXTDocument.h"
 #import "EXTScrollView.h"
 #import "EXTGrid.h"
@@ -23,17 +23,17 @@
 
 #pragma mark - Exported variables
 
-NSString * const EXTViewSseqBindingName = @"sseq";
-NSString * const EXTViewSelectedPageIndexBindingName = @"selectedPageIndex";
+NSString * const EXTChartViewSseqBindingName = @"sseq";
+NSString * const EXTChartViewSelectedPageIndexBindingName = @"selectedPageIndex";
 
 #pragma mark - Private variables
 
-static void *_EXTViewSseqContext = &_EXTViewSseqContext;
-static void *_EXTViewSelectedPageIndexContext = &_EXTViewSelectedPageIndexContext;
-static void *_EXTViewArtBoardDrawingRectContext = &_EXTViewArtBoardDrawingRectContext;
+static void *_EXTChartViewSseqContext = &_EXTChartViewSseqContext;
+static void *_EXTChartViewSelectedPageIndexContext = &_EXTChartViewSelectedPageIndexContext;
+static void *_EXTChartViewArtBoardDrawingRectContext = &_EXTChartViewArtBoardDrawingRectContext;
 
 
-@implementation EXTView
+@implementation EXTChartView
 {
     NSMutableDictionary *_bindings;
 }
@@ -48,8 +48,8 @@ static void *_EXTViewArtBoardDrawingRectContext = &_EXTViewArtBoardDrawingRectCo
 
 + (void)initialize
 {
-    if (self == [EXTView class])
-        [self exposeBinding:EXTViewSseqBindingName];
+    if (self == [EXTChartView class])
+        [self exposeBinding:EXTChartViewSseqBindingName];
 }
 
 - (id)initWithFrame:(NSRect)frame {
@@ -63,7 +63,7 @@ static void *_EXTViewArtBoardDrawingRectContext = &_EXTViewArtBoardDrawingRectCo
 
 		_editingArtBoards = NO;
         _artBoard = [EXTArtBoard new];
-        [_artBoard addObserver:self forKeyPath:@"drawingRect" options:NSKeyValueObservingOptionOld context:_EXTViewArtBoardDrawingRectContext];
+        [_artBoard addObserver:self forKeyPath:@"drawingRect" options:NSKeyValueObservingOptionOld context:_EXTChartViewArtBoardDrawingRectContext];
 
         _bindings = [NSMutableDictionary dictionary];
 
@@ -71,6 +71,7 @@ static void *_EXTViewArtBoardDrawingRectContext = &_EXTViewArtBoardDrawingRectCo
 
 		[self setGrid:[EXTGrid new]];
         [grid setBoundsRect:[self bounds]];
+        [grid addObserver:self forKeyPath:EXTGridAnyKey options:0 context:NULL];
 		
 		// the tracking area should be set to the dataRect, which is still not implemented.
 		
@@ -123,6 +124,7 @@ static void *_EXTViewArtBoardDrawingRectContext = &_EXTViewArtBoardDrawingRectCo
 
 - (void)dealloc {
     [_artBoard removeObserver:self forKeyPath:@"drawingRect"];
+    [grid removeObserver:self forKeyPath:EXTGridAnyKey];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
@@ -346,25 +348,25 @@ static void *_EXTViewArtBoardDrawingRectContext = &_EXTViewArtBoardDrawingRectCo
 #pragma mark - Bindings & KVO
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context{
-	if (context == _EXTViewArtBoardDrawingRectContext) {
+	if (context == _EXTChartViewArtBoardDrawingRectContext) {
         [self setNeedsDisplayInRect:NSUnionRect([change[NSKeyValueChangeOldKey] rectValue], [_artBoard drawingRect])];
         if (_editingArtBoards)
             [[self window] invalidateCursorRectsForView:self];
 	}
 	else if ([keyPath isEqualToString:EXTGridAnyKey]){
 		// control never reaches this point.  both strings are substitutes for "ANY".  But nevertheless the grid spacing is getting reset.   Ugh.
-		// the next line is a hack, and results in a few  redundant settings of gridSpacing.   It should be do-able with a simple binding, binding the value of gridSpacing to the one in the grid object.   But furthermore, there shouldn't be a gridSpacing variable in the EXTView class.
+		// the next line is a hack, and results in a few  redundant settings of gridSpacing.   It should be do-able with a simple binding, binding the value of gridSpacing to the one in the grid object.   But furthermore, there shouldn't be a gridSpacing variable in the EXTChartView class.
 		
 		[self setGridSpacing:grid.gridSpacing]; 
 		[self setNeedsDisplay:YES];
 	}
-    else if (context == _EXTViewSseqContext) {
+    else if (context == _EXTChartViewSseqContext) {
         EXTSpectralSequence *newSseq = [object valueForKeyPath:keyPath];
 
         if (newSseq != NSNotApplicableMarker)
             [self setSseq:newSseq];
     }
-    else if (context == _EXTViewSelectedPageIndexContext) {
+    else if (context == _EXTChartViewSelectedPageIndexContext) {
         NSNumber *selectedPageNumber = [object valueForKeyPath:keyPath];
 
         if (selectedPageNumber != NSNotApplicableMarker)
@@ -377,11 +379,11 @@ static void *_EXTViewArtBoardDrawingRectContext = &_EXTViewArtBoardDrawingRectCo
 
 - (void)bind:(NSString *)binding toObject:(id)observable withKeyPath:(NSString *)keyPath options:(NSDictionary *)options
 {
-    if ([binding isEqualToString:EXTViewSseqBindingName] || [binding isEqualToString:EXTViewSelectedPageIndexBindingName]) {
+    if ([binding isEqualToString:EXTChartViewSseqBindingName] || [binding isEqualToString:EXTChartViewSelectedPageIndexBindingName]) {
         if (_bindings[binding])
             [self unbind:binding];
 
-        void *context = [binding isEqualToString:EXTViewSseqBindingName] ? _EXTViewSseqContext : _EXTViewSelectedPageIndexContext;
+        void *context = [binding isEqualToString:EXTChartViewSseqBindingName] ? _EXTChartViewSseqContext : _EXTChartViewSelectedPageIndexContext;
         [observable addObserver:self forKeyPath:keyPath options:0 context:context];
         _bindings[binding] = @{
                                NSObservedObjectKey : observable,

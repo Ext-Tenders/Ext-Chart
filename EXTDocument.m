@@ -7,7 +7,7 @@
 //
 
 #import "EXTDocument.h"
-#import "EXTView.h"
+#import "EXTChartView.h"
 #import "EXTGrid.h"
 #import "EXTArtBoard.h"
 #import "EXTterm.h"
