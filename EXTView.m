@@ -71,6 +71,7 @@ static void *_EXTViewArtBoardDrawingRectContext = &_EXTViewArtBoardDrawingRectCo
 
 		[self setGrid:[EXTGrid new]];
         [grid setBoundsRect:[self bounds]];
+        [grid addObserver:self forKeyPath:EXTGridAnyKey options:0 context:NULL];
 		
 		// the tracking area should be set to the dataRect, which is still not implemented.
 		
@@ -123,6 +124,7 @@ static void *_EXTViewArtBoardDrawingRectContext = &_EXTViewArtBoardDrawingRectCo
 
 - (void)dealloc {
     [_artBoard removeObserver:self forKeyPath:@"drawingRect"];
+    [grid removeObserver:self forKeyPath:EXTGridAnyKey];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
