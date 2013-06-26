@@ -21,8 +21,6 @@
 	BOOL editMode;
 	BOOL highlighting;
 
-	// the gridspacing ivar should be taken out.   It's currently used in some of the data drawing code, which should be moved elsewhere.
-	CGFloat gridSpacing;
 	int pageInView;
 	
 	NSRect highlightRect;    // make this private?
@@ -36,7 +34,6 @@
 
 
 
-@property(assign) CGFloat gridSpacing; 
 @property(nonatomic, assign) BOOL showGrid;
 @property(nonatomic, assign) BOOL editMode, showPages, editingArtBoards, highlighting;
 @property(strong) EXTArtBoard *artBoard;

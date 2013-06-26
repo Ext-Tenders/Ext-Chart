@@ -31,6 +31,7 @@ NSString * const EXTChartViewSelectedPageIndexBindingName = @"selectedPageIndex"
 static void *_EXTChartViewSseqContext = &_EXTChartViewSseqContext;
 static void *_EXTChartViewSelectedPageIndexContext = &_EXTChartViewSelectedPageIndexContext;
 static void *_EXTChartViewArtBoardDrawingRectContext = &_EXTChartViewArtBoardDrawingRectContext;
+static void *_EXTChartViewGridAnyKeyContext = &_EXTChartViewGridAnyKeyContext;
 
 
 @implementation EXTChartView
@@ -38,7 +39,6 @@ static void *_EXTChartViewArtBoardDrawingRectContext = &_EXTChartViewArtBoardDra
     NSMutableDictionary *_bindings;
 }
 
-@synthesize gridSpacing;
 @synthesize showGrid, editMode, showPages;
 @synthesize highlighting;
 @synthesize highlightPath;
@@ -58,7 +58,6 @@ static void *_EXTChartViewArtBoardDrawingRectContext = &_EXTChartViewArtBoardDra
 		showGrid = TRUE;
 		showPages = YES;
 		editMode = NO;
-		gridSpacing = 9.0;
         _bindings = [NSMutableDictionary dictionary];
 
 		_editingArtBoards = NO;
@@ -68,7 +67,7 @@ static void *_EXTChartViewArtBoardDrawingRectContext = &_EXTChartViewArtBoardDra
 
 		_grid = [EXTGrid new];
         [_grid setBoundsRect:[self bounds]];
-        [_grid addObserver:self forKeyPath:EXTGridAnyKey options:0 context:NULL];
+        [_grid addObserver:self forKeyPath:EXTGridAnyKey options:0 context:_EXTChartViewGridAnyKeyContext];
 
 
         // Align the art board to the grid
@@ -130,8 +129,8 @@ static void *_EXTChartViewArtBoardDrawingRectContext = &_EXTChartViewArtBoardDra
 }
 
 - (void)dealloc {
-    [_artBoard removeObserver:self forKeyPath:@"drawingRect"];
-    [_grid removeObserver:self forKeyPath:EXTGridAnyKey];
+    [_artBoard removeObserver:self forKeyPath:@"drawingRect" context:_EXTChartViewArtBoardDrawingRectContext];
+    [_grid removeObserver:self forKeyPath:EXTGridAnyKey context:_EXTChartViewGridAnyKeyContext];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
@@ -139,12 +138,12 @@ static void *_EXTChartViewArtBoardDrawingRectContext = &_EXTChartViewArtBoardDra
 #pragma mark *** utility methods ***
 // convert pixel coordinates to (p, q) coordinates
 -(NSPoint) convertToGridCoordinates:(NSPoint)pixelLoc {
-	return NSMakePoint(floor(pixelLoc.x/gridSpacing), floor(pixelLoc.y/gridSpacing));
+	return NSMakePoint(floor(pixelLoc.x / [_grid gridSpacing]), floor(pixelLoc.y / [_grid gridSpacing]));
 }
 
 // convert (p, q) coordinates to pixel coordinates
 - (NSPoint) convertToPixelCoordinates:(NSPoint) gridLoc{
-	return NSMakePoint(gridLoc.x*gridSpacing, gridLoc.y*gridSpacing);
+	return NSMakePoint(gridLoc.x*[_grid gridSpacing], gridLoc.y*[_grid gridSpacing]);
 }
 
 
@@ -208,7 +207,7 @@ static void *_EXTChartViewArtBoardDrawingRectContext = &_EXTChartViewArtBoardDra
         [_delegate drawPageNumber:_selectedPageIndex
                               ll:[self convertToGridCoordinates:lowerLeftPoint]
                               ur:[self convertToGridCoordinates:upperRightPoint]
-                     withSpacing:gridSpacing];
+                     withSpacing:[_grid gridSpacing]];
 		
 		//  // restore the graphics context
 		//	[theContext restoreGraphicsState];
@@ -354,17 +353,13 @@ static void *_EXTChartViewArtBoardDrawingRectContext = &_EXTChartViewArtBoardDra
 
 #pragma mark - Bindings & KVO
 
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context{
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
 	if (context == _EXTChartViewArtBoardDrawingRectContext) {
         [self setNeedsDisplayInRect:NSUnionRect([change[NSKeyValueChangeOldKey] rectValue], [_artBoard drawingRect])];
         if (_editingArtBoards)
             [[self window] invalidateCursorRectsForView:self];
 	}
-	else if ([keyPath isEqualToString:EXTGridAnyKey]){
-		// control never reaches this point.  both strings are substitutes for "ANY".  But nevertheless the grid spacing is getting reset.   Ugh.
-		// the next line is a hack, and results in a few  redundant settings of gridSpacing.   It should be do-able with a simple binding, binding the value of gridSpacing to the one in the grid object.   But furthermore, there shouldn't be a gridSpacing variable in the EXTChartView class.
-		
-		[self setGridSpacing:_grid.gridSpacing]; 
+	else if (context == _EXTChartViewGridAnyKeyContext) {
 		[self setNeedsDisplay:YES];
 	}
     else if (context == _EXTChartViewSseqContext) {
@@ -465,7 +460,7 @@ static void *_EXTChartViewArtBoardDrawingRectContext = &_EXTChartViewArtBoardDra
 	// ripped off from sketch.   according to apple's document, it is better not to override the event loop like this.  Also, see the DragItemAround code for what I think is a better way to organize this.
 
     const NSRect originalVisibleRect = [[self enclosingScrollView] documentVisibleRect];
-    NSPoint lastPoint = [self convertPoint:[event locationInWindow] fromView:nil];
+    NSPoint lastPoint = [_grid nearestGridPoint:[self convertPoint:[event locationInWindow] fromView:nil]];
 
     [_artBoard startDragOperationAtPoint:lastPoint];
 
