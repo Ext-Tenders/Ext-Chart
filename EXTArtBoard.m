@@ -12,7 +12,7 @@
 
 #pragma mark - Private variables
 
-static const NSSize _EXTArtBoardDefaultSize = {792, 612};
+static const NSSize _EXTArtBoardDefaultSize = {360, 216};
 static const NSSize _EXTArtBoardMinimumSize = {50, 50};
 static NSColor *_EXTArtBoardBackgroundColour = nil;
 static NSColor *_EXTArtBoardBorderColour = nil;
