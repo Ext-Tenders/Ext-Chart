@@ -462,6 +462,12 @@ static void *_EXTChartViewGridAnyKeyContext = &_EXTChartViewGridAnyKeyContext;
     const NSRect originalVisibleRect = [[self enclosingScrollView] documentVisibleRect];
     NSPoint lastPoint = [_grid nearestGridPoint:[self convertPoint:[event locationInWindow] fromView:nil]];
 
+    // Disable highlight whilst dragging the art board
+    BOOL wasHighlighting = highlighting;
+    [self setHighlighting:NO];
+    if (wasHighlighting)
+        [self setNeedsDisplayInRect:NSInsetRect([highlightPath bounds], -1.0, -1.0)];
+
     [_artBoard startDragOperationAtPoint:lastPoint];
 
 	while ([event type] != NSLeftMouseUp) {
@@ -490,6 +496,8 @@ static void *_EXTChartViewGridAnyKeyContext = &_EXTChartViewGridAnyKeyContext;
 	}
 
     [_artBoard finishDragOperation];
+    [self setHighlighting:wasHighlighting];
+	[self resetHighlightRectAtLocation:lastPoint];
 }
 
 
