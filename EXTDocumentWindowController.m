@@ -11,6 +11,7 @@
 #import "EXTterm.h"
 #import "EXTdifferential.h"
 #import "EXTChartView.h"
+#import "EXTScrollView.h"
 #import "EXTSpectralSequence.h"
 
 @interface EXTDocumentWindowController ()
@@ -49,6 +50,15 @@
     self.chartView.delegate = self;
 
     [[self chartView] bind:EXTChartViewSseqBindingName toObject:[self document] withKeyPath:@"sseq" options:nil];
+
+    // Offset the clip view a bit to the left and bottom so that the origin does not coincide with the window’s bottom-left corner,
+    // making the art board border more noticeable.
+    // Also, increase the initial scale factor
+    EXTScrollView *scrollView = (EXTScrollView *)[_chartView enclosingScrollView];
+    NSPoint clipViewOrigin = [[scrollView contentView] bounds].origin;
+    clipViewOrigin.x -= 50.0;
+    clipViewOrigin.y -= 50.0;
+    [scrollView zoomToPoint:clipViewOrigin withScaling:2.0];
 }
 
 #pragma mark - Properties
