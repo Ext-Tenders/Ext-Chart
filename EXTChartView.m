@@ -216,23 +216,21 @@ static void *_EXTChartViewGridAnyKeyContext = &_EXTChartViewGridAnyKeyContext;
 }
 
 
-- (void)resetHighlightRectAtLocation:(NSPoint)location{
+- (void)resetHighlightRectAtLocation:(NSPoint)location {
 	
 // we're rebuilding the (small) highlightPath every time the mouse moves.   Is it better to just translate it, if needed?   We could eliminate the currentTool's need to know about the grid by taking one path, and translating and scaling it.   That path could be a constant, so wouldn't need to be rebuilt.
 
 	NSBezierPath *newHighlightPath = [currentTool makeHighlightPathAtPoint:location onGrid: _grid onPage:pageInView];
 	
-	NSRect oldRect = [highlightPath bounds];
-	NSRect newRect = [newHighlightPath bounds];
+	const NSRect oldRect = [highlightPath bounds];
+	const NSRect newRect = [newHighlightPath bounds];
 	
-	BOOL sameRectQ = newRect.origin.x == oldRect.origin.x  && newRect.origin.y == oldRect.origin.y && newRect.size.width == oldRect.size.width && newRect.size.height == oldRect.size.height;
-	
-	
-	if (!sameRectQ) {
-		[self setHighlightPath:newHighlightPath];
-		[self setNeedsDisplayInRect:NSInsetRect(oldRect, -1.0, -1.0)];
-		[self setNeedsDisplayInRect:NSInsetRect(newRect, -1.0, -1.0)];
-	}
+    [self setHighlightPath:newHighlightPath];
+
+    // We may be resetting the highlight because the mouse has moved, the page has changed, or the highlighting {YES,NO} status has changed,
+    // so we always flag both the previous location and the new location as dirty.
+    [self setNeedsDisplayInRect:NSInsetRect(oldRect, -1.0, -1.0)];
+    [self setNeedsDisplayInRect:NSInsetRect(newRect, -1.0, -1.0)];
 }
 
 -(IBAction)setGridToDefaults:(id)sender{
@@ -463,37 +461,35 @@ static void *_EXTChartViewGridAnyKeyContext = &_EXTChartViewGridAnyKeyContext;
     NSPoint lastPoint = [_grid nearestGridPoint:[self convertPoint:[event locationInWindow] fromView:nil]];
 
     // Disable highlight whilst dragging the art board
-    BOOL wasHighlighting = highlighting;
+    const BOOL wasHighlighting = highlighting;
     [self setHighlighting:NO];
     if (wasHighlighting)
         [self setNeedsDisplayInRect:NSInsetRect([highlightPath bounds], -1.0, -1.0)];
 
     [_artBoard startDragOperationAtPoint:lastPoint];
 
-	while ([event type] != NSLeftMouseUp) {
+    bool (^isEscapeKeyEvent)(NSEvent *) = ^bool (NSEvent *event) {
+        return [event type] == NSKeyDown && [event keyCode] == 53;
+    };
+
+    // Since we are sequestering event loop processing, check for the Escape key here to cancel the drag operation
+	while ([event type] != NSLeftMouseUp && !isEscapeKeyEvent(event)) {
 		event = [[self window] nextEventMatchingMask:(NSLeftMouseDraggedMask | NSLeftMouseUpMask | NSKeyDownMask)];
         const NSPoint currentPoint = [_grid nearestGridPoint:[self convertPoint:[event locationInWindow] fromView:nil]];
 
-        switch ([event type]) {
-            case NSLeftMouseDragged: {
-                if (! NSEqualPoints(lastPoint, currentPoint))
-                    [_artBoard performDragOperationWithPoint:currentPoint];
-                [self autoscroll:event];
-                break;
+        if ([event type] == NSLeftMouseDragged) {
+            if (! NSEqualPoints(lastPoint, currentPoint)) {
+                [_artBoard performDragOperationWithPoint:currentPoint];
+                lastPoint = currentPoint;
             }
-
-            case NSKeyDown:
-                // Since we are sequestering event loop processing, check for the Escape key here to cancel the drag operation
-                if ([event keyCode] == 53) {
-                    [_artBoard cancelDragOperation];
-                    [self scrollRectToVisible:originalVisibleRect];
-                    return;
-                }
-                break;
+            [self autoscroll:event];
         }
-
-        lastPoint = currentPoint;
 	}
+
+    if (isEscapeKeyEvent(event)) {
+        [_artBoard cancelDragOperation];
+        [self scrollRectToVisible:originalVisibleRect];
+    }
 
     [_artBoard finishDragOperation];
     [self setHighlighting:wasHighlighting];

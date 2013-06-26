@@ -203,8 +203,6 @@ NS_INLINE void EXTArtBoardComputeHotSpotFrames(const NSRect frame,
 - (void)cancelDragOperation {
     if (_dragOperation != EXTArtBoardMouseDragOperationNone)
         [self setFrame:_initialDragFrame];
-    
-    [self finishDragOperation];
 }
 
 
