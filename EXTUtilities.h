@@ -12,7 +12,7 @@
 #ifdef DEBUG
     #define DLog(format, ...) NSLog((@"%s L%d: " format), __PRETTY_FUNCTION__, __LINE__, ##__VA_ARGS__)
 #else
-    #define DLog(format, ...)
+    #define DLog(format, ...) do {} while (false)
 #endif
 
 /*! EXTLog() always logs the message */

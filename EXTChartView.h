@@ -21,11 +21,7 @@
 	BOOL editMode;
 	BOOL highlighting;
 
-	// the gridspacing ivar should be taken out.   It's currently used in some of the data drawing code, which should be moved elsewhere.
-	CGFloat gridSpacing;
 	int pageInView;
-	
-	IBOutlet EXTGrid *grid;
 	
 	NSRect highlightRect;    // make this private?
 	NSColor *highlightRectColor;  // if this is not customizable, it should be a constant.   I couldn't make it work as a static or extern...
@@ -38,11 +34,10 @@
 
 
 
-@property(assign) CGFloat gridSpacing; 
 @property(nonatomic, assign) BOOL showGrid;
 @property(nonatomic, assign) BOOL editMode, showPages, editingArtBoards, highlighting;
 @property(strong) EXTArtBoard *artBoard;
-@property(strong) EXTGrid *grid;
+@property(nonatomic, readonly) EXTGrid *grid;
 @property(strong) NSBezierPath *highlightPath;
 
 @property(nonatomic, strong) EXTSpectralSequence *sseq; // TODO: this should evolve to a copy property in order to avoid side effects
