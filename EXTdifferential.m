@@ -131,7 +131,7 @@
 // it looks better if they always attach themselves to the *last* class.
 // *really* really, they should attach themselves intelligently to the class
 // that makes most sense.  :)
-- (void) drawWithSpacing:(CGFloat)spacing {
+- (void) drawWithSpacing:(CGFloat)spacing targetPosition:(int)targetPosition {
     // if this differential is actually empty, then don't draw it.
     if (([self.presentation image].count == 0) ||
         ([self.start dimension:self.page] == 0) ||
@@ -140,10 +140,16 @@
     
     NSPoint pointStart = [start.location makePoint],
             pointEnd = [end.location makePoint];
+    
 	CGFloat x1 = (pointStart.x+0.25)*spacing,
 			y1 = (pointStart.y+0.25)*spacing,
-			x2 = (pointEnd.x+0.25)*spacing,
-			y2 = (pointEnd.y+0.25)*spacing;
+			x2 = (pointEnd.x+0.1)*spacing,
+			y2 = (pointEnd.y+0.1)*spacing;
+    
+    // TODO: factor this out and make it less retarded
+    x2 = x2 + 3.5/9*spacing + ((CGFloat)((targetPosition%3)-1)*2)/9*spacing;
+    y2 = y2 + 3.5/9*spacing + ((CGFloat)(((1+targetPosition)%4)-2)*2)/9*spacing;
+    
 	[[NSColor blackColor] set];
 	NSBezierPath *line = [NSBezierPath bezierPath];
 	[line moveToPoint:NSMakePoint(x1, y1)];

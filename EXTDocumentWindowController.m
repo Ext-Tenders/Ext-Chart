@@ -80,29 +80,49 @@
 // needs to be investigated and untangled... :(
 -(void) drawPageNumber:(NSUInteger)pageNumber ll:(NSPoint)lowerLeft
                     ur:(NSPoint)upperRight withSpacing:(CGFloat)withSpacing {
+    // start by initializing the array of counts
+    int width = (int)(upperRight.x - lowerLeft.x + 1),
+        height = (int)(upperRight.y - lowerLeft.y + 1);
+    NSMutableArray *counts = [NSMutableArray arrayWithCapacity:width];
+    for (int i = 0; i < width; i++) {
+        NSMutableArray *row = [NSMutableArray arrayWithCapacity:height];
+        for (int j = 0; j < height; j++)
+            [row setObject:@0 atIndexedSubscript:j];
+        [counts setObject:row atIndexedSubscript:i];
+    }
+    
     // iterate through the available grid locations in the view. it's too bad
     // that this is slow.
-    for (int s = (int)floor(lowerLeft.x); s < ceil(upperRight.x); s++)
-    for (int t = (int)floor(lowerLeft.y); t < ceil(upperRight.y); t++) {
-        // tell each cycle in this location to draw, but we remember previously
-        // drawn cycles so that they don't overlap in projected views.
-        int cyclesDrawnSoFar = 0;
+    for (EXTTerm *term in self.extDocument.sseq.terms.allValues) {
+        NSPoint point = [[term location] makePoint];
         
-        for (EXTTerm *term in self.extDocument.sseq.terms.allValues) {
-            NSPoint point = [[term location] makePoint];
-            if (((int)point.x != s) || ((int)point.y != t))
-                continue;
-            
-            [term drawWithSpacing:withSpacing page:pageNumber offset:cyclesDrawnSoFar];
-            
-            cyclesDrawnSoFar += [term dimension:pageNumber];
+        if (point.x >= lowerLeft.x && point.x <= upperRight.x &&
+            point.y >= lowerLeft.y && point.y <= upperRight.y) {
+            NSMutableArray *column = (NSMutableArray*)counts[(int)(point.x-lowerLeft.x)];
+            int offset = [column[(int)(point.y-lowerLeft.y)] intValue];
+        
+            [term drawWithSpacing:withSpacing page:pageNumber offset:offset];
+        
+            column[(int)(point.y-lowerLeft.y)] = @(offset + [term dimension:pageNumber]);
         }
     }
 
     // iterate also through the available differentials
     for (EXTDifferential* differential in self.extDocument.sseq.differentials) {
-        if ([differential page] == pageNumber)
-            [differential drawWithSpacing:withSpacing];
+        if ([differential page] != pageNumber)
+            continue;
+        
+        int targetPosition = 0;
+        NSPoint target = [differential.end.location makePoint];
+        
+        if (target.x >= lowerLeft.x && target.x <= upperRight.x &&
+            target.y >= lowerLeft.y && target.y <= upperRight.y) {
+            NSMutableArray *column = (NSMutableArray*)counts[(int)(target.x-lowerLeft.x)];
+            if ((int)(target.y-lowerLeft.y) < height)
+                targetPosition = [column[(int)(target.y-lowerLeft.y)] intValue];
+        }
+        
+        [differential drawWithSpacing:withSpacing targetPosition:targetPosition-1];
     }
 }
 
