@@ -11,6 +11,7 @@
 #import "EXTterm.h"
 #import "EXTdifferential.h"
 #import "EXTChartView.h"
+#import "EXTArtBoard.h"
 #import "EXTScrollView.h"
 #import "EXTSpectralSequence.h"
 
@@ -138,6 +139,23 @@
 
 -(void)drawPagesUpTo: (NSUInteger) pageNumber {
 	;
+}
+
+#pragma mark - Actions
+
+- (IBAction)exportArtBoard:(id)sender {
+    NSData *artBoardPDFData = [_chartView dataWithPDFInsideRect:[[_chartView artBoard] frame]];
+
+    NSSavePanel *savePanel = [NSSavePanel savePanel];
+    [savePanel setNameFieldStringValue:[NSString stringWithFormat:@"page_%lu", [_chartView selectedPageIndex]]];
+    [savePanel setAllowedFileTypes:@[@"pdf"]];
+    [savePanel setAllowsOtherFileTypes:NO];
+
+    [savePanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result) {
+        // TODO: error handling
+        if (result == NSFileHandlingPanelOKButton)
+            [artBoardPDFData writeToURL:[savePanel URL] atomically:YES];
+    }];
 }
 
 #pragma mark ***view customization***
