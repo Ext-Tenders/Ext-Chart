@@ -111,23 +111,6 @@ static void *_EXTChartViewGridAnyKeyContext = &_EXTChartViewGridAnyKeyContext;
 	return self;
 }
 
--(void)awakeFromNib	{
-	[self scrollRectToVisible:[_artBoard frame]];
-	NSScrollView *scroller = [self enclosingScrollView];
-	
-	[scroller setHasHorizontalRuler:YES];
-	[scroller setHasVerticalRuler:YES];
-	
-	NSRulerView *horizRuler = [scroller horizontalRulerView];
-    NSRulerView *vertRuler = [scroller verticalRulerView];
-	
-    [horizRuler setOriginOffset: - [self bounds].origin.x];
-	
-    [vertRuler setOriginOffset: - [self bounds].origin.y];
-	
-	[scroller setRulersVisible:YES];	
-}
-
 - (void)dealloc {
     [_artBoard removeObserver:self forKeyPath:@"drawingRect" context:_EXTChartViewArtBoardDrawingRectContext];
     [_grid removeObserver:self forKeyPath:EXTGridAnyKey context:_EXTChartViewGridAnyKeyContext];
@@ -280,6 +263,9 @@ static void *_EXTChartViewGridAnyKeyContext = &_EXTChartViewGridAnyKeyContext;
     if (editingArtBoards != _editingArtBoards) {
         _editingArtBoards = editingArtBoards;
         [[self window] invalidateCursorRectsForView:self];
+
+        [self setHighlighting:!editingArtBoards];
+        [self setNeedsDisplayInRect:NSInsetRect([highlightPath bounds], -1.0, -1.0)];
     }
 }
 
@@ -324,7 +310,10 @@ static void *_EXTChartViewGridAnyKeyContext = &_EXTChartViewGridAnyKeyContext;
         [self setSelectedPageIndex:_selectedPageIndex - 1];
 }
 
-
+// This is odd: we do not receive -swipeWithEvent: until the user scrolls the view using
+// a two-finger scroll gesture. This same behaviour happens if the scroll view implements
+// -swipeWithEvent:.
+// See http://stackoverflow.com/questions/15854301
 - (void)swipeWithEvent:(NSEvent *)event{
 	CGFloat x = [event deltaX];
 	if (x != 0) {
@@ -334,6 +323,10 @@ static void *_EXTChartViewGridAnyKeyContext = &_EXTChartViewGridAnyKeyContext;
 
 - (BOOL)acceptsFirstResponder
 {
+    return YES;
+}
+
+- (BOOL)acceptsTouchEvents {
     return YES;
 }
 
@@ -416,12 +409,14 @@ static void *_EXTChartViewGridAnyKeyContext = &_EXTChartViewGridAnyKeyContext;
 
 #pragma mark *** zooming and scrolling ***
 
--(IBAction)fitWidth:(id)sender{
-	
+- (IBAction)zoomToFit:(id)sender {
+    const NSRect artBoardRect = [_artBoard frame];
+    [[self enclosingScrollView] magnifyToFitRect:artBoardRect];
+    [self scrollPoint:artBoardRect.origin];
 }
 
--(IBAction)fitHeight:(id)sender{
-	
+- (NSRect)rectForSmartMagnificationAtPoint:(NSPoint)location inRect:(NSRect)visibleRect {
+    return [_artBoard frame];
 }
 
 #pragma mark *** mouse tracking and cursor changing (tests)  ***
@@ -460,12 +455,6 @@ static void *_EXTChartViewGridAnyKeyContext = &_EXTChartViewGridAnyKeyContext;
     const NSRect originalVisibleRect = [[self enclosingScrollView] documentVisibleRect];
     NSPoint lastPoint = [_grid nearestGridPoint:[self convertPoint:[event locationInWindow] fromView:nil]];
 
-    // Disable highlight whilst dragging the art board
-    const BOOL wasHighlighting = highlighting;
-    [self setHighlighting:NO];
-    if (wasHighlighting)
-        [self setNeedsDisplayInRect:NSInsetRect([highlightPath bounds], -1.0, -1.0)];
-
     [_artBoard startDragOperationAtPoint:lastPoint];
 
     bool (^isEscapeKeyEvent)(NSEvent *) = ^bool (NSEvent *event) {
@@ -492,8 +481,6 @@ static void *_EXTChartViewGridAnyKeyContext = &_EXTChartViewGridAnyKeyContext;
     }
 
     [_artBoard finishDragOperation];
-    [self setHighlighting:wasHighlighting];
-	[self resetHighlightRectAtLocation:lastPoint];
 }
 
 

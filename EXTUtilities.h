@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
+
 /*! DLog() only logs the message in debug builds */
 #ifdef DEBUG
     #define DLog(format, ...) NSLog((@"%s L%d: " format), __PRETTY_FUNCTION__, __LINE__, ##__VA_ARGS__)
@@ -17,3 +18,9 @@
 
 /*! EXTLog() always logs the message */
 #define EXTLog(format, ...) NSLog((@"%s L%d" format), __PRETTY_FUNCTION__, __LINE__, ##__VA_ARGS__)
+
+
+/*! EXTEpsilonEqual() returns true iff its two floating-point arguments differ by at most epsilon, where epsilon depends on the argument’s data types */
+static bool __attribute__((__overloadable__, __always_inline__)) EXTEpsilonEqual(float x, float y) {return fabsf(x - y) <= FLT_EPSILON;}
+static bool __attribute__((__overloadable__, __always_inline__)) EXTEpsilonEqual(double x, double y) {return fabs(x - y) <= DBL_EPSILON;}
+static bool __attribute__((__overloadable__, __always_inline__)) EXTEpsilonEqual(long double x, long double y) {return fabsl(x - y) <= LDBL_EPSILON;}

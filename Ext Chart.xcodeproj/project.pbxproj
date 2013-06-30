@@ -9,6 +9,9 @@
 /* Begin PBXBuildFile section */
 		093AEADD13E10759003E9F58 /* EXTPair.m in Sources */ = {isa = PBXBuildFile; fileRef = 093AEADC13E10759003E9F58 /* EXTPair.m */; };
 		143F3DFE176D615100FB92B3 /* EXTUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 143F3DFD176D615100FB92B3 /* EXTUtilities.m */; };
+		149314581783B6EB0080EF28 /* EXTDocumentControlsView.m in Sources */ = {isa = PBXBuildFile; fileRef = 149314571783B6EA0080EF28 /* EXTDocumentControlsView.m */; };
+		149949DF1786906200001137 /* ArtBoardToolAlternate.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 149949DE1786906200001137 /* ArtBoardToolAlternate.pdf */; };
+		149949E11786A3A000001137 /* ArtBoardTool.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 149949E01786A3A000001137 /* ArtBoardTool.pdf */; };
 		14EF1A661756EE3C0012DD3C /* SelectTool.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 14EF1A651756EE3C0012DD3C /* SelectTool.pdf */; };
 		14EF1A6B17584C080012DD3C /* EXTDocumentWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 14EF1A6A17584C080012DD3C /* EXTDocumentWindowController.m */; };
 		1DDD582C0DA1D0D100B32029 /* EXTDocument.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1DDD58280DA1D0D100B32029 /* EXTDocument.xib */; };
@@ -50,6 +53,10 @@
 		13E42FBA07B3F13500E4EEF1 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
 		143F3DFC176D615100FB92B3 /* EXTUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTUtilities.h; sourceTree = "<group>"; };
 		143F3DFD176D615100FB92B3 /* EXTUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTUtilities.m; sourceTree = "<group>"; };
+		149314561783B6EA0080EF28 /* EXTDocumentControlsView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTDocumentControlsView.h; sourceTree = "<group>"; };
+		149314571783B6EA0080EF28 /* EXTDocumentControlsView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTDocumentControlsView.m; sourceTree = "<group>"; };
+		149949DE1786906200001137 /* ArtBoardToolAlternate.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = ArtBoardToolAlternate.pdf; sourceTree = "<group>"; };
+		149949E01786A3A000001137 /* ArtBoardTool.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = ArtBoardTool.pdf; sourceTree = "<group>"; };
 		149A0EA6176C409C006F6142 /* NSCursor+EXTApplePrivate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSCursor+EXTApplePrivate.h"; sourceTree = "<group>"; };
 		14EF1A651756EE3C0012DD3C /* SelectTool.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = SelectTool.pdf; path = Images/SelectTool.pdf; sourceTree = "<group>"; };
 		14EF1A6917584C080012DD3C /* EXTDocumentWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTDocumentWindowController.h; sourceTree = "<group>"; };
@@ -190,6 +197,8 @@
 				3187BA2413DC6C6C00C26803 /* EXTScrollView.m */,
 				317707DF13D7893A003475A2 /* EXTChartView.h */,
 				317707E013D7893A003475A2 /* EXTChartView.m */,
+				149314561783B6EA0080EF28 /* EXTDocumentControlsView.h */,
+				149314571783B6EA0080EF28 /* EXTDocumentControlsView.m */,
 			);
 			name = Views;
 			sourceTree = "<group>";
@@ -224,6 +233,8 @@
 			isa = PBXGroup;
 			children = (
 				14EF1A651756EE3C0012DD3C /* SelectTool.pdf */,
+				149949E01786A3A000001137 /* ArtBoardTool.pdf */,
+				149949DE1786906200001137 /* ArtBoardToolAlternate.pdf */,
 			);
 			name = Images;
 			sourceTree = "<group>";
@@ -371,6 +382,8 @@
 				38A1AB6E1727009C00F9F9D5 /* todo.md in Resources */,
 				38F7830B17565F72009D207A /* LICENSE in Resources */,
 				14EF1A661756EE3C0012DD3C /* SelectTool.pdf in Resources */,
+				149949DF1786906200001137 /* ArtBoardToolAlternate.pdf in Resources */,
+				149949E11786A3A000001137 /* ArtBoardTool.pdf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -402,6 +415,7 @@
 				3841EBD2177380C000ADA929 /* EXTZeroRange.m in Sources */,
 				38F9220C17888DE200E30900 /* EXTPolynomialSSeq.m in Sources */,
 				38A35E75178A018600D2A019 /* EXTDemos.m in Sources */,
+				149314581783B6EB0080EF28 /* EXTDocumentControlsView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

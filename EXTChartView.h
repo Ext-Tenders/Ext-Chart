@@ -55,8 +55,7 @@
 - (IBAction)previousPage:(id)sender;
 - (IBAction)computeHomology:(id)sender;
 
-- (IBAction)fitWidth:(id)sender;
-- (IBAction)fitHeight:(id)sender;
+- (IBAction)zoomToFit:(id)sender;
 - (IBAction)setGridToDefaults:(id)sender;
 
 - (void)toolSelectionDidChange;

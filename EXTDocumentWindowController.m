@@ -17,57 +17,221 @@
 #import "EXTScrollView.h"
 #import "EXTSpectralSequence.h"
 
-@interface EXTDocumentWindowController ()
+
+#pragma mark - Private variables
+
+static void *_EXTScrollViewMagnificationContext = &_EXTScrollViewMagnificationContext;
+static void *_EXTSelectedPageIndexContext = &_EXTSelectedPageIndexContext;
+static CGFloat const _EXTDefaultMagnificationSteps[] = {0.1, 0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 2.0, 4.0, 8.0, 16.0, 32.0};
+static size_t const _EXTDefaultMagnificationStepsCount = sizeof(_EXTDefaultMagnificationSteps) / sizeof(_EXTDefaultMagnificationSteps[0]);
+static CGFloat _EXTMagnificationStepRoundingMultiplier = 100.0;
+
+// We use -[NSMenuItem representedObject] to store the magnification that a zoom pop up menu item represents. Since
+// other magnifications are added to the pop up menu (for instance, when the user chooses zoom to fit) and we remove
+// them if the user then chooses a default magnification, we use -[NSMenuItem tag] to indicate whether a menu item
+// is a default magnification or a custom one. For the sake of completeness, we also set a different tag for the other
+// menu item that does not represent a default magnification: zoom to fit.
+enum : NSInteger {
+    _EXTDefaultMagnificationStepTag = 1,
+    _EXTCustomMagnificationTag = 2,
+    _EXTZoomToFitTag = 3,
+};
+
+
+@interface EXTDocumentWindowController () <NSWindowDelegate>
     @property(nonatomic, weak) IBOutlet EXTChartView *chartView;
+    @property(nonatomic, weak) IBOutlet EXTScrollView *scrollView;
+    @property(nonatomic, weak) IBOutlet NSPopUpButton *zoomPopUpButton;
+    @property(nonatomic, weak) IBOutlet NSPopUpButton *pagesPopUpButton;
+    @property(nonatomic, weak) IBOutlet NSButton *editArtBoardsButton;
     @property(nonatomic, assign) NSUInteger maxPage;
     @property(nonatomic, readonly) EXTDocument *extDocument;
 @end
+
 
 @implementation EXTDocumentWindowController
 
 #pragma mark - Life cycle
 
-- (id)init
-{
+- (id)init {
     return [super initWithWindowNibName:@"EXTDocument"];
 }
 
-- (id)initWithWindow:(NSWindow *)window
-{
-    self = [super initWithWindow:window];
-    if (self) {
-        // Initialization code here.
-    }
-    
-    return self;
-}
-
-- (void)windowDidLoad
-{
+- (void)windowDidLoad {
     [super windowDidLoad];
+    [[self window] setDelegate:self];
 
-	// the big board is the bounds rectangle of the EXTChartView object, and is set in the xib file, so we initialize theGrid in the windowControllerDidLoadNib function.   HOWEVER, it screws up the binding of the text cell on the main document.  see the console
+    // Edit art boards pop up button
+    [[_editArtBoardsButton cell] setHighlightsBy:NSChangeBackgroundCellMask];
 
-    // The analogue of these next settings 	 are done with bindings in Sketch.   I'm not sure what the difference is.
-    self.chartView.sseq = [self.document sseq];
-    self.chartView.delegate = self;
+    // Zoom levels pop up button
+    NSMenu *zoomMenu = [[NSMenu alloc] initWithTitle:@""];
+    for (NSInteger i = 0; i < _EXTDefaultMagnificationStepsCount; i++) {
+        NSString *plainTitle = [NSString stringWithFormat:@"%ld%%", lround(_EXTDefaultMagnificationSteps[i] * _EXTMagnificationStepRoundingMultiplier)];
+        NSMenuItem *menuItem = [[NSMenuItem alloc] initWithTitle:plainTitle action:@selector(applyMagnification:) keyEquivalent:@""];
+        [menuItem setRepresentedObject:@(_EXTDefaultMagnificationSteps[i])];
+        [menuItem setTag:_EXTDefaultMagnificationStepTag];
+        [zoomMenu addItem:menuItem];
+    }
 
-    [[self chartView] bind:EXTChartViewSseqBindingName toObject:[self document] withKeyPath:@"sseq" options:nil];
+    [zoomMenu addItem:[NSMenuItem separatorItem]];
+
+    NSMenuItem *menuItem = [[NSMenuItem alloc] initWithTitle:@"Zoom to Fit" action:@selector(zoomToFit:) keyEquivalent:@""];
+    [menuItem setTag:_EXTZoomToFitTag];
+    [zoomMenu addItem:menuItem];
+
+    [_zoomPopUpButton setMenu:zoomMenu];
+
+    // Chart view
+    [_chartView setDelegate:self];
+    [_chartView bind:EXTChartViewSseqBindingName toObject:[self document] withKeyPath:@"sseq" options:nil];
+    [_chartView addObserver:self forKeyPath:@"selectedPageIndex" options:0 context:_EXTSelectedPageIndexContext];
+
+    // Scroll view
+    [_scrollView setHasHorizontalRuler:YES];
+    [_scrollView setHasVerticalRuler:YES];
+    [[_scrollView horizontalRulerView] setOriginOffset:-[_chartView bounds].origin.x];
+    [[_scrollView horizontalRulerView] setReservedThicknessForMarkers:0.0];
+    [[_scrollView verticalRulerView] setOriginOffset:-[_chartView bounds].origin.y];
+    [_scrollView setUsesPredominantAxisScrolling:NO];
+    [_scrollView setRulersVisible:YES];
+    [_scrollView setAllowsMagnification:YES];
+    [_scrollView setMinMagnification:_EXTDefaultMagnificationSteps[0]];
+    [_scrollView setMaxMagnification:_EXTDefaultMagnificationSteps[_EXTDefaultMagnificationStepsCount - 1]];
+
+    [_scrollView addObserver:self forKeyPath:@"magnification" options:0 context:_EXTScrollViewMagnificationContext];
 
     // Offset the clip view a bit to the left and bottom so that the origin does not coincide with the window’s bottom-left corner,
-    // making the art board border more noticeable.
-    // Also, increase the initial scale factor
-    EXTScrollView *scrollView = (EXTScrollView *)[_chartView enclosingScrollView];
-    NSPoint clipViewOrigin = [[scrollView contentView] bounds].origin;
-    clipViewOrigin.x -= 50.0;
-    clipViewOrigin.y -= 50.0;
-    [scrollView zoomToPoint:clipViewOrigin withScaling:2.0];
+    // making the art board border and the axes more noticeable.
+    // Also, increase the initial scale factor.
+    // IMO, this looks nicer than -[EXTChartView zoomToFit:]
+    const NSRect visibleRect = NSInsetRect([[_chartView artBoard] frame], -20.0, -20.0);
+    [_scrollView magnifyToFitRect:visibleRect];
+    [_chartView scrollRectToVisible:visibleRect];
+
+    // Pages pop up button
+    NSMenu *pagesMenu = [[NSMenu alloc] initWithTitle:@""];
+
+    // TODO: this is not quite right. I’m setting an arbitrary number of pages, but this actually depends on the current document
+    [self setMaxPage:10];
+    for (NSInteger page = 0; page < _maxPage; page++) {
+        NSString *title = [NSString stringWithFormat:@"Page %ld", page];
+        menuItem = [[NSMenuItem alloc] initWithTitle:title action:@selector(selectPage:) keyEquivalent:@""];
+        [menuItem setRepresentedObject:@(page)];
+        [pagesMenu addItem:menuItem];
+    }
+
+    [pagesMenu addItem:[NSMenuItem separatorItem]];
+
+    menuItem = [[NSMenuItem alloc] initWithTitle:@"Add Page" action:@selector(addPage:) keyEquivalent:@""];
+    [pagesMenu addItem:menuItem];
+
+    [_pagesPopUpButton setMenu:pagesMenu];
+
+    [[self window] makeFirstResponder:_chartView];
+}
+
+- (void)windowWillClose:(NSNotification *)notification {
+    [_chartView removeObserver:self forKeyPath:@"selectedPageIndex"];
+    [_scrollView removeObserver:self forKeyPath:@"magnification"];
+}
+
+#pragma mark - Zoom
+
+- (IBAction)applyMagnification:(id)sender {
+    NSAssert([sender respondsToSelector:@selector(representedObject)], @"Sender must respond to -representedObject");
+    const CGFloat targetMagnification = [[sender representedObject] doubleValue];
+    if (targetMagnification == [_scrollView magnification])
+        return;
+    NSClipView *clipView = [_scrollView contentView];
+    const NSRect clipViewBounds = [clipView bounds];
+    const NSPoint clipViewCentre = {NSMidX(clipViewBounds), NSMidY(clipViewBounds)};
+
+    // TODO: -setMagnification:centeredAtPoint: does not work correctly with visible rulers, so we
+    // scroll manually after setting the magnification whilst this bug is not fixed.
+    //    [self setMagnification:[step scaleFactor] centeredAtPoint:clipViewCentre];
+
+    [_scrollView setMagnification:targetMagnification];
+
+    const NSPoint documentViewCentre = [[_scrollView documentView] convertPoint:clipViewCentre fromView:clipView];
+    const NSSize newSize = [clipView bounds].size;
+    const NSPoint newOrigin = {
+        .x = documentViewCentre.x - newSize.width / 2.0,
+        .y = documentViewCentre.y - newSize.height / 2.0
+    };
+    [[_scrollView documentView] scrollPoint:newOrigin];
+
+    // Since we’ve just applied one of the default magnifications, there’s no need to show the previous custom magnification, if any.
+    [self _extRemoveCustomZoomFromPopUpMenu];
+}
+
+- (IBAction)zoomIn:(id)sender {
+    const long currentRoundedMagnification = lround([_scrollView magnification] * _EXTMagnificationStepRoundingMultiplier);
+    NSInteger nextStepIndex;
+    for (nextStepIndex = 0; nextStepIndex < _EXTDefaultMagnificationStepsCount; nextStepIndex++) {
+        const long stepRoundedMagnification = lround(_EXTDefaultMagnificationSteps[nextStepIndex] * _EXTMagnificationStepRoundingMultiplier);
+        if (stepRoundedMagnification > currentRoundedMagnification)
+            break;
+    }
+
+    [self _extRemoveCustomZoomFromPopUpMenu];
+
+    if (nextStepIndex != _EXTDefaultMagnificationStepsCount) {
+        [_zoomPopUpButton selectItemAtIndex:nextStepIndex];
+        [[_zoomPopUpButton menu] performActionForItemAtIndex:nextStepIndex];
+    }
+}
+
+- (IBAction)zoomOut:(id)sender {
+    const long currentRoundedMagnification = lround([_scrollView magnification] * _EXTMagnificationStepRoundingMultiplier);
+    NSInteger previousStepIndex;
+    for (previousStepIndex = _EXTDefaultMagnificationStepsCount - 1; previousStepIndex >= 0; previousStepIndex--) {
+        const long stepRoundedMagnification = lround(_EXTDefaultMagnificationSteps[previousStepIndex] * _EXTMagnificationStepRoundingMultiplier);
+        if (stepRoundedMagnification < currentRoundedMagnification)
+            break;
+    }
+
+    [self _extRemoveCustomZoomFromPopUpMenu];
+
+    if (previousStepIndex >= 0) {
+        [_zoomPopUpButton selectItemAtIndex:previousStepIndex];
+        [[_zoomPopUpButton menu] performActionForItemAtIndex:previousStepIndex];
+    }
+}
+
+- (void)_extRemoveCustomZoomFromPopUpMenu {
+    NSMenu *menu = [_zoomPopUpButton menu];
+    NSUInteger indexToRemove = [[menu itemArray] indexOfObjectPassingTest:^BOOL(NSMenuItem *menuItem, NSUInteger idx, BOOL *stop) {
+        return [menuItem tag] == _EXTCustomMagnificationTag;
+    }];
+    if (indexToRemove != NSNotFound)
+        [menu removeItemAtIndex:indexToRemove];
+}
+
+#pragma mark - Pages
+
+- (void)selectPage:(id)sender {
+    NSAssert([sender respondsToSelector:@selector(representedObject)], @"Sender must respond to -representedObject");
+    const NSUInteger targetPage = [[sender representedObject] unsignedIntegerValue];
+
+    if (targetPage <= _maxPage)
+        [_chartView setSelectedPageIndex:targetPage];
+}
+
+- (IBAction)addPage:(id)sender {
+    [self setMaxPage:[self maxPage] + 1];
+
+    NSString *title = [NSString stringWithFormat:@"Page %lu", _maxPage];
+    NSMenuItem *menuItem = [[NSMenuItem alloc] initWithTitle:title action:@selector(selectPage:) keyEquivalent:@""];
+    [menuItem setRepresentedObject:@(_maxPage)];
+    [[_pagesPopUpButton menu] insertItem:menuItem atIndex:_maxPage];
+    [_pagesPopUpButton selectItemAtIndex:_maxPage];
+    [[_pagesPopUpButton menu] performActionForItemAtIndex:_maxPage];
 }
 
 #pragma mark - Properties
 
-- (void)setDocument:(NSDocument *)document
-{
+- (void)setDocument:(NSDocument *)document {
     NSAssert(!document || [document isKindOfClass:[EXTDocument class]], @"This window controller accepts EXTDocument documents only");
 
     if (document != [self document]) {
@@ -81,9 +245,8 @@
     }
 }
 
-- (EXTDocument *)extDocument
-{
-    return self.document;
+- (EXTDocument *)extDocument {
+    return [self document];
 }
 
 #pragma mark -
@@ -142,11 +305,12 @@
 // this performs the culling and delegation calls for drawing a page of the SS
 // TODO: does this need spacing to be passed in?  probably a lot of data passing
 // needs to be investigated and untangled... :(
--(void) drawPageNumber:(NSUInteger)pageNumber ll:(NSPoint)lowerLeft
-                    ur:(NSPoint)upperRight withSpacing:(CGFloat)spacing {
-    // start by initializing the array of counts.  each element is a pair, the
-    // first of which is the total number of dots in the grid, and the second of
-    // which is the number which have been 'used' by differentials on this page.
+- (void)drawPageNumber:(NSUInteger)pageNumber
+                    ll:(NSPoint)lowerLeft
+                    ur:(NSPoint)upperRight
+           withSpacing:(CGFloat)withSpacing
+{
+    // start by initializing the array of counts
     int width = (int)(upperRight.x - lowerLeft.x + 1),
         height = (int)(upperRight.y - lowerLeft.y + 1);
     NSMutableArray *counts = [NSMutableArray arrayWithCapacity:width];
@@ -302,8 +466,50 @@
     // TODO: draw certain multiplicative structures?
 }
 
--(void)drawPagesUpTo: (NSUInteger) pageNumber {
-	;
+- (void)drawPagesUpTo:(NSUInteger)pageNumber {
+    // TODO: what’s this supposed to do?
+}
+
+#pragma mark - Key-value observing
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
+    if (context == _EXTSelectedPageIndexContext)
+        [_pagesPopUpButton selectItemAtIndex:[_chartView selectedPageIndex]];
+    else if (context == _EXTScrollViewMagnificationContext) {
+        const long roundedMagnification = lround([_scrollView magnification] * _EXTMagnificationStepRoundingMultiplier);
+        NSUInteger stepIndex = NSNotFound;
+        int i;
+        for (i = 0; i < _EXTDefaultMagnificationStepsCount; i++) {
+            const long stepRoundedMagnification = lround(_EXTDefaultMagnificationSteps[i] * _EXTMagnificationStepRoundingMultiplier);
+            if (stepRoundedMagnification > roundedMagnification)
+                break;
+            if (stepRoundedMagnification == roundedMagnification) {
+                stepIndex = i;
+                break;
+            }
+        };
+        NSUInteger indexToInsertCustomStep = i;
+
+        // If the magnification corresponds to a default magnification step, the pop up button menu does not show any custom steps.
+        // Otherwise, we need to remove the previous step since there can be only one and at an index possibly different from the
+        // previous one.
+        [self _extRemoveCustomZoomFromPopUpMenu];
+
+        // If it’s not one of the default magnification steps, add a custom step
+        if (stepIndex == NSNotFound) {
+            NSString *title = [NSString stringWithFormat:@"%ld%%", roundedMagnification];
+            NSMenuItem *menuItem = [[NSMenuItem alloc] initWithTitle:title action:NULL keyEquivalent:@""];
+            [menuItem setTag:_EXTCustomMagnificationTag];
+            [[_zoomPopUpButton menu] insertItem:menuItem atIndex:indexToInsertCustomStep];
+            [_zoomPopUpButton selectItemAtIndex:indexToInsertCustomStep];
+        }
+        else
+            [_zoomPopUpButton selectItemAtIndex:stepIndex];
+
+        [[self window] invalidateCursorRectsForView:[_scrollView documentView]];
+    }
+    else
+        [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
 }
 
 #pragma mark - Actions
@@ -321,13 +527,6 @@
         if (result == NSFileHandlingPanelOKButton)
             [artBoardPDFData writeToURL:[savePanel URL] atomically:YES];
     }];
-}
-
-#pragma mark ***view customization***
-
--(NSUInteger) maxPage {
-    //	return [pages count] - 1;
-    return 0; // XXX: what is this used for? fix it!
 }
 
 - (IBAction)demoGroups:(id)sender {
