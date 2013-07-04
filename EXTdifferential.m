@@ -164,6 +164,8 @@
 // until I do something better...namely getting the bidegree of the differential from the page
 	
 	NSRect baseRect = [theGrid enclosingGridRect:point];
+    // XXX: this doesn't work for the May grading.  there should be some kind
+    // of call the EXTLocation or something to make this work out.
 	NSRect targetRect = NSOffsetRect(baseRect, -1*[theGrid gridSpacing], (page)*[theGrid gridSpacing]);
 	NSBezierPath *newPath = [NSBezierPath bezierPathWithRect:baseRect];
 	[newPath appendBezierPathWithRect:targetRect];
