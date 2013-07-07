@@ -43,12 +43,7 @@
 }
 
 +(EXTPair*) scale:(EXTPair*)loc by:(int)scale {
-    if (scale == 0)
-        return [EXTPair identityLocation];
-    if (scale < 0)
-        return [EXTPair scale:[EXTPair negate:loc] by:(-scale)];
-    
-    return [EXTPair addLocation:loc to:[EXTPair scale:loc by:(scale-1)]];
+    return [EXTPair pairWithA:(loc.a*scale) B:(loc.b*scale)];
 }
 
 +(EXTPair*) followDiffl:(EXTPair*)a page:(int)page {

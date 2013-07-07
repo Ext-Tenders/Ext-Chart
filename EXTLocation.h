@@ -8,6 +8,17 @@
 
 #import <Foundation/Foundation.h>
 
+/*
++(EXTLocation*) scale:(EXTLocation*)loc by:(int)scale {
+    if (scale == 0)
+        return [EXTLocation identityLocation];
+    if (scale < 0)
+        return [EXTLocation scale:[EXTLocation negate:loc] by:(-scale)];
+    
+    return [EXTLocation addLocation:loc to:[EXTLocation scale:loc by:(scale-1)]];
+}
+*/
+
 @protocol EXTLocation <NSObject, NSCopying, NSCoding>
 
 // these translate the EXTLocation data into other (potentially lossy) formats

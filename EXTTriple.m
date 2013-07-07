@@ -50,12 +50,7 @@
 }
 
 +(EXTTriple*) scale:(EXTTriple*)loc by:(int)scale {
-    if (scale == 0)
-        return [EXTTriple identityLocation];
-    if (scale < 0)
-        return [EXTTriple scale:[EXTTriple negate:loc] by:(-scale)];
-    
-    return [EXTTriple addLocation:loc to:[EXTTriple scale:loc by:(scale-1)]];
+    return [EXTTriple tripleWithA:(loc.a*scale) B:(loc.b*scale) C:(loc.c*scale)];
 }
 
 +(EXTTriple*) followDiffl:(EXTTriple *)a page:(int)page {
