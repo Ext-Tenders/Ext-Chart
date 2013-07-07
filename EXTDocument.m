@@ -10,11 +10,8 @@
 #import "EXTChartView.h"
 #import "EXTGrid.h"
 #import "EXTArtBoard.h"
-#import "EXTterm.h"
-#import "EXTPair.h"
-#import "EXTdifferential.h"
-#import "EXTMultiplicationTables.h"
 #import "EXTDocumentWindowController.h"
+#import "EXTDemos.h"
 
 
 @interface EXTDocument ()
@@ -54,7 +51,7 @@
 // if requested, we can initialize the terms array with some test garbage
 -(EXTSpectralSequence*) runDemo {
     // XXX: this should set the current page to 0, but bavarious changed sth...
-    return self.sseq = [EXTSpectralSequence workingDemo];
+    return self.sseq = [EXTDemos workingDemo];
 }
 
 #pragma mark - Window controllers

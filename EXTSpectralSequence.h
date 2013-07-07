@@ -51,13 +51,4 @@
 
 -(BOOL) isInZeroRanges:(EXTLocation*)loc;
 
-
-#pragma mark - built-in demos
-
-+(EXTSpectralSequence*) workingDemo;
-+(EXTSpectralSequence*) randomDemo;
-+(EXTSpectralSequence*) S5Demo;
-+(EXTSpectralSequence*) KUhC2Demo;
-+(EXTSpectralSequence*) A1MSSDemo;
-
 @end

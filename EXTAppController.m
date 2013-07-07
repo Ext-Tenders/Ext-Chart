@@ -9,7 +9,7 @@
 #import "EXTAppController.h"
 #import "EXTsettingPanelController.h"
 #import "EXTToolPaletteController.h"
-#import "EXTSpectralSequence.h"
+#import "EXTDemos.h"
 #import "EXTDocument.h"
 
 
@@ -55,19 +55,19 @@ typedef enum : NSInteger {
 
     switch ((EXTAppControllerExampleTag)[sender tag]) {
         case EXTAppControllerRandomExampleTag:
-            sseq = [EXTSpectralSequence randomDemo];
+            sseq = [EXTDemos randomDemo];
             break;
 
         case EXTAppControllerS5ExampleTag:
-            sseq = [EXTSpectralSequence S5Demo];
+            sseq = [EXTDemos S5Demo];
             break;
             
         case EXTAppControllerKUhC2ExampleTag:
-            sseq = [EXTSpectralSequence KUhC2Demo];
+            sseq = [EXTDemos KUhC2Demo];
             break;
             
         case EXTAppControllerA1MSSExampleTag:
-            sseq = [EXTSpectralSequence A1MSSDemo];
+            sseq = [EXTDemos A1MSSDemo];
             break;
 
         default:
