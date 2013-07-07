@@ -44,6 +44,17 @@
 }
 
 +(EXTPolynomialTag*) sum:(EXTPolynomialTag*)left with:(EXTPolynomialTag*)right {
+    EXTPolynomialTag *ret = [left copy];
+    
+    for (NSString *key in right.tags.keyEnumerator) {
+        id leftValue = [left.tags objectForKey:key],
+            rightValue = [right.tags objectForKey:key];
+        if (!leftValue)
+            [ret.tags setObject:rightValue forKey:key];
+        else
+            [ret.tags setObject:@([rightValue intValue] + [leftValue intValue]) forKey:key];
+    }
+    
     return nil;
 }
 
