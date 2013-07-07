@@ -455,10 +455,22 @@
     return disjunction;
 }
 
+-(void) propagateLeibniz:(NSArray*)locations page:(int)page {
+    [multTables propagateLeibniz:locations page:page];
+}
+
+-(EXTSpectralSequence*) unspecialize {
+    return self;
+}
+
 #pragma mark - built-in demos
 
 +(EXTSpectralSequence*) workingDemo {
-    return [EXTSpectralSequence A1MSSDemo];
+    return [EXTSpectralSequence A1MSSModernDemo];
+}
+
++(EXTSpectralSequence*) A1MSSModernDemo {
+    return [EXTSpectralSequence sSeqWithUnit:[EXTTriple class]];
 }
 
 +(EXTSpectralSequence*) ladderDemo {
