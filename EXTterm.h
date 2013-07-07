@@ -44,6 +44,8 @@
     -(id) setTerm:(EXTLocation*)whichLocation andNames:(NSMutableArray*)whichNames;
     // TODO: a direct sum constructor might be nice?
 
+    -(int) size;
+
 
     // this gets called when the Term tool receives a click event
     +(id) dealWithClick:(NSPoint)location document:(EXTDocument*)document;

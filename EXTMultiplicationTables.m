@@ -332,9 +332,9 @@
         // in the case that both differentials are zero, no matter what happens
         // we're going to end up with the zero differential off the source.
         EXTPartialDefinition *allZero = [EXTPartialDefinition new];
-        allZero.inclusion = [EXTMatrix identity:sumterm.names.count];
-        allZero.differential = [EXTMatrix matrixWidth:sumterm.names.count
-                                               height:targetterm.names.count];
+        allZero.inclusion = [EXTMatrix identity:sumterm.size];
+        allZero.differential = [EXTMatrix matrixWidth:sumterm.size
+                                               height:targetterm.size];
         [dsum.partialDefinitions addObject:allZero];
     } else if (d1Zero && !d2Zero) {
         for (EXTPartialDefinition *partial2 in d2.partialDefinitions) {
@@ -355,8 +355,8 @@
                 // from A|B <-< A|J --> A|Y <-< K --> Z, build the pullback
                 // cospan A|B <-< V --> Z.
                 EXTMatrix
-                    *Idj = [EXTMatrix hadamardProduct:[EXTMatrix identity:A.names.count] with:j],
-                    *IdpartialJ = [EXTMatrix hadamardProduct:[EXTMatrix identity:A.names.count] with:partialJ];
+                    *Idj = [EXTMatrix hadamardProduct:[EXTMatrix identity:A.size] with:j],
+                    *IdpartialJ = [EXTMatrix hadamardProduct:[EXTMatrix identity:A.size] with:partialJ];
                 NSArray *AYspan = [EXTMatrix formIntersection:IdpartialJ with:k];
                 EXTMatrix *v = [EXTMatrix newMultiply:Idj by:AYspan[0]],
                 *partialV = [EXTMatrix newMultiply:muK by:AYspan[1]];
@@ -386,8 +386,8 @@
                         
                 // first, produce the tensored up cospan A|B <-< I|B --> X|B.
                 EXTMatrix
-                    *iId = [EXTMatrix hadamardProduct:i with:[EXTMatrix identity:B.names.count]],
-                    *partialIId = [EXTMatrix hadamardProduct:partialI with:[EXTMatrix identity:B.names.count]];
+                    *iId = [EXTMatrix hadamardProduct:i with:[EXTMatrix identity:B.size]],
+                    *partialIId = [EXTMatrix hadamardProduct:partialI with:[EXTMatrix identity:B.size]];
                         
                 // this shares a target to get A|B <-< I|B --> X|B <-< L --> Z,
                 // so intersect to get a big cospan A|B <-< U --> Z.

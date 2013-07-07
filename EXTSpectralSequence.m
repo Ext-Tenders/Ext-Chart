@@ -60,8 +60,8 @@
             EXTLocation *loc = [[t1.location class] addLocation:t1.location
                                                              to:t2.location];
             NSMutableArray *names = [NSMutableArray array];
-            for (int i = 0; i < t1.names.count; i++)
-                for (int j = 0; j < t2.names.count; j++)
+            for (int i = 0; i < t1.size; i++)
+                for (int j = 0; j < t2.size; j++)
                     [names addObject:[NSString stringWithFormat:@"%@ %@", t1.names[i], t2.names[j]]];
             
             EXTTerm *t1t2 = [EXTTerm term:loc andNames:names];
@@ -123,7 +123,7 @@
                     sourceIndex = i;
                     break;
                 }
-                sourceOffset += ((EXTTerm*)tuple[1]).names.count;
+                sourceOffset += ((EXTTerm*)tuple[1]).size;
             }
             if (sourceIndex == -1)
                 continue;
@@ -146,7 +146,7 @@
                         endIndex = i;
                         break;
                     }
-                    endOffset += ((EXTTerm*)tuple[0]).names.count;
+                    endOffset += ((EXTTerm*)tuple[0]).size;
                 }
                 
                 if (endIndex != -1)
@@ -160,9 +160,9 @@
             // (+)_I A|P <-i1- A|P <-(i|1)-< A'|P -(d|1)-> B|P -i2-> (+)_J B|P.
             // many of these pieces are common to varying i and d, so we pre-
             // compute the ones we can hold constant.
-            EXTMatrix *idP = [EXTMatrix identity:P.names.count];
-            EXTMatrix *i1 = [EXTMatrix includeEvenlySpacedBasis:AP.names.count endDim:start.names.count offset:sourceOffset spacing:1];
-            EXTMatrix *i2 = [EXTMatrix includeEvenlySpacedBasis:BP.names.count endDim:end.names.count offset:endOffset spacing:1];
+            EXTMatrix *idP = [EXTMatrix identity:P.size];
+            EXTMatrix *i1 = [EXTMatrix includeEvenlySpacedBasis:AP.size endDim:start.size offset:sourceOffset spacing:1];
+            EXTMatrix *i2 = [EXTMatrix includeEvenlySpacedBasis:BP.size endDim:end.size offset:endOffset spacing:1];
             
             // now we iterate through the available i and d.
             NSMutableArray *partialsForThisD = [NSMutableArray array];
@@ -190,7 +190,7 @@
                     sourceIndex = i;
                     break;
                 }
-                sourceOffset += ((EXTTerm*)tuple[2]).names.count;
+                sourceOffset += ((EXTTerm*)tuple[2]).size;
             }
             if (sourceIndex == -1)
                 continue;
@@ -213,7 +213,7 @@
                         endIndex = i;
                         break;
                     }
-                    endOffset += ((EXTTerm*)tuple[0]).names.count;
+                    endOffset += ((EXTTerm*)tuple[0]).size;
                 }
                 
                 if (endIndex != -1)
@@ -227,9 +227,9 @@
             // (+)_I A|P <-i1- A|P <-(1|i)-< A|P' -(1|d)-> A|Q -i2-> (+)_J A|Q.
             // many of these pieces are common to varying i and d, so we pre-
             // compute the ones we can hold constant.
-            EXTMatrix *idA = [EXTMatrix identity:A.names.count];
-            EXTMatrix *i1 = [EXTMatrix includeEvenlySpacedBasis:AP.names.count endDim:start.names.count offset:sourceOffset spacing:1];
-            EXTMatrix *i2 = [EXTMatrix includeEvenlySpacedBasis:AQ.names.count endDim:end.names.count offset:endOffset spacing:1];
+            EXTMatrix *idA = [EXTMatrix identity:A.size];
+            EXTMatrix *i1 = [EXTMatrix includeEvenlySpacedBasis:AP.size endDim:start.size offset:sourceOffset spacing:1];
+            EXTMatrix *i2 = [EXTMatrix includeEvenlySpacedBasis:AQ.size endDim:end.size offset:endOffset spacing:1];
             
             // now we iterate through the available i and d.
             NSMutableArray *partialsForThisD = [NSMutableArray array];
@@ -314,7 +314,7 @@
                         CR = subTuple[0];
                         CRplus = workingTuple[0];
                         break;
-                    } else CRoffset += ((EXTTerm*)(subTuple[0])).names.count;
+                    } else CRoffset += ((EXTTerm*)(subTuple[0])).size;
                 }
                 if (CR) break;
                 CRoffset = 0;
@@ -322,10 +322,10 @@
             
             int BQoffset = 0;
             for (int i = 0; i < [rightSummands indexOfObject:rightSummand]; i++)
-                BQoffset += ((EXTTerm*)(rightSummands[i])).names.count;
+                BQoffset += ((EXTTerm*)(rightSummands[i])).size;
             
             // while we're at it, build the inclusion matrix C|R --> (+) C|R
-            EXTMatrix *i2 = [EXTMatrix includeEvenlySpacedBasis:CR.names.count endDim:CRplus.names.count offset:CRoffset spacing:1];
+            EXTMatrix *i2 = [EXTMatrix includeEvenlySpacedBasis:CR.size endDim:CRplus.size offset:CRoffset spacing:1];
             
             for (EXTPartialDefinition *leftPartial in leftPartials)
             for (EXTPartialDefinition *rightPartial in rightPartials) {
@@ -341,17 +341,17 @@
                 // to include across the reassociation and transposition
                 // (A|B)|(P|Q) ~= (A|P)|(B|Q), along with dealing with one of
                 // the big direct sum inclusions we're constructing.
-                EXTMatrix *i1 = [EXTMatrix matrixWidth:(A.names.count*B.names.count*P.names.count*Q.names.count) height:(leftTerm.names.count*rightTerm.names.count)];
+                EXTMatrix *i1 = [EXTMatrix matrixWidth:(A.size*B.size*P.size*Q.size) height:(leftTerm.size*rightTerm.size)];
                 
-                for (int i = 0; i < A.names.count; i++)
-                for (int j = 0; j < P.names.count; j++)
-                for (int k = 0; k < B.names.count; k++)
-                for (int l = 0; l < Q.names.count; l++) {
-                    int APskip = B.names.count*Q.names.count*([leftSummands indexOfObject:leftSummand] + i*P.names.count + j);
+                for (int i = 0; i < A.size; i++)
+                for (int j = 0; j < P.size; j++)
+                for (int k = 0; k < B.size; k++)
+                for (int l = 0; l < Q.size; l++) {
+                    int APskip = B.size*Q.size*([leftSummands indexOfObject:leftSummand] + i*P.size + j);
                     // poke a 1 in at this location.  the only way to see that
                     // this is a reasonable thing to do is to draw out an
                     // example.  i'm very sorry. :(
-                    ((NSMutableArray*)(i1.presentation[l+Q.names.count*(j+P.names.count*(k+i*B.names.count))]))[APskip + BQoffset + k*Q.names.count + l] = @1;
+                    ((NSMutableArray*)(i1.presentation[l+Q.size*(j+P.size*(k+i*B.size))]))[APskip + BQoffset + k*Q.size + l] = @1;
                 }
                 
                 // now, we use this to build the differential presentation.
@@ -497,10 +497,6 @@
     EXTPartialDefinition *diffone = [EXTPartialDefinition new];
     EXTMatrix *one = [EXTMatrix identity:1];
     diffone.differential = diffone.inclusion = one;
-    
-    EXTPartialDefinition *diffzero = [EXTPartialDefinition new];
-    EXTMatrix *zero = [EXTMatrix matrixWidth:1 height:1];
-    diffzero.differential = zero; diffzero.inclusion = one;
     
     EXTTriple *h10 = [EXTTriple tripleWithA:1 B:1 C:1],
               *h11 = [EXTTriple tripleWithA:1 B:2 C:1],

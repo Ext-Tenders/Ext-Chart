@@ -23,6 +23,10 @@
 
 #pragma mark *** initialization ***
 
+-(int) size {
+    return names.count;
+}
+
 // setTerm re/initializes an EXTTerm with the desired values.
 -(id) setTerm:(EXTLocation*)whichLocation andNames:(NSMutableArray*)whichNames {
     // first try to initialize the memory for the object which we don't control
@@ -126,7 +130,7 @@
                  sSeq:(EXTSpectralSequence*)sSeq {
     // if we're at the bottom page, then there are no differentials to test.
     if (whichPage == 0) {
-        [cycles setObject:[EXTMatrix identity:self.names.count].presentation atIndexedSubscript:0];
+        [cycles setObject:[EXTMatrix identity:self.size].presentation atIndexedSubscript:0];
         return;
     }
 
@@ -159,9 +163,9 @@
     // are the elements of Z^r_{s+1, t-r+2} which we want.  following the
     // composite Z^r_{s+1, t-r+2} --> Z^{r-1}_{s+1, t-r+2} --> E^1_{s+1, t-r+2}
     // gives the cycle matrix in the form we've been expecting it.
-    EXTMatrix *left = [EXTMatrix matrixWidth:[[differential.end.boundaries objectAtIndex:(whichPage-1)] count] height:differential.end.names.count];
+    EXTMatrix *left = [EXTMatrix matrixWidth:[[differential.end.boundaries objectAtIndex:(whichPage-1)] count] height:differential.end.size];
     left.presentation = [differential.end.boundaries objectAtIndex:(whichPage-1)];
-    EXTMatrix *incomingCycles = [EXTMatrix matrixWidth:[cycles[whichPage-1] count] height:names.count];
+    EXTMatrix *incomingCycles = [EXTMatrix matrixWidth:[cycles[whichPage-1] count] height:self.size];
     incomingCycles.presentation = cycles[whichPage-1];
     EXTMatrix *right = [EXTMatrix newMultiply:differential.presentation by:incomingCycles];
     
@@ -199,13 +203,13 @@
     [differential assemblePresentation];
     
     // restrict its action to the previous cycle group
-    EXTMatrix *restriction = [EXTMatrix matrixWidth:((NSMutableArray*)differential.start.cycles[whichPage-1]).count height:differential.start.names.count];
+    EXTMatrix *restriction = [EXTMatrix matrixWidth:((NSMutableArray*)differential.start.cycles[whichPage-1]).count height:differential.start.size];
     restriction.presentation = differential.start.cycles[whichPage-1];
     EXTMatrix *restrictedDiff = [EXTMatrix newMultiply:differential.presentation by:restriction];
     
     // add these to the old boundaries
     NSMutableArray *newImage = [restrictedDiff image];
-    EXTMatrix *boundaryInclusion = [EXTMatrix matrixWidth:(newImage.count+((NSMutableArray*)boundaries[whichPage-1]).count) height:differential.end.names.count];
+    EXTMatrix *boundaryInclusion = [EXTMatrix matrixWidth:(newImage.count+((NSMutableArray*)boundaries[whichPage-1]).count) height:differential.end.size];
     [newImage addObjectsFromArray:boundaries[whichPage-1]];
     boundaryInclusion.presentation = [NSMutableArray arrayWithArray:newImage];
     

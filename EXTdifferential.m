@@ -73,8 +73,8 @@
 -(void) assemblePresentation {
     _presentation =
         [EXTMatrix assemblePresentation:self.partialDefinitions
-                        sourceDimension:self.start.names.count
-                        targetDimension:self.end.names.count];
+                        sourceDimension:self.start.size
+                        targetDimension:self.end.size];
     return;
 }
 
