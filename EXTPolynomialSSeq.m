@@ -17,13 +17,14 @@
 // for robustness, a nil entry in a tag should be thought of as zero, so that
 // when introducing a new class we don't have to go back and add a bunch of
 // labels to the existing tags.
-@interface EXTPolynomialTag : NSObject
+@interface EXTPolynomialTag : NSObject <NSCopying>
 
 @property(strong) NSMutableDictionary *tags;
 
 -(NSString*) description;
 +(EXTPolynomialTag*) sum:(EXTPolynomialTag*)left with:(EXTPolynomialTag*)right;
 -(BOOL) isEqual:(id)object;
+-(id) copyWithZone:(NSZone *)zone;
 
 @end
 
@@ -88,6 +89,12 @@
     return TRUE;
 }
 
+-(id) copyWithZone:(NSZone *)zone {
+    EXTPolynomialTag *ret = [EXTPolynomialTag new];
+    ret.tags = [tags copy];
+    return ret;
+}
+
 @end
 
 
@@ -117,6 +124,8 @@
 +(EXTPolynomialSSeq*) sSeqWithUnit:(Class<EXTLocation>)locClass {
     EXTPolynomialSSeq *ret = [EXTPolynomialSSeq new];
     
+    ret.indexClass = locClass;
+    
     EXTTerm *unit = [EXTTerm term:[locClass identityLocation] andNames:[NSMutableArray arrayWithObject:@"1"]];
     [ret.terms setObject:unit forKey:unit.location];
     
@@ -142,32 +151,20 @@
 -(void) resizePolyClass:(NSString*)name upTo:(int)newBound {
     int index = [names indexOfObject:name];
     
+    // XXX: we can only resize to be larger.  not sure if this is desirable.
+    if ([upperBounds[index] intValue] > newBound)
+        return;
+    
     // set up the array of counters
     EXTPolynomialTag *tag = [EXTPolynomialTag new];
     tag.tags = [NSMutableDictionary dictionaryWithCapacity:names.count];
     for (int i = 0; i < names.count; i++)
         [tag.tags setObject:@0 forKey:names[i]];
-    [tag.tags setObject:upperBounds[index] forKey:names[index]];
+    [tag.tags setObject:@([upperBounds[index] intValue]+1) forKey:names[index]];
     
-    while (true) {
-        // increment the counter
-        for (int i = 0; i < names.count; i++) {
-            int value = [[tag.tags objectForKey:names[i]] intValue];
-            
-            // there are two kinds of roll-over
-            if ((i == index) && (value + 1 == newBound)) {
-                [tag.tags setObject:upperBounds[index] forKey:names[index]];
-                continue;
-            } else if ((i != index) && (value + 1 == [upperBounds[i] intValue])) {
-                [tag.tags setObject:@0 forKey:names[index]];
-                continue;
-            }
-            
-            [tag.tags setObject:@(value+1) forKey:names[i]];
-            break;
-        }
-        
-        // search for a term in the resulting location
+    BOOL totalRollover = FALSE;
+    while (!totalRollover) {
+        // search for a term in the location encoded by the counter
         EXTLocation *workingLoc = [[self indexClass] identityLocation];
         for (int i = 0; i < names.count; i++)
             workingLoc = [[self indexClass] addLocation:workingLoc to:[[self indexClass] scale:locations[i] by:[[tag.tags objectForKey:names[i]] intValue]]];
@@ -181,7 +178,26 @@
         
         // now add the new tag to its names array
         [term.names addObject:[tag copy]];
-    }
+        
+        // increment the counter
+        for (int i = 0;
+             i < names.count ? TRUE : !(totalRollover = TRUE);
+             i++) {
+            int value = [[tag.tags objectForKey:names[i]] intValue] + 1;
+            
+            // there are two kinds of roll-over
+            if ((i == index) && (value > newBound)) {
+                [tag.tags setObject:@([upperBounds[index] intValue] + 1) forKey:names[index]];
+                continue;
+            } else if ((i != index) && (value > [upperBounds[i] intValue])) {
+                [tag.tags setObject:@0 forKey:names[i]];
+                continue;
+            } else {
+                [tag.tags setObject:@(value) forKey:names[i]];
+                break;
+            }
+        } // for: counter increment
+    } // while
     
     // store newBound as the new bound
     upperBounds[index] = @(newBound);

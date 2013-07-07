@@ -42,7 +42,7 @@
     if (self) {
         // allocate the display parts of things
         
-        _sseq = [EXTSpectralSequence spectralSequence];
+        _sseq = [EXTSpectralSequence new];
     }
 
     return self;

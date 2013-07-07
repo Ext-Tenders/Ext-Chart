@@ -20,11 +20,37 @@
 +(EXTSpectralSequence*) A1MSSModernDemo {
     EXTPolynomialSSeq *sseq = [EXTPolynomialSSeq sSeqWithUnit:[EXTTriple class]];
     
+    EXTTriple *h10 = [EXTTriple tripleWithA:1 B:1 C:1],
+              *h11 = [EXTTriple tripleWithA:1 B:2 C:1],
+              *h20 = [EXTTriple tripleWithA:1 B:3 C:2];
+    
+    [sseq addPolyClass:@"h10" location:h10 upTo:8];
+    [sseq addPolyClass:@"h11" location:h11 upTo:8];
+    [sseq addPolyClass:@"h20" location:h20 upTo:4];
+    
+    // set up the zero range.  TODO: this should come before the tensor calls,
+    // and they should handle it well. :)
+    [sseq.zeroRanges addObject:[EXTZeroRangeStrict newWithSSeq:sseq]];
+    
+    // some basic partial definitions
+    EXTPartialDefinition *diffone = [EXTPartialDefinition new];
+    EXTMatrix *one = [EXTMatrix identity:1];
+    diffone.differential = diffone.inclusion = one;
+    
+    // d1(h20) = h10 h11
+    EXTDifferential *diff = [EXTDifferential differential:[sseq findTerm:h20] end:[sseq findTerm:[EXTTriple followDiffl:h20 page:1]] page:1];
+    [diff.partialDefinitions addObject:diffone];
+    [sseq.differentials addObject:diff];
+    
+    // now, do leibniz propagation.
+    //[ret.multTables propagateLeibniz:@[h20, h10, h11] page:1];
+
+    
     return sseq;
 }
 
 +(EXTSpectralSequence*) ladderDemo {
-    EXTSpectralSequence *ret = [EXTSpectralSequence spectralSequence];
+    EXTSpectralSequence *ret = [EXTSpectralSequence new];
     
     EXTTerm *start = [EXTTerm term:[EXTPair pairWithA:1 B:0] andNames:[NSMutableArray arrayWithObject:@"e"]],
     *end = [EXTTerm term:[EXTPair pairWithA:0 B:1] andNames:[NSMutableArray arrayWithObject:@"x"]];
@@ -61,8 +87,8 @@
     diffone.differential = diffone.inclusion = one;
     
     EXTTriple *h10 = [EXTTriple tripleWithA:1 B:1 C:1],
-    *h11 = [EXTTriple tripleWithA:1 B:2 C:1],
-    *h20 = [EXTTriple tripleWithA:1 B:3 C:2];
+              *h11 = [EXTTriple tripleWithA:1 B:2 C:1],
+              *h20 = [EXTTriple tripleWithA:1 B:3 C:2];
     
     // d1(h20) = h10 h11
     EXTDifferential *diff = [EXTDifferential differential:[ret findTerm:h20] end:[ret findTerm:[EXTTriple followDiffl:h20 page:1]] page:1];
@@ -141,7 +167,7 @@
 }
 
 +(EXTSpectralSequence*) randomDemo {
-    EXTSpectralSequence *ret = [EXTSpectralSequence spectralSequence];
+    EXTSpectralSequence *ret = [EXTSpectralSequence new];
     
     // XXX: this doesn't catch collisions.
     for (int i = 0; i < 40; i++) {
@@ -186,7 +212,7 @@
 }
 
 +(EXTSpectralSequence*) S5Demo {
-    EXTSpectralSequence *ret = [EXTSpectralSequence spectralSequence];
+    EXTSpectralSequence *ret = [EXTSpectralSequence new];
     
     [ret.zeroRanges addObject:[EXTZeroRangeStrict newWithSSeq:ret]];
     

@@ -24,7 +24,6 @@
 @property(nonatomic, assign) Class<EXTLocation> indexClass;
 @property(nonatomic, strong) NSMutableArray *zeroRanges;
 
-+(EXTSpectralSequence*) spectralSequence;
 +(EXTSpectralSequence*) sSeqWithUnit:(Class<EXTLocation>)locClass;
 -(EXTSpectralSequence*) tensorWithSSeq:(EXTSpectralSequence*)p;
 
