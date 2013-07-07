@@ -18,8 +18,6 @@
 @property(strong,readonly) NSArray* locations;
 @property(strong,readonly) NSArray* upperBounds;
 
-+(EXTPolynomialSSeq*) sSeqWithUnit:(Class<EXTLocation>)locClass;
-
 -(void) addPolyClass:(NSString*)name location:(EXTLocation*)loc upTo:(int)bound;
 -(void) resizePolyClass:(NSString*)name upTo:(int)newBound;
 

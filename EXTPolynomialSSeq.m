@@ -9,6 +9,59 @@
 #import "EXTPolynomialSSeq.h"
 #import "EXTterm.h"
 
+
+// EXTTerms should have names which aren't strings but "tags".  each tag should
+// be either a dictionary of pairs of base class + exponent.  multiplication
+// should act by iterating through and adding these lists together.
+//
+// for robustness, a nil entry in a tag should be thought of as zero, so that
+// when introducing a new class we don't have to go back and add a bunch of
+// labels to the existing tags.
+//
+@interface EXTPolynomialTag : NSObject
+
+@property(strong) NSMutableDictionary *tags;
+
+-(NSString*) description;
++(EXTPolynomialTag*) sum:(EXTPolynomialTag*)left with:(EXTPolynomialTag*)right;
+-(BOOL) isEqual:(id)object;
+
+@end
+
+@implementation EXTPolynomialTag
+
+@synthesize tags;
+
+// sends the tag dictionary [[x, 1], [y, 2]] to the string "x^1 y^2"
+-(NSString*) description {
+    NSString *ret = [NSMutableString string];
+    
+    for (NSString *key in tags.keyEnumerator) {
+        ret = [ret stringByAppendingFormat:@" (%@)^{%@}", key.description, [tags objectForKey:key]];
+    }
+    
+    return ret;
+}
+
++(EXTPolynomialTag*) sum:(EXTPolynomialTag*)left with:(EXTPolynomialTag*)right {
+    return nil;
+}
+
+// XXX: hopefully this recursively calls isEqual on the various key/value pairs.
+-(BOOL) isEqual:(id)object {
+    if ([object class] != [EXTPolynomialTag class])
+        return FALSE;
+    
+    EXTPolynomialTag *target = (EXTPolynomialTag*)object;
+    
+    return [tags isEqual:target.tags];
+}
+
+@end
+
+
+
+
 // make the new member arrays write-able, provided we're in-file.
 @interface EXTPolynomialSSeq ()
 @property(strong) NSMutableArray* names;
@@ -52,18 +105,6 @@
 -(EXTSpectralSequence*) unspecialize {
     return nil;
 }
-
-/*
- 
- EXTTerms should have names which aren't strings but "tags".  each tag should be
- either a list or a dictionary or something of pairs of base class + exponent.
- multiplication should act by iterating through and adding these lists together.
- 
- for robustness, a nil entry in a tag should be thought of as zero, so that when
- introducing a new class we don't have to go back and add a bunch of labels to
- the existing tags.
- 
- */
 
 -(void) addPolyClass:(NSString*)name location:(EXTLocation*)loc upTo:(int)bound {
     return;

@@ -24,8 +24,9 @@
 @property(nonatomic, assign) Class<EXTLocation> indexClass;
 @property(nonatomic, strong) NSMutableArray *zeroRanges;
 
-+ (EXTSpectralSequence*) spectralSequence;
-- (EXTSpectralSequence*) tensorWithSSeq:(EXTSpectralSequence*)p;
++(EXTSpectralSequence*) spectralSequence;
++(EXTSpectralSequence*) sSeqWithUnit:(Class<EXTLocation>)locClass;
+-(EXTSpectralSequence*) tensorWithSSeq:(EXTSpectralSequence*)p;
 
 // TODO: these are misleading names, as they are nondestructive.
 -(EXTSpectralSequence*) tensorWithPolyClass:(NSString*)name
