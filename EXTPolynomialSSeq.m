@@ -17,7 +17,6 @@
 // for robustness, a nil entry in a tag should be thought of as zero, so that
 // when introducing a new class we don't have to go back and add a bunch of
 // labels to the existing tags.
-//
 @interface EXTPolynomialTag : NSObject
 
 @property(strong) NSMutableDictionary *tags;
@@ -58,27 +57,39 @@
     return nil;
 }
 
-// XXX: hopefully this recursively calls isEqual on the various key/value pairs.
 -(BOOL) isEqual:(id)object {
     if ([object class] != [EXTPolynomialTag class])
         return FALSE;
     
     EXTPolynomialTag *target = (EXTPolynomialTag*)object;
     
-    return [tags isEqual:target.tags];
+    for (NSString *key in target.tags.keyEnumerator) {
+        int value = [[target.tags objectForKey:key] intValue];
+        if (value == 0)
+            continue;
+        NSNumber *selfValue = [tags objectForKey:key];
+        if (!selfValue)
+            return FALSE;
+        if ([selfValue intValue] != value)
+            return FALSE;
+    }
+    
+    for (NSString *key in tags.keyEnumerator) {
+        int value = [[tags objectForKey:key] intValue];
+        if (value == 0)
+            continue;
+        NSNumber *targetValue = [target.tags objectForKey:key];
+        if (!targetValue)
+            return FALSE;
+        if ([targetValue intValue] != value)
+            return FALSE;
+    }
+    
+    return TRUE;
 }
 
 @end
 
-
-
-
-// make the new member arrays write-able, provided we're in-file.
-@interface EXTPolynomialSSeq ()
-@property(strong) NSMutableArray* names;
-@property(strong) NSMutableArray* locations;
-@property(strong) NSMutableArray* upperBounds;
-@end
 
 
 
@@ -118,15 +129,82 @@
 }
 
 -(void) addPolyClass:(NSString*)name location:(EXTLocation*)loc upTo:(int)bound {
+    // update the navigation members
+    [names addObject:name];
+    [locations addObject:loc];
+    [upperBounds addObject:@0];
+    
+    [self resizePolyClass:name upTo:bound];
+    
     return;
 }
 
 -(void) resizePolyClass:(NSString*)name upTo:(int)newBound {
+    int index = [names indexOfObject:name];
+    
+    // set up the array of counters
+    EXTPolynomialTag *tag = [EXTPolynomialTag new];
+    tag.tags = [NSMutableDictionary dictionaryWithCapacity:names.count];
+    for (int i = 0; i < names.count; i++)
+        [tag.tags setObject:@0 forKey:names[i]];
+    [tag.tags setObject:upperBounds[index] forKey:names[index]];
+    
+    while (true) {
+        // increment the counter
+        for (int i = 0; i < names.count; i++) {
+            int value = [[tag.tags objectForKey:names[i]] intValue];
+            
+            // there are two kinds of roll-over
+            if ((i == index) && (value + 1 == newBound)) {
+                [tag.tags setObject:upperBounds[index] forKey:names[index]];
+                continue;
+            } else if ((i != index) && (value + 1 == [upperBounds[i] intValue])) {
+                [tag.tags setObject:@0 forKey:names[index]];
+                continue;
+            }
+            
+            [tag.tags setObject:@(value+1) forKey:names[i]];
+            break;
+        }
+        
+        // search for a term in the resulting location
+        EXTLocation *workingLoc = [[self indexClass] identityLocation];
+        for (int i = 0; i < names.count; i++)
+            workingLoc = [[self indexClass] addLocation:workingLoc to:[[self indexClass] scale:locations[i] by:[[tag.tags objectForKey:names[i]] intValue]]];
+        EXTTerm *term = [self findTerm:workingLoc];
+        
+        // if it doesn't exist, create it
+        if (!term) {
+            term = [EXTTerm term:workingLoc andNames:[NSMutableArray array]];
+            [self.terms setObject:term forKey:workingLoc];
+        }
+        
+        // now add the new tag to its names array
+        [term.names addObject:[tag copy]];
+    }
+    
+    // store newBound as the new bound
+    upperBounds[index] = @(newBound);
+    
     return;
 }
 
--(EXTMatrix*) productWithLeft:(EXTLocation*)left right:(EXTLocation*)right {
-    return nil;
+// builds the multiplication matrix for a pair of EXTLocations
+-(EXTMatrix*) productWithLeft:(EXTLocation*)leftLoc right:(EXTLocation*)rightLoc {
+    EXTTerm *left = [self findTerm:leftLoc], *right = [self findTerm:rightLoc],
+    *target = [self findTerm:[[leftLoc class] addLocation:leftLoc to:rightLoc]];
+    
+    EXTMatrix *ret = [EXTMatrix matrixWidth:(left.size*right.size) height:target.size];
+    
+    for (int i = 0; i < left.size; i++)
+    for (int j = 0; j < right.size; j++) {
+        EXTPolynomialTag *sumTag = [EXTPolynomialTag sum:left.names[i] with:right.names[j]];
+        int index = [target.names indexOfObject:sumTag];
+        NSMutableArray *retcol = ret.presentation[i*right.size+j];
+        retcol[index] = @1;
+    }
+    
+    return ret;
 }
 
 -(void) propagateLeibniz:(NSArray *)locations page:(int)page {
