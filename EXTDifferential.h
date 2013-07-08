@@ -39,6 +39,5 @@
     -(void) stripDuplicates;
 
     // UI messages
-    -(void) drawWithSpacing:(CGFloat)spacing targetPosition:(int)targetPosition;
     +(id) dealWithClick:(NSPoint)location document:(EXTDocument*)document;
 @end
