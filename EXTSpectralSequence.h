@@ -37,6 +37,7 @@
                                         downTo:(int)downTo;
 
 - (EXTTerm*)findTerm:(EXTLocation*)loc;
+- (void) addDifferential:(EXTDifferential*)diff;
 - (EXTDifferential*)findDifflWithSource:(EXTLocation*)loc onPage:(int)page;
 - (EXTDifferential*)findDifflWithTarget:(EXTLocation*)loc onPage:(int)page;
 

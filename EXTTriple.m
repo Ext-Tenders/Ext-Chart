@@ -82,11 +82,9 @@
     if ([other class] != [EXTTriple class])
         return false;
     
-    EXTTriple *input = (EXTTriple*)other;
-        
-    return (([self a] == [input a]) &&
-            ([self b] == [input b]) &&
-            ([self c] == [input c]));
+    return ((a == ((EXTTriple*)other)->a) &&
+            (b == ((EXTTriple*)other)->b) &&
+            (c == ((EXTTriple*)other)->c));
 }
 
 @end

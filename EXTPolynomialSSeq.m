@@ -259,7 +259,7 @@
                                                     onPage:page];
     if (!dsum) {
         dsum = [EXTDifferential differential:sumterm end:targetterm page:page];
-        [self.differentials addObject:dsum];
+        [self addDifferential:dsum];
     }
     
     // TODO: note that this is duplicated code from EXTMultiplicationTables.

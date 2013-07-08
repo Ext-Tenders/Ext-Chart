@@ -234,7 +234,7 @@
                                                     onPage:page];
     if (!dsum) {
         dsum = [EXTDifferential differential:sumterm end:targetterm page:page];
-        [sSeq.differentials addObject:dsum];
+        [sSeq addDifferential:dsum];
     }
     
     // depending upon whether a differential lands in the zero range, we need to

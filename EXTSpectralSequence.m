@@ -24,6 +24,7 @@
     // and allocate the internal parts of things
     terms = [NSMutableDictionary dictionary];
     differentials = [NSMutableArray array];
+    differentials[0] = [NSMutableDictionary dictionary];
     multTables = [EXTMultiplicationTables multiplicationTables:self];
     indexClass = [EXTPair class];
     zeroRanges = [NSMutableArray array];
@@ -103,7 +104,7 @@
     }
     
     // XXX: i don't think that this is **summing** differentials correctly...
-    NSMutableArray *outputDifferentials = [NSMutableArray array];
+    NSMutableDictionary *outputDifferentials = [NSMutableDictionary dictionary];
     // iterate over pairs of existing terms to build differentials from old ones
     for (NSMutableArray *tuple in splicedTensorTerms) {
         EXTTerm *start = tuple[0];
@@ -111,7 +112,9 @@
         
         // find all the differentials involving any of the working left-summands
         NSMutableArray *partialPresentations = [NSMutableArray array];
-        for (EXTDifferential *d1 in self.differentials) {
+        for (NSMutableDictionary *dictionary in self.differentials)
+        for (NSArray *key in dictionary) {
+            EXTDifferential *d1 = [dictionary objectForKey:key];
             // check if this diff'l is attached to one of our left-summands.
             int sourceIndex = -1, sourceOffset = 0;
             for (int i = 0; i < startSummands.count; i++) {
@@ -178,7 +181,10 @@
         // now also do d2.
         // XXX: THIS IS DUPLICATED CODE. BUGS IN ONE MEAN BUGS IN THE OTHER.
         // CORRECT APPROPRIATELY, AND EVENTUALLY FACTOR THIS ALL OUT.
-        for (EXTDifferential *d2 in p.differentials) {
+        for (NSMutableDictionary *dictionary in p.differentials)
+        for (NSArray *key in dictionary) {
+            EXTDifferential *d2 = [dictionary objectForKey:key];
+            
             // check if this diff'l is attached to one of our right-summands.
             int sourceIndex = -1, sourceOffset = 0;
             for (int i = 0; i < startSummands.count; i++) {
@@ -257,7 +263,7 @@
                 tagPartial[4] = @true;
             }
             
-            [outputDifferentials addObject:diff];
+            [outputDifferentials setObject:diff forKey:@[diff.start.location, @(diff.page)]];
         } // partialPresentations
     } // splicedTensorTerms
     
@@ -418,20 +424,26 @@
     return [terms objectForKey:loc];
 }
 
--(EXTDifferential*) findDifflWithSource:(EXTLocation *)loc onPage:(int)page {
-    for (EXTDifferential *diffl in self.differentials)
-        if ([[[diffl start] location] isEqual:loc] && ([diffl page] == page))
-            return diffl;
+-(void) addDifferential:(EXTDifferential*)diff {
+    // first resize the differentials array if it needs it.
+    while (differentials.count <= diff.page)
+        differentials[differentials.count] = [NSMutableDictionary dictionary];
     
-    return nil;
+    NSMutableDictionary *dictionary = differentials[diff.page];
+    
+    [dictionary setObject:diff forKey:diff.start.location];
+}
+
+-(EXTDifferential*) findDifflWithSource:(EXTLocation *)loc onPage:(int)page {
+    if (page >= differentials.count)
+        return nil;
+    
+    return [differentials[page] objectForKey:loc];
 }
 
 -(EXTDifferential*) findDifflWithTarget:(EXTLocation *)loc onPage:(int)page {
-    for (EXTDifferential *diffl in self.differentials)
-        if (([[[diffl end] location] isEqual:loc]) && ([diffl page] == page))
-            return diffl;
-    
-    return nil;
+    EXTLocation *startLoc = [[loc class] reverseDiffl:loc page:page];
+    return [self findDifflWithSource:startLoc onPage:page];
 }
 
 -(void) computeGroupsForPage:(int)page {

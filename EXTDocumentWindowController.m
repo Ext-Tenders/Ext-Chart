@@ -220,8 +220,12 @@
     }
 
     // iterate also through the available differentials
+    if (pageNumber >= self.extDocument.sseq.differentials.count)
+        return;
+    
     [[NSColor blackColor] set];
-    for (EXTDifferential* differential in self.extDocument.sseq.differentials) {
+    for (NSArray* key in self.extDocument.sseq.differentials[pageNumber]) {
+        EXTDifferential *differential = [self.extDocument.sseq.differentials[pageNumber] objectForKey:key];
         // some sanity checks to make sure this differential is worth drawing
         if ([differential page] != pageNumber)
             continue;

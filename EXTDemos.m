@@ -25,9 +25,9 @@
               *h11 = [EXTTriple tripleWithA:1 B:2 C:1],
               *h20 = [EXTTriple tripleWithA:1 B:3 C:2];
     
-    [sseq addPolyClass:@"h10" location:h10 upTo:8];
-    [sseq addPolyClass:@"h11" location:h11 upTo:8];
-    [sseq addPolyClass:@"h20" location:h20 upTo:4];
+    [sseq addPolyClass:@"h10" location:h10 upTo:16];
+    [sseq addPolyClass:@"h11" location:h11 upTo:16];
+    [sseq addPolyClass:@"h20" location:h20 upTo:8];
     
     // some basic partial definitions
     EXTPartialDefinition *diffone = [EXTPartialDefinition new];
@@ -37,7 +37,7 @@
     // d1(h20) = h10 h11
     EXTDifferential *diff = [EXTDifferential differential:[sseq findTerm:h20] end:[sseq findTerm:[EXTTriple followDiffl:h20 page:1]] page:1];
     [diff.partialDefinitions addObject:diffone];
-    [sseq.differentials addObject:diff];
+    [sseq addDifferential:diff];
     
     // now, do leibniz propagation.
     [sseq propagateLeibniz:@[h20, h10, h11] page:1];
@@ -46,7 +46,7 @@
     EXTLocation *h20squared = [[h20 class] scale:h20 by:2];
     EXTDifferential *diff2 = [EXTDifferential differential:[sseq findTerm:h20squared] end:[sseq findTerm:[[h11 class] scale:h11 by:3]] page:2];
     [diff2.partialDefinitions addObject:diffone];
-    [sseq.differentials addObject:diff2];
+    [sseq addDifferential:diff2];
     
     // leibniz again, on the new terms.
     [sseq propagateLeibniz:@[h10, h11, h20squared] page:2];
@@ -67,7 +67,7 @@
     EXTMatrix *mat = [EXTMatrix identity:1];
     partial.inclusion = partial.differential = mat;
     [diff.partialDefinitions addObject:partial];
-    [ret.differentials addObject:diff];
+    [ret addDifferential:diff];
     
     ret = [ret tensorWithPolyClass:@"eta" location:[EXTPair pairWithA:1 B:1] upTo:5];
     
@@ -100,7 +100,7 @@
     EXTMatrix *one = [EXTMatrix identity:1];
     diffdefn.differential = diffdefn.inclusion = one;
     [diff.partialDefinitions addObject:diffdefn];
-    [ret.differentials addObject:diff];
+    [ret addDifferential:diff];
     
     // d3(eta) = 0
     EXTTerm *eta = [ret findTerm:[EXTPair pairWithA:1 B:1]];
@@ -110,7 +110,7 @@
     diff2defn.differential = zero;
     diff2defn.inclusion = one;
     [diff2.partialDefinitions addObject:diff2defn];
-    [ret.differentials addObject:diff2];
+    [ret addDifferential:diff2];
     
     // d3(beta^-2) = beta^-4 eta^3
     EXTTerm *betaneg2 = [ret findTerm:[EXTPair pairWithA:-4 B:0]];
@@ -119,10 +119,9 @@
     diff3defn.differential = one;
     diff3defn.inclusion = one;
     [diff3.partialDefinitions addObject:diff3defn];
-    [ret.differentials addObject:diff3];
+    [ret addDifferential:diff3];
     
-    // propagate NAIVELY using the Leibniz rule
-    
+    // propagate using the Leibniz rule
     [ret propagateLeibniz:@[[eta location], [beta2 location], [betaneg2 location]] page:3];
     
     return ret;
@@ -209,7 +208,7 @@
     firstpartial.inclusion = inclusion;
     firstpartial.differential = differential;
     firstdiff.partialDefinitions[0] = firstpartial;
-    [ret.differentials addObject:firstdiff];
+    [ret addDifferential:firstdiff];
     
     // TODO: need to assemble the cycle groups for lower pages first...
     [firstdiff assemblePresentation]; // test!

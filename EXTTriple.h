@@ -9,9 +9,8 @@
 #import <Foundation/Foundation.h>
 #import "EXTLocation.h"
 
-@interface EXTTriple : NSObject <EXTLocation> {
-    int a, b, c;
-}
+@interface EXTTriple : NSObject <EXTLocation>
+
 @property(readonly, assign) int a;
 @property(readonly, assign) int b;
 @property(readonly, assign) int c;
