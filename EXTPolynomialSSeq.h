@@ -26,6 +26,10 @@
 -(EXTMatrix*) productWithLeft:(EXTLocation*)left right:(EXTLocation*)right;
 
 // performs an irreversible upcast to EXTSpectralSequence
--(EXTSpectralSequence*) unspecialize;
+-(EXTSpectralSequence*) upcastToSSeq;
+
+-(void) computeLeibniz:(EXTLocation *)loc1
+                  with:(EXTLocation *)loc2
+                onPage:(int)page;
 
 @end

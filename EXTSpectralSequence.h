@@ -41,13 +41,18 @@
 - (EXTDifferential*)findDifflWithTarget:(EXTLocation*)loc onPage:(int)page;
 
 -(void) computeGroupsForPage:(int)page;
--(void) propagateLeibniz:(NSArray*)locations page:(int)page;
 
 // subclasses of EXTSpectralSequence can call this to be turned into plain old
 // instances of EXTSpectralSequence.  this should be useful for e.g. tensoring
 // together specialized spectral sequences of different sorts.
--(EXTSpectralSequence*) unspecialize;
+-(EXTSpectralSequence*) upcastToSSeq;
 
 -(BOOL) isInZeroRanges:(EXTLocation*)loc;
+
+-(void) naivelyPropagateLeibniz:(EXTLocation*)loc page:(int)page;
+-(void) propagateLeibniz:(NSArray*)locations page:(int)page;
+-(void) computeLeibniz:(EXTLocation *)loc1
+                  with:(EXTLocation *)loc2
+                onPage:(int)page;
 
 @end

@@ -452,12 +452,97 @@
     return disjunction;
 }
 
--(void) propagateLeibniz:(NSArray*)locations page:(int)page {
-    [multTables propagateLeibniz:locations page:page];
+-(EXTSpectralSequence*) upcastToSSeq {
+    return self;
 }
 
--(EXTSpectralSequence*) unspecialize {
-    return self;
+-(void) computeLeibniz:(EXTLocation *)loc1
+                  with:(EXTLocation *)loc2
+                onPage:(int)page {
+    [multTables computeLeibniz:loc1 with:loc2 onPage:page];
+}
+
+-(void) naivelyPropagateLeibniz:(EXTLocation*)loc page:(int)page {
+    // once we have those, we should be able to do the rest.
+    for (EXTTerm *t in self.terms.allValues)
+        [self computeLeibniz:loc with:t.location onPage:page];
+    
+    return;
+}
+
+// propagates differentials along a specified lattice of EXTLocations
+-(void) propagateLeibniz:(NSArray*)locations page:(int)page {
+    NSMutableArray *maxes = [NSMutableArray arrayWithCapacity:locations.count];
+    Class<EXTLocation> locClass = [(EXTLocation*)locations[0] class];
+    
+    // build the array of maximums
+    for (int i = 0; i < locations.count; i++) {
+        EXTLocation *loc = locations[i];
+        for (int j = 1; true; j++) {
+            EXTTerm *t = [self findTerm:loc];
+            
+            if (!t) {
+                maxes[i] = @(j);
+                break;
+            }
+            
+            loc = [[loc class] addLocation:loc to:locations[i]];
+        }
+    }
+    
+    // loop through the available differentials by incrementing an array of
+    // counters.  the idea is that the counter [n0, n1, ..., nm, 0, ..., 0]
+    // corresponds to the product [n0, ..., nm-1, 0, ..., 0] * em.
+    NSMutableArray *counter = [NSMutableArray arrayWithCapacity:locations.count];
+    for (int i = 0; i < locations.count; i++)
+        counter[i] = @0;
+    counter[0] = @1;
+    int digitalSum = 1;
+    while (true) {
+        // increment the counter array
+        for (int i = 0; i < locations.count; i++) {
+            counter[i] = @([counter[i] intValue] + 1);
+            
+            // check if we should perform a carry
+            if ([counter[i] isEqual:maxes[i]]) {
+                counter[i] = @0;
+                // and then the for(i) loop will handle the actual carry
+            } else
+                break;
+        }
+        
+        // calculate the digital sum
+        digitalSum = 0;
+        for (int i = 0; i < locations.count; i++)
+            digitalSum += [counter[i] intValue];
+        
+        // this dictates the two edge cases.  if the counter array has only one
+        // thing in it, then we don't have enough to perform a leibniz
+        // calculation, and we should skip ahead to the next counter.
+        if (digitalSum == 1)
+            continue;
+        // and if we've completely rolled over, we're done, so break and return.
+        else if (digitalSum == 0)
+            break;
+        
+        // otherwise, if we have a digital sum >= 2, then find the topmost
+        // nonzero entry, and think of this as what we're propagating against.
+        int topEntry = locations.count-1;
+        for (; topEntry >= 0; topEntry--)
+            if ([counter[topEntry] intValue] != 0)
+                break;
+        
+        // build the EXTLocation sum corresponding to the vector coordinate
+        EXTLocation *leftLoc = [locClass identityLocation];
+        for (int i = 0; i < topEntry; i++)
+            leftLoc = [locClass addLocation:leftLoc to:[locClass scale:locations[i] by:[counter[i] intValue]]];
+        leftLoc = [locClass addLocation:leftLoc to:[locClass scale:locations[topEntry] by:([counter[topEntry] intValue]-1)]];
+        
+        // call -computeLeibniz on (the previous sum + the shifted coordinate)
+        [self computeLeibniz:leftLoc with:locations[topEntry] onPage:page];
+    }
+    
+    return;
 }
 
 @end

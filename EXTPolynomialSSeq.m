@@ -8,6 +8,7 @@
 
 #import "EXTPolynomialSSeq.h"
 #import "EXTterm.h"
+#import "EXTdifferential.h"
 
 
 // EXTTerms should have names which aren't strings but "tags".  each tag should
@@ -55,7 +56,7 @@
             [ret.tags setObject:@([rightValue intValue] + [leftValue intValue]) forKey:key];
     }
     
-    return nil;
+    return ret;
 }
 
 -(BOOL) isEqual:(id)object {
@@ -91,7 +92,7 @@
 
 -(id) copyWithZone:(NSZone *)zone {
     EXTPolynomialTag *ret = [EXTPolynomialTag new];
-    ret.tags = [tags copy];
+    ret.tags = [NSMutableDictionary dictionaryWithDictionary:tags];
     return ret;
 }
 
@@ -133,7 +134,8 @@
 }
 
 // performs an irreversible upcast
--(EXTSpectralSequence*) unspecialize {
+-(EXTSpectralSequence*) upcastToSSeq {
+    NSLog(@"upcastToSSeq not yet implemented.");
     return nil;
 }
 
@@ -151,7 +153,8 @@
 -(void) resizePolyClass:(NSString*)name upTo:(int)newBound {
     int index = [names indexOfObject:name];
     
-    // XXX: we can only resize to be larger.  not sure if this is desirable.
+    // TODO: we can only resize to be larger.  not sure if this is desirable, or
+    // if i'll want to come back and allow for shrinking too.
     if ([upperBounds[index] intValue] > newBound)
         return;
     
@@ -199,6 +202,9 @@
         } // for: counter increment
     } // while
     
+    // XXX: CHECK ALL DIFFERENTIALS THAT TOUCH THESE CLASSES, AND MODIFY THEIR
+    // MATRICES ACCORDINGLY.
+    
     // store newBound as the new bound
     upperBounds[index] = @(newBound);
     
@@ -223,7 +229,109 @@
     return ret;
 }
 
--(void) propagateLeibniz:(NSArray *)locations page:(int)page {
+-(void) computeLeibniz:(EXTLocation *)loc1
+                  with:(EXTLocation *)loc2
+                onPage:(int)page {
+    EXTLocation *sumLoc = [[loc1 class] addLocation:loc1 to:loc2],
+    *targetLoc = [[loc1 class] followDiffl:sumLoc page:page];
+    EXTTerm *sumterm = [self findTerm:sumLoc],
+    *targetterm = [self findTerm:targetLoc],
+    *A = [self findTerm:loc1],
+    *B = [self findTerm:loc2];
+    EXTDifferential *d1 = [self findDifflWithSource:loc1 onPage:page],
+    *d2 = [self findDifflWithSource:loc2 onPage:page];
+    
+    // if we don't have differentials to work with, then skip this entirely.
+    // XXX: i'm not sure this condition is quite right.
+    BOOL d1Zero = [self isInZeroRanges:[[loc1 class] followDiffl:loc1 page:page]],
+    d2Zero = [self isInZeroRanges:[[loc2 class] followDiffl:loc2 page:page]];
+    if ((!d1 && !d1Zero) ||
+        (!d2 && !d2Zero) ||
+        !targetterm ||
+        [self isInZeroRanges:sumLoc] ||
+        !sumterm ||
+        [self isInZeroRanges:targetLoc])
+        return;
+    
+    // if we're here, then we have all the fixin's we need to construct some
+    // more partial differential definitions.  let's find a place to put them.
+    EXTDifferential *dsum = [self findDifflWithSource:sumterm.location
+                                                    onPage:page];
+    if (!dsum) {
+        dsum = [EXTDifferential differential:sumterm end:targetterm page:page];
+        [self.differentials addObject:dsum];
+    }
+    
+    // TODO: note that this is duplicated code from EXTMultiplicationTables.
+    // there's a reason for this: this is meant to be optimized for the
+    // polynomial case.  however, if something breaks there, it will have to
+    // also be fixed here.
+    if (d1Zero && d2Zero) {
+        // in the case that both differentials are zero, no matter what happens
+        // we're going to end up with the zero differential off the source.
+        EXTPartialDefinition *allZero = [EXTPartialDefinition new];
+        allZero.inclusion = [EXTMatrix identity:sumterm.size];
+        allZero.differential = [EXTMatrix matrixWidth:sumterm.size
+                                               height:targetterm.size];
+        [dsum.partialDefinitions addObject:allZero];
+    } else if (d1Zero && !d2Zero) {
+        for (EXTPartialDefinition *partial2 in d2.partialDefinitions) {
+            // in this case, we only have the right-hand differential, so
+            // d(xy) = 0 + x dy.  this means building the span
+            // A|B <-1|j- A|J -1|partial-> A|Y --mu-> Z.
+            EXTMatrix *muAY = [self productWithLeft:loc1 right:[[loc2 class] followDiffl:loc2 page:page]];
+            
+            EXTPartialDefinition *partial = [EXTPartialDefinition new];
+            partial.inclusion =
+                [EXTMatrix hadamardProduct:[EXTMatrix identity:A.size]
+                                      with:partial2.inclusion];
+            partial.differential = [EXTMatrix newMultiply:muAY by:[EXTMatrix hadamardProduct:[EXTMatrix identity:A.size] with:partial2.differential]];
+            
+            [dsum.partialDefinitions addObject:partial];
+        }
+    } else if (!d1Zero && d2Zero) {
+        for (EXTPartialDefinition *partial1 in d1.partialDefinitions) {
+            // in this case, we only have the left-hand differential, so
+            // d(xy) = dx y.  this means building the span
+            // A|B <-i|1- I|B -partial|1-> X|B --mu-> Z.
+            EXTMatrix *muXB = [self productWithLeft:[[loc1 class] followDiffl:loc1 page:page] right:loc2];
+            
+            EXTPartialDefinition *partial = [EXTPartialDefinition new];
+            partial.inclusion =
+                [EXTMatrix hadamardProduct:partial1.inclusion
+                                      with:[EXTMatrix identity:B.size]];
+            partial.differential = [EXTMatrix newMultiply:muXB by:[EXTMatrix hadamardProduct:partial1.differential with:[EXTMatrix identity:B.size]]];
+            
+            [dsum.partialDefinitions addObject:partial];
+        }
+    } else {
+        for (EXTPartialDefinition *partial1 in d1.partialDefinitions)
+        for (EXTPartialDefinition *partial2 in d2.partialDefinitions) {
+            // in this case, we only both differentials, so d(xy) = dx y + x dy.
+            // this means building both spans, then taking their intersection,
+            // and summing their action on the intersection.
+            EXTMatrix *muAY = [self productWithLeft:loc1 right:[[loc2 class] followDiffl:loc2 page:page]],
+                      *muXB = [self productWithLeft:[[loc1 class] followDiffl:loc1 page:page] right:loc2];
+
+            
+            EXTMatrix
+                *rightInclusion = [EXTMatrix hadamardProduct:[EXTMatrix identity:A.size] with:partial2.inclusion],
+                *leftInclusion = [EXTMatrix hadamardProduct:partial1.inclusion with:[EXTMatrix identity:B.size]],
+                *rightMultiply = [EXTMatrix newMultiply:muAY by:[EXTMatrix hadamardProduct:[EXTMatrix identity:A.size] with:partial2.differential]],
+                *leftMultiply = [EXTMatrix newMultiply:muXB by:[EXTMatrix hadamardProduct:partial1.differential with:[EXTMatrix identity:B.size]]];
+            
+            NSArray *pair = [EXTMatrix formIntersection:leftInclusion with:rightInclusion];
+            
+            EXTPartialDefinition *partial = [EXTPartialDefinition new];
+            partial.inclusion = [EXTMatrix newMultiply:leftInclusion by:pair[0]];
+            partial.differential = [EXTMatrix sum:[EXTMatrix newMultiply:leftMultiply by:pair[0]] with:[EXTMatrix newMultiply:rightMultiply by:pair[1]]];
+            
+            [dsum.partialDefinitions addObject:partial];            
+        }
+    }
+    
+    [dsum stripDuplicates];
+    
     return;
 }
 

@@ -14,11 +14,12 @@
 @implementation EXTDemos
 
 +(EXTSpectralSequence*) workingDemo {
-    return [EXTDemos A1MSSModernDemo];
+    return [EXTDemos A1MSSDemo];
 }
 
-+(EXTSpectralSequence*) A1MSSModernDemo {
++(EXTSpectralSequence*) A1MSSDemo {
     EXTPolynomialSSeq *sseq = [EXTPolynomialSSeq sSeqWithUnit:[EXTTriple class]];
+    [sseq.zeroRanges addObject:[EXTZeroRangeStrict newWithSSeq:sseq]];
     
     EXTTriple *h10 = [EXTTriple tripleWithA:1 B:1 C:1],
               *h11 = [EXTTriple tripleWithA:1 B:2 C:1],
@@ -27,10 +28,6 @@
     [sseq addPolyClass:@"h10" location:h10 upTo:8];
     [sseq addPolyClass:@"h11" location:h11 upTo:8];
     [sseq addPolyClass:@"h20" location:h20 upTo:4];
-    
-    // set up the zero range.  TODO: this should come before the tensor calls,
-    // and they should handle it well. :)
-    [sseq.zeroRanges addObject:[EXTZeroRangeStrict newWithSSeq:sseq]];
     
     // some basic partial definitions
     EXTPartialDefinition *diffone = [EXTPartialDefinition new];
@@ -43,8 +40,16 @@
     [sseq.differentials addObject:diff];
     
     // now, do leibniz propagation.
-    //[ret.multTables propagateLeibniz:@[h20, h10, h11] page:1];
-
+    [sseq propagateLeibniz:@[h20, h10, h11] page:1];
+    
+    // d3(h20^2) = h11^3
+    EXTLocation *h20squared = [[h20 class] scale:h20 by:2];
+    EXTDifferential *diff2 = [EXTDifferential differential:[sseq findTerm:h20squared] end:[sseq findTerm:[[h11 class] scale:h11 by:3]] page:2];
+    [diff2.partialDefinitions addObject:diffone];
+    [sseq.differentials addObject:diff2];
+    
+    // leibniz again, on the new terms.
+    [sseq propagateLeibniz:@[h10, h11, h20squared] page:2];
     
     return sseq;
 }
@@ -65,49 +70,6 @@
     [ret.differentials addObject:diff];
     
     ret = [ret tensorWithPolyClass:@"eta" location:[EXTPair pairWithA:1 B:1] upTo:5];
-    
-    return ret;
-}
-
-+(EXTSpectralSequence*) A1MSSDemo {
-    EXTSpectralSequence *ret = [EXTSpectralSequence sSeqWithUnit:[EXTTriple class]];
-    
-    // add the three polynomial generators to the sseq: h10, h11, h20
-    ret = [ret tensorWithPolyClass:@"h10" location:[EXTTriple tripleWithA:1 B:1 C:1] upTo:8];
-    ret = [ret tensorWithPolyClass:@"h11" location:[EXTTriple tripleWithA:1 B:2 C:1] upTo:8];
-    ret = [ret tensorWithPolyClass:@"h20" location:[EXTTriple tripleWithA:1 B:3 C:2] upTo:4];
-    
-    // set up the zero range.  TODO: this should come before the tensor calls,
-    // and they should handle it well. :)
-    [ret.zeroRanges addObject:[EXTZeroRangeStrict newWithSSeq:ret]];
-    
-    // some basic partial definitions
-    EXTPartialDefinition *diffone = [EXTPartialDefinition new];
-    EXTMatrix *one = [EXTMatrix identity:1];
-    diffone.differential = diffone.inclusion = one;
-    
-    EXTTriple *h10 = [EXTTriple tripleWithA:1 B:1 C:1],
-              *h11 = [EXTTriple tripleWithA:1 B:2 C:1],
-              *h20 = [EXTTriple tripleWithA:1 B:3 C:2];
-    
-    // d1(h20) = h10 h11
-    EXTDifferential *diff = [EXTDifferential differential:[ret findTerm:h20] end:[ret findTerm:[EXTTriple followDiffl:h20 page:1]] page:1];
-    [diff.partialDefinitions addObject:diffone];
-    [ret.differentials addObject:diff];
-    // d1(h11) = 0 is automatic.
-    // d1(h10) = 0 is automatic.
-    
-    // now, do leibniz propagation.
-    [ret.multTables propagateLeibniz:@[h20, h10, h11] page:1];
-    
-    // d3(h20^2) = h11^3
-    EXTLocation *h20squared = [[h20 class] scale:h20 by:2];
-    EXTDifferential *diff2 = [EXTDifferential differential:[ret findTerm:h20squared] end:[ret findTerm:[[h11 class] scale:h11 by:3]] page:2];
-    [diff2.partialDefinitions addObject:diffone];
-    [ret.differentials addObject:diff2];
-    
-    // leibniz again, on the new terms.
-    [ret.multTables propagateLeibniz:@[h10, h11, h20squared] page:2];
     
     return ret;
 }
@@ -161,7 +123,7 @@
     
     // propagate NAIVELY using the Leibniz rule
     
-    [ret.multTables propagateLeibniz:@[[eta location], [beta2 location], [betaneg2 location]] page:3];
+    [ret propagateLeibniz:@[[eta location], [beta2 location], [betaneg2 location]] page:3];
     
     return ret;
 }

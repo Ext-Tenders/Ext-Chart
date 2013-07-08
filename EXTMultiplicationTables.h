@@ -58,7 +58,5 @@
 -(void) computeLeibniz:(EXTLocation*)loc1
                   with:(EXTLocation*)loc2
                 onPage:(int)page;
--(void) naivelyPropagateLeibniz:(EXTLocation*)loc page:(int)page;
--(void) propagateLeibniz:(NSArray*)locations page:(int)page;
 
 @end
