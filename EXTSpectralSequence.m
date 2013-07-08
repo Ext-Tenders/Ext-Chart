@@ -104,7 +104,7 @@
     }
     
     // XXX: i don't think that this is **summing** differentials correctly...
-    NSMutableDictionary *outputDifferentials = [NSMutableDictionary dictionary];
+    NSMutableArray *outputDifferentials = [NSMutableArray array];
     // iterate over pairs of existing terms to build differentials from old ones
     for (NSMutableArray *tuple in splicedTensorTerms) {
         EXTTerm *start = tuple[0];
@@ -263,7 +263,9 @@
                 tagPartial[4] = @true;
             }
             
-            [outputDifferentials setObject:diff forKey:@[diff.start.location, @(diff.page)]];
+            while (diff.page <= outputDifferentials.count)
+                outputDifferentials[outputDifferentials.count] = [NSMutableDictionary dictionary];
+            [outputDifferentials[diff.page] setObject:diff forKey:diff.start.location];
         } // partialPresentations
     } // splicedTensorTerms
     

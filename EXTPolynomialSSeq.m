@@ -100,7 +100,9 @@
 
 
 
-
+//
+// now, the actual polynomial spectral sequence class.
+//
 @implementation EXTPolynomialSSeq
 
 @synthesize names, locations, upperBounds;

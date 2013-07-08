@@ -25,9 +25,9 @@
               *h11 = [EXTTriple tripleWithA:1 B:2 C:1],
               *h20 = [EXTTriple tripleWithA:1 B:3 C:2];
     
-    [sseq addPolyClass:@"h10" location:h10 upTo:16];
-    [sseq addPolyClass:@"h11" location:h11 upTo:16];
-    [sseq addPolyClass:@"h20" location:h20 upTo:8];
+    [sseq addPolyClass:@"h10" location:h10 upTo:24];
+    [sseq addPolyClass:@"h11" location:h11 upTo:24];
+    [sseq addPolyClass:@"h20" location:h20 upTo:12];
     
     // some basic partial definitions
     EXTPartialDefinition *diffone = [EXTPartialDefinition new];
