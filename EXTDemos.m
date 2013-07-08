@@ -8,8 +8,8 @@
 
 #import "EXTDemos.h"
 #import "EXTPolynomialSSeq.h"
-#import "EXTdifferential.h"
-#import "EXTterm.h"
+#import "EXTDifferential.h"
+#import "EXTTerm.h"
 
 @implementation EXTDemos
 

@@ -7,8 +7,8 @@
 //
 
 #import "EXTPolynomialSSeq.h"
-#import "EXTterm.h"
-#import "EXTdifferential.h"
+#import "EXTTerm.h"
+#import "EXTDifferential.h"
 
 
 // EXTTerms should have names which aren't strings but "tags".  each tag should

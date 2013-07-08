@@ -9,8 +9,8 @@
 #import "EXTSpectralSequence.h"
 #import "EXTPair.h"
 #import "EXTTriple.h"
-#import "EXTterm.h"
-#import "EXTdifferential.h"
+#import "EXTTerm.h"
+#import "EXTDifferential.h"
 #import "EXTMultiplicationTables.h"
 #import "EXTMatrix.h"
 

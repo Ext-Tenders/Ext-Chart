@@ -9,7 +9,7 @@
 #import "EXTTerm.h"
 #import "EXTGrid.h"
 #import "EXTDocument.h"
-#import "EXTdifferential.h"
+#import "EXTDifferential.h"
 #import "EXTMatrix.h"
 #import "EXTPair.h"
 #import "EXTSpectralSequence.h"

@@ -8,8 +8,8 @@
 
 #import "EXTDocumentWindowController.h"
 #import "EXTDocument.h"
-#import "EXTterm.h"
-#import "EXTdifferential.h"
+#import "EXTTerm.h"
+#import "EXTDifferential.h"
 #import "EXTChartView.h"
 #import "EXTArtBoard.h"
 #import "EXTScrollView.h"

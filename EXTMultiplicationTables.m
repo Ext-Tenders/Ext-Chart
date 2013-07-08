@@ -7,8 +7,8 @@
 //
 
 #import "EXTMultiplicationTables.h"
-#import "EXTterm.h"
-#import "EXTdifferential.h"
+#import "EXTTerm.h"
+#import "EXTDifferential.h"
 
 
 @interface EXTMultiplicationKey : NSObject <NSCopying>
