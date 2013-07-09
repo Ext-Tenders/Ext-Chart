@@ -308,7 +308,7 @@ enum : NSInteger {
 - (void)drawPageNumber:(NSUInteger)pageNumber
                     ll:(NSPoint)lowerLeft
                     ur:(NSPoint)upperRight
-           withSpacing:(CGFloat)withSpacing
+           withSpacing:(CGFloat)spacing
 {
     // start by initializing the array of counts
     int width = (int)(upperRight.x - lowerLeft.x + 1),
