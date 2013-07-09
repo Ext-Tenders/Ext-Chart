@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		093AEADD13E10759003E9F58 /* EXTPair.m in Sources */ = {isa = PBXBuildFile; fileRef = 093AEADC13E10759003E9F58 /* EXTPair.m */; };
 		143F3DFE176D615100FB92B3 /* EXTUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 143F3DFD176D615100FB92B3 /* EXTUtilities.m */; };
+		1467B26B178C6D500084A2F6 /* Ext Chart.iconset in Resources */ = {isa = PBXBuildFile; fileRef = 1467B26A178C6D500084A2F6 /* Ext Chart.iconset */; };
 		149314581783B6EB0080EF28 /* EXTDocumentControlsView.m in Sources */ = {isa = PBXBuildFile; fileRef = 149314571783B6EA0080EF28 /* EXTDocumentControlsView.m */; };
 		149949DF1786906200001137 /* ArtBoardToolAlternate.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 149949DE1786906200001137 /* ArtBoardToolAlternate.pdf */; };
 		149949E11786A3A000001137 /* ArtBoardTool.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 149949E01786A3A000001137 /* ArtBoardTool.pdf */; };
@@ -53,6 +54,7 @@
 		13E42FBA07B3F13500E4EEF1 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
 		143F3DFC176D615100FB92B3 /* EXTUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTUtilities.h; sourceTree = "<group>"; };
 		143F3DFD176D615100FB92B3 /* EXTUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTUtilities.m; sourceTree = "<group>"; };
+		1467B26A178C6D500084A2F6 /* Ext Chart.iconset */ = {isa = PBXFileReference; lastKnownFileType = folder.iconset; path = "Ext Chart.iconset"; sourceTree = "<group>"; };
 		149314561783B6EA0080EF28 /* EXTDocumentControlsView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTDocumentControlsView.h; sourceTree = "<group>"; };
 		149314571783B6EA0080EF28 /* EXTDocumentControlsView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTDocumentControlsView.m; sourceTree = "<group>"; };
 		149949DE1786906200001137 /* ArtBoardToolAlternate.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = ArtBoardToolAlternate.pdf; sourceTree = "<group>"; };
@@ -232,6 +234,7 @@
 		14EF1A611756ED430012DD3C /* Images */ = {
 			isa = PBXGroup;
 			children = (
+				1467B26A178C6D500084A2F6 /* Ext Chart.iconset */,
 				14EF1A651756EE3C0012DD3C /* SelectTool.pdf */,
 				149949E01786A3A000001137 /* ArtBoardTool.pdf */,
 				149949DE1786906200001137 /* ArtBoardToolAlternate.pdf */,
@@ -384,6 +387,7 @@
 				14EF1A661756EE3C0012DD3C /* SelectTool.pdf in Resources */,
 				149949DF1786906200001137 /* ArtBoardToolAlternate.pdf in Resources */,
 				149949E11786A3A000001137 /* ArtBoardTool.pdf in Resources */,
+				1467B26B178C6D500084A2F6 /* Ext Chart.iconset in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
