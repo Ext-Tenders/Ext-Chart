@@ -11,13 +11,15 @@
 #import "EXTToolPaletteController.h"
 #import "EXTDemos.h"
 #import "EXTDocument.h"
+#import "EXTMaySpectralSequence.h"
 
 
 typedef enum : NSInteger {
     EXTAppControllerRandomExampleTag  = 0,
     EXTAppControllerS5ExampleTag      = 1,
     EXTAppControllerKUhC2ExampleTag   = 2,
-    EXTAppControllerA1MSSExampleTag   = 3
+    EXTAppControllerA1MSSExampleTag   = 3,
+    EXTAppControllerMayExampleTag     = 4
 } EXTAppControllerExampleTag;
 
 
@@ -68,6 +70,10 @@ typedef enum : NSInteger {
             
         case EXTAppControllerA1MSSExampleTag:
             sseq = [EXTDemos A1MSSDemo];
+            break;
+            
+        case EXTAppControllerMayExampleTag:
+            sseq = [EXTMaySpectralSequence fillToWidth:14];
             break;
 
         default:

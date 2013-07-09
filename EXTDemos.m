@@ -10,11 +10,13 @@
 #import "EXTPolynomialSSeq.h"
 #import "EXTDifferential.h"
 #import "EXTTerm.h"
+#import "EXTMaySpectralSequence.h"
 
 @implementation EXTDemos
 
 +(EXTSpectralSequence*) workingDemo {
-    return [EXTDemos A1MSSDemo];
+    
+    return [EXTMaySpectralSequence fillToWidth:7];
 }
 
 +(EXTSpectralSequence*) A1MSSDemo {

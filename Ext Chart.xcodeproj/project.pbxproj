@@ -40,6 +40,7 @@
 		38F7830B17565F72009D207A /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = 38F7830A17565F72009D207A /* LICENSE */; };
 		38F783121756AEBF009D207A /* EXTTriple.m in Sources */ = {isa = PBXBuildFile; fileRef = 38F783111756AEBF009D207A /* EXTTriple.m */; };
 		38F9220C17888DE200E30900 /* EXTPolynomialSSeq.m in Sources */ = {isa = PBXBuildFile; fileRef = 38F9220B17888DE200E30900 /* EXTPolynomialSSeq.m */; };
+		38FB16CA178CB35D00D7D62B /* EXTMaySpectralSequence.m in Sources */ = {isa = PBXBuildFile; fileRef = 38FB16C9178CB35D00D7D62B /* EXTMaySpectralSequence.m */; };
 		8D15AC2F0486D014006FF6A4 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165FFE840EACC02AAC07 /* InfoPlist.strings */; };
 		8D15AC310486D014006FF6A4 /* EXTDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A37F4ACFDCFA73011CA2CEA /* EXTDocument.m */; settings = {ATTRIBUTES = (); }; };
 		8D15AC320486D014006FF6A4 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A37F4B0FDCFA73011CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
@@ -111,6 +112,8 @@
 		38F783111756AEBF009D207A /* EXTTriple.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTTriple.m; sourceTree = "<group>"; };
 		38F9220A17888DE200E30900 /* EXTPolynomialSSeq.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTPolynomialSSeq.h; sourceTree = "<group>"; };
 		38F9220B17888DE200E30900 /* EXTPolynomialSSeq.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTPolynomialSSeq.m; sourceTree = "<group>"; };
+		38FB16C8178CB35D00D7D62B /* EXTMaySpectralSequence.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTMaySpectralSequence.h; sourceTree = "<group>"; };
+		38FB16C9178CB35D00D7D62B /* EXTMaySpectralSequence.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTMaySpectralSequence.m; sourceTree = "<group>"; };
 		8D15AC360486D014006FF6A4 /* Ext_Chart-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Ext_Chart-Info.plist"; sourceTree = "<group>"; };
 		8D15AC370486D014006FF6A4 /* Ext Chart.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Ext Chart.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -170,6 +173,8 @@
 				38F7830F17566281009D207A /* EXTLocation.h */,
 				3896548B16F538D90008FB8D /* EXTMatrix.h */,
 				3896548C16F538D90008FB8D /* EXTMatrix.m */,
+				38FB16C8178CB35D00D7D62B /* EXTMaySpectralSequence.h */,
+				38FB16C9178CB35D00D7D62B /* EXTMaySpectralSequence.m */,
 				389FB38B17498AF500D0FE75 /* EXTMultiplicationTables.h */,
 				389FB38C17498AF500D0FE75 /* EXTMultiplicationTables.m */,
 				093AEADB13E10759003E9F58 /* EXTPair.h */,
@@ -420,6 +425,7 @@
 				38F9220C17888DE200E30900 /* EXTPolynomialSSeq.m in Sources */,
 				38A35E75178A018600D2A019 /* EXTDemos.m in Sources */,
 				149314581783B6EB0080EF28 /* EXTDocumentControlsView.m in Sources */,
+				38FB16CA178CB35D00D7D62B /* EXTMaySpectralSequence.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
