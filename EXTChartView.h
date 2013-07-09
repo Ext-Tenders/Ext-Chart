@@ -21,8 +21,6 @@
 	BOOL editMode;
 	BOOL highlighting;
 
-	int pageInView;
-	
 	NSRect highlightRect;    // make this private?
 	NSColor *highlightRectColor;  // if this is not customizable, it should be a constant.   I couldn't make it work as a static or extern...
 		
