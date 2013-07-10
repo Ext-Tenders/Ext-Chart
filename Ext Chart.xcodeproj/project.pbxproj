@@ -25,7 +25,6 @@
 		3187BA2713DC6C6C00C26803 /* EXTScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3187BA2413DC6C6C00C26803 /* EXTScrollView.m */; };
 		318EC0691409385F005D21D4 /* to do list.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 318EC0681409385F005D21D4 /* to do list.rtf */; };
 		31C77B8D13E43E3100E9DBFC /* Preferences.xib in Resources */ = {isa = PBXBuildFile; fileRef = 31C77B8C13E43E3100E9DBFC /* Preferences.xib */; };
-		31C77BA113E63E8F00E9DBFC /* EXTDocSettings.xib in Resources */ = {isa = PBXBuildFile; fileRef = 31C77BA013E63E8F00E9DBFC /* EXTDocSettings.xib */; };
 		31C77BA813E63F6800E9DBFC /* EXTAppController.m in Sources */ = {isa = PBXBuildFile; fileRef = 31C77BA713E63F6800E9DBFC /* EXTAppController.m */; };
 		31C77BB613E647A000E9DBFC /* EXTsettingPanelController.m in Sources */ = {isa = PBXBuildFile; fileRef = 31C77BB513E647A000E9DBFC /* EXTsettingPanelController.m */; };
 		31D403BB13DA0476006A8C06 /* EXTTerm.m in Sources */ = {isa = PBXBuildFile; fileRef = 31D403BA13DA0476006A8C06 /* EXTTerm.m */; };
@@ -87,7 +86,6 @@
 		3187BA2413DC6C6C00C26803 /* EXTScrollView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTScrollView.m; sourceTree = "<group>"; };
 		318EC0681409385F005D21D4 /* to do list.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; path = "to do list.rtf"; sourceTree = "<group>"; };
 		31C77B8C13E43E3100E9DBFC /* Preferences.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = Preferences.xib; sourceTree = "<group>"; };
-		31C77BA013E63E8F00E9DBFC /* EXTDocSettings.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = EXTDocSettings.xib; sourceTree = "<group>"; };
 		31C77BA613E63F6800E9DBFC /* EXTAppController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTAppController.h; sourceTree = "<group>"; };
 		31C77BA713E63F6800E9DBFC /* EXTAppController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTAppController.m; sourceTree = "<group>"; };
 		31C77BB413E647A000E9DBFC /* EXTsettingPanelController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTsettingPanelController.h; sourceTree = "<group>"; };
@@ -261,7 +259,6 @@
 				1DDD58280DA1D0D100B32029 /* EXTDocument.xib */,
 				1DDD582A0DA1D0D100B32029 /* MainMenu.xib */,
 				31C77B8C13E43E3100E9DBFC /* Preferences.xib */,
-				31C77BA013E63E8F00E9DBFC /* EXTDocSettings.xib */,
 				31EEEF64140430380035BE7A /* EXTToolPalette.xib */,
 			);
 			name = XIBs;
@@ -392,7 +389,6 @@
 				1DDD582C0DA1D0D100B32029 /* EXTDocument.xib in Resources */,
 				1DDD582D0DA1D0D100B32029 /* MainMenu.xib in Resources */,
 				31C77B8D13E43E3100E9DBFC /* Preferences.xib in Resources */,
-				31C77BA113E63E8F00E9DBFC /* EXTDocSettings.xib in Resources */,
 				31EEEF65140430380035BE7A /* EXTToolPalette.xib in Resources */,
 				318EC0691409385F005D21D4 /* to do list.rtf in Resources */,
 				38DDAA7B16EDA8990001841D /* README.md in Resources */,
