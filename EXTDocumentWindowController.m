@@ -586,8 +586,12 @@ enum : NSInteger {
 
 - (BOOL)validateUserInterfaceItem:(id<NSValidatedUserInterfaceItem>)item {
     if ([item action] == @selector(toggleInspector:)) {
+        NSRect inspectorViewFrame = [_inspectorView frame];
+        NSRect contentFrame = [[[self window] contentView] frame];
+        bool inspectorHidden = inspectorViewFrame.origin.x >= NSMaxX(contentFrame);
+
         if ([(id)item respondsToSelector:@selector(setTitle:)]) {
-            [(id)item setTitle:[_inspectorView isHidden] ? @"Show Inspector" : @"Hide Inspector"];
+            [(id)item setTitle:inspectorHidden ? @"Show Inspector" : @"Hide Inspector"];
         }
     }
 
