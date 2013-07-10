@@ -367,16 +367,14 @@ enum : NSInteger {
                 
                 [path fill];
             } else {
-                NSFont *font = [NSFont fontWithName:@"Palatino-Roman"
-                                               size:5.0];
-                NSDictionary *attrsDictionary = [NSDictionary dictionaryWithObject:font forKey:NSFontAttributeName];
-                NSAttributedString *output = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"%d",count] attributes:attrsDictionary];
-            
-                // XXX: this probably breaks for multidigit numbers.
-                [output drawAtPoint:NSMakePoint(spacing*(float)i+2.3/6.0*spacing,
-                                                spacing*(float)j+0.6/6.0*spacing)];
-            
-                [[NSColor blackColor] set];
+                NSString *output = [NSString stringWithFormat:@"%d", count];
+                NSFont *font = output.length >= 2 ? [NSFont fontWithName:@"Palatino-Roman" size:4.5] : [NSFont fontWithName:@"Palatino-Roman" size:5.0];
+                NSMutableParagraphStyle *paragraphStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
+                [paragraphStyle setAlignment:NSCenterTextAlignment];
+                NSDictionary *attributes = [NSDictionary dictionaryWithObjects:@[paragraphStyle,font] forKeys:@[NSParagraphStyleAttributeName,NSFontAttributeName]];
+                NSRect frame = NSMakeRect((float)i * spacing, ((float)j - 0.1) * spacing, spacing, spacing);
+                [output drawInRect:frame withAttributes:attributes];
+                            
                 [path appendBezierPathWithOvalInRect:[dotPositions[0] rectValue]];
                 [path stroke];
             }
