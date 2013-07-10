@@ -141,7 +141,7 @@
     return nil;
 }
 
--(void) addPolyClass:(NSString*)name location:(EXTLocation*)loc upTo:(int)bound {
+-(void) addPolyClass:(NSObject*)name location:(EXTLocation*)loc upTo:(int)bound {
     // update the navigation members
     [names addObject:name];
     [locations addObject:loc];
@@ -152,7 +152,7 @@
     return;
 }
 
--(void) resizePolyClass:(NSString*)name upTo:(int)newBound {
+-(void) resizePolyClass:(NSObject*)name upTo:(int)newBound {
     int index = [names indexOfObject:name];
     
     // TODO: we can only resize to be larger.  not sure if this is desirable, or
@@ -224,8 +224,10 @@
     for (int j = 0; j < right.size; j++) {
         EXTPolynomialTag *sumTag = [EXTPolynomialTag sum:left.names[i] with:right.names[j]];
         int index = [target.names indexOfObject:sumTag];
-        NSMutableArray *retcol = ret.presentation[i*right.size+j];
-        retcol[index] = @1;
+        if (index != -1) {
+            NSMutableArray *retcol = ret.presentation[i*right.size+j];
+            retcol[index] = @1;
+        }
     }
     
     return ret;
@@ -281,12 +283,12 @@
             // in this case, we only have the right-hand differential, so
             // d(xy) = 0 + x dy.  this means building the span
             // A|B <-1|j- A|J -1|partial-> A|Y --mu-> Z.
-            EXTMatrix *muAY = [self productWithLeft:loc1 right:[[loc2 class] followDiffl:loc2 page:page]];
+            EXTMatrix *muAY = [self productWithLeft:loc1 right:[[loc2 class] followDiffl:loc2 page:page]],
+                      *muAB = [self productWithLeft:loc1 right:loc2];
             
             EXTPartialDefinition *partial = [EXTPartialDefinition new];
             partial.inclusion =
-                [EXTMatrix hadamardProduct:[EXTMatrix identity:A.size]
-                                      with:partial2.inclusion];
+                [EXTMatrix newMultiply:muAB by:[EXTMatrix hadamardProduct:[EXTMatrix identity:A.size] with:partial2.inclusion]];
             partial.differential = [EXTMatrix newMultiply:muAY by:[EXTMatrix hadamardProduct:[EXTMatrix identity:A.size] with:partial2.differential]];
             
             [dsum.partialDefinitions addObject:partial];
@@ -296,12 +298,12 @@
             // in this case, we only have the left-hand differential, so
             // d(xy) = dx y.  this means building the span
             // A|B <-i|1- I|B -partial|1-> X|B --mu-> Z.
-            EXTMatrix *muXB = [self productWithLeft:[[loc1 class] followDiffl:loc1 page:page] right:loc2];
+            EXTMatrix *muXB = [self productWithLeft:[[loc1 class] followDiffl:loc1 page:page] right:loc2],
+                      *muAB = [self productWithLeft:loc1 right:loc2];
             
             EXTPartialDefinition *partial = [EXTPartialDefinition new];
             partial.inclusion =
-                [EXTMatrix hadamardProduct:partial1.inclusion
-                                      with:[EXTMatrix identity:B.size]];
+                [EXTMatrix newMultiply:muAB by:[EXTMatrix hadamardProduct:partial1.inclusion with:[EXTMatrix identity:B.size]]];
             partial.differential = [EXTMatrix newMultiply:muXB by:[EXTMatrix hadamardProduct:partial1.differential with:[EXTMatrix identity:B.size]]];
             
             [dsum.partialDefinitions addObject:partial];
@@ -313,7 +315,8 @@
             // this means building both spans, then taking their intersection,
             // and summing their action on the intersection.
             EXTMatrix *muAY = [self productWithLeft:loc1 right:[[loc2 class] followDiffl:loc2 page:page]],
-                      *muXB = [self productWithLeft:[[loc1 class] followDiffl:loc1 page:page] right:loc2];
+                      *muXB = [self productWithLeft:[[loc1 class] followDiffl:loc1 page:page] right:loc2],
+                      *muAB = [self productWithLeft:loc1 right:loc2];
 
             
             EXTMatrix
@@ -325,12 +328,15 @@
             NSArray *pair = [EXTMatrix formIntersection:leftInclusion with:rightInclusion];
             
             EXTPartialDefinition *partial = [EXTPartialDefinition new];
-            partial.inclusion = [EXTMatrix newMultiply:leftInclusion by:pair[0]];
+            partial.inclusion = [EXTMatrix newMultiply:muAB by:[EXTMatrix newMultiply:leftInclusion by:pair[0]]];
             partial.differential = [EXTMatrix sum:[EXTMatrix newMultiply:leftMultiply by:pair[0]] with:[EXTMatrix newMultiply:rightMultiply by:pair[1]]];
             
-            [dsum.partialDefinitions addObject:partial];            
+            [dsum.partialDefinitions addObject:partial];
         }
     }
+    
+    if (![dsum checkForSanity])
+        NSLog(@"checkForSanity in computeLeibniz failed to pass.");
     
     [dsum stripDuplicates];
     

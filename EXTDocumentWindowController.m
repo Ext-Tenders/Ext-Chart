@@ -388,8 +388,7 @@ enum : NSInteger {
         return;
     
     [[NSColor blackColor] set];
-    for (NSArray* key in self.extDocument.sseq.differentials[pageNumber]) {
-        EXTDifferential *differential = [self.extDocument.sseq.differentials[pageNumber] objectForKey:key];
+    for (EXTDifferential *differential in ((NSDictionary*)self.extDocument.sseq.differentials[pageNumber]).allValues) {
         // some sanity checks to make sure this differential is worth drawing
         if ([differential page] != pageNumber)
             continue;

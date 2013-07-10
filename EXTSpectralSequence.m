@@ -113,8 +113,7 @@
         // find all the differentials involving any of the working left-summands
         NSMutableArray *partialPresentations = [NSMutableArray array];
         for (NSMutableDictionary *dictionary in self.differentials)
-        for (NSArray *key in dictionary) {
-            EXTDifferential *d1 = [dictionary objectForKey:key];
+        for (EXTDifferential *d1 in dictionary.allValues) {
             // check if this diff'l is attached to one of our left-summands.
             int sourceIndex = -1, sourceOffset = 0;
             for (int i = 0; i < startSummands.count; i++) {
@@ -182,9 +181,7 @@
         // XXX: THIS IS DUPLICATED CODE. BUGS IN ONE MEAN BUGS IN THE OTHER.
         // CORRECT APPROPRIATELY, AND EVENTUALLY FACTOR THIS ALL OUT.
         for (NSMutableDictionary *dictionary in p.differentials)
-        for (NSArray *key in dictionary) {
-            EXTDifferential *d2 = [dictionary objectForKey:key];
-            
+        for (EXTDifferential *d2 in dictionary.allValues) {
             // check if this diff'l is attached to one of our right-summands.
             int sourceIndex = -1, sourceOffset = 0;
             for (int i = 0; i < startSummands.count; i++) {
@@ -449,12 +446,11 @@
 }
 
 -(void) computeGroupsForPage:(int)page {
+    if (differentials.count > page)
+        for (EXTDifferential *diff in ((NSDictionary*)differentials[page]).allValues)
+            [diff assemblePresentation];
+    
     for (EXTTerm *term in self.terms.allValues) {
-        if (differentials.count > page)
-            for (NSObject *key in differentials[page]) {
-                EXTDifferential *diff = [(NSDictionary*)differentials[page] objectForKey:key];
-                [diff assemblePresentation];
-            }
         [term computeCycles:page sSeq:self];
         [term computeBoundaries:page sSeq:self];
     }

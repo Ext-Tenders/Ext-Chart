@@ -120,6 +120,7 @@
 // live in the spectral sequence.  summation is more appropriate an operation on
 // modules, rather than on EXTTerms...
 + (id) sumOfTerms:(EXTTerm *)termOne and:(EXTTerm *)termTwo {
+    NSLog(@"+sumOfTerms is not yet implemented.");
 	return nil; // allowed?
 }
 
@@ -220,8 +221,9 @@
 }
 
 -(int) dimension:(int)whichPage {
-    int dim = [[cycles objectAtIndex:whichPage] count] -
-                [[boundaries objectAtIndex:whichPage] count];
+    int cycleCount = [[cycles objectAtIndex:whichPage] count],
+        boundaryCount = [[boundaries objectAtIndex:whichPage] count],
+        dim = cycleCount - boundaryCount;
     
     if (dim < 0) {
         DLog("term with name %@ has negative dimension on page %d", self.names[0], whichPage);

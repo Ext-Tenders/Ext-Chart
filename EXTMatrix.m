@@ -166,18 +166,15 @@
     }
 }
 
-// performs a *deep* copy of the matrix
+// performs a deep copy of the matrix
 -(EXTMatrix*) copy {
     EXTMatrix *copy = [EXTMatrix initWidth:width height:height];
     
-    for (int i = 0; i < width; i++) {
+    for (int i = 0; i < width; i++)
         for (int j = 0; j < height; j++) {
-            NSNumber *num = [[[presentation objectAtIndex:i]
-                              objectAtIndex:j] copy];
-            [[copy.presentation objectAtIndex:i] setObject:num
-                                        atIndexedSubscript:j];
+            NSNumber *num = ((NSArray*)presentation[i])[j];
+            ((NSMutableArray*)copy.presentation[i])[j] = num;
         }
-    }
     
     return copy;
 }
@@ -188,9 +185,7 @@
     int pivotRow = 0, pivotColumn = 0;
     EXTMatrix *ret = [self copy];
     
-    for (pivotRow = 0; (pivotRow < height) && (pivotColumn < width);
-         pivotRow++) {
-        
+    for (pivotRow = 0; (pivotRow < height) && (pivotColumn < width); pivotRow++) {
         int j;
         
         // find the first nonzero entry in this row, right of where we're at
@@ -317,6 +312,9 @@
 +(EXTMatrix*) newMultiply:(EXTMatrix*)left by:(EXTMatrix*)right {
     EXTMatrix *product = [EXTMatrix initWidth:[right width]
                                         height:[left height]];
+    
+    if (left.width != right.height)
+        NSLog(@"Mismatched multiplication.");
     
     for (int k = 0; k < [right width]; k++) {
         NSMutableArray *rightColumn = [[right presentation] objectAtIndex:k],

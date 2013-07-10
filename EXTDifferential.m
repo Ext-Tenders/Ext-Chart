@@ -59,7 +59,7 @@
 
 // quietly assemble the presentation when asked for it :)
 -(EXTMatrix*) presentation {
-//    [self assemblePresentation];
+    [self assemblePresentation];
     
     return _presentation;
 }
@@ -104,6 +104,19 @@
     }
     
     self.partialDefinitions = reducedPartials;
+}
+
+-(BOOL) checkForSanity {
+    for (EXTPartialDefinition *partial in partialDefinitions) {
+        if (partial.inclusion.width != partial.differential.width)
+            return false;
+        if (partial.inclusion.height != start.size)
+            return false;
+        if (partial.differential.height != end.size)
+            return false;
+    }
+    
+    return true;
 }
 
 +(id) dealWithClick:(NSPoint)location document:(EXTDocument *)document {

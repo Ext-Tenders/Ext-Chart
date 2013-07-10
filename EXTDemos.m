@@ -16,7 +16,7 @@
 
 +(EXTSpectralSequence*) workingDemo {
     
-    return [EXTMaySpectralSequence fillToWidth:7];
+    return [EXTMaySpectralSequence fillToWidth:6];
 }
 
 +(EXTSpectralSequence*) A1MSSDemo {

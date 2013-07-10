@@ -20,8 +20,8 @@
 
 +(EXTPolynomialSSeq*) sSeqWithUnit:(Class<EXTLocation>)locClass;
 
--(void) addPolyClass:(NSString*)name location:(EXTLocation*)loc upTo:(int)bound;
--(void) resizePolyClass:(NSString*)name upTo:(int)newBound;
+-(void) addPolyClass:(NSObject*)name location:(EXTLocation*)loc upTo:(int)bound;
+-(void) resizePolyClass:(NSObject*)name upTo:(int)newBound;
 
 -(EXTMatrix*) productWithLeft:(EXTLocation*)left right:(EXTLocation*)right;
 

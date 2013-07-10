@@ -40,4 +40,6 @@
 
     // UI messages
     +(id) dealWithClick:(NSPoint)location document:(EXTDocument*)document;
+
+    -(BOOL) checkForSanity;
 @end
