@@ -465,9 +465,9 @@
     // of basis vectors.
     NSMutableArray *augmentedVectors =
     [NSMutableArray arrayWithArray:minimalVectors];
-    for (int i = 0; i < targetDimension; i++) {
+    for (int i = 0; i < sourceDimension; i++) {
         NSMutableArray *en = [NSMutableArray array];
-        for (int j = 0; j < targetDimension; j++) {
+        for (int j = 0; j < sourceDimension; j++) {
             if (i == j) {
                 [en addObject:@1];
             } else {
@@ -480,7 +480,7 @@
     
     // then, column reduce it.  the vectors that survive will be our full basis.
     EXTMatrix *augmentedMat =
-    [EXTMatrix matrixWidth:augmentedVectors.count height:targetDimension];
+    [EXTMatrix matrixWidth:augmentedVectors.count height:sourceDimension];
     augmentedMat.presentation = augmentedVectors;
     EXTMatrix *reducedMat = [augmentedMat columnReduce];
     NSMutableArray *reducedVectors = reducedMat.presentation;
