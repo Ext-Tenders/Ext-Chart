@@ -450,6 +450,11 @@
 
 -(void) computeGroupsForPage:(int)page {
     for (EXTTerm *term in self.terms.allValues) {
+        if (differentials.count > page)
+            for (NSObject *key in differentials[page]) {
+                EXTDifferential *diff = [(NSDictionary*)differentials[page] objectForKey:key];
+                [diff assemblePresentation];
+            }
         [term computeCycles:page sSeq:self];
         [term computeBoundaries:page sSeq:self];
     }

@@ -506,7 +506,7 @@
     // now, we construct a matrix presenting the differential in this basis.
     // this is where the partial definitions actually get used.
     EXTMatrix *differentialInCoordinates =
-    [EXTMatrix matrixWidth:basisMatrix.width height:basisMatrix.height];
+            [EXTMatrix matrixWidth:basisMatrix.width height:targetDimension];
     for (int i = 0; i < basisMatrix.width; i++) {
         // if we're in the range of partially determined stuff, use the def'ns
         if (i < minimalParents.count) {

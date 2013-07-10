@@ -59,7 +59,7 @@
 
 // quietly assemble the presentation when asked for it :)
 -(EXTMatrix*) presentation {
-    [self assemblePresentation];
+//    [self assemblePresentation];
     
     return _presentation;
 }
