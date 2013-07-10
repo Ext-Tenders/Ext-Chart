@@ -408,6 +408,14 @@ enum : NSInteger {
         if ([differential page] != pageNumber)
             continue;
         
+        NSPoint start = [differential.start.location makePoint],
+                end = [differential.end.location makePoint];
+        if (((start.x < lowerLeft.x || start.x > upperRight.x) ||
+             (start.y < lowerLeft.y || start.y > upperRight.y)) &&
+            ((end.x < lowerLeft.x || end.x > upperRight.x) ||
+             (end.y < lowerLeft.y || end.y > upperRight.y)))
+            continue;
+        
         int imageSize = [differential.presentation image].count;
         if ((imageSize == 0) ||
             ([differential.start dimension:differential.page] == 0) ||
@@ -419,8 +427,6 @@ enum : NSInteger {
         NSMutableArray
             *startPosition = [NSMutableArray arrayWithArray:@[@0, @0]],
             *endPosition = [NSMutableArray arrayWithArray:@[@0, @0]];
-        NSPoint start = [differential.start.location makePoint],
-                end = [differential.end.location makePoint];
         
         if (start.x >= lowerLeft.x && start.x <= upperRight.x &&
             start.y >= lowerLeft.y && start.y <= upperRight.y) {
