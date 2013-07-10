@@ -103,10 +103,10 @@
         NSMutableArray *leftcol = left.presentation[i];
         for (int j = 0; j < right.width; j++) {
             NSMutableArray *rightcol = right.presentation[j],
-                             *retcol = ret.presentation[i*left.width+j];
+                             *retcol = ret.presentation[i*right.width+j];
             for (int k = 0; k < left.height; k++) {
                 for (int l = 0; l < right.height; l++) {
-                    retcol[k*left.height+l] =
+                    retcol[k*right.height+l] =
                             @([leftcol[k] intValue] * [rightcol[l] intValue]);
                 }
             }
