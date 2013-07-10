@@ -527,4 +527,10 @@ static void *_EXTChartViewGridAnyKeyContext = &_EXTChartViewGridAnyKeyContext;
 	currentTool = EXTToolPaletteController.sharedToolPaletteController.currentToolClass;
 }
 
+#pragma mark - NSUserInterfaceValidations
+
+- (BOOL)validateUserInterfaceItem:(id<NSValidatedUserInterfaceItem>)item {
+    return [self respondsToSelector:[item action]];
+}
+
 @end

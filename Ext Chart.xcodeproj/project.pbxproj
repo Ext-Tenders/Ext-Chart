@@ -10,6 +10,8 @@
 		093AEADD13E10759003E9F58 /* EXTPair.m in Sources */ = {isa = PBXBuildFile; fileRef = 093AEADC13E10759003E9F58 /* EXTPair.m */; };
 		143F3DFE176D615100FB92B3 /* EXTUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 143F3DFD176D615100FB92B3 /* EXTUtilities.m */; };
 		1467B26B178C6D500084A2F6 /* Ext Chart.iconset in Resources */ = {isa = PBXBuildFile; fileRef = 1467B26A178C6D500084A2F6 /* Ext Chart.iconset */; };
+		1467B26E178CF15E0084A2F6 /* EXTDocumentInspectorView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1467B26D178CF15E0084A2F6 /* EXTDocumentInspectorView.m */; };
+		1467B272178D13A80084A2F6 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1467B271178D13A80084A2F6 /* QuartzCore.framework */; };
 		149314581783B6EB0080EF28 /* EXTDocumentControlsView.m in Sources */ = {isa = PBXBuildFile; fileRef = 149314571783B6EA0080EF28 /* EXTDocumentControlsView.m */; };
 		149949DF1786906200001137 /* ArtBoardToolAlternate.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 149949DE1786906200001137 /* ArtBoardToolAlternate.pdf */; };
 		149949E11786A3A000001137 /* ArtBoardTool.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 149949E01786A3A000001137 /* ArtBoardTool.pdf */; };
@@ -56,6 +58,9 @@
 		143F3DFC176D615100FB92B3 /* EXTUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTUtilities.h; sourceTree = "<group>"; };
 		143F3DFD176D615100FB92B3 /* EXTUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTUtilities.m; sourceTree = "<group>"; };
 		1467B26A178C6D500084A2F6 /* Ext Chart.iconset */ = {isa = PBXFileReference; lastKnownFileType = folder.iconset; path = "Ext Chart.iconset"; sourceTree = "<group>"; };
+		1467B26C178CF15E0084A2F6 /* EXTDocumentInspectorView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTDocumentInspectorView.h; sourceTree = "<group>"; };
+		1467B26D178CF15E0084A2F6 /* EXTDocumentInspectorView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTDocumentInspectorView.m; sourceTree = "<group>"; };
+		1467B271178D13A80084A2F6 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk/System/Library/Frameworks/QuartzCore.framework; sourceTree = DEVELOPER_DIR; };
 		149314561783B6EA0080EF28 /* EXTDocumentControlsView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTDocumentControlsView.h; sourceTree = "<group>"; };
 		149314571783B6EA0080EF28 /* EXTDocumentControlsView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTDocumentControlsView.m; sourceTree = "<group>"; };
 		149949DE1786906200001137 /* ArtBoardToolAlternate.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = ArtBoardToolAlternate.pdf; sourceTree = "<group>"; };
@@ -123,6 +128,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1467B272178D13A80084A2F6 /* QuartzCore.framework in Frameworks */,
 				8D15AC340486D014006FF6A4 /* Cocoa.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -206,6 +212,8 @@
 				317707E013D7893A003475A2 /* EXTChartView.m */,
 				149314561783B6EA0080EF28 /* EXTDocumentControlsView.h */,
 				149314571783B6EA0080EF28 /* EXTDocumentControlsView.m */,
+				1467B26C178CF15E0084A2F6 /* EXTDocumentInspectorView.h */,
+				1467B26D178CF15E0084A2F6 /* EXTDocumentInspectorView.m */,
 			);
 			name = Views;
 			sourceTree = "<group>";
@@ -270,6 +278,7 @@
 		2A37F4AAFDCFA73011CA2CEA /* Ext Chart */ = {
 			isa = PBXGroup;
 			children = (
+				1467B271178D13A80084A2F6 /* QuartzCore.framework */,
 				2A37F4ABFDCFA73011CA2CEA /* Classes */,
 				2A37F4AFFDCFA73011CA2CEA /* Other Sources */,
 				2A37F4B8FDCFA73011CA2CEA /* Resources */,
@@ -426,6 +435,7 @@
 				38A35E75178A018600D2A019 /* EXTDemos.m in Sources */,
 				149314581783B6EB0080EF28 /* EXTDocumentControlsView.m in Sources */,
 				38FB16CA178CB35D00D7D62B /* EXTMaySpectralSequence.m in Sources */,
+				1467B26E178CF15E0084A2F6 /* EXTDocumentInspectorView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

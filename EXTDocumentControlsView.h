@@ -1,5 +1,5 @@
 //
-//  EXTBorderedView.h
+//  ExtDocumentControlsView.h
 //  Ext Chart
 //
 //  Created by Bavarious on 02/07/2013.

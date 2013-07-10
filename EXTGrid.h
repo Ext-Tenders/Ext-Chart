@@ -14,7 +14,7 @@ extern NSString * const EXTGridAnyKey;
 
 @property(nonatomic, strong) NSColor *gridColor, *emphasisGridColor, *axisColor;
 @property(nonatomic, assign) CGFloat gridSpacing;
-@property(nonatomic, assign) NSUInteger emphasisSpacing;
+@property(nonatomic, assign) NSInteger emphasisSpacing;
 @property(nonatomic, assign) NSRect boundsRect;
 @property(nonatomic, strong) NSBezierPath *gridPath, *emphasisGridPath;
 

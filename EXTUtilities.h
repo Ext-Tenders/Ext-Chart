@@ -24,3 +24,7 @@
 static bool __attribute__((__overloadable__, __always_inline__)) EXTEpsilonEqual(float x, float y) {return fabsf(x - y) <= FLT_EPSILON;}
 static bool __attribute__((__overloadable__, __always_inline__)) EXTEpsilonEqual(double x, double y) {return fabs(x - y) <= DBL_EPSILON;}
 static bool __attribute__((__overloadable__, __always_inline__)) EXTEpsilonEqual(long double x, long double y) {return fabsl(x - y) <= LDBL_EPSILON;}
+
+/*! Boolean to string conversions */
+static NSString * __attribute__((__always_inline__)) EXTBoolToString(bool x) { return x ? @"true" : @"false"; }
+static const char * __attribute__((__always_inline__)) EXTBoolToCString(bool x) { return x ? "true" : "false"; }

@@ -160,7 +160,7 @@ static NSColor *_EXTDefaultAxisColor = nil;
 
 }
 
-- (void) setEmphasisSpacing:(NSUInteger) spacing{
+- (void) setEmphasisSpacing:(NSInteger) spacing{
 	_emphasisSpacing = spacing;	
 	// regenerate the emphasisGridPath
 	self.emphasisGridPath = [self makeGridInRect:_boundsRect withFactor:_emphasisSpacing];

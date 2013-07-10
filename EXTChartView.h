@@ -15,7 +15,7 @@
 @end
 
 
-@interface EXTChartView : NSView {
+@interface EXTChartView : NSView <NSUserInterfaceValidations> {
 	BOOL showGrid;
 	BOOL showPages;
 	BOOL editMode;

@@ -13,9 +13,11 @@
 #import "EXTTerm.h"
 #import "EXTDifferential.h"
 #import "EXTChartView.h"
+#import "EXTGrid.h"
 #import "EXTArtBoard.h"
 #import "EXTScrollView.h"
 #import "EXTSpectralSequence.h"
+#import "EXTDocumentInspectorView.h"
 
 
 #pragma mark - Private variables
@@ -38,18 +40,23 @@ enum : NSInteger {
 };
 
 
-@interface EXTDocumentWindowController () <NSWindowDelegate>
+@interface EXTDocumentWindowController () <NSWindowDelegate, NSUserInterfaceValidations>
     @property(nonatomic, weak) IBOutlet EXTChartView *chartView;
     @property(nonatomic, weak) IBOutlet EXTScrollView *scrollView;
+    @property(nonatomic, weak) IBOutlet NSView *controlsView;
+    @property(nonatomic, weak) IBOutlet NSView *gridInspectorView;
     @property(nonatomic, weak) IBOutlet NSPopUpButton *zoomPopUpButton;
     @property(nonatomic, weak) IBOutlet NSPopUpButton *pagesPopUpButton;
     @property(nonatomic, weak) IBOutlet NSButton *editArtBoardsButton;
+
     @property(nonatomic, assign) NSUInteger maxPage;
     @property(nonatomic, readonly) EXTDocument *extDocument;
 @end
 
 
-@implementation EXTDocumentWindowController
+@implementation EXTDocumentWindowController {
+    EXTDocumentInspectorView *_inspectorView;
+}
 
 #pragma mark - Life cycle
 
@@ -128,6 +135,16 @@ enum : NSInteger {
 
     [_pagesPopUpButton setMenu:pagesMenu];
 
+    // Inspector view
+    CGFloat inspectorWidth = [EXTDocumentInspectorView widthForContentWidth:[_gridInspectorView frame].size.width];
+    NSRect contentFrame = [[[self window] contentView] frame];
+    NSRect inspectorFrame = {{NSMaxX(contentFrame), 0}, {inspectorWidth, contentFrame.size.height}};
+    _inspectorView = [[EXTDocumentInspectorView alloc] initWithFrame:inspectorFrame];
+    [_inspectorView setAutoresizingMask:NSViewHeightSizable | NSViewMinXMargin];
+    [_inspectorView addSubview:_gridInspectorView withTitle:@"Grid"];
+    [[[self window] contentView] addSubview:_inspectorView];
+
+    // Ready, set, go
     [[self window] makeFirstResponder:_chartView];
 }
 
@@ -511,6 +528,36 @@ enum : NSInteger {
 
 #pragma mark - Actions
 
+- (IBAction)toggleInspector:(id)sender {
+    NSRect inspectorViewFrame = [_inspectorView frame];
+    NSSize scrollViewSize = [_scrollView frame].size;
+    NSSize controlsViewSize = [_controlsView frame].size;
+    NSRect contentFrame = [[[self window] contentView] frame];
+    bool inspectorHidden = inspectorViewFrame.origin.x >= NSMaxX(contentFrame);
+
+    if (inspectorHidden) {
+        inspectorViewFrame.origin.x = NSMaxX(contentFrame) - inspectorViewFrame.size.width;
+        scrollViewSize.width -= inspectorViewFrame.size.width;
+        controlsViewSize.width -= inspectorViewFrame.size.width;
+    }
+    else {
+        inspectorViewFrame.origin.x = NSMaxX(contentFrame);
+        scrollViewSize.width += inspectorViewFrame.size.width;
+        controlsViewSize.width += inspectorViewFrame.size.width;
+    }
+
+    // TODO: check why the chart view sometimes flashes during the animation. It is apparently
+    // related to the overlay scrollers showing up, and sometimes they won’t even automatically
+    // disappear afterwards!
+    [NSAnimationContext beginGrouping];
+    {
+        [[_inspectorView animator] setFrame:inspectorViewFrame];
+        [[_scrollView animator] setFrameSize:scrollViewSize];
+        [[_controlsView animator] setFrameSize:controlsViewSize];
+    }
+    [NSAnimationContext endGrouping];
+}
+
 - (IBAction)exportArtBoard:(id)sender {
     NSData *artBoardPDFData = [_chartView dataWithPDFInsideRect:[[_chartView artBoard] frame]];
 
@@ -526,9 +573,25 @@ enum : NSInteger {
     }];
 }
 
+- (IBAction)resetGridToDefaults:(id)sender {
+    [[_chartView grid] resetToDefaults];
+}
+
 - (IBAction)demoGroups:(id)sender {
     [[self document] runDemo];
     [[self chartView] setSelectedPageIndex:0];
+}
+
+#pragma mark - NSUserInterfaceValidations
+
+- (BOOL)validateUserInterfaceItem:(id<NSValidatedUserInterfaceItem>)item {
+    if ([item action] == @selector(toggleInspector:)) {
+        if ([(id)item respondsToSelector:@selector(setTitle:)]) {
+            [(id)item setTitle:[_inspectorView isHidden] ? @"Show Inspector" : @"Hide Inspector"];
+        }
+    }
+
+    return true;
 }
 
 @end
