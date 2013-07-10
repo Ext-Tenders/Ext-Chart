@@ -556,6 +556,8 @@ enum : NSInteger {
         [[_controlsView animator] setFrameSize:controlsViewSize];
     }
     [NSAnimationContext endGrouping];
+
+    [[self window] makeFirstResponder:_chartView];
 }
 
 - (IBAction)exportArtBoard:(id)sender {
