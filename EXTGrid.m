@@ -215,7 +215,7 @@ static NSColor *_EXTDefaultAxisColor = nil;
 #pragma mark *** KVO stuff ***
 
 +(NSSet *)keyPathsForValuesAffectingAnyGridKey{
-	return [NSSet setWithObjects:@"gridColor", @"emphasisGridColor", @"gridSpacing", @"emphasisSpacing", nil];
+	return [NSSet setWithObjects:@"gridColor", @"emphasisGridColor", @"gridSpacing", @"emphasisSpacing", @"axisColor", nil];
 }
 
 @end
