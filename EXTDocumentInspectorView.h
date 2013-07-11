@@ -9,6 +9,5 @@
 #import <Cocoa/Cocoa.h>
 
 @interface EXTDocumentInspectorView : NSView
-    + (CGFloat)widthForContentWidth:(CGFloat)contentWidth;
     - (void)addSubview:(NSView *)subview withTitle:(NSString *)title;
 @end

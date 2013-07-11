@@ -41,13 +41,16 @@ enum : NSInteger {
 
 
 @interface EXTDocumentWindowController () <NSWindowDelegate, NSUserInterfaceValidations>
+    @property(nonatomic, weak) IBOutlet NSView *mainView;
     @property(nonatomic, weak) IBOutlet EXTChartView *chartView;
-    @property(nonatomic, weak) IBOutlet EXTScrollView *scrollView;
+    @property(nonatomic, weak) IBOutlet EXTScrollView *chartScrollView;
     @property(nonatomic, weak) IBOutlet NSView *controlsView;
-    @property(nonatomic, weak) IBOutlet NSView *gridInspectorView;
     @property(nonatomic, weak) IBOutlet NSPopUpButton *zoomPopUpButton;
     @property(nonatomic, weak) IBOutlet NSPopUpButton *pagesPopUpButton;
     @property(nonatomic, weak) IBOutlet NSButton *editArtBoardsButton;
+
+    @property(nonatomic, strong) IBOutlet NSView *sidebarView;
+    @property(nonatomic, weak) IBOutlet NSView *gridInspectorView;
 
     @property(nonatomic, assign) NSUInteger maxPage;
     @property(nonatomic, readonly) EXTDocument *extDocument;
@@ -94,26 +97,26 @@ enum : NSInteger {
     [_chartView bind:EXTChartViewSseqBindingName toObject:[self document] withKeyPath:@"sseq" options:nil];
     [_chartView addObserver:self forKeyPath:@"selectedPageIndex" options:0 context:_EXTSelectedPageIndexContext];
 
-    // Scroll view
-    [_scrollView setHasHorizontalRuler:YES];
-    [_scrollView setHasVerticalRuler:YES];
-    [[_scrollView horizontalRulerView] setOriginOffset:-[_chartView bounds].origin.x];
-    [[_scrollView horizontalRulerView] setReservedThicknessForMarkers:0.0];
-    [[_scrollView verticalRulerView] setOriginOffset:-[_chartView bounds].origin.y];
-    [_scrollView setUsesPredominantAxisScrolling:NO];
-    [_scrollView setRulersVisible:YES];
-    [_scrollView setAllowsMagnification:YES];
-    [_scrollView setMinMagnification:_EXTDefaultMagnificationSteps[0]];
-    [_scrollView setMaxMagnification:_EXTDefaultMagnificationSteps[_EXTDefaultMagnificationStepsCount - 1]];
+    // Chart scroll view
+    [_chartScrollView setHasHorizontalRuler:YES];
+    [_chartScrollView setHasVerticalRuler:YES];
+    [[_chartScrollView horizontalRulerView] setOriginOffset:-[_chartView bounds].origin.x];
+    [[_chartScrollView horizontalRulerView] setReservedThicknessForMarkers:0.0];
+    [[_chartScrollView verticalRulerView] setOriginOffset:-[_chartView bounds].origin.y];
+    [_chartScrollView setUsesPredominantAxisScrolling:NO];
+    [_chartScrollView setRulersVisible:YES];
+    [_chartScrollView setAllowsMagnification:YES];
+    [_chartScrollView setMinMagnification:_EXTDefaultMagnificationSteps[0]];
+    [_chartScrollView setMaxMagnification:_EXTDefaultMagnificationSteps[_EXTDefaultMagnificationStepsCount - 1]];
 
-    [_scrollView addObserver:self forKeyPath:@"magnification" options:0 context:_EXTScrollViewMagnificationContext];
+    [_chartScrollView addObserver:self forKeyPath:@"magnification" options:0 context:_EXTScrollViewMagnificationContext];
 
     // Offset the clip view a bit to the left and bottom so that the origin does not coincide with the window’s bottom-left corner,
     // making the art board border and the axes more noticeable.
     // Also, increase the initial scale factor.
     // IMO, this looks nicer than -[EXTChartView zoomToFit:]
     const NSRect visibleRect = NSInsetRect([[_chartView artBoard] frame], -20.0, -20.0);
-    [_scrollView magnifyToFitRect:visibleRect];
+    [_chartScrollView magnifyToFitRect:visibleRect];
     [_chartView scrollRectToVisible:visibleRect];
 
     // Pages pop up button
@@ -135,14 +138,31 @@ enum : NSInteger {
 
     [_pagesPopUpButton setMenu:pagesMenu];
 
-    // Inspector view
-    CGFloat inspectorWidth = [EXTDocumentInspectorView widthForContentWidth:[_gridInspectorView frame].size.width];
-    NSRect contentFrame = [[[self window] contentView] frame];
-    NSRect inspectorFrame = {{NSMaxX(contentFrame), 0}, {inspectorWidth, contentFrame.size.height}};
-    _inspectorView = [[EXTDocumentInspectorView alloc] initWithFrame:inspectorFrame];
-    [_inspectorView setAutoresizingMask:NSViewHeightSizable | NSViewMinXMargin];
+    // Sidebar & inspector views
+    _inspectorView = [[EXTDocumentInspectorView alloc] initWithFrame:NSZeroRect];
     [_inspectorView addSubview:_gridInspectorView withTitle:@"Grid"];
-    [[[self window] contentView] addSubview:_inspectorView];
+    [_inspectorView addSubview:[[NSTextView alloc] initWithFrame:(NSRect){NSZeroPoint, {100.0, 50.0}}] withTitle:@"Some Text"];
+    [_inspectorView addSubview:[[NSTextView alloc] initWithFrame:(NSRect){NSZeroPoint, {150.0, 100.0}}] withTitle:@"Some Text"];
+    [_inspectorView addSubview:[[NSTextView alloc] initWithFrame:(NSRect){NSZeroPoint, {400.0, 300.0}}] withTitle:@"Some Text"];
+
+    NSRect contentFrame = [[[self window] contentView] frame];
+    NSSize scrollViewSize = [NSScrollView contentSizeForFrameSize:[_inspectorView frame].size hasHorizontalScroller:NO hasVerticalScroller:YES borderType:NSNoBorder];
+    scrollViewSize.height = contentFrame.size.height;
+    NSScrollView *inspectorScrollView = [[NSScrollView alloc] initWithFrame:(NSRect){NSZeroPoint, scrollViewSize}];
+    [inspectorScrollView setHasHorizontalScroller:NO];
+    [inspectorScrollView setHasVerticalScroller:YES];
+    [inspectorScrollView setAutohidesScrollers:YES];
+    [inspectorScrollView setBorderType:NSNoBorder];
+    [inspectorScrollView setAutoresizingMask:NSViewWidthSizable | NSViewHeightSizable];
+    [inspectorScrollView setDrawsBackground:YES];
+    [inspectorScrollView setBackgroundColor:[NSColor windowBackgroundColor]];
+    [inspectorScrollView setDocumentView:_inspectorView];
+
+    NSRect sidebarFrame = {{NSMaxX(contentFrame), 0.0}, scrollViewSize};
+    _sidebarView = [[NSView alloc] initWithFrame:sidebarFrame];
+    [_sidebarView setAutoresizingMask:NSViewHeightSizable | NSViewMinXMargin];
+    [_sidebarView addSubview:inspectorScrollView];
+    [[[self window] contentView] addSubview:_sidebarView];
 
     // Ready, set, go
     [[self window] makeFirstResponder:_chartView];
@@ -150,7 +170,7 @@ enum : NSInteger {
 
 - (void)windowWillClose:(NSNotification *)notification {
     [_chartView removeObserver:self forKeyPath:@"selectedPageIndex"];
-    [_scrollView removeObserver:self forKeyPath:@"magnification"];
+    [_chartScrollView removeObserver:self forKeyPath:@"magnification"];
 }
 
 #pragma mark - Zoom
@@ -158,9 +178,9 @@ enum : NSInteger {
 - (IBAction)applyMagnification:(id)sender {
     NSAssert([sender respondsToSelector:@selector(representedObject)], @"Sender must respond to -representedObject");
     const CGFloat targetMagnification = [[sender representedObject] doubleValue];
-    if (targetMagnification == [_scrollView magnification])
+    if (targetMagnification == [_chartScrollView magnification])
         return;
-    NSClipView *clipView = [_scrollView contentView];
+    NSClipView *clipView = [_chartScrollView contentView];
     const NSRect clipViewBounds = [clipView bounds];
     const NSPoint clipViewCentre = {NSMidX(clipViewBounds), NSMidY(clipViewBounds)};
 
@@ -168,22 +188,22 @@ enum : NSInteger {
     // scroll manually after setting the magnification whilst this bug is not fixed.
     //    [self setMagnification:[step scaleFactor] centeredAtPoint:clipViewCentre];
 
-    [_scrollView setMagnification:targetMagnification];
+    [_chartScrollView setMagnification:targetMagnification];
 
-    const NSPoint documentViewCentre = [[_scrollView documentView] convertPoint:clipViewCentre fromView:clipView];
+    const NSPoint documentViewCentre = [[_chartScrollView documentView] convertPoint:clipViewCentre fromView:clipView];
     const NSSize newSize = [clipView bounds].size;
     const NSPoint newOrigin = {
         .x = documentViewCentre.x - newSize.width / 2.0,
         .y = documentViewCentre.y - newSize.height / 2.0
     };
-    [[_scrollView documentView] scrollPoint:newOrigin];
+    [[_chartScrollView documentView] scrollPoint:newOrigin];
 
     // Since we’ve just applied one of the default magnifications, there’s no need to show the previous custom magnification, if any.
     [self _extRemoveCustomZoomFromPopUpMenu];
 }
 
 - (IBAction)zoomIn:(id)sender {
-    const long currentRoundedMagnification = lround([_scrollView magnification] * _EXTMagnificationStepRoundingMultiplier);
+    const long currentRoundedMagnification = lround([_chartScrollView magnification] * _EXTMagnificationStepRoundingMultiplier);
     NSInteger nextStepIndex;
     for (nextStepIndex = 0; nextStepIndex < _EXTDefaultMagnificationStepsCount; nextStepIndex++) {
         const long stepRoundedMagnification = lround(_EXTDefaultMagnificationSteps[nextStepIndex] * _EXTMagnificationStepRoundingMultiplier);
@@ -200,7 +220,7 @@ enum : NSInteger {
 }
 
 - (IBAction)zoomOut:(id)sender {
-    const long currentRoundedMagnification = lround([_scrollView magnification] * _EXTMagnificationStepRoundingMultiplier);
+    const long currentRoundedMagnification = lround([_chartScrollView magnification] * _EXTMagnificationStepRoundingMultiplier);
     NSInteger previousStepIndex;
     for (previousStepIndex = _EXTDefaultMagnificationStepsCount - 1; previousStepIndex >= 0; previousStepIndex--) {
         const long stepRoundedMagnification = lround(_EXTDefaultMagnificationSteps[previousStepIndex] * _EXTMagnificationStepRoundingMultiplier);
@@ -490,7 +510,7 @@ enum : NSInteger {
     if (context == _EXTSelectedPageIndexContext)
         [_pagesPopUpButton selectItemAtIndex:[_chartView selectedPageIndex]];
     else if (context == _EXTScrollViewMagnificationContext) {
-        const long roundedMagnification = lround([_scrollView magnification] * _EXTMagnificationStepRoundingMultiplier);
+        const long roundedMagnification = lround([_chartScrollView magnification] * _EXTMagnificationStepRoundingMultiplier);
         NSUInteger stepIndex = NSNotFound;
         int i;
         for (i = 0; i < _EXTDefaultMagnificationStepsCount; i++) {
@@ -520,7 +540,7 @@ enum : NSInteger {
         else
             [_zoomPopUpButton selectItemAtIndex:stepIndex];
 
-        [[self window] invalidateCursorRectsForView:[_scrollView documentView]];
+        [[self window] invalidateCursorRectsForView:[_chartScrollView documentView]];
     }
     else
         [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
@@ -529,21 +549,18 @@ enum : NSInteger {
 #pragma mark - Actions
 
 - (IBAction)toggleInspector:(id)sender {
-    NSRect inspectorViewFrame = [_inspectorView frame];
-    NSSize scrollViewSize = [_scrollView frame].size;
-    NSSize controlsViewSize = [_controlsView frame].size;
-    NSRect contentFrame = [[[self window] contentView] frame];
-    bool inspectorHidden = inspectorViewFrame.origin.x >= NSMaxX(contentFrame);
+    const NSRect contentFrame = [[[self window] contentView] frame];
+    NSRect sidebarFrame = [_sidebarView frame];
+    NSSize mainSize = [_mainView frame].size;
+    bool inspectorHidden = sidebarFrame.origin.x >= NSMaxX(contentFrame);
 
     if (inspectorHidden) {
-        inspectorViewFrame.origin.x = NSMaxX(contentFrame) - inspectorViewFrame.size.width;
-        scrollViewSize.width -= inspectorViewFrame.size.width;
-        controlsViewSize.width -= inspectorViewFrame.size.width;
+        sidebarFrame.origin.x = NSMaxX(contentFrame) - sidebarFrame.size.width;
+        mainSize.width -= sidebarFrame.size.width;
     }
     else {
-        inspectorViewFrame.origin.x = NSMaxX(contentFrame);
-        scrollViewSize.width += inspectorViewFrame.size.width;
-        controlsViewSize.width += inspectorViewFrame.size.width;
+        sidebarFrame.origin.x = NSMaxX(contentFrame);
+        mainSize.width += sidebarFrame.size.width;
     }
 
     // TODO: check why the chart view sometimes flashes during the animation. It is apparently
@@ -551,9 +568,8 @@ enum : NSInteger {
     // disappear afterwards!
     [NSAnimationContext beginGrouping];
     {
-        [[_inspectorView animator] setFrame:inspectorViewFrame];
-        [[_scrollView animator] setFrameSize:scrollViewSize];
-        [[_controlsView animator] setFrameSize:controlsViewSize];
+        [[_sidebarView animator] setFrame:sidebarFrame];
+        [[_mainView animator] setFrameSize:mainSize];
     }
     [NSAnimationContext endGrouping];
 
