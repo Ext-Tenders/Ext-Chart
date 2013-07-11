@@ -23,51 +23,40 @@ static const CGFloat _EXTGroupHeaderHeight = 40.0;
 @end
 
 
-@implementation EXTDocumentInspectorView {
-    CGFloat _contentHeight;
-}
+@implementation EXTDocumentInspectorView
 
 - (void)addSubview:(NSView *)subview withTitle:(NSString *)title {
+    NSSize frameSize = [self frame].size;
     NSSize subviewSize = [subview frame].size;
     NSRect groupViewFrame = {
         .origin.x = _EXTLeftRightMargin,
-        .origin.y = _contentHeight + _EXTTopMargin,
+        .origin.y = frameSize.height + _EXTTopMargin,
         .size.width = subviewSize.width,
         .size.height = subviewSize.height + _EXTGroupHeaderHeight
     };
 
+    frameSize.height += groupViewFrame.size.height + _EXTTopMargin;
+    frameSize.width = MAX(frameSize.width, groupViewFrame.size.width + _EXTLeftRightMargin * 2);
+    [self setFrameSize:frameSize];
+
     EXTDocumentInspectorGroupView *groupView = [[EXTDocumentInspectorGroupView alloc] initWithFrame:groupViewFrame contentView:subview title:title];
+    groupViewFrame.size.width = frameSize.width - _EXTLeftRightMargin * 2;
     [groupView setFrame:groupViewFrame];
-    [groupView setAutoresizingMask:NSViewNotSizable];
+    [groupView setAutoresizingMask:NSViewWidthSizable];
     [self addSubview:groupView];
 
-    _contentHeight += groupViewFrame.size.height;
-}
-
-+ (CGFloat)widthForContentWidth:(CGFloat)contentWidth {
-    return contentWidth + (_EXTLeftRightMargin * 2);
+    // If we change the view width, group (sub)views may be resized to accomodate the new width
+    // given their autoresizing mask. When that happens, AppKit decides to change masksToBounds
+    // to NO, which ends up rendering the group views as straight rectangles. Since this is the
+    // only place where the view frame is supposed to change, we re-enable masksToBounds to get
+    // rounded rectangles back again. Take that, AppKit!
+    for (NSView *subview in [self subviews])
+        if ([subview isKindOfClass:[EXTDocumentInspectorGroupView class]])
+            [[subview layer] setMasksToBounds:YES];
 }
 
 - (BOOL)isFlipped {
     return YES;
-}
-
-- (void)drawRect:(NSRect)dirtyRect {
-    NSRect leftBorderFrame = {
-        .size.width = 2.0,
-        .size.height = [self bounds].size.height
-    };
-
-    NSRect leftBorderDirtyFrame = NSIntersectionRect(leftBorderFrame, dirtyRect);
-    if (!NSEqualRects(leftBorderDirtyFrame, NSZeroRect)) {
-        leftBorderDirtyFrame.size.width = 0.5;
-        [[NSColor blackColor] setFill];
-        NSRectFill(leftBorderDirtyFrame);
-
-        leftBorderDirtyFrame.origin.x = 1.0;
-        [[NSColor whiteColor] setFill];
-        NSRectFill(leftBorderDirtyFrame);
-    }
 }
 
 @end
@@ -98,6 +87,7 @@ static const CGFloat _EXTGroupHeaderHeight = 40.0;
         CALayer *headerLayer = [CALayer layer];
         [headerLayer setBackgroundColor:[[NSColor colorWithCalibratedWhite:0.8 alpha:1.0] CGColor]];
         [headerLayer setFrame:(CGRect){{0.0, 0.0}, {frame.size.width, 30.0}}];
+        [headerLayer setAutoresizingMask:kCALayerWidthSizable];
         [headerLayer setBorderColor:[[NSColor lightGrayColor] CGColor]];
         [headerLayer setBorderWidth:1.0];
         [headerLayer setShadowOpacity:1.0];
@@ -113,12 +103,12 @@ static const CGFloat _EXTGroupHeaderHeight = 40.0;
         [textLayer setFontSize:13.0];
         [textLayer setForegroundColor:[[NSColor blackColor] CGColor]];
         [textLayer setFrame:(CGRect){{0.0, 8.0}, {frame.size.width, 15.0}}];
+        [textLayer setAutoresizingMask:kCALayerWidthSizable];
         [textLayer setShadowOpacity:1.0];
         [textLayer setShadowColor:[[NSColor whiteColor] CGColor]];
         [textLayer setShadowOffset:(CGSize){0.0, 1.0}];
         [textLayer setShadowRadius:0.0];
         [headerLayer addSublayer:textLayer];
-
     }
     return self;
 }
