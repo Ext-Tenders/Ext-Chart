@@ -59,6 +59,8 @@ enum : NSInteger {
 
 @implementation EXTDocumentWindowController {
     EXTDocumentInspectorView *_inspectorView;
+    bool _sidebarHidden;
+    bool _sidebarAnimating;
 }
 
 #pragma mark - Life cycle
@@ -174,6 +176,7 @@ enum : NSInteger {
     [[_sidebarView layer] addSublayer:sidebarLeftBorderLayer];
     
     [[[self window] contentView] addSubview:_sidebarView];
+    _sidebarHidden = true;
 
     // Ready, set, go
     [[self window] makeFirstResponder:_chartView];
@@ -566,12 +569,14 @@ enum : NSInteger {
 #pragma mark - Actions
 
 - (IBAction)toggleInspector:(id)sender {
+    if (_sidebarAnimating)
+        return;
+
     const NSRect contentFrame = [[[self window] contentView] frame];
     NSRect sidebarFrame = [_sidebarView frame];
     NSSize mainSize = [_mainView frame].size;
-    bool inspectorHidden = sidebarFrame.origin.x >= NSMaxX(contentFrame);
 
-    if (inspectorHidden) {
+    if (_sidebarHidden) {
         sidebarFrame.origin.x = NSMaxX(contentFrame) - sidebarFrame.size.width;
         mainSize.width -= sidebarFrame.size.width;
     }
@@ -583,12 +588,14 @@ enum : NSInteger {
     // TODO: check why the chart view sometimes flashes during the animation. It is apparently
     // related to the overlay scrollers showing up, and sometimes they won’t even automatically
     // disappear afterwards!
-    [NSAnimationContext beginGrouping];
-    {
+    _sidebarAnimating = true;
+    [NSAnimationContext runAnimationGroup:^(NSAnimationContext *context) {
         [[_sidebarView animator] setFrame:sidebarFrame];
         [[_mainView animator] setFrameSize:mainSize];
-    }
-    [NSAnimationContext endGrouping];
+    } completionHandler:^{
+        _sidebarHidden = !_sidebarHidden;
+        _sidebarAnimating = false;
+    }];
 
     [[self window] makeFirstResponder:_chartView];
 }
@@ -620,17 +627,10 @@ enum : NSInteger {
 #pragma mark - NSUserInterfaceValidations
 
 - (BOOL)validateUserInterfaceItem:(id<NSValidatedUserInterfaceItem>)item {
-    if ([item action] == @selector(toggleInspector:)) {
-        NSRect inspectorViewFrame = [_inspectorView frame];
-        NSRect contentFrame = [[[self window] contentView] frame];
-        bool inspectorHidden = inspectorViewFrame.origin.x >= NSMaxX(contentFrame);
+    if ([item action] == @selector(toggleInspector:) && [(id)item isKindOfClass:[NSMenuItem class]])
+        [(NSMenuItem *)item setTitle:_sidebarHidden ? @"Show Inspector" : @"Hide Inspector"];
 
-        if ([(id)item respondsToSelector:@selector(setTitle:)]) {
-            [(id)item setTitle:inspectorHidden ? @"Show Inspector" : @"Hide Inspector"];
-        }
-    }
-
-    return true;
+    return [self respondsToSelector:[item action]];
 }
 
 @end
