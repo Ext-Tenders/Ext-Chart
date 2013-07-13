@@ -142,7 +142,16 @@ enum : NSInteger {
 
     // Sidebar & inspector views
     _inspectorView = [[EXTDocumentInspectorView alloc] initWithFrame:NSZeroRect];
+
+    NSTextView *sampleTextView = [[NSTextView alloc] initWithFrame:(NSRect){.size = {200.0, 50.0}}];
+    [sampleTextView setAutoresizingMask:NSViewWidthSizable];
+    [_inspectorView addSubview:sampleTextView withTitle:@"Text"];
+
     [_inspectorView addSubview:_gridInspectorView withTitle:@"Grid"];
+
+    sampleTextView = [[NSTextView alloc] initWithFrame:(NSRect){.size = {250.0, 100.0}}];
+    [sampleTextView setAutoresizingMask:NSViewWidthSizable];
+    [_inspectorView addSubview:sampleTextView withTitle:@"More text"];
 
     NSRect contentFrame = [[[self window] contentView] frame];
     NSSize scrollViewSize = [NSScrollView contentSizeForFrameSize:[_inspectorView frame].size hasHorizontalScroller:NO hasVerticalScroller:YES borderType:NSNoBorder];
