@@ -157,8 +157,22 @@ enum : NSInteger {
 
     NSRect sidebarFrame = {{NSMaxX(contentFrame), 0.0}, scrollViewSize};
     _sidebarView = [[NSView alloc] initWithFrame:sidebarFrame];
+    [_sidebarView setWantsLayer:YES];
     [_sidebarView setAutoresizingMask:NSViewHeightSizable | NSViewMinXMargin];
     [_sidebarView addSubview:inspectorScrollView];
+
+    // Sidebar left border
+    CALayer *sidebarLeftBorderLayer = [CALayer layer];
+    [sidebarLeftBorderLayer setBorderWidth:0.5];
+    [sidebarLeftBorderLayer setBorderColor:[[NSColor darkGrayColor] CGColor]];
+    [sidebarLeftBorderLayer setFrame:(CGRect){NSZeroPoint, {0.5, scrollViewSize.height}}];
+    [sidebarLeftBorderLayer setAutoresizingMask:kCALayerHeightSizable];
+    [sidebarLeftBorderLayer setShadowColor:[[NSColor whiteColor] CGColor]];
+    [sidebarLeftBorderLayer setShadowRadius:0.0];
+    [sidebarLeftBorderLayer setShadowOpacity:1.0];
+    [sidebarLeftBorderLayer setShadowOffset:(CGSize){1.0, 0.0}];
+    [[_sidebarView layer] addSublayer:sidebarLeftBorderLayer];
+    
     [[[self window] contentView] addSubview:_sidebarView];
 
     // Ready, set, go
