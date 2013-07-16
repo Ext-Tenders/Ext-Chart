@@ -145,13 +145,13 @@ enum : NSInteger {
 
     NSTextView *sampleTextView = [[NSTextView alloc] initWithFrame:(NSRect){.size = {200.0, 50.0}}];
     [sampleTextView setAutoresizingMask:NSViewWidthSizable];
-    [_inspectorView addSubview:sampleTextView withTitle:@"Text"];
+    [_inspectorView addSubview:sampleTextView withTitle:@"Text" collapsed:true];
 
-    [_inspectorView addSubview:_gridInspectorView withTitle:@"Grid"];
+    [_inspectorView addSubview:_gridInspectorView withTitle:@"Grid" collapsed:false];
 
-    sampleTextView = [[NSTextView alloc] initWithFrame:(NSRect){.size = {250.0, 100.0}}];
+    sampleTextView = [[NSTextView alloc] initWithFrame:(NSRect){.size = {250.0, 800.0}}];
     [sampleTextView setAutoresizingMask:NSViewWidthSizable];
-    [_inspectorView addSubview:sampleTextView withTitle:@"More text"];
+    [_inspectorView addSubview:sampleTextView withTitle:@"More text" collapsed:true];
 
     NSRect contentFrame = [[[self window] contentView] frame];
     NSSize scrollViewSize = [NSScrollView contentSizeForFrameSize:[_inspectorView frame].size hasHorizontalScroller:NO hasVerticalScroller:YES borderType:NSNoBorder];
@@ -189,6 +189,11 @@ enum : NSInteger {
 
     // Ready, set, go
     [[self window] makeFirstResponder:_chartView];
+
+    // For debug only at the moment, but this may evolve to a preference
+    // $ defaults write edu.harvard.math.Ext-Chart EXTInspectorVisible -bool YES
+    if ([[NSUserDefaults standardUserDefaults] boolForKey:@"EXTInspectorVisible"])
+        [self toggleInspector:nil];
 }
 
 - (void)windowWillClose:(NSNotification *)notification {
