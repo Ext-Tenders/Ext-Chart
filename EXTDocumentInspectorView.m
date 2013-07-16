@@ -33,14 +33,6 @@ NS_INLINE NSSize _EXTGroupSizeForContentSize(NSSize contentSize) {
     };
 }
 
-NS_INLINE void _EXTAddWhiteShadow(CALayer *layer) {
-    [layer setShadowOpacity:1.0];
-    [layer setShadowColor:[[NSColor whiteColor] CGColor]];
-    [layer setShadowOffset:(CGSize){0.0, 1.0}];
-    [layer setShadowRadius:0.0];
-}
-
-
 @interface EXTDocumentInspectorGroupView : NSView
     @property(nonatomic, readonly) NSView *contentView;
     @property(nonatomic, readonly) NSString *title;
