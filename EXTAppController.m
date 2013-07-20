@@ -73,7 +73,7 @@ typedef enum : NSInteger {
             break;
             
         case EXTAppControllerMayExampleTag:
-            sseq = [EXTMaySpectralSequence fillToWidth:14];
+            sseq = [EXTMaySpectralSequence fillToWidth:6];
             break;
 
         default:

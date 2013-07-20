@@ -57,9 +57,20 @@
 @implementation EXTMaySpectralSequence
 
 +(EXTTriple*) followSquare:(EXTTriple*)location order:(int)order {
+    /*
+     |h_ij| = (1, 2^j(2^i-1), i)
+     |Sq^0 h_ij| = |h_i(j+1)| = (1, 2 2^j(2^i-1), i)
+     |Sq^1 h_ij| = |h_ij^2| = (2, 2 2^j(2^i-1), 2i)
+     
+     Sq^n: (a, b, c) |-> (a+n, 2b, n*c)?
+    */
+    
+    // XXX: i think B is not quite right.
+    
     return [EXTTriple tripleWithA:(location.a+order) B:(location.b*2) C:(location.c*order)];
 }
 
+// TODO: should this routine be memoized?
 -(EXTMatrix*) squaringMatrix:(int)order location:(EXTTriple*)location {
     // we know the following three facts about the squaring operations:
     // Sq^n(xy) = sum_{i=0}^n Sq^i x Sq^{n-i} y, (Cartan)
@@ -72,12 +83,100 @@
     
     EXTTerm *startTerm = [self findTerm:location],
             *endTerm = [self findTerm:[EXTMaySpectralSequence followSquare:location order:order]];
-    for (int i = 0; i < startTerm.size; i++) {
-        EXTMayTag *tag = startTerm.names[i];
-        
-    }
+    EXTMatrix *ret = [EXTMatrix matrixWidth:startTerm.size height:endTerm.size];
     
-    return nil;
+    for (int termIndex = 0; termIndex < startTerm.size; termIndex++) {
+        EXTPolynomialTag *tag = startTerm.names[termIndex];
+        NSArray *tags = tag.tags.allKeys;
+        NSMutableArray *counters = [NSMutableArray arrayWithCapacity:tags.count];
+        for (int i = 0; i < tags.count; i++)
+            counters[i] = @0;
+        
+        // initialize the counter with the left-most stuffing
+        int leftover = order;
+        
+        // iterate through the available buckets.  this loop breaks out whenever
+        // we completely roll over on the carries.
+        do {
+            // start by initializing the leftmost buckets
+            for (int i = 0; leftover > 0; ) {
+                int bucketSize = [[tag.tags objectForKey:tags[i]] intValue];
+                counters[i] = @(leftover < bucketSize ? leftover : bucketSize);
+                leftover -= bucketSize;
+            }
+            
+            // at each term, perform the assigned number of Sq^1s, and apply
+            // Sq^0 to the remainder.
+            // so: (h_ij^n) |-> (n r) h_ij^(2r) h_i(j+1)^(n-r).
+            //
+            // first, note that 2 | (n r) exactly when r&(n-r) is true. :) so,
+            // if that's ever true then we can just skip this summand entirely.
+            bool zeroMod2 = false;
+            for (int i = 0; i < counters.count; i++) {
+                int r = [counters[i] intValue],
+                    n = [[tag.tags objectForKey:tags[i]] intValue];
+                zeroMod2 |= r & (n - r);
+            }
+            
+            // if we're not 0 mod 2, then we're 1 mod 2, and we should do it.
+            if (!zeroMod2) {
+                EXTPolynomialTag *targetTag = [EXTPolynomialTag new];
+                
+                // start by building the tag we're going to be looking up
+                for (int i = 0; i < counters.count; i++) {
+                    EXTMayTag *hij = tags[i],
+                              *hinext = [EXTMayTag tagWithI:hij.i J:(hij.j+1)];
+                    int n = [[tag.tags objectForKey:tags[i]] intValue],
+                        r = [counters[i] intValue];
+                    NSNumber *oldSq0Exp = [targetTag.tags objectForKey:hinext],
+                             *oldSq1Exp = [targetTag.tags objectForKey:hij];
+                    
+                    if (oldSq0Exp)
+                        oldSq0Exp = @([oldSq0Exp intValue] + n-r);
+                    else
+                        oldSq0Exp = @(n-r);
+                    
+                    if (oldSq1Exp)
+                        oldSq1Exp = @([oldSq1Exp intValue] + 2*r);
+                    else
+                        oldSq1Exp = @(2*r);
+                    
+                    [targetTag.tags setObject:oldSq0Exp forKey:hinext];
+                    [targetTag.tags setObject:oldSq1Exp forKey:hij];
+                }
+                
+                // find this tag in the target term and poke the value
+                NSMutableArray *col = ret.presentation[termIndex];
+                int pokeIndex = [endTerm.names indexOfObject:targetTag];
+                col[pokeIndex] = @([col[pokeIndex] intValue] + 1);
+            }
+                        
+            // now we move to the next bucket.  start by finding the leftmost
+            // nonzero bucket.
+            int leftmost = 0;
+            for (; [counters[leftmost] intValue] == 0; leftmost++);
+            
+            // this value of this bucket is going to be split into (value-1)+1.
+            // the right-hand part of this is used for a carry, and the left-
+            // hand part is used for 'leftovers' to minimally reinitialize
+            // the leftmost segment of the counters.
+            leftover = [counters[leftmost] intValue] - 1;
+            counters[leftmost] = @0;
+            // continually try to perform carries until we hit a not-maxed bucket
+            int carryBuckets = leftmost+1;
+            for (; carryBuckets < counters.count; carryBuckets++) {
+                if ([counters[carryBuckets] isEqual:[tag.tags objectForKey:tags[carryBuckets]]]) {
+                    leftover += [counters[carryBuckets] intValue];
+                    counters[carryBuckets] = @0;
+                } else {
+                    counters[carryBuckets] = @(1 + [counters[carryBuckets] intValue]);
+                    break;
+                }
+            }
+        } while (leftover != order); // cartan loop
+    } // term summand loop
+    
+    return ret;
 }
 
 // applies Sq^(order) to the terms at location to get a differential on page page

@@ -18,17 +18,6 @@
 // for robustness, a nil entry in a tag should be thought of as zero, so that
 // when introducing a new class we don't have to go back and add a bunch of
 // labels to the existing tags.
-@interface EXTPolynomialTag : NSObject <NSCopying>
-
-@property(strong) NSMutableDictionary *tags;
-
--(NSString*) description;
-+(EXTPolynomialTag*) sum:(EXTPolynomialTag*)left with:(EXTPolynomialTag*)right;
--(BOOL) isEqual:(id)object;
--(id) copyWithZone:(NSZone *)zone;
-
-@end
-
 @implementation EXTPolynomialTag
 
 @synthesize tags;

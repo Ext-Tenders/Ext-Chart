@@ -9,6 +9,21 @@
 #import "EXTSpectralSequence.h"
 #import "EXTMultiplicationTables.h"
 
+
+
+@interface EXTPolynomialTag : NSObject <NSCopying>
+
+@property(strong) NSMutableDictionary *tags;
+
+-(NSString*) description;
++(EXTPolynomialTag*) sum:(EXTPolynomialTag*)left with:(EXTPolynomialTag*)right;
+-(BOOL) isEqual:(id)object;
+-(id) copyWithZone:(NSZone *)zone;
+
+@end
+
+
+
 // sometimes (oftentimes, actually), we know that a spectral sequence has an E1-
 // page which is presented by a polynomial algebra.  this allows us to make
 // some dramatic simplifications to how things are stored and computed.
