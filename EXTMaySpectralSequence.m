@@ -188,6 +188,35 @@
     // * the matrix describing the map Sq^order on E_old
     //
     // then, we apply: d_page (Sq^order x) = Sq^order (d_{page-order} x).
+    
+    EXTDifferential *underlyingDiff = [self findDifflWithSource:location onPage:page];
+    if (!underlyingDiff)
+        return;
+    
+    EXTTriple *newSource = [EXTMaySpectralSequence followSquare:location order:order];
+    EXTDifferential *diff = [self findDifflWithSource:newSource onPage:(page+order)];
+    if (!diff) {
+        EXTTerm *start = [self findTerm:newSource],
+                *end = [self findTerm:[EXTTriple followDiffl:newSource page:(page+order)]];
+        if (!start || !end)
+            return;
+        
+        diff = [EXTDifferential differential:start end:end page:(page+order)];
+        [self addDifferential:diff];
+    }
+    
+    // for each partial definition A <-- I --> B, we have two squaring morphisms
+    // A --> C and B --> D, which we glue together to get the span
+    // C <-- A <-- I --> B --> D.
+    for (EXTPartialDefinition *oldPartial in underlyingDiff.partialDefinitions) {
+        EXTPartialDefinition *partial = [EXTPartialDefinition new];
+        partial.differential = [EXTMatrix newMultiply:[self squaringMatrix:order location:((EXTTriple*)underlyingDiff.end.location)] by:partial.differential];
+        partial.inclusion = [EXTMatrix newMultiply:[self squaringMatrix:order location:((EXTTriple*)underlyingDiff.start.location)] by:partial.inclusion];
+        [diff.partialDefinitions addObject:partial];
+        // TODO: it's not clear that the rest of the code requires the inclusion
+        // map to be an inclusion.  if it does, we should insert something to
+        // make that so.  otherwise, we shouldn't, since it requires a choice.
+    }
 
     return;
 }
