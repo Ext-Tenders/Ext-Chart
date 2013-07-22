@@ -33,11 +33,11 @@ static CGFloat _EXTMagnificationStepRoundingMultiplier = 100.0;
 // them if the user then chooses a default magnification, we use -[NSMenuItem tag] to indicate whether a menu item
 // is a default magnification or a custom one. For the sake of completeness, we also set a different tag for the other
 // menu item that does not represent a default magnification: zoom to fit.
-enum : NSInteger {
+typedef enum : NSInteger {
     _EXTDefaultMagnificationStepTag = 1,
     _EXTCustomMagnificationTag = 2,
     _EXTZoomToFitTag = 3,
-};
+} EXTMagnificationTag;
 
 
 @interface EXTDocumentWindowController () <NSWindowDelegate, NSUserInterfaceValidations>
@@ -48,8 +48,9 @@ enum : NSInteger {
     @property(nonatomic, weak) IBOutlet NSPopUpButton *zoomPopUpButton;
     @property(nonatomic, weak) IBOutlet NSPopUpButton *pagesPopUpButton;
     @property(nonatomic, weak) IBOutlet NSButton *editArtBoardsButton;
+    @property(nonatomic, weak) IBOutlet NSMatrix *toolboxMatrix;
 
-    @property(nonatomic, strong) IBOutlet NSView *sidebarView;
+    @property(nonatomic, strong) NSView *sidebarView;
     @property(nonatomic, weak) IBOutlet NSView *gridInspectorView;
 
     @property(nonatomic, assign) NSUInteger maxPage;
@@ -74,118 +75,142 @@ enum : NSInteger {
     [[self window] setDelegate:self];
 
     // Edit art boards pop up button
-    [[_editArtBoardsButton cell] setHighlightsBy:NSChangeBackgroundCellMask];
+    {
+        [[_editArtBoardsButton cell] setHighlightsBy:NSChangeBackgroundCellMask];
+    }
 
     // Zoom levels pop up button
-    NSMenu *zoomMenu = [[NSMenu alloc] initWithTitle:@""];
-    for (NSInteger i = 0; i < _EXTDefaultMagnificationStepsCount; i++) {
-        NSString *plainTitle = [NSString stringWithFormat:@"%ld%%", lround(_EXTDefaultMagnificationSteps[i] * _EXTMagnificationStepRoundingMultiplier)];
-        NSMenuItem *menuItem = [[NSMenuItem alloc] initWithTitle:plainTitle action:@selector(applyMagnification:) keyEquivalent:@""];
-        [menuItem setRepresentedObject:@(_EXTDefaultMagnificationSteps[i])];
-        [menuItem setTag:_EXTDefaultMagnificationStepTag];
+    {
+        NSMenu *zoomMenu = [[NSMenu alloc] initWithTitle:@""];
+        for (NSInteger i = 0; i < _EXTDefaultMagnificationStepsCount; i++) {
+            NSString *plainTitle = [NSString stringWithFormat:@"%ld%%", lround(_EXTDefaultMagnificationSteps[i] * _EXTMagnificationStepRoundingMultiplier)];
+            NSMenuItem *menuItem = [[NSMenuItem alloc] initWithTitle:plainTitle action:@selector(applyMagnification:) keyEquivalent:@""];
+            [menuItem setRepresentedObject:@(_EXTDefaultMagnificationSteps[i])];
+            [menuItem setTag:_EXTDefaultMagnificationStepTag];
+            [zoomMenu addItem:menuItem];
+        }
+
+        [zoomMenu addItem:[NSMenuItem separatorItem]];
+
+        NSMenuItem *menuItem = [[NSMenuItem alloc] initWithTitle:@"Zoom to Fit" action:@selector(zoomToFit:) keyEquivalent:@""];
+        [menuItem setTag:_EXTZoomToFitTag];
         [zoomMenu addItem:menuItem];
+        
+        [_zoomPopUpButton setMenu:zoomMenu];
     }
-
-    [zoomMenu addItem:[NSMenuItem separatorItem]];
-
-    NSMenuItem *menuItem = [[NSMenuItem alloc] initWithTitle:@"Zoom to Fit" action:@selector(zoomToFit:) keyEquivalent:@""];
-    [menuItem setTag:_EXTZoomToFitTag];
-    [zoomMenu addItem:menuItem];
-
-    [_zoomPopUpButton setMenu:zoomMenu];
 
     // Chart view
-    [_chartView setDelegate:self];
-    [_chartView bind:EXTChartViewSseqBindingName toObject:[self document] withKeyPath:@"sseq" options:nil];
-    [_chartView addObserver:self forKeyPath:@"selectedPageIndex" options:0 context:_EXTSelectedPageIndexContext];
-
-    // Chart scroll view
-    [_chartScrollView setHasHorizontalRuler:YES];
-    [_chartScrollView setHasVerticalRuler:YES];
-    [[_chartScrollView horizontalRulerView] setOriginOffset:-[_chartView bounds].origin.x];
-    [[_chartScrollView horizontalRulerView] setReservedThicknessForMarkers:0.0];
-    [[_chartScrollView verticalRulerView] setOriginOffset:-[_chartView bounds].origin.y];
-    [_chartScrollView setUsesPredominantAxisScrolling:NO];
-    [_chartScrollView setRulersVisible:YES];
-    [_chartScrollView setAllowsMagnification:YES];
-    [_chartScrollView setMinMagnification:_EXTDefaultMagnificationSteps[0]];
-    [_chartScrollView setMaxMagnification:_EXTDefaultMagnificationSteps[_EXTDefaultMagnificationStepsCount - 1]];
-
-    [_chartScrollView addObserver:self forKeyPath:@"magnification" options:0 context:_EXTScrollViewMagnificationContext];
-
-    // Offset the clip view a bit to the left and bottom so that the origin does not coincide with the window’s bottom-left corner,
-    // making the art board border and the axes more noticeable.
-    // Also, increase the initial scale factor.
-    // IMO, this looks nicer than -[EXTChartView zoomToFit:]
-    const NSRect visibleRect = NSInsetRect([[_chartView artBoard] frame], -20.0, -20.0);
-    [_chartScrollView magnifyToFitRect:visibleRect];
-    [_chartView scrollRectToVisible:visibleRect];
-
-    // Pages pop up button
-    NSMenu *pagesMenu = [[NSMenu alloc] initWithTitle:@""];
-
-    // TODO: this is not quite right. I’m setting an arbitrary number of pages, but this actually depends on the current document
-    [self setMaxPage:10];
-    for (NSInteger page = 0; page < _maxPage; page++) {
-        NSString *title = [NSString stringWithFormat:@"Page %ld", page];
-        menuItem = [[NSMenuItem alloc] initWithTitle:title action:@selector(selectPage:) keyEquivalent:@""];
-        [menuItem setRepresentedObject:@(page)];
-        [pagesMenu addItem:menuItem];
+    {
+        [_chartView setDelegate:self];
+        [_chartView bind:EXTChartViewSseqBindingName toObject:[self document] withKeyPath:@"sseq" options:nil];
+        [_chartView addObserver:self forKeyPath:@"selectedPageIndex" options:0 context:_EXTSelectedPageIndexContext];
     }
 
-    [pagesMenu addItem:[NSMenuItem separatorItem]];
+    // Chart scroll view
+    {
+        [_chartScrollView setHasHorizontalRuler:YES];
+        [_chartScrollView setHasVerticalRuler:YES];
+        [[_chartScrollView horizontalRulerView] setOriginOffset:-[_chartView bounds].origin.x];
+        [[_chartScrollView horizontalRulerView] setReservedThicknessForMarkers:0.0];
+        [[_chartScrollView verticalRulerView] setOriginOffset:-[_chartView bounds].origin.y];
+        [_chartScrollView setUsesPredominantAxisScrolling:NO];
+        [_chartScrollView setRulersVisible:YES];
+        [_chartScrollView setAllowsMagnification:YES];
+        [_chartScrollView setMinMagnification:_EXTDefaultMagnificationSteps[0]];
+        [_chartScrollView setMaxMagnification:_EXTDefaultMagnificationSteps[_EXTDefaultMagnificationStepsCount - 1]];
 
-    menuItem = [[NSMenuItem alloc] initWithTitle:@"Add Page" action:@selector(addPage:) keyEquivalent:@""];
-    [pagesMenu addItem:menuItem];
+        [_chartScrollView addObserver:self forKeyPath:@"magnification" options:0 context:_EXTScrollViewMagnificationContext];
 
-    [_pagesPopUpButton setMenu:pagesMenu];
+        // Offset the clip view a bit to the left and bottom so that the origin does not coincide with the window’s bottom-left corner,
+        // making the art board border and the axes more noticeable.
+        // Also, increase the initial scale factor.
+        // IMO, this looks nicer than -[EXTChartView zoomToFit:]
+        const NSRect visibleRect = NSInsetRect([[_chartView artBoard] frame], -20.0, -20.0);
+        [_chartScrollView magnifyToFitRect:visibleRect];
+        [_chartView scrollRectToVisible:visibleRect];
+    }
+
+    // Controls view
+    {
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(controlsViewFrameDidChange:) name:NSViewFrameDidChangeNotification object:_controlsView];
+    }
+
+    // Pages pop up button
+    {
+        NSMenu *pagesMenu = [[NSMenu alloc] initWithTitle:@""];
+
+        // TODO: this is not quite right. I’m setting an arbitrary number of pages, but this actually depends on the current document
+        [self setMaxPage:10];
+        for (NSInteger page = 0; page < _maxPage; page++) {
+            NSString *title = [NSString stringWithFormat:@"Page %ld", page];
+            NSMenuItem *menuItem = [[NSMenuItem alloc] initWithTitle:title action:@selector(selectPage:) keyEquivalent:@""];
+            [menuItem setRepresentedObject:@(page)];
+            [pagesMenu addItem:menuItem];
+        }
+        
+        [pagesMenu addItem:[NSMenuItem separatorItem]];
+        
+        NSMenuItem *menuItem = [[NSMenuItem alloc] initWithTitle:@"Add Page" action:@selector(addPage:) keyEquivalent:@""];
+        [pagesMenu addItem:menuItem];
+
+        [_pagesPopUpButton setMenu:pagesMenu];
+    }
+
+    // Toolbox matrix
+    {
+        [_chartView setSelectedToolTag:_EXTSelectionToolTag];
+        [self _extCenterToolbox];
+    }
+
 
     // Sidebar & inspector views
-    _inspectorView = [[EXTDocumentInspectorView alloc] initWithFrame:NSZeroRect];
+    {
+        _inspectorView = [[EXTDocumentInspectorView alloc] initWithFrame:NSZeroRect];
 
-    NSTextView *sampleTextView = [[NSTextView alloc] initWithFrame:(NSRect){.size = {200.0, 50.0}}];
-    [sampleTextView setAutoresizingMask:NSViewWidthSizable];
-    [_inspectorView addSubview:sampleTextView withTitle:@"Text" collapsed:true];
+        NSTextView *sampleTextView = [[NSTextView alloc] initWithFrame:(NSRect){.size = {200.0, 50.0}}];
+        [sampleTextView setAutoresizingMask:NSViewWidthSizable];
+        [_inspectorView addSubview:sampleTextView withTitle:@"Text" collapsed:true];
 
-    [_inspectorView addSubview:_gridInspectorView withTitle:@"Grid" collapsed:false];
+        [_inspectorView addSubview:_gridInspectorView withTitle:@"Grid" collapsed:false];
 
-    sampleTextView = [[NSTextView alloc] initWithFrame:(NSRect){.size = {250.0, 800.0}}];
-    [sampleTextView setAutoresizingMask:NSViewWidthSizable];
-    [_inspectorView addSubview:sampleTextView withTitle:@"More text" collapsed:true];
+        sampleTextView = [[NSTextView alloc] initWithFrame:(NSRect){.size = {250.0, 800.0}}];
+        [sampleTextView setAutoresizingMask:NSViewWidthSizable];
+        [_inspectorView addSubview:sampleTextView withTitle:@"More text" collapsed:true];
 
-    NSRect contentFrame = [[[self window] contentView] frame];
-    NSSize scrollViewSize = [NSScrollView contentSizeForFrameSize:[_inspectorView frame].size hasHorizontalScroller:NO hasVerticalScroller:YES borderType:NSNoBorder];
-    scrollViewSize.height = contentFrame.size.height;
-    NSScrollView *inspectorScrollView = [[NSScrollView alloc] initWithFrame:(NSRect){NSZeroPoint, scrollViewSize}];
-    [inspectorScrollView setHasHorizontalScroller:NO];
-    [inspectorScrollView setHasVerticalScroller:YES];
-    [inspectorScrollView setAutohidesScrollers:YES];
-    [inspectorScrollView setBorderType:NSNoBorder];
-    [inspectorScrollView setAutoresizingMask:NSViewWidthSizable | NSViewHeightSizable];
-    [inspectorScrollView setDrawsBackground:YES];
-    [inspectorScrollView setBackgroundColor:[NSColor windowBackgroundColor]];
-    [inspectorScrollView setDocumentView:_inspectorView];
+        NSRect contentFrame = [[[self window] contentView] frame];
+        NSSize scrollViewSize = [NSScrollView contentSizeForFrameSize:[_inspectorView frame].size hasHorizontalScroller:NO hasVerticalScroller:YES borderType:NSNoBorder];
+        scrollViewSize.height = contentFrame.size.height;
+        NSScrollView *inspectorScrollView = [[NSScrollView alloc] initWithFrame:(NSRect){NSZeroPoint, scrollViewSize}];
+        [inspectorScrollView setHasHorizontalScroller:NO];
+        [inspectorScrollView setHasVerticalScroller:YES];
+        [inspectorScrollView setAutohidesScrollers:YES];
+        [inspectorScrollView setBorderType:NSNoBorder];
+        [inspectorScrollView setAutoresizingMask:NSViewWidthSizable | NSViewHeightSizable];
+        [inspectorScrollView setDrawsBackground:YES];
+        [inspectorScrollView setBackgroundColor:[NSColor windowBackgroundColor]];
+        [inspectorScrollView setDocumentView:_inspectorView];
 
-    NSRect sidebarFrame = {{NSMaxX(contentFrame), 0.0}, scrollViewSize};
-    _sidebarView = [[NSView alloc] initWithFrame:sidebarFrame];
-    [_sidebarView setWantsLayer:YES];
-    [_sidebarView setAutoresizingMask:NSViewHeightSizable | NSViewMinXMargin];
-    [_sidebarView addSubview:inspectorScrollView];
+        NSRect sidebarFrame = {{NSMaxX(contentFrame), 0.0}, scrollViewSize};
+        _sidebarView = [[NSView alloc] initWithFrame:sidebarFrame];
+        [_sidebarView setWantsLayer:YES];
+        [_sidebarView setAutoresizingMask:NSViewHeightSizable | NSViewMinXMargin];
+        [_sidebarView addSubview:inspectorScrollView];
 
-    // Sidebar left border
-    CALayer *sidebarLeftBorderLayer = [CALayer layer];
-    [sidebarLeftBorderLayer setBorderWidth:0.5];
-    [sidebarLeftBorderLayer setBorderColor:[[NSColor darkGrayColor] CGColor]];
-    [sidebarLeftBorderLayer setFrame:(CGRect){NSZeroPoint, {0.5, scrollViewSize.height}}];
-    [sidebarLeftBorderLayer setAutoresizingMask:kCALayerHeightSizable];
-    [sidebarLeftBorderLayer setShadowColor:[[NSColor whiteColor] CGColor]];
-    [sidebarLeftBorderLayer setShadowRadius:0.0];
-    [sidebarLeftBorderLayer setShadowOpacity:1.0];
-    [sidebarLeftBorderLayer setShadowOffset:(CGSize){1.0, 0.0}];
-    [[_sidebarView layer] addSublayer:sidebarLeftBorderLayer];
-    
-    [[[self window] contentView] addSubview:_sidebarView];
-    _sidebarHidden = true;
+        // Sidebar left border
+        CALayer *sidebarLeftBorderLayer = [CALayer layer];
+        [sidebarLeftBorderLayer setBorderWidth:0.5];
+        [sidebarLeftBorderLayer setBorderColor:[[NSColor darkGrayColor] CGColor]];
+        [sidebarLeftBorderLayer setFrame:(CGRect){NSZeroPoint, {0.5, scrollViewSize.height}}];
+        [sidebarLeftBorderLayer setAutoresizingMask:kCALayerHeightSizable];
+        [sidebarLeftBorderLayer setShadowColor:[[NSColor whiteColor] CGColor]];
+        [sidebarLeftBorderLayer setShadowRadius:0.0];
+        [sidebarLeftBorderLayer setShadowOpacity:1.0];
+        [sidebarLeftBorderLayer setShadowOffset:(CGSize){1.0, 0.0}];
+        [[_sidebarView layer] addSublayer:sidebarLeftBorderLayer];
+        
+        [[[self window] contentView] addSubview:_sidebarView];
+        _sidebarHidden = true;
+    }
 
     // Ready, set, go
     [[self window] makeFirstResponder:_chartView];
@@ -199,6 +224,8 @@ enum : NSInteger {
 - (void)windowWillClose:(NSNotification *)notification {
     [_chartView removeObserver:self forKeyPath:@"selectedPageIndex"];
     [_chartScrollView removeObserver:self forKeyPath:@"magnification"];
+
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:NSViewFrameDidChangeNotification object:_controlsView];
 }
 
 #pragma mark - Zoom
@@ -578,6 +605,20 @@ enum : NSInteger {
     }
     else
         [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
+}
+
+#pragma mark - Notifications
+
+- (void)controlsViewFrameDidChange:(NSNotification *)notification {
+    [self _extCenterToolbox];
+}
+
+- (void)_extCenterToolbox {
+    const CGFloat toolboxWidth = [_toolboxMatrix frame].size.width;
+    const CGFloat controlsViewWidth = [_controlsView frame].size.width;
+    NSPoint toolboxOrigin = [_toolboxMatrix frame].origin;
+    toolboxOrigin.x = floor((controlsViewWidth - toolboxWidth) / 2);
+    [_toolboxMatrix setFrameOrigin:toolboxOrigin];
 }
 
 #pragma mark - Actions

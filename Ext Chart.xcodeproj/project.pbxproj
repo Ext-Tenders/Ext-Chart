@@ -19,7 +19,6 @@
 		14EF1A6B17584C080012DD3C /* EXTDocumentWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 14EF1A6A17584C080012DD3C /* EXTDocumentWindowController.m */; };
 		1DDD582C0DA1D0D100B32029 /* EXTDocument.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1DDD58280DA1D0D100B32029 /* EXTDocument.xib */; };
 		1DDD582D0DA1D0D100B32029 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1DDD582A0DA1D0D100B32029 /* MainMenu.xib */; };
-		315BC80F140430B7007D49CA /* EXTToolPaletteController.m in Sources */ = {isa = PBXBuildFile; fileRef = 315BC80E140430B7007D49CA /* EXTToolPaletteController.m */; };
 		317707C413D784B0003475A2 /* EXTGrid.m in Sources */ = {isa = PBXBuildFile; fileRef = 317707C313D784B0003475A2 /* EXTGrid.m */; };
 		317707E113D7893A003475A2 /* EXTChartView.m in Sources */ = {isa = PBXBuildFile; fileRef = 317707E013D7893A003475A2 /* EXTChartView.m */; };
 		3187BA2713DC6C6C00C26803 /* EXTScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3187BA2413DC6C6C00C26803 /* EXTScrollView.m */; };
@@ -30,7 +29,6 @@
 		31D403BB13DA0476006A8C06 /* EXTTerm.m in Sources */ = {isa = PBXBuildFile; fileRef = 31D403BA13DA0476006A8C06 /* EXTTerm.m */; };
 		31D403C013DA04D8006A8C06 /* EXTDifferential.m in Sources */ = {isa = PBXBuildFile; fileRef = 31D403BF13DA04D8006A8C06 /* EXTDifferential.m */; };
 		31D5D2E513F6933B00F1B2F9 /* EXTArtBoard.m in Sources */ = {isa = PBXBuildFile; fileRef = 31D5D2E413F6933B00F1B2F9 /* EXTArtBoard.m */; };
-		31EEEF65140430380035BE7A /* EXTToolPalette.xib in Resources */ = {isa = PBXBuildFile; fileRef = 31EEEF64140430380035BE7A /* EXTToolPalette.xib */; };
 		3841EBD2177380C000ADA929 /* EXTZeroRange.m in Sources */ = {isa = PBXBuildFile; fileRef = 3841EBD1177380C000ADA929 /* EXTZeroRange.m */; };
 		3896548D16F538D90008FB8D /* EXTMatrix.m in Sources */ = {isa = PBXBuildFile; fileRef = 3896548C16F538D90008FB8D /* EXTMatrix.m */; };
 		389FB38D17498AF500D0FE75 /* EXTMultiplicationTables.m in Sources */ = {isa = PBXBuildFile; fileRef = 389FB38C17498AF500D0FE75 /* EXTMultiplicationTables.m */; };
@@ -76,8 +74,6 @@
 		2A37F4B0FDCFA73011CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		2A37F4C4FDCFA73011CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		2A37F4C5FDCFA73011CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
-		315BC80D140430B7007D49CA /* EXTToolPaletteController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTToolPaletteController.h; sourceTree = "<group>"; };
-		315BC80E140430B7007D49CA /* EXTToolPaletteController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTToolPaletteController.m; sourceTree = "<group>"; };
 		317707C213D784B0003475A2 /* EXTGrid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTGrid.h; sourceTree = "<group>"; };
 		317707C313D784B0003475A2 /* EXTGrid.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTGrid.m; sourceTree = "<group>"; };
 		317707DF13D7893A003475A2 /* EXTChartView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTChartView.h; sourceTree = "<group>"; };
@@ -96,7 +92,6 @@
 		31D403BF13DA04D8006A8C06 /* EXTDifferential.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTDifferential.m; sourceTree = "<group>"; };
 		31D5D2E313F6933B00F1B2F9 /* EXTArtBoard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTArtBoard.h; sourceTree = "<group>"; };
 		31D5D2E413F6933B00F1B2F9 /* EXTArtBoard.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTArtBoard.m; sourceTree = "<group>"; };
-		31EEEF64140430380035BE7A /* EXTToolPalette.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = EXTToolPalette.xib; sourceTree = "<group>"; };
 		3841EBD0177380C000ADA929 /* EXTZeroRange.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTZeroRange.h; sourceTree = "<group>"; };
 		3841EBD1177380C000ADA929 /* EXTZeroRange.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTZeroRange.m; sourceTree = "<group>"; };
 		3896548B16F538D90008FB8D /* EXTMatrix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTMatrix.h; sourceTree = "<group>"; };
@@ -223,8 +218,6 @@
 				31C77BA713E63F6800E9DBFC /* EXTAppController.m */,
 				14EF1A6917584C080012DD3C /* EXTDocumentWindowController.h */,
 				14EF1A6A17584C080012DD3C /* EXTDocumentWindowController.m */,
-				315BC80D140430B7007D49CA /* EXTToolPaletteController.h */,
-				315BC80E140430B7007D49CA /* EXTToolPaletteController.m */,
 				31C77BB413E647A000E9DBFC /* EXTsettingPanelController.h */,
 				31C77BB513E647A000E9DBFC /* EXTsettingPanelController.m */,
 			);
@@ -259,7 +252,6 @@
 				1DDD58280DA1D0D100B32029 /* EXTDocument.xib */,
 				1DDD582A0DA1D0D100B32029 /* MainMenu.xib */,
 				31C77B8C13E43E3100E9DBFC /* Preferences.xib */,
-				31EEEF64140430380035BE7A /* EXTToolPalette.xib */,
 			);
 			name = XIBs;
 			sourceTree = "<group>";
@@ -389,7 +381,6 @@
 				1DDD582C0DA1D0D100B32029 /* EXTDocument.xib in Resources */,
 				1DDD582D0DA1D0D100B32029 /* MainMenu.xib in Resources */,
 				31C77B8D13E43E3100E9DBFC /* Preferences.xib in Resources */,
-				31EEEF65140430380035BE7A /* EXTToolPalette.xib in Resources */,
 				318EC0691409385F005D21D4 /* to do list.rtf in Resources */,
 				38DDAA7B16EDA8990001841D /* README.md in Resources */,
 				38A1AB6E1727009C00F9F9D5 /* todo.md in Resources */,
@@ -419,7 +410,6 @@
 				31C77BA813E63F6800E9DBFC /* EXTAppController.m in Sources */,
 				31C77BB613E647A000E9DBFC /* EXTsettingPanelController.m in Sources */,
 				31D5D2E513F6933B00F1B2F9 /* EXTArtBoard.m in Sources */,
-				315BC80F140430B7007D49CA /* EXTToolPaletteController.m in Sources */,
 				3896548D16F538D90008FB8D /* EXTMatrix.m in Sources */,
 				389FB38D17498AF500D0FE75 /* EXTMultiplicationTables.m in Sources */,
 				38F783121756AEBF009D207A /* EXTTriple.m in Sources */,

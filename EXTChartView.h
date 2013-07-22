@@ -8,7 +8,20 @@
 
 
 #import <Cocoa/Cocoa.h>
+
+typedef enum : NSInteger {
+    _EXTSelectionToolTag = 1,
+    _EXTArtboardToolTag = 2,
+    _EXTGeneratorToolTag = 3,
+    _EXTDifferentialToolTag = 4,
+    _EXTEraseToolTag = 5,
+    _EXTMarqueeToolTag = 6,
+    _EXTToolTagCount
+} EXTToolboxTag;
+
+
 @class EXTScrollView, EXTArtBoard, EXTGrid, EXTDocument, EXTToolPaletteController, EXTTerm, EXTDifferential, EXTSpectralSequence;
+
 
 @protocol EXTChartViewDelegate <NSObject>
     - (void)drawPageNumber:(NSUInteger)pageNumber ll:(NSPoint)lowerLeftCoord ur:(NSPoint)upperRightCoord withSpacing:(CGFloat)gridSpacing;
@@ -26,14 +39,13 @@
 		
 	NSTrackingArea *trackingArea;
 	
-	Class currentTool;  // simple assignment?
 	NSBezierPath *hightlightPath;
 }
 
 
 
 @property(nonatomic, assign) BOOL showGrid;
-@property(nonatomic, assign) BOOL editMode, showPages, editingArtBoards, highlighting;
+@property(nonatomic, assign) BOOL editMode, showPages, highlighting;
 @property(strong) EXTArtBoard *artBoard;
 @property(nonatomic, readonly) EXTGrid *grid;
 @property(strong) NSBezierPath *highlightPath;
@@ -41,7 +53,7 @@
 @property(nonatomic, strong) EXTSpectralSequence *sseq; // TODO: this should evolve to a copy property in order to avoid side effects
 @property(nonatomic, weak) id<EXTChartViewDelegate> delegate;
 @property(nonatomic, assign) NSUInteger selectedPageIndex;
-
+@property(nonatomic, assign) EXTToolboxTag selectedToolTag;
 
 
 - (NSPoint) convertToGridCoordinates:(NSPoint)pixelLoc;
@@ -56,7 +68,8 @@
 - (IBAction)zoomToFit:(id)sender;
 - (IBAction)setGridToDefaults:(id)sender;
 
-- (void)toolSelectionDidChange;
+- (IBAction)changeTool:(id)sender;
+
 - (void)resetHighlightRectAtLocation:(NSPoint)location;
 
 @end
