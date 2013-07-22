@@ -8,7 +8,6 @@
 
 #import "EXTAppController.h"
 #import "EXTsettingPanelController.h"
-#import "EXTToolPaletteController.h"
 #import "EXTDemos.h"
 #import "EXTDocument.h"
 #import "EXTMaySpectralSequence.h"
@@ -25,16 +24,10 @@ typedef enum : NSInteger {
 
 @interface EXTAppController ()
     @property(nonatomic, strong) EXTsettingPanelController *panelController;
-    @property(nonatomic, strong) EXTToolPaletteController *toolPaletteController;
 @end
 
 
 @implementation EXTAppController
-
-- (void)applicationDidFinishLaunching:(NSNotification *)notification
-{
-	[self showToolPalette:self];
-}
 
 - (IBAction)showSettingsPanel:(id)sender{
 	if (! self.panelController) {
@@ -42,11 +35,6 @@ typedef enum : NSInteger {
 	}
 
     [self.panelController showWindow:self];
-}
-
-- (IBAction)showToolPalette:(id)sender
-{
-    [EXTToolPaletteController.sharedToolPaletteController showWindow:self];
 }
 
 - (IBAction)newExampleDocument:(id)sender

@@ -11,7 +11,6 @@
 #import "EXTScrollView.h"
 #import "EXTGrid.h"
 #import "EXTArtBoard.h"
-#import "EXTToolPaletteController.h"
 #import "EXTTerm.h"
 #import "EXTDifferential.h"
 #import "EXTSpectralSequence.h"
@@ -32,6 +31,22 @@ static void *_EXTChartViewSseqContext = &_EXTChartViewSseqContext;
 static void *_EXTChartViewSelectedPageIndexContext = &_EXTChartViewSelectedPageIndexContext;
 static void *_EXTChartViewArtBoardDrawingRectContext = &_EXTChartViewArtBoardDrawingRectContext;
 static void *_EXTChartViewGridAnyKeyContext = &_EXTChartViewGridAnyKeyContext;
+
+#pragma mark - Private functions
+
+NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
+    switch (tag) {
+        case _EXTSelectionToolTag:
+            // TODO: this can’t be right
+            return [EXTDifferential class];
+        case _EXTGeneratorToolTag:
+            return [EXTTerm class];
+        case _EXTDifferentialToolTag:
+            return [EXTDifferential class];
+        default:
+            return Nil;
+    }
+}
 
 
 @implementation EXTChartView
@@ -60,7 +75,6 @@ static void *_EXTChartViewGridAnyKeyContext = &_EXTChartViewGridAnyKeyContext;
 		editMode = NO;
         _bindings = [NSMutableDictionary dictionary];
 
-		_editingArtBoards = NO;
         _artBoard = [EXTArtBoard new];
         // since the frame extends past the bounds rectangle, we need observe the drawingRect in order to know what to refresh when the artBoard changes
         [_artBoard addObserver:self forKeyPath:@"drawingRect" options:NSKeyValueObservingOptionOld context:_EXTChartViewArtBoardDrawingRectContext];
@@ -99,13 +113,6 @@ static void *_EXTChartViewGridAnyKeyContext = &_EXTChartViewGridAnyKeyContext;
 
 //		highlightRectColor = [NSColor colorWithCalibratedRed:102.0/255 green:255.0/255 blue:204.0/255 alpha:1];
 		highlightRectColor = [NSColor colorWithCalibratedRed:0 green:1.0 blue:1.0 alpha:1];
-		
-		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(toolSelectionDidChange) name:@"EXTtoolSelectionChanged" object:EXTToolPaletteController.sharedToolPaletteController];
-
-// a new document can get initialized when any tool is selected
-		
-		currentTool = EXTToolPaletteController.sharedToolPaletteController.currentToolClass;
-		 
     }
 
 	return self;
@@ -203,7 +210,8 @@ static void *_EXTChartViewGridAnyKeyContext = &_EXTChartViewGridAnyKeyContext;
 	
 // we're rebuilding the (small) highlightPath every time the mouse moves.   Is it better to just translate it, if needed?   We could eliminate the currentTool's need to know about the grid by taking one path, and translating and scaling it.   That path could be a constant, so wouldn't need to be rebuilt.
 
-	NSBezierPath *newHighlightPath = [currentTool makeHighlightPathAtPoint:location onGrid: _grid onPage:_selectedPageIndex];
+    Class toolClass = _EXTClassFromToolTag(_selectedToolTag);
+	NSBezierPath *newHighlightPath = [toolClass makeHighlightPathAtPoint:location onGrid: _grid onPage:_selectedPageIndex];
 	
 	const NSRect oldRect = [highlightPath bounds];
 	const NSRect newRect = [newHighlightPath bounds];
@@ -259,13 +267,13 @@ static void *_EXTChartViewGridAnyKeyContext = &_EXTChartViewGridAnyKeyContext;
     }
 }
 
-- (void)setEditingArtBoards:(BOOL)editingArtBoards {
-    if (editingArtBoards != _editingArtBoards) {
-        _editingArtBoards = editingArtBoards;
+- (void)setSelectedToolTag:(EXTToolboxTag)selectedToolTag {
+    if (selectedToolTag != _selectedToolTag) {
         [[self window] invalidateCursorRectsForView:self];
-
-        [self setHighlighting:!editingArtBoards];
+        [self setHighlighting:selectedToolTag != _EXTArtboardToolTag];
         [self setNeedsDisplayInRect:NSInsetRect([highlightPath bounds], -1.0, -1.0)];
+
+        _selectedToolTag = selectedToolTag;
     }
 }
 
@@ -347,7 +355,7 @@ static void *_EXTChartViewGridAnyKeyContext = &_EXTChartViewGridAnyKeyContext;
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
 	if (context == _EXTChartViewArtBoardDrawingRectContext) {
         [self setNeedsDisplayInRect:NSUnionRect([change[NSKeyValueChangeOldKey] rectValue], [_artBoard drawingRect])];
-        if (_editingArtBoards)
+        if (_selectedToolTag == _EXTArtboardToolTag)
             [[self window] invalidateCursorRectsForView:self];
 	}
 	else if (context == _EXTChartViewGridAnyKeyContext) {
@@ -429,7 +437,7 @@ static void *_EXTChartViewGridAnyKeyContext = &_EXTChartViewGridAnyKeyContext;
 	[self discardCursorRects];
 	//	need to clip the artBoards cursor rects to the visible portion.   I haven't implemented this yet. The "visibleRect" command is supposed to make this easier.   I just checked with some log statements, and it indeed does report, in the bounds coordinates, the clipView's rectangle.    Sweet.
 	
-	if (_editingArtBoards)
+	if (_selectedToolTag == _EXTArtboardToolTag)
 		[_artBoard buildCursorRectsInView:self];
 }
 
@@ -487,11 +495,12 @@ static void *_EXTChartViewGridAnyKeyContext = &_EXTChartViewGridAnyKeyContext;
 - (void)mouseDown:(NSEvent *)event {
 	const NSPoint locationPoint = [self convertPoint:[event locationInWindow] fromView:nil];
     const EXTArtBoardMouseDragOperation artBoardDragOperation = [_artBoard mouseDragOperationAtPoint:locationPoint];
+    Class toolClass = _EXTClassFromToolTag(_selectedToolTag);
 
-    if (_editingArtBoards && artBoardDragOperation != EXTArtBoardMouseDragOperationNone) {
+    if (_selectedToolTag == _EXTArtboardToolTag && artBoardDragOperation != EXTArtBoardMouseDragOperationNone) {
 		[self _extDragArtBoardWithEvent:event];
 	}
-    else if (currentTool) {
+    else if (toolClass) {
         // TODO: reenable clicks.  the idea is that both terms and differentials
         // present the same 'insertable' interface, which is called here.
         
@@ -518,18 +527,27 @@ static void *_EXTChartViewGridAnyKeyContext = &_EXTChartViewGridAnyKeyContext;
 	[self setHighlightPath:[NSBezierPath bezierPathWithRect:NSZeroRect]];
 	[self setNeedsDisplayInRect:lastRect];	
 }
-											
-#pragma mark *** tool selection ***
 
-- (void)toolSelectionDidChange{
-	// just set the tool class to what it is
+- (IBAction)changeTool:(id)sender {
+    if (![sender respondsToSelector:@selector(tag)])
+        return;
 
-	currentTool = EXTToolPaletteController.sharedToolPaletteController.currentToolClass;
+    EXTToolboxTag tag = [sender tag];
+    if (tag <= 0 || tag >= _EXTToolTagCount)
+        return;
+
+    [self setSelectedToolTag:tag];
 }
-
+											
 #pragma mark - NSUserInterfaceValidations
 
 - (BOOL)validateUserInterfaceItem:(id<NSValidatedUserInterfaceItem>)item {
+    if ([item action] == @selector(changeTool:)) {
+        if ([(id)item respondsToSelector:@selector(setState:)]) {
+            [(id)item setState:([item tag] == _selectedToolTag ? NSOnState : NSOffState)];
+        }
+    }
+
     return [self respondsToSelector:[item action]];
 }
 
