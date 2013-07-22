@@ -148,7 +148,8 @@
                 // find this tag in the target term and poke the value
                 NSMutableArray *col = ret.presentation[termIndex];
                 int pokeIndex = [endTerm.names indexOfObject:targetTag];
-                col[pokeIndex] = @([col[pokeIndex] intValue] + 1);
+                if (pokeIndex != -1)
+                    col[pokeIndex] = @([col[pokeIndex] intValue] + 1);
             }
                         
             // now we move to the next bucket.  start by finding the leftmost
@@ -222,7 +223,7 @@
 }
 
 -(void) propagateNakamura:(int)page generators:(NSMutableArray*)generators {
-    // then propagate with nakamura's lemma / the Cartan formula until exhausted
+    // then propagate with nakamura's lemma / the cartan formula until exhausted
     
     return;
 }
