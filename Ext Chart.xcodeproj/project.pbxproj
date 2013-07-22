@@ -34,6 +34,9 @@
 		389FB38D17498AF500D0FE75 /* EXTMultiplicationTables.m in Sources */ = {isa = PBXBuildFile; fileRef = 389FB38C17498AF500D0FE75 /* EXTMultiplicationTables.m */; };
 		38A1AB6E1727009C00F9F9D5 /* todo.md in Resources */ = {isa = PBXBuildFile; fileRef = 38A1AB6D1727009C00F9F9D5 /* todo.md */; };
 		38A35E75178A018600D2A019 /* EXTDemos.m in Sources */ = {isa = PBXBuildFile; fileRef = 38A35E74178A018600D2A019 /* EXTDemos.m */; };
+		38A92122179DCED8000B827D /* DifferentialTool.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 38A9211F179DCED8000B827D /* DifferentialTool.pdf */; };
+		38A92123179DCED8000B827D /* MultiplicativeStructureTool.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 38A92120179DCED8000B827D /* MultiplicativeStructureTool.pdf */; };
+		38A92125179DDF06000B827D /* GeneratorTool.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 38A92124179DDF06000B827D /* GeneratorTool.pdf */; };
 		38B4B08417597EA80065D421 /* EXTSpectralSequence.m in Sources */ = {isa = PBXBuildFile; fileRef = 38B4B08317597EA80065D421 /* EXTSpectralSequence.m */; };
 		38DDAA7B16EDA8990001841D /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 38DDAA7A16EDA8990001841D /* README.md */; };
 		38F7830B17565F72009D207A /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = 38F7830A17565F72009D207A /* LICENSE */; };
@@ -101,6 +104,9 @@
 		38A1AB6D1727009C00F9F9D5 /* todo.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = todo.md; sourceTree = "<group>"; };
 		38A35E73178A018600D2A019 /* EXTDemos.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTDemos.h; sourceTree = "<group>"; };
 		38A35E74178A018600D2A019 /* EXTDemos.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTDemos.m; sourceTree = "<group>"; };
+		38A9211F179DCED8000B827D /* DifferentialTool.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = DifferentialTool.pdf; path = Images/DifferentialTool.pdf; sourceTree = "<group>"; };
+		38A92120179DCED8000B827D /* MultiplicativeStructureTool.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = MultiplicativeStructureTool.pdf; path = Images/MultiplicativeStructureTool.pdf; sourceTree = "<group>"; };
+		38A92124179DDF06000B827D /* GeneratorTool.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = GeneratorTool.pdf; path = Images/GeneratorTool.pdf; sourceTree = "<group>"; };
 		38B4B08217597EA80065D421 /* EXTSpectralSequence.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTSpectralSequence.h; sourceTree = "<group>"; };
 		38B4B08317597EA80065D421 /* EXTSpectralSequence.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTSpectralSequence.m; sourceTree = "<group>"; };
 		38DDAA7A16EDA8990001841D /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.md; sourceTree = "<group>"; };
@@ -238,6 +244,9 @@
 		14EF1A611756ED430012DD3C /* Images */ = {
 			isa = PBXGroup;
 			children = (
+				38A92124179DDF06000B827D /* GeneratorTool.pdf */,
+				38A9211F179DCED8000B827D /* DifferentialTool.pdf */,
+				38A92120179DCED8000B827D /* MultiplicativeStructureTool.pdf */,
 				14CCA3891794F21D002EF861 /* ArtBoardTool.pdf */,
 				14CCA38A1794F21D002EF861 /* ArtBoardToolAlternate.pdf */,
 				14CCA38B1794F21D002EF861 /* Ext Chart.iconset */,
@@ -389,6 +398,9 @@
 				14CCA38C1794F21D002EF861 /* ArtBoardTool.pdf in Resources */,
 				14CCA38D1794F21D002EF861 /* ArtBoardToolAlternate.pdf in Resources */,
 				14CCA38E1794F21D002EF861 /* Ext Chart.iconset in Resources */,
+				38A92122179DCED8000B827D /* DifferentialTool.pdf in Resources */,
+				38A92123179DCED8000B827D /* MultiplicativeStructureTool.pdf in Resources */,
+				38A92125179DDF06000B827D /* GeneratorTool.pdf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
