@@ -93,6 +93,9 @@
     
     [self setTables:[NSMutableDictionary dictionary]];
     [self setSSeq:nil];
+    
+    // XXX: these don't seem to be properly tracked at the moment.  it's not
+    // clear that we should bother, though --- maybe just delete them?
     [self setUnitTerm:nil];
     [self setUnitClass:[NSMutableArray array]];
     

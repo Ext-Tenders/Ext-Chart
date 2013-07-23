@@ -125,9 +125,47 @@
 }
 
 // performs an irreversible upcast
+// XXX: these copies may not be deep enough to prevent modifications of the
+// return value independent of the parent polynomial spectral sequence.  so,
+// this should be considered a DESTRUCTIVE method.
 -(EXTSpectralSequence*) upcastToSSeq {
-    NSLog(@"upcastToSSeq not yet implemented.");
-    return nil;
+    EXTSpectralSequence *ret = [EXTSpectralSequence new];
+    ret.indexClass = self.indexClass;
+    ret.multTables.unitTerm = [self findTerm:[self.indexClass identityLocation]];
+    
+    // for the most part, we're already tracking the structure of a general sseq
+    ret.terms = self.terms;
+    ret.differentials = self.differentials;
+    
+    // the zero ranges can mostly be copied over, except for EXTZeroRangeStrict,
+    // which is chained to the parent spectral sequence.  so, we make a special
+    // except for that class.  ideally this would be 
+    ret.zeroRanges = [NSMutableArray arrayWithCapacity:self.zeroRanges.count];
+    for (EXTZeroRange *zeroRange in self.zeroRanges) {
+        EXTZeroRange *newZeroRange = nil;
+        
+        if ([[newZeroRange class] isSubclassOfClass:[EXTZeroRangeStrict class]])
+            newZeroRange = [EXTZeroRangeStrict newWithSSeq:ret];
+        else
+            newZeroRange = [zeroRange copy];
+        
+        [ret.zeroRanges addObject:newZeroRange];
+    }
+    
+    // the real piece that's missing is the multiplicative structure, which we
+    // now just iterate straight through and compute.
+    for (EXTTerm *leftTerm in ret.terms)
+    for (EXTTerm *rightTerm in ret.terms) {
+        EXTPartialDefinition *partial = [EXTPartialDefinition new];
+        partial.differential = [self productWithLeft:leftTerm.location
+                                               right:rightTerm.location];
+        partial.inclusion = [EXTMatrix identity:partial.differential.width];
+        [self.multTables addPartialDefinition:partial
+                                           to:leftTerm.location
+                                         with:rightTerm.location];
+    }
+    
+    return ret;
 }
 
 -(void) addPolyClass:(NSObject*)name location:(EXTLocation*)loc upTo:(int)bound {

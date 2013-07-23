@@ -15,6 +15,8 @@ deleting classes will be tricky; there isn't support for this in the model yet.
 
 another thing Mike would like in the model/view boundary: a change-of-basis matrix attached to each particular EXTTerm, which doesn't affect internal calculations but does affect how the user interacts (via input matrices) with the sseq.
 
+the basic structure of the undo manager calls is visible at the bottom of this page: http://developer.apple.com/library/ios/#documentation/Cocoa/Conceptual/UndoArchitecture/Articles/RegisteringUndo.html#//apple_ref/doc/uid/20000206-BABICFDE .  this isn't helpful until at least one thing in the UI is functioning, though, so that we've made all our decisions about the call graph sitting between the user and the model.
+
 
 backend work
 ============
