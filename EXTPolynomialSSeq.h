@@ -33,6 +33,7 @@
 @property(strong,readonly) NSMutableArray* locations;
 @property(strong,readonly) NSMutableArray* upperBounds;
 
+-(EXTPolynomialSSeq*) initWithUnit:(Class<EXTLocation>)locClass;
 +(EXTPolynomialSSeq*) sSeqWithUnit:(Class<EXTLocation>)locClass;
 
 -(void) addPolyClass:(NSObject*)name location:(EXTLocation*)loc upTo:(int)bound;

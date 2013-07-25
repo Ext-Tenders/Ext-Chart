@@ -80,6 +80,10 @@
 
 @implementation EXTMaySpectralSequence
 
+-(id) init {    
+    return self = [super initWithUnit:[EXTTriple class]];
+}
+
 +(EXTTriple*) followSquare:(EXTTriple*)location order:(int)order {
     /*
      |h_ij| = (1, 2^j(2^i-1), i)
@@ -252,11 +256,42 @@
     return;
 }
 
-+(EXTMaySpectralSequence*) fillToWidth:(int)width {
-    EXTMaySpectralSequence *sseq = (EXTMaySpectralSequence*)[EXTMaySpectralSequence sSeqWithUnit:[EXTTriple class]];
++(EXTMaySpectralSequence*) fillForAn:(int)n width:(int)width {
+    EXTMaySpectralSequence *sseq = [EXTMaySpectralSequence new];
     
     [sseq.zeroRanges addObject:[EXTZeroRangeStrict newWithSSeq:sseq]];
-    int last1Index = 0;
+    
+    // start by adding the polynomial terms h_{i,j}
+    for (int i = 1; ; i++) {
+        
+        // if we've passed outside of the width or left A(n), then quit.
+        if (((1 << i)-2 > width) || (i > n+1))
+            break;
+        
+        for (int j = 0; ; j++) {
+            // calculate the location of the present term
+            int A = 1, B = (1 << j)*((1 << i) - 1), C = i;
+            
+            // if we're outside the width limit *or* if we've hit the truncation
+            // level, then it's time to move on to the next element.
+            if ((B - 1 > width) || (j > (1 << (n-i+2))))
+                break;
+            
+            int limit = ((i == 1) && (j == 0)) ? width : width/(B-1);
+            
+            [sseq addPolyClass:[EXTMayTag tagWithI:i J:j] location:[EXTTriple tripleWithA:A B:B C:C] upTo:limit];
+        }
+    }
+    
+    [sseq buildDifferentials];
+    
+    return sseq;
+}
+
++(EXTMaySpectralSequence*) fillToWidth:(int)width {
+    EXTMaySpectralSequence *sseq = [EXTMaySpectralSequence new];
+    
+    [sseq.zeroRanges addObject:[EXTZeroRangeStrict newWithSSeq:sseq]];
     
     // start by adding the polynomial terms h_{i,j}
     for (int i = 1; ; i++) {
@@ -275,23 +310,26 @@
             
             [sseq addPolyClass:[EXTMayTag tagWithI:i J:j] location:[EXTTriple tripleWithA:A B:B C:C] upTo:limit];
         }
-        
-        if (i == 1)
-            last1Index = [sseq.names count];
     }
     
-    // then add their d1 differentials
-    for (int index = 0; index < sseq.names.count; index++) {
-        EXTMayTag *tag = sseq.names[index];
+    [sseq buildDifferentials];
+    
+    return sseq;
+}
+
+-(void) buildDifferentials {
+    // add the d1 differentials
+    for (int index = 0; index < self.names.count; index++) {
+        EXTMayTag *tag = self.names[index];
         int i = tag.i, j = tag.j;
         
         // these elements are genuinely primitive, so never support diff'ls.
         if (i == 1)
             continue;
         
-        EXTTriple *location = sseq.locations[index];
-        EXTTerm *target = [sseq findTerm:[EXTTriple followDiffl:location page:1]];
-        EXTDifferential *diff = [EXTDifferential differential:[sseq findTerm:location] end:target page:1];
+        EXTTriple *location = self.locations[index];
+        EXTTerm *target = [self findTerm:[EXTTriple followDiffl:location page:1]];
+        EXTDifferential *diff = [EXTDifferential differential:[self findTerm:location] end:target page:1];
         EXTPartialDefinition *partial = [EXTPartialDefinition new];
         partial.inclusion = [EXTMatrix identity:1];
         partial.differential = [EXTMatrix matrixWidth:1 height:target.size];
@@ -300,25 +338,23 @@
         // diagonal: d_1 h_{i,j} = sum_{k=1}^{i-1} h_{k,i-k+j} h_{i-k,j}
         for (int k = 1; k <= i-1; k++) {
             EXTMayTag *tagLeft = [EXTMayTag tagWithI:k J:(i-k+j)],
-                      *tagRight = [EXTMayTag tagWithI:(i-k) J:j];
-            int leftIndex = [sseq.names indexOfObject:tagLeft],
-                rightIndex = [sseq.names indexOfObject:tagRight];
-            EXTMatrix *product = [sseq productWithLeft:sseq.locations[leftIndex] right:sseq.locations[rightIndex]];
+            *tagRight = [EXTMayTag tagWithI:(i-k) J:j];
+            int leftIndex = [self.names indexOfObject:tagLeft],
+            rightIndex = [self.names indexOfObject:tagRight];
+            EXTMatrix *product = [self productWithLeft:self.locations[leftIndex] right:self.locations[rightIndex]];
             partial.differential = [EXTMatrix sum:partial.differential with:product];
         }
         
         [diff.partialDefinitions addObject:partial];
-        [sseq addDifferential:diff];
+        [self addDifferential:diff];
     }
     
     // propagate the d1 differentials with Leibniz's rule
-    [sseq propagateLeibniz:sseq.locations page:1];
+    [self propagateLeibniz:self.locations page:1];
     
-    [sseq computeGroupsForPage:0];
-    [sseq computeGroupsForPage:1];
-    [sseq computeGroupsForPage:2];
+    // TODO: use nakamura's lemma to get the higher differentials
     
-    return sseq;
+    return;
 }
 
 @end

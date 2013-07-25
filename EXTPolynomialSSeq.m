@@ -142,6 +142,17 @@
     return self;
 }
 
+-(EXTPolynomialSSeq*) initWithUnit:(Class<EXTLocation>)locClass {
+    self = [super init];
+    
+    self.indexClass = locClass;
+    
+    EXTTerm *unit = [EXTTerm term:[locClass identityLocation] andNames:[NSMutableArray arrayWithObject:@"1"]];
+    [self.terms setObject:unit forKey:unit.location];
+    
+    return self;
+}
+
 // return an almost-empty spectral sequence
 +(EXTPolynomialSSeq*) sSeqWithUnit:(Class<EXTLocation>)locClass {
     EXTPolynomialSSeq *ret = [EXTPolynomialSSeq new];
