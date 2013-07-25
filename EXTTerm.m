@@ -64,6 +64,12 @@
 	{
         names = [coder decodeObjectForKey:@"names"];
         location = [coder decodeObjectForKey:@"location"];
+        
+        // start off with the default cycles and boundaries
+        boundaries = [NSMutableArray array];
+        cycles = [NSMutableArray array];
+        [cycles addObject:[EXTMatrix identity:names.count].presentation];
+        [boundaries addObject:@[]];
 	}
     
 	return self;

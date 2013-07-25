@@ -14,7 +14,7 @@
 			<key>CFBundleTypeIconFile</key>
 			<string></string>
 			<key>CFBundleTypeName</key>
-			<string>DocumentType</string>
+			<string>SpectralSequence</string>
 			<key>CFBundleTypeOSTypes</key>
 			<array>
 				<string>.sseq</string>

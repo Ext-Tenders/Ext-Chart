@@ -37,8 +37,8 @@
         terms = [aDecoder decodeObjectForKey:@"terms"];
         
         differentials = [aDecoder decodeObjectForKey:@"differentials"];
-        for (NSArray *page in differentials)
-        for (EXTDifferential *diff in page) {
+        for (NSDictionary *page in differentials)
+        for (EXTDifferential *diff in page.allValues) {
             diff.start = [terms objectForKey:((EXTLocation*)diff.start)];
             diff.end = [terms objectForKey:((EXTLocation*)diff.end)];
         }
@@ -47,9 +47,24 @@
         multTables.sSeq = self;
         multTables.unitTerm = [terms objectForKey:((EXTLocation*)multTables.unitTerm)];
         
-        indexClass = [aDecoder decodeObjectForKey:@"indexClass"];
+        switch ([aDecoder decodeIntForKey:@"indexClass"]) {
+            case EXTPair_KIND:
+                indexClass = [EXTPair class];
+                break;
+            case EXTTriple_KIND:
+                indexClass = [EXTTriple class];
+                break;
+            default:
+                NSLog(@"unrecognized indexClass kind on load");
+                indexClass = [EXTPair class];
+                break;
+        }
         
         zeroRanges = [aDecoder decodeObjectForKey:@"zeroRanges"];
+        for (EXTZeroRange *zeroRange in zeroRanges) {
+            if ([[zeroRanges class] isSubclassOfClass:[EXTZeroRangeStrict class]])
+                [(EXTZeroRangeStrict*)zeroRanges setSSeq:self];
+        }
     }
     
     return self;
@@ -59,8 +74,16 @@
     [aCoder encodeObject:terms forKey:@"terms"];
     [aCoder encodeObject:differentials forKey:@"differentials"];
     [aCoder encodeObject:multTables forKey:@"multTables"];
-    [aCoder encodeObject:indexClass forKey:@"indexClass"];
     [aCoder encodeObject:zeroRanges forKey:@"zeroRanges"];
+    
+    if ([[EXTPair class] isEqual:indexClass])
+        [aCoder encodeInteger:EXTPair_KIND forKey:@"indexClass"];
+    else if ([[EXTTriple class] isEqual:indexClass])
+        [aCoder encodeInteger:EXTTriple_KIND forKey:@"indexClass"];
+    else {
+        NSLog(@"unrecognized indexClass on write");
+        [aCoder encodeInteger:EXTPair_KIND forKey:@"indexClass"];
+    }
 }
 
 

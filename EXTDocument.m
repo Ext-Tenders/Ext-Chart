@@ -14,17 +14,17 @@
 #import "EXTDemos.h"
 
 
+#define PRESENT_FILE_VERSION 1
+#define MINIMUM_FILE_VERSION_ALLOWED 1
+
+
 @interface EXTDocument ()
     {
         // view configuration
         CGFloat gridSpacing;
-        CGFloat gridScalingFactor;
         NSSize extDocumentSize;
         NSPoint extDocumentOrigin;
-        //	extern CGFloat gridSpacing;
-        //	extern NSRect canvasRect;
         NSColor *gridLineColor;
-        NSColor *emphasGridLineColor;
     }
 
     @property(nonatomic, weak) EXTDocumentWindowController *windowController;
@@ -73,8 +73,20 @@
     if ( outError != NULL ) {
 		*outError = [NSError errorWithDomain:NSOSStatusErrorDomain code:unimpErr userInfo:NULL];
 	}
-//	return[NSKeyedArchiver archivedDataWithRootObject:[self pages]];
-    return nil;
+    
+    NSMutableData* data = [NSMutableData data];
+    NSKeyedArchiver* arch = [[NSKeyedArchiver alloc]
+                             initForWritingWithMutableData:data];
+    
+    // TODO: at the moment, i'm just writing the model out to disk.  however,
+    // the routine is structured so that we can add other keys to the root
+    // object for other document settings, like spacing and color and so forth.
+    [arch encodeObject:_sseq forKey:@"sseq"];
+    [arch encodeInteger:PRESENT_FILE_VERSION forKey:@"fileVersion"];
+    
+    [arch finishEncoding];
+    
+    return data;
 }
 
 - (BOOL)readFromData:(NSData *)data ofType:(NSString *)typeName error:(NSError **)outError
@@ -82,12 +94,17 @@
 	if ( outError != NULL ) {
 		*outError = [NSError errorWithDomain:NSOSStatusErrorDomain code:unimpErr userInfo:NULL];
 	}
+    
+    NSKeyedUnarchiver *unarchiver = [[NSKeyedUnarchiver alloc] initForReadingWithData:data];
+    
+    int version = [unarchiver decodeIntegerForKey:@"fileVersion"];
+    if (version < MINIMUM_FILE_VERSION_ALLOWED) {
+        *outError = [NSError errorWithDomain:@"edu.harvard.math.ext-chart" code:(-1) userInfo:[NSDictionary dictionaryWithObject:@"This version of Ext Chart is not backwards-compatible with this data file." forKey:NSLocalizedDescriptionKey]];
+        return NO;
+    }
+    
+    self.sseq = [unarchiver decodeObjectForKey:@"sseq"];
 
-	// TODO: review this
-//	NSArray* arr = [NSKeyedUnarchiver unarchiveObjectWithData:data];
-//	NSMutableArray* marr = [arr mutableCopy];
-//	
-//	[self setPages:marr];
     return YES;
 }
 

@@ -19,6 +19,11 @@
 }
 */
 
+enum EXTLocationKinds {
+    EXTPair_KIND = 0,
+    EXTTriple_KIND = 1
+};
+
 @protocol EXTLocation <NSObject, NSCopying, NSCoding>
 
 // these translate the EXTLocation data into other (potentially lossy) formats
