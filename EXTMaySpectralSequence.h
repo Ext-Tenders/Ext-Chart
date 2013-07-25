@@ -11,6 +11,6 @@
 @interface EXTMaySpectralSequence : EXTPolynomialSSeq
 
 +(EXTMaySpectralSequence*) fillToWidth:(int)width;
-+(EXTMaySpectralSequence*) fillForAn:(int)n;
++(EXTMaySpectralSequence*) fillForAn:(int)n width:(int)width;
 
 @end

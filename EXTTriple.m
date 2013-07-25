@@ -61,6 +61,12 @@
     return [EXTTriple tripleWithA:(a.a - 1) B:(a.b) C:(a.c - 1 + page)];
 }
 
++(int) calculateDifflPage:(EXTTriple*)start end:(EXTTriple*)end {
+    if ((start.b != end.b) || (start.a + 1 != end.a))
+        return -1;
+    return (end.c - start.c + 1);
+}
+
 -(EXTTriple*) copyWithZone:(NSZone*)zone {
     return [[EXTTriple allocWithZone:zone] initWithA:self.a B:self.b C:self.c];
 }

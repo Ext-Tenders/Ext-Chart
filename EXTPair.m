@@ -54,6 +54,12 @@
     return [EXTPair pairWithA:(b.a+1) B:(b.b-page)];
 }
 
++(int) calculateDifflPage:(EXTPair*)start end:(EXTPair*)end {
+    if ((start.a + 1 != end.a))
+        return -1;
+    return (end.b - start.b);
+}
+
 /// NSCoder, NSCopying routines ///
 
 -(EXTPair*) copyWithZone:(NSZone*)zone {

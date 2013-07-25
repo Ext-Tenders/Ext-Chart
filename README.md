@@ -15,6 +15,7 @@ Credits
 ### Documentation
 
 ### Special thanks
-+ bavarious
-+ Haynes Miller
-+ Constantin Teleman
++ bavarious (UI work, general Cocoa consultant)
++ Mark Behrens (May spectral sequence consultant)
++ Haynes Miller (Host)
++ Constantin Teleman (Host)

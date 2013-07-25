@@ -39,6 +39,7 @@ enum EXTLocationKinds {
 // these record the affine translation by a differential
 +(NSObject<EXTLocation>*) followDiffl:(NSObject<EXTLocation>*)a page:(int)page;
 +(NSObject<EXTLocation>*) reverseDiffl:(NSObject<EXTLocation>*)b page:(int)page;
++(int) calculateDifflPage:(NSObject<EXTLocation>*)start end:(NSObject<EXTLocation>*)end;
 
 // these make it possible to use EXTLocation as a dictionary key.
 -(BOOL) isEqual:(NSObject<EXTLocation>*)a;
