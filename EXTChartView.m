@@ -50,9 +50,6 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
 
 
 @implementation EXTChartView
-{
-    NSMutableDictionary *_bindings;
-}
 
 @synthesize showGrid, editMode, showPages;
 @synthesize highlighting;
@@ -62,8 +59,10 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
 
 + (void)initialize
 {
-    if (self == [EXTChartView class])
+    if (self == [EXTChartView class]) {
         [self exposeBinding:EXTChartViewSseqBindingName];
+        [self exposeBinding:EXTChartViewSelectedPageIndexBindingName];
+    }
 }
 
 - (id)initWithFrame:(NSRect)frame {
@@ -73,7 +72,6 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
 		showGrid = TRUE;
 		showPages = YES;
 		editMode = NO;
-        _bindings = [NSMutableDictionary dictionary];
 
         _artBoard = [EXTArtBoard new];
         // since the frame extends past the bounds rectangle, we need observe the drawingRect in order to know what to refresh when the artBoard changes
@@ -350,7 +348,7 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
 
 
 
-#pragma mark - Bindings & KVO
+#pragma mark - Key-value observing
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
 	if (context == _EXTChartViewArtBoardDrawingRectContext) {
@@ -377,56 +375,6 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
 		[super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
 	}
 }
-
-- (void)bind:(NSString *)binding toObject:(id)observable withKeyPath:(NSString *)keyPath options:(NSDictionary *)options
-{
-    if ([binding isEqualToString:EXTChartViewSseqBindingName] || [binding isEqualToString:EXTChartViewSelectedPageIndexBindingName]) {
-        if (_bindings[binding])
-            [self unbind:binding];
-
-        void *context;
-        NSString *localKeyPath;
-
-        if ([binding isEqualToString:EXTChartViewSseqBindingName]) {
-            context = _EXTChartViewSseqContext;
-            localKeyPath = @"sseq";
-        }
-        else { // EXTChartViewSelectedPageIndexBindingName
-            context = _EXTChartViewSelectedPageIndexContext;
-            localKeyPath = @"selectedPageIndex";
-        }
-
-        [observable addObserver:self forKeyPath:keyPath options:0 context:context];
-        _bindings[binding] = @{
-                               NSObservedObjectKey : observable,
-                               NSObservedKeyPathKey : [keyPath copy],
-                               NSOptionsKey : (options ? [options copy] : @{}),
-                               };
-
-        [self setValue:[observable valueForKeyPath:keyPath] forKeyPath:localKeyPath];
-    }
-    else
-        [super bind:binding toObject:observable withKeyPath:keyPath options:options];
-}
-
-- (void)unbind:(NSString *)binding
-{
-    NSDictionary *bindingInfo = _bindings[binding];
-
-    if (bindingInfo) {
-        [bindingInfo[NSObservedObjectKey] removeObserver:self forKeyPath:bindingInfo[NSObservedKeyPathKey]];
-        [_bindings removeObjectForKey:binding];
-    }
-    else
-        [super unbind:binding];
-}
-
-- (NSDictionary *)infoForBinding:(NSString *)binding
-{
-    NSDictionary *bindingInfo = _bindings[binding];
-    return bindingInfo ? bindingInfo : [super infoForBinding:binding];
-}
-
 
 #pragma mark *** zooming and scrolling ***
 
