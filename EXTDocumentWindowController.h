@@ -9,7 +9,9 @@
 #import <Cocoa/Cocoa.h>
 #import "EXTChartView.h"
 
-@interface EXTDocumentWindowController : NSWindowController <EXTChartViewDelegate>
-    - (void)drawPagesUpTo:(NSUInteger)pageNumber;
-    - (void)drawPageNumber:(NSUInteger)pageNumber ll:(NSPoint)lowerLeftCoord ur:(NSPoint)upperRightCoord withSpacing:(CGFloat)gridSpacing;
+@interface EXTDocumentWindowController : NSWindowController
+    @property(nonatomic, readonly) EXTDocument *extDocument;
+@end
+
+@interface EXTDocumentWindowController (EXTChartViewDelegate) <EXTChartViewDelegate>
 @end
