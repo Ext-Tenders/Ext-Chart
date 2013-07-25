@@ -800,34 +800,6 @@
 							<string key="NSTitle">View</string>
 							<object class="NSMutableArray" key="NSMenuItems">
 								<bool key="EncodedWithXMLCoder">YES</bool>
-								<object class="NSMenuItem" id="102151532">
-									<reference key="NSMenu" ref="466310130"/>
-									<string key="NSTitle">Show Toolbar</string>
-									<string key="NSKeyEquiv">t</string>
-									<int key="NSKeyEquivModMask">1048576</int>
-									<int key="NSMnemonicLoc">2147483647</int>
-									<reference key="NSOnImage" ref="1033313550"/>
-									<reference key="NSMixedImage" ref="310636482"/>
-								</object>
-								<object class="NSMenuItem" id="237841660">
-									<reference key="NSMenu" ref="466310130"/>
-									<string key="NSTitle">Customize Toolbar…</string>
-									<string key="NSKeyEquiv"/>
-									<int key="NSKeyEquivModMask">1048576</int>
-									<int key="NSMnemonicLoc">2147483647</int>
-									<reference key="NSOnImage" ref="1033313550"/>
-									<reference key="NSMixedImage" ref="310636482"/>
-								</object>
-								<object class="NSMenuItem" id="104555878">
-									<reference key="NSMenu" ref="466310130"/>
-									<bool key="NSIsDisabled">YES</bool>
-									<bool key="NSIsSeparator">YES</bool>
-									<string key="NSTitle"/>
-									<string key="NSKeyEquiv"/>
-									<int key="NSMnemonicLoc">2147483647</int>
-									<reference key="NSOnImage" ref="1033313550"/>
-									<reference key="NSMixedImage" ref="310636482"/>
-								</object>
 								<object class="NSMenuItem" id="73754632">
 									<reference key="NSMenu" ref="466310130"/>
 									<string key="NSTitle">Show Inspector</string>
@@ -1351,22 +1323,6 @@
 						<reference key="destination" ref="579971712"/>
 					</object>
 					<int key="connectionID">364</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">runToolbarCustomizationPalette:</string>
-						<reference key="source" ref="1014"/>
-						<reference key="destination" ref="237841660"/>
-					</object>
-					<int key="connectionID">365</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">toggleToolbarShown:</string>
-						<reference key="source" ref="1014"/>
-						<reference key="destination" ref="102151532"/>
-					</object>
-					<int key="connectionID">366</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
@@ -2106,9 +2062,6 @@
 						<reference key="object" ref="466310130"/>
 						<object class="NSMutableArray" key="children">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="102151532"/>
-							<reference ref="237841660"/>
-							<reference ref="104555878"/>
 							<reference ref="73754632"/>
 							<reference ref="418612357"/>
 							<reference ref="562221820"/>
@@ -2124,16 +2077,6 @@
 							<reference ref="58626058"/>
 						</object>
 						<reference key="parent" ref="586577488"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">297</int>
-						<reference key="object" ref="102151532"/>
-						<reference key="parent" ref="466310130"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">298</int>
-						<reference key="object" ref="237841660"/>
-						<reference key="parent" ref="466310130"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">211</int>
@@ -2305,11 +2248,6 @@
 						<int key="objectID">493</int>
 						<reference key="object" ref="253952766"/>
 						<reference key="parent" ref="388842427"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">540</int>
-						<reference key="object" ref="104555878"/>
-						<reference key="parent" ref="466310130"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">541</int>
@@ -2581,8 +2519,6 @@
 					<string>29.IBPluginDependency</string>
 					<string>295.IBPluginDependency</string>
 					<string>296.IBPluginDependency</string>
-					<string>297.IBPluginDependency</string>
-					<string>298.IBPluginDependency</string>
 					<string>346.IBPluginDependency</string>
 					<string>348.IBPluginDependency</string>
 					<string>349.IBPluginDependency</string>
@@ -2606,7 +2542,6 @@
 					<string>492.IBPluginDependency</string>
 					<string>493.IBPluginDependency</string>
 					<string>5.IBPluginDependency</string>
-					<string>540.IBPluginDependency</string>
 					<string>541.IBPluginDependency</string>
 					<string>543.IBPluginDependency</string>
 					<string>551.IBPluginDependency</string>
@@ -2656,9 +2591,6 @@
 				</object>
 				<object class="NSArray" key="dict.values">
 					<bool key="EncodedWithXMLCoder">YES</bool>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
