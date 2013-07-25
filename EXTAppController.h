@@ -1,5 +1,5 @@
 //
-//  EXTDocumentSettingsController.h
+//  EXTAppController.h
 //  Ext Chart
 //
 //  Created by Michael Hopkins on 7/31/11.
