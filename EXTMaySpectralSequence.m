@@ -10,34 +10,43 @@
 #import "EXTTriple.h"
 #import "EXTDifferential.h"
 
-@interface EXTMayTag : NSObject <NSCopying>
+@interface EXTMayTag : NSObject <NSCopying, NSCoding>
+
 @property (assign) int i, j;
+
 +(EXTMayTag*) tagWithI:(int)i J:(int)j;
 -(NSString*) description;
 -(NSUInteger) hash;
+
 @end
 
 @implementation EXTMayTag
+
 @synthesize i, j;
+
 +(EXTMayTag*) tagWithI:(int)i J:(int)j {
     EXTMayTag *ret = [EXTMayTag new];
     ret.i = i; ret.j = j;
     return ret;
 }
+
 -(NSString*) description {
     return [NSString stringWithFormat:@"h_{%d,%d}",i,j];
 }
+
 -(EXTMayTag*) copyWithZone:(NSZone*)zone {
     EXTMayTag *ret = [[EXTMayTag allocWithZone:zone] init];
     ret.i = i; ret.j = j;
     return ret;
 }
+
 -(BOOL) isEqual:(id)object {
     if ([object class] != [EXTMayTag class])
         return FALSE;
     return ((((EXTMayTag*)object)->i == i) &&
             (((EXTMayTag*)object)->j == j));
 }
+
 -(NSUInteger) hash {
     long long key = i;
 	key = (~key) + (key << 18); // key = (key << 18) - key - 1;
@@ -49,6 +58,21 @@
 	key = key ^ (key >> 22);
 	return (int) key;
 }
+
+- (id)initWithCoder:(NSCoder *)aDecoder {
+    if (self = [super init]) {
+        i = [aDecoder decodeIntForKey:@"i"];
+        j = [aDecoder decodeIntForKey:@"j"];
+    }
+    
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder *)aCoder {
+    [aCoder encodeInteger:i forKey:@"i"];
+    [aCoder encodeInteger:j forKey:@"j"];
+}
+
 @end
 
 

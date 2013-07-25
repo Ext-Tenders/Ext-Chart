@@ -62,15 +62,16 @@
 - (id) initWithCoder: (NSCoder*) coder {
 	if (self = [super init])
 	{
-		[self setLocation:[coder decodeObjectForKey:@"location"]];
-        //		[self setPage:[coder decodeIntForKey:@"page"]];
+        names = [coder decodeObjectForKey:@"names"];
+        location = [coder decodeObjectForKey:@"location"];
 	}
+    
 	return self;
 }
 
 - (void) encodeWithCoder:(NSCoder*) coder {
-	[coder encodeObject: location forKey:@"location"];
-//	[coder encodeInt:page forKey:@"page"];
+    [coder encodeObject:names forKey:@"names"];
+	[coder encodeObject:location forKey:@"location"];
 }
 
 #pragma mark *** drawing; TODO: SEPARATE THIS OUT ***

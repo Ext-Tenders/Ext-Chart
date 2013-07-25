@@ -32,6 +32,38 @@
     return self;
 }
 
+- (id)initWithCoder:(NSCoder *)aDecoder {
+    if (self = [super init]) {
+        terms = [aDecoder decodeObjectForKey:@"terms"];
+        
+        differentials = [aDecoder decodeObjectForKey:@"differentials"];
+        for (NSArray *page in differentials)
+        for (EXTDifferential *diff in page) {
+            diff.start = [terms objectForKey:((EXTLocation*)diff.start)];
+            diff.end = [terms objectForKey:((EXTLocation*)diff.end)];
+        }
+        
+        multTables = [aDecoder decodeObjectForKey:@"multTables"];
+        multTables.sSeq = self;
+        multTables.unitTerm = [terms objectForKey:((EXTLocation*)multTables.unitTerm)];
+        
+        indexClass = [aDecoder decodeObjectForKey:@"indexClass"];
+        
+        zeroRanges = [aDecoder decodeObjectForKey:@"zeroRanges"];
+    }
+    
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder *)aCoder {
+    [aCoder encodeObject:terms forKey:@"terms"];
+    [aCoder encodeObject:differentials forKey:@"differentials"];
+    [aCoder encodeObject:multTables forKey:@"multTables"];
+    [aCoder encodeObject:indexClass forKey:@"indexClass"];
+    [aCoder encodeObject:zeroRanges forKey:@"zeroRanges"];
+}
+
+
 // returns an EXTSpectralSequence which is given by the tensor product of the
 // current spectral sequence with an incoming collection of classes with
 // multiplication and diff'ls.

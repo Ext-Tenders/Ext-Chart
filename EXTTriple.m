@@ -87,4 +87,20 @@
             (c == ((EXTTriple*)other)->c));
 }
 
+-(id) initWithCoder:(NSCoder *)aDecoder {
+    if (self = [super init]) {
+        a = [aDecoder decodeIntForKey:@"a"];
+        b = [aDecoder decodeIntForKey:@"b"];
+        c = [aDecoder decodeIntForKey:@"c"];
+    }
+    
+    return self;
+}
+
+-(void) encodeWithCoder:(NSCoder *)aCoder {
+    [aCoder encodeInt:a forKey:@"a"];
+    [aCoder encodeInt:b forKey:@"b"];
+    [aCoder encodeInt:c forKey:@"c"];
+}
+
 @end

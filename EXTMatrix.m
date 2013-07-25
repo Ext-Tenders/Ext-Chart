@@ -36,6 +36,20 @@
     return ([self.differential isEqual:target.differential] && [self.inclusion isEqual:target.inclusion]);
 }
 
+-(void) encodeWithCoder:(NSCoder *)aCoder {
+    [aCoder encodeObject:inclusion forKey:@"inclusion"];
+    [aCoder encodeObject:differential forKey:@"differential"];
+}
+
+-(id) initWithCoder:(NSCoder *)aDecoder {
+    if (self = [super init]) {
+        inclusion = [aDecoder decodeObjectForKey:@"inclusion"];
+        differential = [aDecoder decodeObjectForKey:@"differential"];
+    }
+    
+    return self;
+}
+
 // TODO: make the boolean flag into (change to true)-only, like a dirty flag.
 // use this to decide whether to prompt the user when deleting partial
 // definitions, or generally when performing any other destructive operation.
@@ -52,6 +66,22 @@
 // the presentation, just when it's somehow "dirty"...
 @synthesize height, width;
 @synthesize presentation;
+
+- (id)initWithCoder:(NSCoder *)aDecoder {
+    if (self = [super init]) {
+        height = [aDecoder decodeIntForKey:@"height"];
+        width = [aDecoder decodeIntForKey:@"width"];
+        presentation = [aDecoder decodeObjectForKey:@"presentation"];
+    }
+    
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder *)aCoder {
+    [aCoder encodeInt:height forKey:@"height"];
+    [aCoder encodeInt:width forKey:@"width"];
+    [aCoder encodeObject:presentation forKey:@"presentation"];
+}
 
 -(BOOL) isEqual:(id)object {
     if ([object class] != [EXTMatrix class])
@@ -73,7 +103,7 @@
 
 // initializes an EXTMatrix object and allocates all the NSMutableArrays
 // used in the presentation.
-+(EXTMatrix*) initWidth:(int)newWidth height:(int)newHeight {
++(EXTMatrix*) matrixWidth:(int)newWidth height:(int)newHeight {
     EXTMatrix *obj = [EXTMatrix new];
     
     // set the basic properties
@@ -129,15 +159,10 @@
     return ret;
 }
 
-+(EXTMatrix*) matrixWidth:(int)newWidth height:(int)newHeight {
-    EXTMatrix *object = [EXTMatrix initWidth:newWidth height:newHeight];
-    return object;
-}
-
 // allocates and initializes a new matrix 
 +(EXTMatrix*) copyTranspose:(EXTMatrix *)input {
-    EXTMatrix *ret = [EXTMatrix initWidth:input.height
-                                    height:input.width];
+    EXTMatrix *ret = [EXTMatrix matrixWidth:input.height
+                                     height:input.width];
     
     for (int i = 0; i < [input height]; i++) {
         NSMutableArray *newColumn =
@@ -168,7 +193,7 @@
 
 // performs a deep copy of the matrix
 -(EXTMatrix*) copy {
-    EXTMatrix *copy = [EXTMatrix initWidth:width height:height];
+    EXTMatrix *copy = [EXTMatrix matrixWidth:width height:height];
     
     for (int i = 0; i < width; i++)
         for (int j = 0; j < height; j++) {
@@ -310,8 +335,8 @@
 
 // returns the product of two matrices.
 +(EXTMatrix*) newMultiply:(EXTMatrix*)left by:(EXTMatrix*)right {
-    EXTMatrix *product = [EXTMatrix initWidth:[right width]
-                                        height:[left height]];
+    EXTMatrix *product = [EXTMatrix matrixWidth:[right width]
+                                         height:[left height]];
     
     if (left.width != right.height)
         NSLog(@"Mismatched multiplication.");

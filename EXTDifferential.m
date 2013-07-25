@@ -19,8 +19,6 @@
 @property(strong) NSMutableArray *partialDefinitions;
 @property(strong) EXTMatrix *presentation;
 
--(BOOL) isEqual:(id)object;
-
 @end
 
 
@@ -123,20 +121,25 @@
     return nil;
 }
 
+// IMPORTANT NOTE: this DOESN'T actually return a properly initialized object.
+// instead, the start and end pointers are set to the EXTLocation of the term
+// they refer to.  this must be dereferenced before storing the differential.
 - (id) initWithCoder: (NSCoder*) coder {
 	if (self = [super init])
 	{
-		[self setStart:[coder decodeObjectForKey:@"start"]];
-		[self setEnd:[coder decodeObjectForKey:@"end"]];
-		[self setPage:[coder decodeIntForKey:@"page"]];
+        start = [coder decodeObjectForKey:@"start"];
+		end = [coder decodeObjectForKey:@"end"];
+		page = [coder decodeIntForKey:@"page"];
+        partialDefinitions = [coder decodeObjectForKey:@"partialDefinitions"];
 	}
 	return self;
 }
 
 - (void) encodeWithCoder:(NSCoder*) coder {
-	[coder encodeObject:start forKey:@"start"];
-	[coder encodeObject:end forKey:@"end"];
+	[coder encodeObject:start.location forKey:@"start"];
+	[coder encodeObject:end.location forKey:@"end"];
 	[coder encodeInt:page forKey:@"page"];
+    [coder encodeObject:partialDefinitions forKey:@"partialDefinitions"];
 }
 
 #pragma mark *** overridden EXTTool methods***

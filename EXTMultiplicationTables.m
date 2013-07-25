@@ -11,21 +11,26 @@
 #import "EXTDifferential.h"
 
 
-@interface EXTMultiplicationKey : NSObject <NSCopying>
+@interface EXTMultiplicationKey : NSObject <NSCopying, NSCoding>
+
 @property(strong) EXTLocation *left;
 @property(strong) EXTLocation *right;
+
 +(EXTMultiplicationKey*) newWith:(EXTLocation*)left and:(EXTLocation*)right;
 -(NSUInteger) hash;
+
 @end
 
 @implementation EXTMultiplicationKey
 @synthesize left, right;
+
 +(EXTMultiplicationKey*) newWith:(EXTLocation*)newLeft
                              and:(EXTLocation*)newRight {
     EXTMultiplicationKey *ret = [EXTMultiplicationKey new];
     ret.left = [newLeft copy]; ret.right = [newRight copy];
     return ret;
 }
+
 -(BOOL) isEqual:(id)object {
     if ([object class] != [EXTMultiplicationKey class])
         return false;
@@ -33,6 +38,7 @@
     
     return ([self.left isEqual:input.left] && [self.right isEqual:input.right]);
 }
+
 -(EXTMultiplicationKey*) copyWithZone:(NSZone*)zone {
     EXTMultiplicationKey *ret = [[EXTMultiplicationKey allocWithZone:zone] init];
     ret.left = [self.left copyWithZone:zone];
@@ -51,7 +57,24 @@
 	key = key ^ (key >> 22);
 	return (int) key;
 }
+
+- (id)initWithCoder:(NSCoder *)aDecoder {
+    if (self = [super init]) {
+        left = [aDecoder decodeObjectForKey:@"left"];
+        right = [aDecoder decodeObjectForKey:@"right"];
+    }
+    
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder *)aCoder {
+    [aCoder encodeObject:left forKey:@"left"];
+    [aCoder encodeObject:right forKey:@"right"];
+}
+
 @end
+
+
 
 
 @implementation EXTMultiplicationEntry
@@ -68,6 +91,17 @@
 
 +(id) entry {
     return [EXTMultiplicationEntry new];
+}
+
+- (id)initWithCoder:(NSCoder *)aDecoder {
+    if (self = [super init]) {
+        partialDefinitions = [aDecoder decodeObjectForKey:@"partialDefinitions"];
+    }
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder *)aCoder {
+    [aCoder encodeObject:partialDefinitions forKey:@"partialDefinitions"];
 }
 
 @end
@@ -108,6 +142,29 @@
     [ret setSSeq:sseq];
     
     return ret;
+}
+
+// IMPORTANT NOTE: same caveat as elsewhere: EXTTerm pointers are instead
+// initialized to the EXTLocation of the associated EXTTerm, and they need to be
+// linked up to the right EXTTerm in the terms array before usage.  this is now
+// *ALSO* true of the sSeq pointer.
+//
+// TODO: should the aforementioned behavior be written into an NSCoder subclass?
+- (id)initWithCoder:(NSCoder *)aDecoder {
+    if (self = [super init]) {
+        tables = [aDecoder decodeObjectForKey:@"tables"];
+        unitTerm = [aDecoder decodeObjectForKey:@"unitTerm"];
+        unitClass = [aDecoder decodeObjectForKey:@"unitClass"];
+        sSeq = nil;
+    }
+    
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder *)aCoder {
+    [aCoder encodeObject:tables forKey:@"tables"];
+    [aCoder encodeObject:unitTerm forKey:@"unitTerm"];
+    [aCoder encodeObject:unitClass forKey:@"unitClass"];
 }
 
 // this performs a lookup without instantiating a new entry if it's not found.

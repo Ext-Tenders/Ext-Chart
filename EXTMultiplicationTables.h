@@ -8,11 +8,10 @@
 
 #import <Foundation/Foundation.h>
 #import "EXTMatrix.h"
-#import "EXTDocument.h"
 #import "EXTSpectralSequence.h"
 
 // the dictionary entries contain both precompiled matrices and partial def'ns.
-@interface EXTMultiplicationEntry : NSObject {
+@interface EXTMultiplicationEntry : NSObject <NSCoding> {
     EXTMatrix *presentation;
     NSMutableArray *partialDefinitions;
 }
@@ -26,9 +25,8 @@
 
 
 // tracks a single multiplicative structure
-@interface EXTMultiplicationTables : NSObject {
+@interface EXTMultiplicationTables : NSObject <NSCoding> {
     NSMutableDictionary *tables;
-    EXTDocument *document;
     EXTTerm *unitTerm;
     NSMutableArray *unitClass;
 }

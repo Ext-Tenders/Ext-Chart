@@ -11,7 +11,7 @@
 
 
 
-@interface EXTPolynomialTag : NSObject <NSCopying>
+@interface EXTPolynomialTag : NSObject <NSCopying, NSCoding>
 
 @property(strong) NSMutableDictionary *tags;
 

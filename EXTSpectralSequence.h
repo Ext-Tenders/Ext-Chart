@@ -16,7 +16,7 @@
 @class EXTMultiplicationTables;
 @class EXTTerm, EXTDifferential;
 
-@interface EXTSpectralSequence : NSObject
+@interface EXTSpectralSequence : NSObject <NSCoding>
 
 @property(nonatomic, strong) NSMutableDictionary *terms;
 @property(nonatomic, strong) NSMutableArray *differentials;

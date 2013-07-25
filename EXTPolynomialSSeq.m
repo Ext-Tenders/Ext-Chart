@@ -85,6 +85,18 @@
     return ret;
 }
 
+- (id)initWithCoder:(NSCoder *)aDecoder {
+    if (self = [super init]) {
+        tags = [aDecoder decodeObjectForKey:@"tags"];
+    }
+    
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder *)aCoder {
+    [aCoder encodeObject:tags forKey:@"tags"];
+}
+
 @end
 
 
@@ -95,6 +107,24 @@
 @implementation EXTPolynomialSSeq
 
 @synthesize names, locations, upperBounds;
+
+- (id)initWithCoder:(NSCoder *)aDecoder {
+    if (self = [super initWithCoder:aDecoder]) {
+        names = [aDecoder decodeObjectForKey:@"names"];
+        locations = [aDecoder decodeObjectForKey:@"locations"];
+        upperBounds = [aDecoder decodeObjectForKey:@"upperBounds"];
+    }
+    
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder *)aCoder {
+    [super encodeWithCoder:aCoder];
+    
+    [aCoder encodeObject:names forKey:@"names"];
+    [aCoder encodeObject:locations forKey:@"locations"];
+    [aCoder encodeObject:upperBounds forKey:@"upperBounds"];
+}
 
 -(EXTMultiplicationTables*) multTables {
     NSLog(@"EXTPolynomialSSeq %@ was asked for its multTables.", self);

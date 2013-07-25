@@ -18,7 +18,7 @@
 //
 // such partial definitions are not trivial to stitch together, and so to do
 // that successfully, we just record all the definitions we have, together.
-@interface EXTPartialDefinition : NSObject {
+@interface EXTPartialDefinition : NSObject <NSCoding> {
     EXTMatrix *inclusion;
     EXTMatrix *differential;
     bool automaticallyGenerated;
@@ -34,7 +34,7 @@
 
 
 
-@interface EXTMatrix : NSObject {
+@interface EXTMatrix : NSObject <NSCoding> {
     NSUInteger height, width;
     NSMutableArray *presentation;
 }
@@ -42,7 +42,6 @@
 @property(assign) NSUInteger height, width;
 @property(strong) NSMutableArray *presentation;
 
-+(EXTMatrix*) initWidth:(int)newWidth height:(int)newHeight;
 +(EXTMatrix*) matrixWidth:(int)newWidth height:(int)newHeight;
 -(EXTMatrix*) copy;
 
