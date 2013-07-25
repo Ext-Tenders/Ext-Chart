@@ -384,13 +384,26 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
         if (_bindings[binding])
             [self unbind:binding];
 
-        void *context = [binding isEqualToString:EXTChartViewSseqBindingName] ? _EXTChartViewSseqContext : _EXTChartViewSelectedPageIndexContext;
+        void *context;
+        NSString *localKeyPath;
+
+        if ([binding isEqualToString:EXTChartViewSseqBindingName]) {
+            context = _EXTChartViewSseqContext;
+            localKeyPath = @"sseq";
+        }
+        else { // EXTChartViewSelectedPageIndexBindingName
+            context = _EXTChartViewSelectedPageIndexContext;
+            localKeyPath = @"selectedPageIndex";
+        }
+
         [observable addObserver:self forKeyPath:keyPath options:0 context:context];
         _bindings[binding] = @{
                                NSObservedObjectKey : observable,
                                NSObservedKeyPathKey : [keyPath copy],
                                NSOptionsKey : (options ? [options copy] : @{}),
                                };
+
+        [self setValue:[observable valueForKeyPath:keyPath] forKeyPath:localKeyPath];
     }
     else
         [super bind:binding toObject:observable withKeyPath:keyPath options:options];
