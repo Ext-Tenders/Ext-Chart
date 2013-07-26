@@ -37,13 +37,14 @@ NS_INLINE NSSize _EXTGroupSizeForContentSize(NSSize contentSize) {
     @property(nonatomic, readonly) NSView *contentView;
     @property(nonatomic, readonly) NSString *title;
     @property(nonatomic, assign, getter=isCollapsed) bool collapsed;
+    @property(nonatomic, assign, getter=isContentCentered) bool contentCentered;
     - (id)initWithFrame:(NSRect)frame contentView:(NSView *)contentView title:(NSString *)title;
 @end
 
 
 @implementation EXTDocumentInspectorView
 
-- (void)addSubview:(NSView *)subview withTitle:(NSString *)title collapsed:(bool)collapsed {
+- (void)addSubview:(NSView *)subview withTitle:(NSString *)title collapsed:(bool)collapsed centered:(bool)centered {
     NSSize frameSize = [self frame].size;
     NSRect groupViewFrame = {
         .origin.x = _EXTHorizontalMargin,
@@ -62,6 +63,7 @@ NS_INLINE NSSize _EXTGroupSizeForContentSize(NSSize contentSize) {
 
     [groupView addObserver:self forKeyPath:@"collapsed" options:(NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew) context:_EXTCollapsedContext];
     [groupView setCollapsed:collapsed];
+    [groupView setContentCentered:centered];
 }
 
 - (void)willRemoveSubview:(NSView *)subview {
@@ -135,13 +137,23 @@ NS_INLINE NSSize _EXTGroupSizeForContentSize(NSSize contentSize) {
     self = [super initWithFrame:frame];
     if (self) {
         _contentView = contentView;
-        [contentView setFrameOrigin:(NSPoint){_EXTHorizontalPadding, _EXTHeaderHeight + _EXTContentTopPadding}];
-        [contentView setAutoresizingMask:NSViewWidthSizable];
+
+        NSSize contentSize = [contentView frame].size;
+        if ([_contentView autoresizingMask] & NSViewWidthSizable)
+            contentSize.width = frame.size.width - _EXTHorizontalPadding * 2;
+        [contentView setFrameSize:contentSize];
+        [self _extLayoutContentFrame];
         [self addSubview:contentView];
 
         _title = [title copy];
+
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(frameDidChange:) name:NSViewFrameDidChangeNotification object:self];
     }
     return self;
+}
+
+- (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:NSViewFrameDidChangeNotification object:self];
 }
 
 - (void)mouseDown:(NSEvent *)event {
@@ -159,6 +171,29 @@ NS_INLINE NSSize _EXTGroupSizeForContentSize(NSSize contentSize) {
         _collapsed = collapsed;
         [self setFrameSize:targetSize];
     }
+}
+
+- (void)_extLayoutContentFrame {
+    const NSRect bounds = [self bounds];
+    const NSPoint contentOrigin = {
+        .x = (_contentCentered ?
+              floor(NSMinX(bounds) + (bounds.size.width - [_contentView frame].size.width) / 2) :
+              floor(NSMinX(bounds) + _EXTHorizontalPadding)),
+        .y = _EXTHeaderHeight + _EXTContentTopPadding
+    };
+
+    [_contentView setFrameOrigin:contentOrigin];
+}
+
+- (void)setContentCentered:(bool)contentCentered {
+    if (contentCentered != _contentCentered) {
+        _contentCentered = contentCentered;
+        [self _extLayoutContentFrame];
+    }
+}
+
+- (void)frameDidChange:(NSNotification *)notification {
+    [self _extLayoutContentFrame];
 }
 
 - (void)resetCursorRects {

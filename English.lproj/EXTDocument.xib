@@ -72,7 +72,7 @@
 											<string key="NSFrame">{{931, 0}, {5, 26}}</string>
 											<reference key="NSSuperview" ref="828169455"/>
 											<reference key="NSWindow"/>
-											<reference key="NSNextKeyView" ref="66083316"/>
+											<reference key="NSNextKeyView"/>
 											<string key="NSReuseIdentifierKey">_NS:9</string>
 											<string key="NSOffsets">{0, 0}</string>
 											<object class="NSTextFieldCell" key="NSTitleCell">
@@ -110,7 +110,7 @@
 											<string key="NSFrame">{{75, 0}, {5, 24}}</string>
 											<reference key="NSSuperview" ref="828169455"/>
 											<reference key="NSWindow"/>
-											<reference key="NSNextKeyView" ref="609675932"/>
+											<reference key="NSNextKeyView"/>
 											<string key="NSReuseIdentifierKey">_NS:9</string>
 											<string key="NSOffsets">{0, 0}</string>
 											<object class="NSTextFieldCell" key="NSTitleCell">
@@ -344,7 +344,7 @@
 			</object>
 			<object class="NSCustomView" id="151539512">
 				<reference key="NSNextResponder"/>
-				<int key="NSvFlags">266</int>
+				<int key="NSvFlags">264</int>
 				<array class="NSMutableArray" key="NSSubviews">
 					<object class="NSColorWell" id="965074956">
 						<reference key="NSNextResponder" ref="151539512"/>
@@ -680,15 +680,15 @@
 				<string key="NSReuseIdentifierKey">_NS:9</string>
 				<string key="NSClassName">NSView</string>
 			</object>
-			<object class="NSCustomView" id="305598969">
+			<object class="NSCustomView" id="967477368">
 				<reference key="NSNextResponder"/>
-				<int key="NSvFlags">266</int>
+				<int key="NSvFlags">264</int>
 				<array class="NSMutableArray" key="NSSubviews">
 					<object class="NSMatrix" id="142460500">
-						<reference key="NSNextResponder" ref="305598969"/>
+						<reference key="NSNextResponder" ref="967477368"/>
 						<int key="NSvFlags">292</int>
 						<string key="NSFrame">{{0, 8}, {210, 35}}</string>
-						<reference key="NSSuperview" ref="305598969"/>
+						<reference key="NSSuperview" ref="967477368"/>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView"/>
 						<string key="NSReuseIdentifierKey">_NS:9</string>
@@ -899,7 +899,7 @@
 					<object class="IBOutletConnection" key="connection">
 						<string key="label">horizontalToolboxView</string>
 						<reference key="source" ref="512844837"/>
-						<reference key="destination" ref="305598969"/>
+						<reference key="destination" ref="967477368"/>
 					</object>
 					<int key="connectionID">100357</int>
 				</object>
@@ -1175,6 +1175,7 @@
 							<reference ref="751062417"/>
 						</array>
 						<reference key="parent" ref="151539512"/>
+						<string key="objectName">Reset Grid to Defaults Button</string>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">100296</int>
@@ -1263,6 +1264,7 @@
 						<int key="objectID">100326</int>
 						<reference key="object" ref="965074956"/>
 						<reference key="parent" ref="151539512"/>
+						<string key="objectName">Axis Color Well</string>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">100330</int>
@@ -1383,7 +1385,7 @@
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">100356</int>
-						<reference key="object" ref="305598969"/>
+						<reference key="object" ref="967477368"/>
 						<array class="NSMutableArray" key="children">
 							<reference ref="142460500"/>
 						</array>
@@ -1402,7 +1404,7 @@
 							<reference ref="329427267"/>
 							<reference ref="528685185"/>
 						</array>
-						<reference key="parent" ref="305598969"/>
+						<reference key="parent" ref="967477368"/>
 						<string key="objectName">Toolbox Matrix</string>
 					</object>
 					<object class="IBObjectRecord">
@@ -1623,45 +1625,6 @@
 				<object class="IBPartialClassDescription">
 					<string key="className">EXTDocumentWindowController</string>
 					<string key="superclassName">NSWindowController</string>
-					<dictionary class="NSMutableDictionary" key="actions">
-						<string key="addPage:">id</string>
-						<string key="applyMagnification:">id</string>
-						<string key="exportArtBoard:">id</string>
-						<string key="resetGridToDefaults:">id</string>
-						<string key="toggleInspector:">id</string>
-						<string key="zoomIn:">id</string>
-						<string key="zoomOut:">id</string>
-					</dictionary>
-					<dictionary class="NSMutableDictionary" key="actionInfosByName">
-						<object class="IBActionInfo" key="addPage:">
-							<string key="name">addPage:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="applyMagnification:">
-							<string key="name">applyMagnification:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="exportArtBoard:">
-							<string key="name">exportArtBoard:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="resetGridToDefaults:">
-							<string key="name">resetGridToDefaults:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="toggleInspector:">
-							<string key="name">toggleInspector:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="zoomIn:">
-							<string key="name">zoomIn:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="zoomOut:">
-							<string key="name">zoomOut:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-					</dictionary>
 					<dictionary class="NSMutableDictionary" key="outlets">
 						<string key="chartScrollView">EXTScrollView</string>
 						<string key="chartView">EXTChartView</string>
