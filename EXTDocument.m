@@ -84,4 +84,10 @@
     return YES;
 }
 
+#pragma mark - Document features
+
++ (BOOL)canConcurrentlyReadDocumentsOfType:(NSString *)typeName {
+    return YES;
+}
+
 @end
