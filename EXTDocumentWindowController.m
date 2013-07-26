@@ -45,7 +45,6 @@ typedef enum : NSInteger {
     @property(nonatomic, weak) IBOutlet NSPopUpButton *zoomPopUpButton;
     @property(nonatomic, weak) IBOutlet NSPopUpButton *pagesPopUpButton;
     @property(nonatomic, weak) IBOutlet NSButton *editArtBoardsButton;
-    @property(nonatomic, weak) IBOutlet NSMatrix *toolboxMatrix;
 
     @property(nonatomic, strong) NSView *sidebarView;
     @property(nonatomic, weak) IBOutlet NSView *gridInspectorView;
@@ -127,11 +126,6 @@ typedef enum : NSInteger {
         [_chartView scrollRectToVisible:visibleRect];
     }
 
-    // Controls view
-    {
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(controlsViewFrameDidChange:) name:NSViewFrameDidChangeNotification object:_controlsView];
-    }
-
     // Pages pop up button
     {
         NSMenu *pagesMenu = [[NSMenu alloc] initWithTitle:@""];
@@ -156,7 +150,6 @@ typedef enum : NSInteger {
     // Toolbox matrix
     {
         [_chartView setSelectedToolTag:_EXTSelectionToolTag];
-        [self _extCenterToolbox];
     }
 
 
@@ -223,8 +216,6 @@ typedef enum : NSInteger {
 - (void)windowWillClose:(NSNotification *)notification {
     [_chartView removeObserver:self forKeyPath:@"selectedPageIndex"];
     [_chartScrollView removeObserver:self forKeyPath:@"magnification"];
-
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:NSViewFrameDidChangeNotification object:_controlsView];
 }
 
 #pragma mark - Zoom
@@ -381,20 +372,6 @@ typedef enum : NSInteger {
     }
     else
         [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
-}
-
-#pragma mark - Notifications
-
-- (void)controlsViewFrameDidChange:(NSNotification *)notification {
-    [self _extCenterToolbox];
-}
-
-- (void)_extCenterToolbox {
-    const CGFloat toolboxWidth = [_toolboxMatrix frame].size.width;
-    const CGFloat controlsViewWidth = [_controlsView frame].size.width;
-    NSPoint toolboxOrigin = [_toolboxMatrix frame].origin;
-    toolboxOrigin.x = floor((controlsViewWidth - toolboxWidth) / 2);
-    [_toolboxMatrix setFrameOrigin:toolboxOrigin];
 }
 
 #pragma mark - Actions
