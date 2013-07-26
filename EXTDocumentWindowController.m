@@ -49,6 +49,7 @@ typedef enum : NSInteger {
 
     @property(nonatomic, strong) NSView *sidebarView;
     @property(nonatomic, weak) IBOutlet NSView *gridInspectorView;
+    @property(nonatomic, weak) IBOutlet NSView *horizontalToolboxView;
 
     @property(nonatomic, assign) NSUInteger maxPage;
 @end
@@ -162,6 +163,8 @@ typedef enum : NSInteger {
     // Sidebar & inspector views
     {
         _inspectorView = [[EXTDocumentInspectorView alloc] initWithFrame:NSZeroRect];
+
+        [_inspectorView addSubview:_horizontalToolboxView withTitle:@"Toolbox" collapsed:false];
 
         NSTextView *sampleTextView = [[NSTextView alloc] initWithFrame:(NSRect){.size = {200.0, 50.0}}];
         [sampleTextView setAutoresizingMask:NSViewWidthSizable];
