@@ -35,60 +35,50 @@
 #pragma mark - Lifecycle
 
 - (id)init {
-    // upcall.
     self = [super init];
-    
-    // if we succeeded...
     if (self) {
-        // allocate the display parts of things
-        
         _sseq = [EXTSpectralSequence new];
     }
-
     return self;
 }
 
 #pragma mark - Window controllers
 
-- (void)makeWindowControllers
-{
+- (void)makeWindowControllers {
     [self addWindowController:[EXTDocumentWindowController new]];
 }
 
-- (EXTDocumentWindowController *)windowController
-{
+- (EXTDocumentWindowController *)windowController {
     return (self.windowControllers.count == 1 ? self.windowControllers[0] : nil);
 }
 
 #pragma mark - Document saving and loading
 
-- (NSData *)dataOfType:(NSString *)typeName error:(NSError **)outError
-{    
+- (NSData *)dataOfType:(NSString *)typeName error:(NSError **)outError {
     NSMutableData* data = [NSMutableData data];
     NSKeyedArchiver* arch = [[NSKeyedArchiver alloc]
                              initForWritingWithMutableData:data];
-    
+
     // TODO: at the moment, i'm just writing the model out to disk.  however,
     // the routine is structured so that we can add other keys to the root
     // object for other document settings, like spacing and color and so forth.
     [arch encodeObject:_sseq forKey:@"sseq"];
     [arch encodeInteger:PRESENT_FILE_VERSION forKey:@"fileVersion"];
-    
+
     [arch finishEncoding];
-    
+
     return data;
 }
 
-- (BOOL)readFromData:(NSData *)data ofType:(NSString *)typeName error:(NSError **)outError
-{
+- (BOOL)readFromData:(NSData *)data ofType:(NSString *)typeName error:(NSError **)outError {
     NSKeyedUnarchiver *unarchiver = [[NSKeyedUnarchiver alloc] initForReadingWithData:data];
-    
+
     int version = [unarchiver decodeIntegerForKey:@"fileVersion"];
     if (version < MINIMUM_FILE_VERSION_ALLOWED) {
         *outError = [NSError errorWithDomain:@"edu.harvard.math.ext-chart" code:(-1) userInfo:[NSDictionary dictionaryWithObject:@"This version of Ext Chart is not backwards-compatible with this data file." forKey:NSLocalizedDescriptionKey]];
         return NO;
     }
-    
+
     self.sseq = [unarchiver decodeObjectForKey:@"sseq"];
 
     return YES;
