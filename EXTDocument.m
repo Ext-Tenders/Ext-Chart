@@ -48,12 +48,6 @@
     return self;
 }
 
-// if requested, we can initialize the terms array with some test garbage
--(EXTSpectralSequence*) runDemo {
-    // XXX: this should set the current page to 0, but bavarious changed sth...
-    return self.sseq = [EXTDemos workingDemo];
-}
-
 #pragma mark - Window controllers
 
 - (void)makeWindowControllers
