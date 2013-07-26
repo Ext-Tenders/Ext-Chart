@@ -72,7 +72,6 @@
 											<string key="NSFrame">{{931, 0}, {5, 26}}</string>
 											<reference key="NSSuperview" ref="828169455"/>
 											<reference key="NSWindow"/>
-											<reference key="NSNextKeyView"/>
 											<string key="NSReuseIdentifierKey">_NS:9</string>
 											<string key="NSOffsets">{0, 0}</string>
 											<object class="NSTextFieldCell" key="NSTitleCell">
@@ -110,7 +109,6 @@
 											<string key="NSFrame">{{75, 0}, {5, 24}}</string>
 											<reference key="NSSuperview" ref="828169455"/>
 											<reference key="NSWindow"/>
-											<reference key="NSNextKeyView"/>
 											<string key="NSReuseIdentifierKey">_NS:9</string>
 											<string key="NSOffsets">{0, 0}</string>
 											<object class="NSTextFieldCell" key="NSTitleCell">
@@ -194,7 +192,6 @@
 											<string key="NSFrame">{{937, 2}, {58, 22}}</string>
 											<reference key="NSSuperview" ref="828169455"/>
 											<reference key="NSWindow"/>
-											<reference key="NSNextKeyView"/>
 											<string key="NSReuseIdentifierKey">_NS:9</string>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSPopUpButtonCell" key="NSCell" id="766744535">
@@ -531,7 +528,6 @@
 						<string key="NSFrame">{{2, -1}, {143, 28}}</string>
 						<reference key="NSSuperview" ref="151539512"/>
 						<reference key="NSWindow"/>
-						<reference key="NSNextKeyView"/>
 						<string key="NSReuseIdentifierKey">_NS:9</string>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSButtonCell" key="NSCell" id="751062417">
@@ -690,7 +686,6 @@
 						<string key="NSFrame">{{0, 8}, {210, 35}}</string>
 						<reference key="NSSuperview" ref="967477368"/>
 						<reference key="NSWindow"/>
-						<reference key="NSNextKeyView"/>
 						<string key="NSReuseIdentifierKey">_NS:9</string>
 						<bool key="NSEnabled">YES</bool>
 						<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
@@ -738,7 +733,7 @@
 							<object class="NSButtonCell" id="390405794">
 								<int key="NSCellFlags">67108864</int>
 								<int key="NSCellFlags2">167903232</int>
-								<string key="NSContents">g</string>
+								<string key="NSContents"/>
 								<object class="NSFont" key="NSSupport" id="844028219">
 									<string key="NSName">Palatino-BoldItalic</string>
 									<double key="NSSize">16</double>
@@ -758,7 +753,7 @@
 							<object class="NSButtonCell" id="715734039">
 								<int key="NSCellFlags">67108864</int>
 								<int key="NSCellFlags2">167903232</int>
-								<string key="NSContents">d</string>
+								<string key="NSContents"/>
 								<reference key="NSSupport" ref="844028219"/>
 								<reference key="NSControlView" ref="142460500"/>
 								<int key="NSTag">4</int>
@@ -774,7 +769,7 @@
 							<object class="NSButtonCell" id="1012604055">
 								<int key="NSCellFlags">67108864</int>
 								<int key="NSCellFlags2">167903232</int>
-								<string key="NSContents">Multiplicative Structure</string>
+								<string key="NSContents"/>
 								<reference key="NSSupport" ref="844028219"/>
 								<reference key="NSControlView" ref="142460500"/>
 								<int key="NSTag">5</int>
@@ -1625,6 +1620,35 @@
 				<object class="IBPartialClassDescription">
 					<string key="className">EXTDocumentWindowController</string>
 					<string key="superclassName">NSWindowController</string>
+					<dictionary class="NSMutableDictionary" key="actions">
+						<string key="addPage:">id</string>
+						<string key="exportArtBoard:">id</string>
+						<string key="resetGridToDefaults:">id</string>
+						<string key="zoomIn:">id</string>
+						<string key="zoomOut:">id</string>
+					</dictionary>
+					<dictionary class="NSMutableDictionary" key="actionInfosByName">
+						<object class="IBActionInfo" key="addPage:">
+							<string key="name">addPage:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="exportArtBoard:">
+							<string key="name">exportArtBoard:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="resetGridToDefaults:">
+							<string key="name">resetGridToDefaults:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="zoomIn:">
+							<string key="name">zoomIn:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="zoomOut:">
+							<string key="name">zoomOut:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+					</dictionary>
 					<dictionary class="NSMutableDictionary" key="outlets">
 						<string key="chartScrollView">EXTScrollView</string>
 						<string key="chartView">EXTChartView</string>
