@@ -60,7 +60,7 @@
     return (self.windowControllers.count == 1 ? self.windowControllers[0] : nil);
 }
 
-#pragma mark - Document saving and loading / TODO: THESE ARE DISABLED ***
+#pragma mark - Document saving and loading
 
 - (NSData *)dataOfType:(NSString *)typeName error:(NSError **)outError
 {
