@@ -15,11 +15,14 @@
 @implementation EXTDemos
 
 +(EXTSpectralSequence*) workingDemo {
-    
     return [EXTMaySpectralSequence fillToWidth:6];
 }
 
 +(EXTSpectralSequence*) A1MSSDemo {
+    return [EXTMaySpectralSequence fillForAn:1 width:24];
+}
+
+/* +(EXTSpectralSequence*) A1MSSDemo {
     EXTPolynomialSSeq *sseq = [EXTPolynomialSSeq sSeqWithUnit:[EXTTriple class]];
     [sseq.zeroRanges addObject:[EXTZeroRangeStrict newWithSSeq:sseq]];
     
@@ -54,7 +57,7 @@
     [sseq propagateLeibniz:@[h10, h11, h20squared] page:2];
     
     return sseq;
-}
+} */
 
 +(EXTSpectralSequence*) ladderDemo {
     EXTSpectralSequence *ret = [EXTSpectralSequence new];
