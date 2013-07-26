@@ -22,6 +22,14 @@
 
 @synthesize tags;
 
+-(EXTPolynomialTag*) init {
+    if (self = [super init]) {
+        tags = [NSMutableDictionary dictionary];
+    }
+    
+    return self;
+}
+
 // sends the tag dictionary [[x, 1], [y, 2]] to the string "x^1 y^2"
 -(NSString*) description {
     NSString *ret = [NSMutableString string];
@@ -144,6 +152,17 @@
 
 -(EXTPolynomialSSeq*) initWithUnit:(Class<EXTLocation>)locClass {
     self = [super init];
+    
+    // TODO: it's weird to me to have this code in two adjacent places, but i
+    // can't think of a way around this that doesn't run into problems with
+    // polymorphism.  like, for instance, suppose that self is actually of class
+    // EXTMaySpectralSequence; it calls init on itself, which then calls init
+    // on super, which winds up here.  we can't call init on self to pull in the
+    // code from the routine above this one, since that will just cause a big
+    // loop back down to EXTMaySpectralSequence. i don't know. it's complicated.
+    names = [NSMutableArray array];
+    locations = [NSMutableArray array];
+    upperBounds = [NSMutableArray array];
     
     self.indexClass = locClass;
     

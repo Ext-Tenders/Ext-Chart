@@ -520,10 +520,13 @@
             [minimalVectors addObject:augmentedVectors[i]];
     }
     
+    if (minimalVectors.count == 0)
+        return [EXTMatrix matrixWidth:sourceDimension height:targetDimension];
+    
     // and so here's our basis matrix.
     EXTMatrix *basisMatrix =
-    [EXTMatrix matrixWidth:minimalVectors.count
-                    height:[minimalVectors[0] count]];
+        [EXTMatrix matrixWidth:minimalVectors.count
+                        height:[minimalVectors[0] count]];
     basisMatrix.presentation = minimalVectors;
     
     // now, we construct a matrix presenting the differential in this basis.

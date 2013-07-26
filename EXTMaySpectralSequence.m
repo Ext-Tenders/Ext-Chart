@@ -120,7 +120,7 @@
         // we completely roll over on the carries.
         do {
             // start by initializing the leftmost buckets
-            for (int i = 0; leftover > 0; ) {
+            for (int i = 0; leftover > 0; i++) {
                 int bucketSize = [[tag.tags objectForKey:tags[i]] intValue];
                 counters[i] = @(leftover < bucketSize ? leftover : bucketSize);
                 leftover -= bucketSize;
@@ -183,15 +183,17 @@
                     
                     // convert the target tag to an EXTLocation
                     EXTTriple *targetLoc = [EXTTriple identityLocation];
-                    for (EXTMayTag *tag in targetTag.tags) {
-                        int index = [self.names indexOfObject:tag];
-                        targetLoc = [EXTTriple addLocation:targetLoc to:[EXTTriple scale:self.locations[index] by:[[targetTag.tags objectForKey:tag] intValue]]];
+                    for (EXTMayTag *workingTag in targetTag.tags) {
+                        EXTTriple *hij = [EXTTriple tripleWithA:1 B:((1<<workingTag.j)*((1<<workingTag.i)-1)) C:workingTag.i];
+                        targetLoc = [EXTTriple addLocation:targetLoc to:[EXTTriple scale:hij by:[[targetTag.tags objectForKey:workingTag] intValue]]];
                     }
                     
                     // set up a new target matrix and target term
-                    endTerm = [self findTerm:targetLoc];
-                    ret = [EXTMatrix matrixWidth:startTerm.size height:endTerm.size];
-                    
+                    EXTTerm *tempTarget = [self findTerm:targetLoc];
+                    if (tempTarget) {
+                        endTerm = tempTarget;
+                        ret = [EXTMatrix matrixWidth:startTerm.size height:endTerm.size];
+                    }
                 }
                 
                 if (mayDegree == activeMayDegree) {
@@ -225,6 +227,8 @@
                     break;
                 }
             }
+            if (carryBuckets == counters.count)
+                leftover += 1;
         } while (leftover != order); // cartan loop
     } // term summand loop
     
@@ -267,8 +271,8 @@
     // C <-- A <-- I --> B --> D.
     for (EXTPartialDefinition *oldPartial in underlyingDiff.partialDefinitions) {
         EXTPartialDefinition *partial = [EXTPartialDefinition new];
-        partial.differential = [EXTMatrix newMultiply:startSquare by:partial.differential];
-        partial.inclusion = [EXTMatrix newMultiply:endSquare by:partial.inclusion];
+        partial.differential = [EXTMatrix newMultiply:endSquare by:oldPartial.differential];
+        partial.inclusion = [EXTMatrix newMultiply:startSquare by:oldPartial.inclusion];
         [diff.partialDefinitions addObject:partial];
         // TODO: it's not clear that the rest of the code requires the inclusion
         // map to be an inclusion.  if it does, we should insert something to
@@ -302,7 +306,7 @@
             
             // if we're outside the width limit *or* if we've hit the truncation
             // level, then it's time to move on to the next element.
-            if ((B - 1 > width) || (j > (1 << (n-i+2))))
+            if ((B - 1 > width) || (j >= (1 << (n-i+1))))
                 break;
             
             int limit = ((i == 1) && (j == 0)) ? width : width/(B-1);
@@ -380,7 +384,10 @@
     // propagate the d1 differentials with Leibniz's rule
     [self propagateLeibniz:self.locations page:1];
     
-    // TODO: use nakamura's lemma to get the higher differentials
+    // TODO: use nakamura's lemma to get the higher differentials.
+    // XXX: right now i'm going to hard-code something that works for A(1)...
+    [self calculateNakamura:1 location:[EXTTriple tripleWithA:1 B:3 C:2] page:1];
+    [self propagateLeibniz:@[[EXTTriple tripleWithA:2 B:6 C:4], [EXTTriple tripleWithA:1 B:1 C:1], [EXTTriple tripleWithA:1 B:2 C:1]] page:2];
     
     return;
 }
