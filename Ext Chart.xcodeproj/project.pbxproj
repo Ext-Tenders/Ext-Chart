@@ -24,9 +24,7 @@
 		317707E113D7893A003475A2 /* EXTChartView.m in Sources */ = {isa = PBXBuildFile; fileRef = 317707E013D7893A003475A2 /* EXTChartView.m */; };
 		3187BA2713DC6C6C00C26803 /* EXTScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3187BA2413DC6C6C00C26803 /* EXTScrollView.m */; };
 		318EC0691409385F005D21D4 /* to do list.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 318EC0681409385F005D21D4 /* to do list.rtf */; };
-		31C77B8D13E43E3100E9DBFC /* Preferences.xib in Resources */ = {isa = PBXBuildFile; fileRef = 31C77B8C13E43E3100E9DBFC /* Preferences.xib */; };
 		31C77BA813E63F6800E9DBFC /* EXTAppController.m in Sources */ = {isa = PBXBuildFile; fileRef = 31C77BA713E63F6800E9DBFC /* EXTAppController.m */; };
-		31C77BB613E647A000E9DBFC /* EXTsettingPanelController.m in Sources */ = {isa = PBXBuildFile; fileRef = 31C77BB513E647A000E9DBFC /* EXTsettingPanelController.m */; };
 		31D403BB13DA0476006A8C06 /* EXTTerm.m in Sources */ = {isa = PBXBuildFile; fileRef = 31D403BA13DA0476006A8C06 /* EXTTerm.m */; };
 		31D403C013DA04D8006A8C06 /* EXTDifferential.m in Sources */ = {isa = PBXBuildFile; fileRef = 31D403BF13DA04D8006A8C06 /* EXTDifferential.m */; };
 		31D5D2E513F6933B00F1B2F9 /* EXTArtBoard.m in Sources */ = {isa = PBXBuildFile; fileRef = 31D5D2E413F6933B00F1B2F9 /* EXTArtBoard.m */; };
@@ -87,11 +85,8 @@
 		3187BA2313DC6C6C00C26803 /* EXTScrollView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTScrollView.h; sourceTree = "<group>"; };
 		3187BA2413DC6C6C00C26803 /* EXTScrollView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTScrollView.m; sourceTree = "<group>"; };
 		318EC0681409385F005D21D4 /* to do list.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; path = "to do list.rtf"; sourceTree = "<group>"; };
-		31C77B8C13E43E3100E9DBFC /* Preferences.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = Preferences.xib; sourceTree = "<group>"; };
 		31C77BA613E63F6800E9DBFC /* EXTAppController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTAppController.h; sourceTree = "<group>"; };
 		31C77BA713E63F6800E9DBFC /* EXTAppController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTAppController.m; sourceTree = "<group>"; };
-		31C77BB413E647A000E9DBFC /* EXTsettingPanelController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTsettingPanelController.h; sourceTree = "<group>"; };
-		31C77BB513E647A000E9DBFC /* EXTsettingPanelController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTsettingPanelController.m; sourceTree = "<group>"; };
 		31D403B913DA0476006A8C06 /* EXTTerm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTTerm.h; sourceTree = "<group>"; };
 		31D403BA13DA0476006A8C06 /* EXTTerm.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTTerm.m; sourceTree = "<group>"; };
 		31D403BE13DA04D8006A8C06 /* EXTDifferential.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTDifferential.h; sourceTree = "<group>"; };
@@ -227,8 +222,6 @@
 				31C77BA713E63F6800E9DBFC /* EXTAppController.m */,
 				14EF1A6917584C080012DD3C /* EXTDocumentWindowController.h */,
 				14EF1A6A17584C080012DD3C /* EXTDocumentWindowController.m */,
-				31C77BB413E647A000E9DBFC /* EXTsettingPanelController.h */,
-				31C77BB513E647A000E9DBFC /* EXTsettingPanelController.m */,
 				14064DC717A0C3B100E202D5 /* EXTDocumentWindowController+EXTChartViewDelegate.h */,
 				14064DC817A0C3B100E202D5 /* EXTDocumentWindowController+EXTChartViewDelegate.m */,
 			);
@@ -265,7 +258,6 @@
 			children = (
 				1DDD58280DA1D0D100B32029 /* EXTDocument.xib */,
 				1DDD582A0DA1D0D100B32029 /* MainMenu.xib */,
-				31C77B8C13E43E3100E9DBFC /* Preferences.xib */,
 			);
 			name = XIBs;
 			sourceTree = "<group>";
@@ -394,7 +386,6 @@
 				8D15AC2F0486D014006FF6A4 /* InfoPlist.strings in Resources */,
 				1DDD582C0DA1D0D100B32029 /* EXTDocument.xib in Resources */,
 				1DDD582D0DA1D0D100B32029 /* MainMenu.xib in Resources */,
-				31C77B8D13E43E3100E9DBFC /* Preferences.xib in Resources */,
 				318EC0691409385F005D21D4 /* to do list.rtf in Resources */,
 				38DDAA7B16EDA8990001841D /* README.md in Resources */,
 				38A1AB6E1727009C00F9F9D5 /* todo.md in Resources */,
@@ -425,7 +416,6 @@
 				3187BA2713DC6C6C00C26803 /* EXTScrollView.m in Sources */,
 				093AEADD13E10759003E9F58 /* EXTPair.m in Sources */,
 				31C77BA813E63F6800E9DBFC /* EXTAppController.m in Sources */,
-				31C77BB613E647A000E9DBFC /* EXTsettingPanelController.m in Sources */,
 				31D5D2E513F6933B00F1B2F9 /* EXTArtBoard.m in Sources */,
 				3896548D16F538D90008FB8D /* EXTMatrix.m in Sources */,
 				389FB38D17498AF500D0FE75 /* EXTMultiplicationTables.m in Sources */,

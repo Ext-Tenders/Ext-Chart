@@ -9,5 +9,4 @@
 #import <Cocoa/Cocoa.h>
 
 @interface EXTAppController : NSObject <NSApplicationDelegate>
-    - (IBAction)showSettingsPanel:(id)sender;
 @end

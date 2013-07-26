@@ -7,7 +7,6 @@
 //
 
 #import "EXTAppController.h"
-#import "EXTsettingPanelController.h"
 #import "EXTDemos.h"
 #import "EXTDocument.h"
 #import "EXTMaySpectralSequence.h"
@@ -23,19 +22,10 @@ typedef enum : NSInteger {
 
 
 @interface EXTAppController ()
-    @property(nonatomic, strong) EXTsettingPanelController *panelController;
 @end
 
 
 @implementation EXTAppController
-
-- (IBAction)showSettingsPanel:(id)sender{
-	if (! self.panelController) {
-		self.panelController = [EXTsettingPanelController new];
-	}
-
-    [self.panelController showWindow:self];
-}
 
 - (IBAction)newExampleDocument:(id)sender
 {

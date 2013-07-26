@@ -447,11 +447,6 @@ typedef enum : NSInteger {
     [[_chartView grid] resetToDefaults];
 }
 
-- (IBAction)demoGroups:(id)sender {
-    [[self document] runDemo];
-    [[self chartView] setSelectedPageIndex:0];
-}
-
 #pragma mark - NSUserInterfaceValidations
 
 - (BOOL)validateUserInterfaceItem:(id<NSValidatedUserInterfaceItem>)item {
