@@ -63,11 +63,7 @@
 #pragma mark - Document saving and loading
 
 - (NSData *)dataOfType:(NSString *)typeName error:(NSError **)outError
-{
-    if ( outError != NULL ) {
-		*outError = [NSError errorWithDomain:NSOSStatusErrorDomain code:unimpErr userInfo:NULL];
-	}
-    
+{    
     NSMutableData* data = [NSMutableData data];
     NSKeyedArchiver* arch = [[NSKeyedArchiver alloc]
                              initForWritingWithMutableData:data];
@@ -85,10 +81,6 @@
 
 - (BOOL)readFromData:(NSData *)data ofType:(NSString *)typeName error:(NSError **)outError
 {
-	if ( outError != NULL ) {
-		*outError = [NSError errorWithDomain:NSOSStatusErrorDomain code:unimpErr userInfo:NULL];
-	}
-    
     NSKeyedUnarchiver *unarchiver = [[NSKeyedUnarchiver alloc] initForReadingWithData:data];
     
     int version = [unarchiver decodeIntegerForKey:@"fileVersion"];
