@@ -20,7 +20,6 @@
 #pragma mark - Private variables
 
 static void *_EXTScrollViewMagnificationContext = &_EXTScrollViewMagnificationContext;
-static void *_EXTSelectedPageIndexContext = &_EXTSelectedPageIndexContext;
 static CGFloat const _EXTDefaultMagnificationSteps[] = {0.1, 0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 2.0, 4.0, 8.0, 16.0, 32.0};
 static size_t const _EXTDefaultMagnificationStepsCount = sizeof(_EXTDefaultMagnificationSteps) / sizeof(_EXTDefaultMagnificationSteps[0]);
 static CGFloat _EXTMagnificationStepRoundingMultiplier = 100.0;
@@ -43,14 +42,11 @@ typedef enum : NSInteger {
     @property(nonatomic, weak) IBOutlet EXTScrollView *chartScrollView;
     @property(nonatomic, weak) IBOutlet NSView *controlsView;
     @property(nonatomic, weak) IBOutlet NSPopUpButton *zoomPopUpButton;
-    @property(nonatomic, weak) IBOutlet NSPopUpButton *pagesPopUpButton;
     @property(nonatomic, weak) IBOutlet NSButton *editArtBoardsButton;
 
     @property(nonatomic, strong) NSView *sidebarView;
     @property(nonatomic, weak) IBOutlet NSView *gridInspectorView;
     @property(nonatomic, weak) IBOutlet NSView *horizontalToolboxView;
-
-    @property(nonatomic, assign) NSUInteger maxPage;
 @end
 
 
@@ -99,7 +95,6 @@ typedef enum : NSInteger {
     {
         [_chartView setDelegate:self];
         [_chartView bind:EXTChartViewSseqBindingName toObject:[self document] withKeyPath:@"sseq" options:nil];
-        [_chartView addObserver:self forKeyPath:@"selectedPageIndex" options:0 context:_EXTSelectedPageIndexContext];
     }
 
     // Chart scroll view
@@ -124,27 +119,6 @@ typedef enum : NSInteger {
         const NSRect visibleRect = NSInsetRect([[_chartView artBoard] frame], -20.0, -20.0);
         [_chartScrollView magnifyToFitRect:visibleRect];
         [_chartView scrollRectToVisible:visibleRect];
-    }
-
-    // Pages pop up button
-    {
-        NSMenu *pagesMenu = [[NSMenu alloc] initWithTitle:@""];
-
-        // TODO: this is not quite right. I’m setting an arbitrary number of pages, but this actually depends on the current document
-        [self setMaxPage:10];
-        for (NSInteger page = 0; page < _maxPage; page++) {
-            NSString *title = [NSString stringWithFormat:@"Page %ld", page];
-            NSMenuItem *menuItem = [[NSMenuItem alloc] initWithTitle:title action:@selector(selectPage:) keyEquivalent:@""];
-            [menuItem setRepresentedObject:@(page)];
-            [pagesMenu addItem:menuItem];
-        }
-        
-        [pagesMenu addItem:[NSMenuItem separatorItem]];
-        
-        NSMenuItem *menuItem = [[NSMenuItem alloc] initWithTitle:@"Add Page" action:@selector(addPage:) keyEquivalent:@""];
-        [pagesMenu addItem:menuItem];
-
-        [_pagesPopUpButton setMenu:pagesMenu];
     }
 
     // Toolbox matrix
@@ -214,7 +188,6 @@ typedef enum : NSInteger {
 }
 
 - (void)windowWillClose:(NSNotification *)notification {
-    [_chartView removeObserver:self forKeyPath:@"selectedPageIndex"];
     [_chartScrollView removeObserver:self forKeyPath:@"magnification"];
 }
 
@@ -290,27 +263,6 @@ typedef enum : NSInteger {
         [menu removeItemAtIndex:indexToRemove];
 }
 
-#pragma mark - Pages
-
-- (void)selectPage:(id)sender {
-    NSAssert([sender respondsToSelector:@selector(representedObject)], @"Sender must respond to -representedObject");
-    const NSUInteger targetPage = [[sender representedObject] unsignedIntegerValue];
-
-    if (targetPage <= _maxPage)
-        [_chartView setSelectedPageIndex:targetPage];
-}
-
-- (IBAction)addPage:(id)sender {
-    [self setMaxPage:[self maxPage] + 1];
-
-    NSString *title = [NSString stringWithFormat:@"Page %lu", _maxPage];
-    NSMenuItem *menuItem = [[NSMenuItem alloc] initWithTitle:title action:@selector(selectPage:) keyEquivalent:@""];
-    [menuItem setRepresentedObject:@(_maxPage)];
-    [[_pagesPopUpButton menu] insertItem:menuItem atIndex:_maxPage];
-    [_pagesPopUpButton selectItemAtIndex:_maxPage];
-    [[_pagesPopUpButton menu] performActionForItemAtIndex:_maxPage];
-}
-
 #pragma mark - Properties
 
 - (void)setDocument:(NSDocument *)document {
@@ -335,9 +287,7 @@ typedef enum : NSInteger {
 #pragma mark - Key-value observing
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
-    if (context == _EXTSelectedPageIndexContext)
-        [_pagesPopUpButton selectItemAtIndex:[_chartView selectedPageIndex]];
-    else if (context == _EXTScrollViewMagnificationContext) {
+    if (context == _EXTScrollViewMagnificationContext) {
         const long roundedMagnification = lround([_chartScrollView magnification] * _EXTMagnificationStepRoundingMultiplier);
         NSUInteger stepIndex = NSNotFound;
         int i;
