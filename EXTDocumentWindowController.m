@@ -79,6 +79,7 @@ typedef enum : NSInteger {
         [zoomMenu addItem:[NSMenuItem separatorItem]];
 
         NSMenuItem *menuItem = [[NSMenuItem alloc] initWithTitle:@"Zoom to Fit" action:@selector(zoomToFit:) keyEquivalent:@""];
+        [menuItem setTarget:_chartView];
         [menuItem setTag:_EXTZoomToFitTag];
         [zoomMenu addItem:menuItem];
         
