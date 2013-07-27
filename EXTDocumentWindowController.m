@@ -42,7 +42,6 @@ typedef enum : NSInteger {
     @property(nonatomic, weak) IBOutlet EXTScrollView *chartScrollView;
     @property(nonatomic, weak) IBOutlet NSView *controlsView;
     @property(nonatomic, weak) IBOutlet NSPopUpButton *zoomPopUpButton;
-    @property(nonatomic, weak) IBOutlet NSButton *editArtBoardsButton;
 
     @property(nonatomic, strong) NSView *sidebarView;
     @property(nonatomic, weak) IBOutlet NSView *gridInspectorView;
@@ -65,11 +64,6 @@ typedef enum : NSInteger {
 - (void)windowDidLoad {
     [super windowDidLoad];
     [[self window] setDelegate:self];
-
-    // Edit art boards pop up button
-    {
-        [[_editArtBoardsButton cell] setHighlightsBy:NSChangeBackgroundCellMask];
-    }
 
     // Zoom levels pop up button
     {

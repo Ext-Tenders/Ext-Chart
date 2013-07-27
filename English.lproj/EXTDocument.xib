@@ -73,7 +73,6 @@
 											<string key="NSFrame">{{937, 2}, {58, 22}}</string>
 											<reference key="NSSuperview" ref="828169455"/>
 											<reference key="NSWindow"/>
-											<reference key="NSNextKeyView"/>
 											<string key="NSReuseIdentifierKey">_NS:9</string>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSPopUpButtonCell" key="NSCell" id="766744535">
@@ -545,7 +544,6 @@
 						<string key="NSFrame">{{2, -1}, {143, 28}}</string>
 						<reference key="NSSuperview" ref="151539512"/>
 						<reference key="NSWindow"/>
-						<reference key="NSNextKeyView"/>
 						<string key="NSReuseIdentifierKey">_NS:9</string>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSButtonCell" key="NSCell" id="751062417">
@@ -704,7 +702,6 @@
 						<string key="NSFrame">{{0, 8}, {210, 35}}</string>
 						<reference key="NSSuperview" ref="967477368"/>
 						<reference key="NSWindow"/>
-						<reference key="NSNextKeyView"/>
 						<string key="NSReuseIdentifierKey">_NS:9</string>
 						<bool key="NSEnabled">YES</bool>
 						<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
@@ -1748,7 +1745,6 @@
 						<string key="chartScrollView">EXTScrollView</string>
 						<string key="chartView">EXTChartView</string>
 						<string key="controlsView">NSView</string>
-						<string key="editArtBoardsButton">NSButton</string>
 						<string key="gridInspectorView">NSView</string>
 						<string key="horizontalToolboxView">NSView</string>
 						<string key="mainView">NSView</string>
@@ -1766,10 +1762,6 @@
 						<object class="IBToOneOutletInfo" key="controlsView">
 							<string key="name">controlsView</string>
 							<string key="candidateClassName">NSView</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="editArtBoardsButton">
-							<string key="name">editArtBoardsButton</string>
-							<string key="candidateClassName">NSButton</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="gridInspectorView">
 							<string key="name">gridInspectorView</string>
