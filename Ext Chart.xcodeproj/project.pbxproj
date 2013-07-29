@@ -136,6 +136,7 @@
 		1058C7A6FEA54F5311CA2CBB /* Linked Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				1467B271178D13A80084A2F6 /* QuartzCore.framework */,
 				1058C7A7FEA54F5311CA2CBB /* Cocoa.framework */,
 			);
 			name = "Linked Frameworks";
@@ -273,7 +274,6 @@
 		2A37F4AAFDCFA73011CA2CEA /* Ext Chart */ = {
 			isa = PBXGroup;
 			children = (
-				1467B271178D13A80084A2F6 /* QuartzCore.framework */,
 				2A37F4ABFDCFA73011CA2CEA /* Classes */,
 				2A37F4AFFDCFA73011CA2CEA /* Other Sources */,
 				2A37F4B8FDCFA73011CA2CEA /* Resources */,
