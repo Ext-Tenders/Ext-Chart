@@ -71,6 +71,9 @@
 +(EXTMatrix*) assemblePresentation:(NSMutableArray*)partialDefinitions
                    sourceDimension:(int)sourceDimension
                    targetDimension:(int)targetDimension;
++(NSArray*) assemblePresentationAndOptimize:(NSMutableArray*)partialDefinitions
+                            sourceDimension:(int)sourceDimension
+                            targetDimension:(int)targetDimension;
 
 // debug operations
 -(void) log;

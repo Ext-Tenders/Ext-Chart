@@ -420,10 +420,20 @@
 +(EXTMatrix*) assemblePresentation:(NSMutableArray*)partialDefinitions
                    sourceDimension:(int)sourceDimension
                    targetDimension:(int)targetDimension {
+    NSArray *pair = [EXTMatrix assemblePresentationAndOptimize:partialDefinitions sourceDimension:sourceDimension targetDimension:targetDimension];
     
+    return pair[0];
+}
+
+// returns a pair (EXTMatrix* presentation, NSMutableArray* partialDefinitions),
+// where the right-hand term contains a minimal list of necessary partial def'ns
+// used the generate this presentation.  good for paring these down.
++(NSArray*) assemblePresentationAndOptimize:(NSMutableArray*)partialDefinitions
+                            sourceDimension:(int)sourceDimension
+                            targetDimension:(int)targetDimension {
     // first, make sure we're not going to bomb.
     if (partialDefinitions.count == 0)
-        return [EXTMatrix matrixWidth:sourceDimension height:targetDimension];
+        return @[[EXTMatrix matrixWidth:sourceDimension height:targetDimension],[NSMutableArray array]];
     
     // we first need to assemble all the inclusion image vectors into one
     // massive array.
@@ -521,7 +531,8 @@
     }
     
     if (minimalVectors.count == 0)
-        return [EXTMatrix matrixWidth:sourceDimension height:targetDimension];
+        return @[[EXTMatrix matrixWidth:sourceDimension height:targetDimension],
+                 [NSMutableArray array]];
     
     // and so here's our basis matrix.
     EXTMatrix *basisMatrix =
@@ -559,10 +570,17 @@
     // and multiply. :)
     EXTMatrix *basisConversion = [basisMatrix invert];
     EXTMatrix *stdDifferential =
-    [EXTMatrix newMultiply:differentialInCoordinates by:basisConversion];
+        [EXTMatrix newMultiply:differentialInCoordinates by:basisConversion];
+    
+    // there is one last orthogonal task: returning a list of minimal def'ns
+    NSMutableArray *minimalDefinitions = [NSMutableArray array];
+    for (int index = 0; index < partialDefinitions.count; index++)
+        if (([minimalParents indexOfObject:@(index)] != -1) &&
+            ([minimalDefinitions indexOfObject:partialDefinitions[index]] != -1))
+            [minimalDefinitions addObject:partialDefinitions[index]];
     
     // finally, all our hard work done, we jump back.
-    return stdDifferential;
+    return @[stdDifferential, minimalDefinitions];
 }
 
 // returns a scaled matrix
