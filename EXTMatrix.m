@@ -487,7 +487,7 @@
     // E_1 term.  start by augmenting to a matrix containing a definite surplus
     // of basis vectors.
     NSMutableArray *augmentedVectors =
-    [NSMutableArray arrayWithArray:minimalVectors];
+                                [NSMutableArray arrayWithArray:minimalVectors];
     for (int i = 0; i < sourceDimension; i++) {
         NSMutableArray *en = [NSMutableArray array];
         for (int j = 0; j < sourceDimension; j++) {
@@ -503,17 +503,17 @@
     
     // then, column reduce it.  the vectors that survive will be our full basis.
     EXTMatrix *augmentedMat =
-    [EXTMatrix matrixWidth:augmentedVectors.count height:sourceDimension];
+        [EXTMatrix matrixWidth:augmentedVectors.count height:sourceDimension];
     augmentedMat.presentation = augmentedVectors;
     EXTMatrix *reducedMat = [augmentedMat columnReduce];
     NSMutableArray *reducedVectors = reducedMat.presentation;
     
     // having reduced it, we pull out the basis vectors we needed for extension
     for (int i = minimalVectors.count; i < reducedVectors.count; i++) {
-        bool needThisOne = true;
+        bool needThisOne = false;
         for (int j = 0; j < [reducedVectors[i] count]; j++) {
-            if ([reducedVectors[i] objectAtIndex:j] != 0)
-                needThisOne = false;
+            if (![[reducedVectors[i] objectAtIndex:j] isEqual:@0])
+                needThisOne = true;
         }
         
         if (needThisOne)
