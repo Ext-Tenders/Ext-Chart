@@ -16,8 +16,7 @@
 #import "EXTSpectralSequence.h"
 
 
-// TODO: check whether this variable is necessary
-//static NSColor *highlightRectColor = nil;
+static NSColor *_EXTDefaultHighlightColor = nil;
 
 
 #pragma mark - Exported variables
@@ -51,7 +50,6 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
 
 @interface EXTChartView () {
     NSRect _highlightRect;
-	NSColor *_highlightRectColor;  // if this is not customizable, it should be a constant.   I couldn't make it work as a static or extern...
 	NSTrackingArea *_trackingArea;
 	NSBezierPath *_hightlightPath;
 }
@@ -70,6 +68,8 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
     if (self == [EXTChartView class]) {
         [self exposeBinding:EXTChartViewSseqBindingName];
         [self exposeBinding:EXTChartViewSelectedPageIndexBindingName];
+
+        _EXTDefaultHighlightColor = [NSColor colorWithCalibratedRed:0.0 green:1.0 blue:1.0 alpha:1.0];
     }
 }
 
@@ -109,14 +109,9 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
 		// we initialize the highlight rect to something stupid.   It will change before it is drawn.
 		
 		_highlighting = true;
-		
+		_highlightColor = _EXTDefaultHighlightColor;
 		_highlightRect = NSZeroRect;
 		[self setHighlightPath:[NSBezierPath bezierPathWithRect:NSZeroRect]];
-		
-// we will make highlightRectColor a user preference.  It should not be document specific.
-
-//		highlightRectColor = [NSColor colorWithCalibratedRed:102.0/255 green:255.0/255 blue:204.0/255 alpha:1];
-		_highlightRectColor = [NSColor colorWithCalibratedRed:0 green:1.0 blue:1.0 alpha:1];
     }
 
 	return self;
@@ -182,7 +177,7 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
 	
 	if (_highlighting) {
 		[_highlightPath setLineWidth:.5];
-		[_highlightRectColor setStroke];
+		[_highlightColor setStroke];
 		[_highlightPath stroke];
 	}
 	

@@ -33,6 +33,7 @@ typedef enum : NSInteger {
 @property(nonatomic, assign) bool showGrid;
 @property(nonatomic, strong) EXTArtBoard *artBoard;
 @property(nonatomic, readonly) EXTGrid *grid;
+@property(nonatomic, strong) NSColor *highlightColor;
 
 @property(nonatomic, strong) EXTSpectralSequence *sseq;
 @property(nonatomic, weak) id<EXTChartViewDelegate> delegate;
