@@ -75,7 +75,11 @@
 
     int version = [unarchiver decodeIntegerForKey:@"fileVersion"];
     if (version < MINIMUM_FILE_VERSION_ALLOWED) {
-        *outError = [NSError errorWithDomain:@"edu.harvard.math.ext-chart" code:(-1) userInfo:[NSDictionary dictionaryWithObject:@"This version of Ext Chart is not backwards-compatible with this data file." forKey:NSLocalizedDescriptionKey]];
+        if (outError) {
+            *outError = [NSError errorWithDomain:@"edu.harvard.math.ext-chart"
+                                            code:(-1)
+                                        userInfo:@{NSLocalizedDescriptionKey : @"This version of Ext Chart is not backwards-compatible with this data file."}];
+        }
         return NO;
     }
 
