@@ -49,6 +49,12 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
 }
 
 
+@interface EXTChartView ()
+    @property(nonatomic, assign) bool highlighting;
+    @property(nonatomic, strong) NSBezierPath *highlightPath;
+@end
+
+
 @implementation EXTChartView
 
 @synthesize highlightPath;

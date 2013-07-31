@@ -40,12 +40,10 @@ typedef enum : NSInteger {
 
 
 @property(nonatomic, assign) bool showGrid;
-@property(nonatomic, assign) bool highlighting;
 @property(strong) EXTArtBoard *artBoard;
 @property(nonatomic, readonly) EXTGrid *grid;
-@property(strong) NSBezierPath *highlightPath;
 
-@property(nonatomic, strong) EXTSpectralSequence *sseq; // TODO: this should evolve to a copy property in order to avoid side effects
+@property(nonatomic, strong) EXTSpectralSequence *sseq;
 @property(nonatomic, weak) id<EXTChartViewDelegate> delegate;
 @property(nonatomic, assign) NSUInteger selectedPageIndex;
 @property(nonatomic, assign) EXTToolboxTag selectedToolTag;
