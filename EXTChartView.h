@@ -28,16 +28,7 @@ typedef enum : NSInteger {
 @end
 
 
-@interface EXTChartView : NSView <NSUserInterfaceValidations> {
-	NSRect highlightRect;    // make this private?
-	NSColor *highlightRectColor;  // if this is not customizable, it should be a constant.   I couldn't make it work as a static or extern...
-		
-	NSTrackingArea *trackingArea;
-	
-	NSBezierPath *hightlightPath;
-}
-
-
+@interface EXTChartView : NSView <NSUserInterfaceValidations>
 
 @property(nonatomic, assign) bool showGrid;
 @property(strong) EXTArtBoard *artBoard;
