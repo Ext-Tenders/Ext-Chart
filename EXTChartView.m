@@ -268,9 +268,15 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
     if (selectedToolTag != _selectedToolTag) {
         [[self window] invalidateCursorRectsForView:self];
         [self setHighlighting:selectedToolTag != _EXTArtboardToolTag];
-        [self setNeedsDisplayInRect:NSInsetRect([_highlightPath bounds], -1.0, -1.0)];
 
         _selectedToolTag = selectedToolTag;
+    }
+}
+
+- (void)setHighlighting:(bool)highlighting {
+    if (highlighting != _highlighting) {
+        _highlighting = highlighting;
+        [self setNeedsDisplayInRect:NSInsetRect([_highlightPath bounds], -1.0, -1.0)];
     }
 }
 
