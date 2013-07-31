@@ -51,7 +51,6 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
 
 @implementation EXTChartView
 
-@synthesize editMode;
 @synthesize highlighting;
 @synthesize highlightPath;
 
@@ -70,7 +69,6 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
     if (self) {
 		[self translateOriginToPoint:NSMakePoint(NSMidX(frame), NSMidY(frame))];
 		_showGrid = true;
-		editMode = NO;
 
         _artBoard = [EXTArtBoard new];
         // since the frame extends past the bounds rectangle, we need observe the drawingRect in order to know what to refresh when the artBoard changes

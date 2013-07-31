@@ -29,7 +29,6 @@ typedef enum : NSInteger {
 
 
 @interface EXTChartView : NSView <NSUserInterfaceValidations> {
-	BOOL editMode;
 	BOOL highlighting;
 
 	NSRect highlightRect;    // make this private?
@@ -43,7 +42,7 @@ typedef enum : NSInteger {
 
 
 @property(nonatomic, assign) bool showGrid;
-@property(nonatomic, assign) BOOL editMode, highlighting;
+@property(nonatomic, assign) BOOL highlighting;
 @property(strong) EXTArtBoard *artBoard;
 @property(nonatomic, readonly) EXTGrid *grid;
 @property(strong) NSBezierPath *highlightPath;
