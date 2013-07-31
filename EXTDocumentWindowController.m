@@ -127,16 +127,7 @@ typedef enum : NSInteger {
         _inspectorView = [[EXTDocumentInspectorView alloc] initWithFrame:NSZeroRect];
 
         [_inspectorView addSubview:_horizontalToolboxView withTitle:@"Toolbox" collapsed:false centered:true];
-
-        NSTextView *sampleTextView = [[NSTextView alloc] initWithFrame:(NSRect){.size = {200.0, 50.0}}];
-        [sampleTextView setAutoresizingMask:NSViewWidthSizable];
-        [_inspectorView addSubview:sampleTextView withTitle:@"Text" collapsed:true centered:true];
-
         [_inspectorView addSubview:_gridInspectorView withTitle:@"Grid" collapsed:false centered:false];
-
-        sampleTextView = [[NSTextView alloc] initWithFrame:(NSRect){.size = {250.0, 800.0}}];
-        [sampleTextView setAutoresizingMask:NSViewWidthSizable];
-        [_inspectorView addSubview:sampleTextView withTitle:@"More text" collapsed:true centered:true];
 
         NSRect contentFrame = [[[self window] contentView] frame];
         NSSize scrollViewSize = [NSScrollView contentSizeForFrameSize:[_inspectorView frame].size hasHorizontalScroller:NO hasVerticalScroller:YES borderType:NSNoBorder];
