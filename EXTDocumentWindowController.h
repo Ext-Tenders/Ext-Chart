@@ -9,6 +9,8 @@
 #import <Cocoa/Cocoa.h>
 #import "EXTChartView.h"
 
+@class EXTDocument;
+
 @interface EXTDocumentWindowController : NSWindowController
     @property(nonatomic, readonly) EXTDocument *extDocument;
 @end

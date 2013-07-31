@@ -20,7 +20,7 @@ typedef enum : NSInteger {
 } EXTToolboxTag;
 
 
-@class EXTScrollView, EXTArtBoard, EXTGrid, EXTDocument, EXTToolPaletteController, EXTTerm, EXTDifferential, EXTSpectralSequence;
+@class EXTArtBoard, EXTGrid, EXTSpectralSequence;
 
 
 @protocol EXTChartViewDelegate <NSObject>
