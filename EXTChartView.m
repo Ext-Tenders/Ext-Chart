@@ -77,41 +77,52 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
     self = [super initWithFrame:frame];
     if (self) {
 		[self translateOriginToPoint:NSMakePoint(NSMidX(frame), NSMidY(frame))];
-		_showGrid = true;
 
-        _artBoard = [EXTArtBoard new];
-        // since the frame extends past the bounds rectangle, we need observe the drawingRect in order to know what to refresh when the artBoard changes
-        [_artBoard addObserver:self forKeyPath:@"drawingRect" options:NSKeyValueObservingOptionOld context:_EXTChartViewArtBoardDrawingRectContext];
+        // Grid
+        {
+            _showGrid = true;
 
-		_grid = [EXTGrid new];
-        [_grid setBoundsRect:[self bounds]];
-        [_grid addObserver:self forKeyPath:EXTGridAnyKey options:0 context:_EXTChartViewGridAnyKeyContext];
+            _grid = [EXTGrid new];
+            [_grid setBoundsRect:[self bounds]];
+            [_grid addObserver:self forKeyPath:EXTGridAnyKey options:0 context:_EXTChartViewGridAnyKeyContext];
+        }
+
+        // Art board
+        {
+            _artBoard = [EXTArtBoard new];
+
+            // Since the frame extends past the bounds rectangle, we need observe the drawingRect in order to know what to refresh when the artBoard changes
+            [_artBoard addObserver:self forKeyPath:@"drawingRect" options:NSKeyValueObservingOptionOld context:_EXTChartViewArtBoardDrawingRectContext];
+
+            // Align the art board to the grid
+            NSRect artBoardFrame = [_artBoard frame];
+            artBoardFrame.origin = [_grid nearestGridPoint:artBoardFrame.origin];
+            const NSPoint originOppositePoint = [_grid nearestGridPoint:(NSPoint){NSMaxX(artBoardFrame), NSMaxY(artBoardFrame)}];
+            artBoardFrame.size.width = originOppositePoint.x - NSMinX(artBoardFrame);
+            artBoardFrame.size.height = originOppositePoint.y - NSMinY(artBoardFrame);
+            [_artBoard setFrame:artBoardFrame];
+        }
 
 
-        // Align the art board to the grid
-        NSRect artBoardFrame = [_artBoard frame];
-        artBoardFrame.origin = [_grid nearestGridPoint:artBoardFrame.origin];
-        const NSPoint originOppositePoint = [_grid nearestGridPoint:(NSPoint){NSMaxX(artBoardFrame), NSMaxY(artBoardFrame)}];
-        artBoardFrame.size.width = originOppositePoint.x - NSMinX(artBoardFrame);
-        artBoardFrame.size.height = originOppositePoint.y - NSMinY(artBoardFrame);
-        [_artBoard setFrame:artBoardFrame];
-
-
-		// the tracking area should be set to the dataRect, which is still not implemented.
+        // Mouse tracking
+		{
+            // The tracking area should be set to the dataRect, which is still not implemented.
+            NSRect dataRect = NSMakeRect(0, 0, 432, 432);
 		
-		NSRect dataRect = NSMakeRect(0, 0, 432, 432);
+            _trackingArea = [[NSTrackingArea alloc] initWithRect:dataRect
+                                                         options: (NSTrackingMouseEnteredAndExited | NSTrackingMouseMoved | NSTrackingActiveInKeyWindow )
+                                                           owner:self
+                                                        userInfo:nil];
+            [self addTrackingArea:_trackingArea];
+        }
 		
-		_trackingArea = [[NSTrackingArea alloc] initWithRect:dataRect
-													options: (NSTrackingMouseEnteredAndExited | NSTrackingMouseMoved | NSTrackingActiveInKeyWindow )
-													  owner:self userInfo:nil];
-        [self addTrackingArea:_trackingArea];
-		
-		// we initialize the highlight rect to something stupid.   It will change before it is drawn.
-		
-		_highlighting = true;
-		_highlightColor = _EXTDefaultHighlightColor;
-		_highlightRect = NSZeroRect;
-		[self setHighlightPath:[NSBezierPath bezierPathWithRect:NSZeroRect]];
+        // Highlighting
+		{
+            _highlighting = true;
+            _highlightColor = _EXTDefaultHighlightColor;
+            _highlightRect = NSZeroRect; // we initialize the highlight rect to something stupid.   It will change before it is drawn.
+            [self setHighlightPath:[NSBezierPath bezierPathWithRect:_highlightRect]];
+        }
     }
 
 	return self;
