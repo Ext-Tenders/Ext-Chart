@@ -254,6 +254,16 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
     [self setNeedsDisplay:YES];
 }
 
+#pragma mark - Properties
+
+- (void)setSseq:(EXTSpectralSequence *)sseq
+{
+    if (sseq != _sseq) {
+        _sseq = sseq;
+        [self displaySelectedPage];
+    }
+}
+
 - (void)setSelectedPageIndex:(NSUInteger)selectedPageIndex
 {
     // TODO: should check whether the argument lies in {min, max} page indices
@@ -266,16 +276,6 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
 - (void)setShowGrid:(bool)showGrid {
 	_showGrid = showGrid;
 	[self setNeedsDisplay:YES];
-}
-
-#pragma mark - Properties
-
-- (void)setSseq:(EXTSpectralSequence *)sseq
-{
-    if (sseq != _sseq) {
-        _sseq = sseq;
-        [self displaySelectedPage];
-    }
 }
 
 - (void)setSelectedToolTag:(EXTToolboxTag)selectedToolTag {
@@ -292,6 +292,10 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
         _highlighting = highlighting;
         [self setNeedsDisplayInRect:NSInsetRect([_highlightPath bounds], -1.0, -1.0)];
     }
+}
+
+- (BOOL)isOpaque {
+    return YES;
 }
 
 #pragma mark - Paging
