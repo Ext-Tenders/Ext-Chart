@@ -13,6 +13,10 @@
 
 @implementation EXTDocumentWindowController (EXTChartViewDelegate)
 
+- (void)computeGroupsForPage:(NSUInteger)pageNumber {
+    [[[self extDocument] sseq] computeGroupsForPage:pageNumber];
+}
+
 // TODO: Talk to Eric about creating an NS_INLINE NSValue *_EXTDotRect() function
 - (NSArray *)dotPositions:(int)count
                         x:(CGFloat)x

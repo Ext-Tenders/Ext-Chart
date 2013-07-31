@@ -235,10 +235,7 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
         [self resetHighlightRectAtLocation:mousePoint];
     }
 
-    // compute all the cycles and boundaries for this new page.
-    // TODO: computations shouldn’t be done by the view. Move this to the model, mediated by a controller
-    [self.sseq computeGroupsForPage:_selectedPageIndex];
-
+    [_delegate computeGroupsForPage:_selectedPageIndex];
     [self setNeedsDisplay:YES];
 }
 
