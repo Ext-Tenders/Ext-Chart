@@ -335,18 +335,6 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
     return YES;
 }
 
-//-(IBAction) scrollToCenter:(id)sender{
-//	NSRect clipViewBounds = [[[self enclosingScrollView] contentView] bounds];
-//	NSPoint newOrigin;
-//	newOrigin.x = NSMidX(theDocumentRectangle) - clipViewBounds.size.width/2;
-//	newOrigin.y = NSMidY(theDocumentRectangle) - clipViewBounds.size.height/2;
-//	
-//	[self scrollPoint:newOrigin];	
-//}
-
-
-
-
 #pragma mark - Key-value observing
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
