@@ -82,7 +82,7 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
 
         // Grid
         {
-            _showGrid = true;
+            _showsGrid = true;
 
             _grid = [EXTGrid new];
             [_grid setBoundsRect:[self bounds]];
@@ -166,7 +166,7 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
 	[_artBoard fillRect]; // TODO: draw only the intersection of rect and the art board
 
     // Grid
-	if (_showGrid)
+	if (_showsGrid)
 		[_grid drawGridInRect:rect];
 
     // Art board borders
@@ -256,8 +256,8 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
     }
 }
 
-- (void)setShowGrid:(bool)showGrid {
-	_showGrid = showGrid;
+- (void)setShowsGrid:(bool)showsGrid {
+	_showsGrid = showsGrid;
 	[self setNeedsDisplay:YES];
 }
 
