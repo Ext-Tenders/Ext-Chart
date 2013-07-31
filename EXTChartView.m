@@ -228,8 +228,7 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
     [self setNeedsDisplayInRect:[self _extHighlightDrawingRect]]; // new frame
 }
 
-- (void)displaySelectedPage
-{
+- (void)displaySelectedPage {
     if (_highlighting) {
         NSPoint mousePoint = [[[self enclosingScrollView] window] mouseLocationOutsideOfEventStream];
         mousePoint = [self convertPoint:mousePoint fromView:nil];
@@ -245,16 +244,14 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
 
 #pragma mark - Properties
 
-- (void)setSseq:(EXTSpectralSequence *)sseq
-{
+- (void)setSseq:(EXTSpectralSequence *)sseq {
     if (sseq != _sseq) {
         _sseq = sseq;
         [self displaySelectedPage];
     }
 }
 
-- (void)setSelectedPageIndex:(NSUInteger)selectedPageIndex
-{
+- (void)setSelectedPageIndex:(NSUInteger)selectedPageIndex {
     // TODO: should check whether the argument lies in {min, max} page indices
     if (selectedPageIndex != _selectedPageIndex) {
         _selectedPageIndex = selectedPageIndex;
@@ -294,6 +291,14 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
     return YES;
 }
 
+- (BOOL)acceptsFirstResponder {
+    return YES;
+}
+
+- (BOOL)acceptsTouchEvents {
+    return YES;
+}
+
 #pragma mark - Paging
 
 // this get called when we move to the next page in the display. it's
@@ -327,20 +332,11 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
 // a two-finger scroll gesture. This same behaviour happens if the scroll view implements
 // -swipeWithEvent:.
 // See http://stackoverflow.com/questions/15854301
-- (void)swipeWithEvent:(NSEvent *)event{
+- (void)swipeWithEvent:(NSEvent *)event {
 	CGFloat x = [event deltaX];
 	if (x != 0) {
 		(x < 0)  ? [self nextPage:self]: [self previousPage:self];
 	};
-}
-
-- (BOOL)acceptsFirstResponder
-{
-    return YES;
-}
-
-- (BOOL)acceptsTouchEvents {
-    return YES;
 }
 
 #pragma mark - Key-value observing
@@ -388,8 +384,7 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
 // from the documentation: "Before resetCursorRects is invoked, the owning view is automatically sent a disableCursorRects message to remove existing cursor rectangles."
 
 
--(void)resetCursorRects
-{
+-(void)resetCursorRects {
 	[self discardCursorRects];
 	//	need to clip the artBoards cursor rects to the visible portion.   I haven't implemented this yet. The "visibleRect" command is supposed to make this easier.   I just checked with some log statements, and it indeed does report, in the bounds coordinates, the clipView's rectangle.    Sweet.
 
@@ -470,15 +465,12 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
 }
 
 
-- (void)mouseMoved:(NSEvent *)theEvent {
-
-    NSPoint mousePoint = [self convertPoint:[theEvent locationInWindow] fromView:nil];
+- (void)mouseMoved:(NSEvent *)event {
+    const NSPoint mousePoint = [self convertPoint:[event locationInWindow] fromView:nil];
 	[self resetHighlightRectAtLocation:mousePoint];
-
-	//    [self displayIfNeeded];
 }
 
-- (void)mouseExited:(NSEvent *)theEvent{
+- (void)mouseExited:(NSEvent *)event {
     [self setNeedsDisplayInRect:[self _extHighlightDrawingRect]];
 	[self setHighlightPath:[NSBezierPath bezierPathWithRect:NSZeroRect]];
 }
