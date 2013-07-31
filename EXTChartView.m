@@ -51,7 +51,7 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
 
 @implementation EXTChartView
 
-@synthesize showGrid, editMode, showPages;
+@synthesize showGrid, editMode;
 @synthesize highlighting;
 @synthesize highlightPath;
 
@@ -70,7 +70,6 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
     if (self) {
 		[self translateOriginToPoint:NSMakePoint(NSMidX(frame), NSMidY(frame))];
 		showGrid = TRUE;
-		showPages = YES;
 		editMode = NO;
 
         _artBoard = [EXTArtBoard new];
@@ -184,23 +183,20 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
 	
 	
 	// the code for the objects.
-	if (showPages) {		
-		NSPoint lowerLeftPoint = rect.origin;
-		NSPoint upperRightPoint = rect.origin;
-		upperRightPoint.x += rect.size.width;
-		upperRightPoint.y += rect.size.height;
-		
-        // XXX: this may be drawing too narrow a window, resulting in blank Ext
-        // charts if the scroll is dragged too slowly.
-        [_delegate drawPageNumber:_selectedPageIndex
-                              ll:[self convertToGridCoordinates:lowerLeftPoint]
-                              ur:[self convertToGridCoordinates:upperRightPoint]
-                     withSpacing:[_grid gridSpacing]];
-		
-		//  // restore the graphics context
-		//	[theContext restoreGraphicsState];
-	}
-	
+    NSPoint lowerLeftPoint = rect.origin;
+    NSPoint upperRightPoint = rect.origin;
+    upperRightPoint.x += rect.size.width;
+    upperRightPoint.y += rect.size.height;
+
+    // XXX: this may be drawing too narrow a window, resulting in blank Ext
+    // charts if the scroll is dragged too slowly.
+    [_delegate drawPageNumber:_selectedPageIndex
+                           ll:[self convertToGridCoordinates:lowerLeftPoint]
+                           ur:[self convertToGridCoordinates:upperRightPoint]
+                  withSpacing:[_grid gridSpacing]];
+
+    //  // restore the graphics context
+    //	[theContext restoreGraphicsState];
 }
 
 

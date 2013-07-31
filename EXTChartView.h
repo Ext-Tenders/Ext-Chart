@@ -30,7 +30,6 @@ typedef enum : NSInteger {
 
 @interface EXTChartView : NSView <NSUserInterfaceValidations> {
 	BOOL showGrid;
-	BOOL showPages;
 	BOOL editMode;
 	BOOL highlighting;
 
@@ -45,7 +44,7 @@ typedef enum : NSInteger {
 
 
 @property(nonatomic, assign) BOOL showGrid;
-@property(nonatomic, assign) BOOL editMode, showPages, highlighting;
+@property(nonatomic, assign) BOOL editMode, highlighting;
 @property(strong) EXTArtBoard *artBoard;
 @property(nonatomic, readonly) EXTGrid *grid;
 @property(strong) NSBezierPath *highlightPath;
