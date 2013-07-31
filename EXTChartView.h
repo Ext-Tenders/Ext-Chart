@@ -29,8 +29,6 @@ typedef enum : NSInteger {
 
 
 @interface EXTChartView : NSView <NSUserInterfaceValidations> {
-	BOOL highlighting;
-
 	NSRect highlightRect;    // make this private?
 	NSColor *highlightRectColor;  // if this is not customizable, it should be a constant.   I couldn't make it work as a static or extern...
 		
@@ -42,7 +40,7 @@ typedef enum : NSInteger {
 
 
 @property(nonatomic, assign) bool showGrid;
-@property(nonatomic, assign) BOOL highlighting;
+@property(nonatomic, assign) bool highlighting;
 @property(strong) EXTArtBoard *artBoard;
 @property(nonatomic, readonly) EXTGrid *grid;
 @property(strong) NSBezierPath *highlightPath;
