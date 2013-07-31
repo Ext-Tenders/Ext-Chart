@@ -51,7 +51,7 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
 
 @implementation EXTChartView
 
-@synthesize showGrid, editMode;
+@synthesize editMode;
 @synthesize highlighting;
 @synthesize highlightPath;
 
@@ -69,7 +69,7 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
     self = [super initWithFrame:frame];
     if (self) {
 		[self translateOriginToPoint:NSMakePoint(NSMidX(frame), NSMidY(frame))];
-		showGrid = TRUE;
+		_showGrid = true;
 		editMode = NO;
 
         _artBoard = [EXTArtBoard new];
@@ -151,7 +151,7 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
 	
 	// draw the grid.  
 	
-	if (showGrid) {
+	if (_showGrid) {
 		[_grid drawGridInRect:rect];
 	}
 	
@@ -246,8 +246,8 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
     }
 }
 
--(void)setShowGrid:(BOOL)showing{
-	showGrid = showing;
+- (void)setShowGrid:(bool)showGrid {
+	_showGrid = showGrid;
 	[self setNeedsDisplay:YES];
 }
 
