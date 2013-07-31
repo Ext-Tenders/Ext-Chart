@@ -31,7 +31,7 @@ typedef enum : NSInteger {
 @interface EXTChartView : NSView <NSUserInterfaceValidations>
 
 @property(nonatomic, assign) bool showGrid;
-@property(strong) EXTArtBoard *artBoard;
+@property(nonatomic, strong) EXTArtBoard *artBoard;
 @property(nonatomic, readonly) EXTGrid *grid;
 
 @property(nonatomic, strong) EXTSpectralSequence *sseq;
