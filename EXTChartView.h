@@ -40,9 +40,6 @@ typedef enum : NSInteger {
 @property(nonatomic, assign) EXTToolboxTag selectedToolTag;
 
 
-- (NSPoint) convertToGridCoordinates:(NSPoint)pixelLoc;
-- (NSPoint) convertToPixelCoordinates:(NSPoint) gridLoc;
-
 // Actions
 - (IBAction)nextPage:(id)sender;
 - (IBAction)previousPage:(id)sender;

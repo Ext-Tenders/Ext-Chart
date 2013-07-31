@@ -128,20 +128,28 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
+#pragma mark - Grid point conversion
 
-#pragma mark *** utility methods ***
-// convert pixel coordinates to (p, q) coordinates
--(NSPoint) convertToGridCoordinates:(NSPoint)pixelLoc {
-	return NSMakePoint(floor(pixelLoc.x / [_grid gridSpacing]), floor(pixelLoc.y / [_grid gridSpacing]));
+// Converts user space coordinates to (p, q) coordinates
+- (NSPoint)convertPointToGrid:(NSPoint)point {
+    const CGFloat gridSpacing = [_grid gridSpacing];
+    return (NSPoint){
+        .x = floor(point.x / gridSpacing),
+        .y = floor(point.y / gridSpacing)
+    };
 }
 
-// convert (p, q) coordinates to pixel coordinates
-- (NSPoint) convertToPixelCoordinates:(NSPoint) gridLoc{
-	return NSMakePoint(gridLoc.x*[_grid gridSpacing], gridLoc.y*[_grid gridSpacing]);
+// Convert (p, q) coordinates to user space coordinates
+- (NSPoint)convertPointFromGrid:(NSPoint)gridPoint {
+    const CGFloat gridSpacing = [_grid gridSpacing];
+    return (NSPoint){
+        .x = gridPoint.x * gridSpacing,
+        .y = gridPoint.y * gridSpacing
+    };
 }
 
+#pragma mark - Drawing
 
-#pragma mark *** drawing ***
 - (void)drawRect:(NSRect)rect {
     // the big background
 	
@@ -198,8 +206,8 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
     // XXX: this may be drawing too narrow a window, resulting in blank Ext
     // charts if the scroll is dragged too slowly.
     [_delegate drawPageNumber:_selectedPageIndex
-                           ll:[self convertToGridCoordinates:lowerLeftPoint]
-                           ur:[self convertToGridCoordinates:upperRightPoint]
+                           ll:[self convertPointToGrid:lowerLeftPoint]
+                           ur:[self convertPointToGrid:upperRightPoint]
                   withSpacing:[_grid gridSpacing]];
 
     //  // restore the graphics context
@@ -280,7 +288,7 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
     }
 }
 
-#pragma mark *** paging ***
+#pragma mark - Paging
 
 // this get called when we move to the next page in the display. it's
 // responsible for checking whether the page is dirty and, if so, calling the
@@ -357,7 +365,7 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
 	}
 }
 
-#pragma mark *** zooming and scrolling ***
+#pragma mark - Zooming and scrolling
 
 - (IBAction)zoomToFit:(id)sender {
     const NSRect artBoardRect = [_artBoard frame];
@@ -369,7 +377,7 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
     return [_artBoard frame];
 }
 
-#pragma mark *** mouse tracking and cursor changing (tests)  ***
+#pragma mark - Mouse tracking and cursor changing (tests)
 
 // from the documentation: "Before resetCursorRects is invoked, the owning view is automatically sent a disableCursorRects message to remove existing cursor rectangles."
 
