@@ -476,8 +476,7 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
 }
 
 - (IBAction)changeTool:(id)sender {
-    if (![sender respondsToSelector:@selector(tag)])
-        return;
+    NSAssert([sender respondsToSelector:@selector(tag)], @"This action requires senders that respond to -tag");
 
     EXTToolboxTag tag = [sender tag];
     if (tag <= 0 || tag >= _EXTToolTagCount)
