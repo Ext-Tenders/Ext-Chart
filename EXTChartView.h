@@ -44,7 +44,6 @@ typedef enum : NSInteger {
 - (NSPoint) convertToPixelCoordinates:(NSPoint) gridLoc;
 
 // Actions
-- (IBAction)computeHomology:(id)sender;
 - (IBAction)nextPage:(id)sender;
 - (IBAction)previousPage:(id)sender;
 - (IBAction)zoomToFit:(id)sender;

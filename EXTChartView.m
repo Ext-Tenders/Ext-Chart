@@ -282,18 +282,6 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
 
 #pragma mark *** paging ***
 
-// TODO: this gets called when the Compute Homology button is pressed. this
-// should still have an action --- it should recalculate the filtration or sth.
-- (IBAction)computeHomology: (id)sender {
-//	NSMutableArray *pages = [delegate pages];
-//	EXTPage *currentPage = [pages objectAtIndex:pageInView];
-//	EXTPage *computedPage = [currentPage computeHomology];
-//	if (pageInView == [pages count]-1)
-//		[pages addObject:computedPage];
-//	else
-//		[pages replaceObjectAtIndex:pageInView+1 withObject:computedPage];
-}
-
 // this get called when we move to the next page in the display. it's
 // responsible for checking whether the page is dirty and, if so, calling the
 // relevant updating algorithms.
