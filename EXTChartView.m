@@ -379,15 +379,9 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
     return [_artBoard frame];
 }
 
-#pragma mark - Mouse tracking and cursor changing (tests)
+#pragma mark - Mouse tracking and cursor
 
-// from the documentation: "Before resetCursorRects is invoked, the owning view is automatically sent a disableCursorRects message to remove existing cursor rectangles."
-
-
--(void)resetCursorRects {
-	[self discardCursorRects];
-	//	need to clip the artBoards cursor rects to the visible portion.   I haven't implemented this yet. The "visibleRect" command is supposed to make this easier.   I just checked with some log statements, and it indeed does report, in the bounds coordinates, the clipView's rectangle.    Sweet.
-
+- (void)resetCursorRects {
 	if (_selectedToolTag == _EXTArtboardToolTag)
 		[_artBoard buildCursorRectsInView:self];
 }
