@@ -43,22 +43,13 @@ typedef enum : NSInteger {
 - (NSPoint) convertToGridCoordinates:(NSPoint)pixelLoc;
 - (NSPoint) convertToPixelCoordinates:(NSPoint) gridLoc;
 
-// paging and zooming
-
+// Actions
+- (IBAction)computeHomology:(id)sender;
 - (IBAction)nextPage:(id)sender;
 - (IBAction)previousPage:(id)sender;
-- (IBAction)computeHomology:(id)sender;
-
 - (IBAction)zoomToFit:(id)sender;
-- (IBAction)setGridToDefaults:(id)sender;
-
 - (IBAction)changeTool:(id)sender;
-
-- (void)resetHighlightRectAtLocation:(NSPoint)location;
-
 @end
-
-// I'm putting the grid stuff in here, temporarily.   We can break it out into the grid object as we add more functionality later.
 
 #pragma mark - Exported variables
 

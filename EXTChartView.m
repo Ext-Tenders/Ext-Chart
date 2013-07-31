@@ -225,10 +225,6 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
     [self setNeedsDisplayInRect:NSInsetRect(newRect, -1.0, -1.0)];
 }
 
--(IBAction)setGridToDefaults:(id)sender{
-	[_grid resetToDefaults];	
-}
-
 - (void)displaySelectedPage
 {
     if (_highlighting) {
