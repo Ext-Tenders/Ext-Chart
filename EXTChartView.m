@@ -386,22 +386,6 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
 		[_artBoard buildCursorRectsInView:self];
 }
 
-
-// should this be passed as a method to the EXTArtBoard object?   I guess not.   When handling these mouse events, I think the view is acting as a model controller, and from that point of view they belong here.   At any rate, the model shouldn't handle any mouse events.
-
-//- (void)mouseDragged:(NSEvent *)theEvent{
-//	return;
-//	NSPoint loc = [self	convertPoint:[theEvent locationInWindow] fromView:nil];
-//	if (NSPointInRect(loc, [artBoard rectValue])) {
-//		EXTScrollView *scrollView = (EXTScrollView *)[self enclosingScrollView];
-//		CGFloat scale = 1/[scrollView scaleFactor];
-//		//	CGFloat scale = 1.0;
-//		[artBoard setXPosition:[artBoard xPosition] + [theEvent deltaX]*scale];
-//		[artBoard setYPosition:[artBoard yPosition] - [theEvent deltaY]*scale];
-//		[self autoscroll:theEvent];
-//	}
-//}
-
 - (void)_extDragArtBoardWithEvent:(NSEvent *)event {
 	// ripped off from sketch.   according to apple's document, it is better not to override the event loop like this.  Also, see the DragItemAround code for what I think is a better way to organize this.
 
