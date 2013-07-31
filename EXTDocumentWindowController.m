@@ -22,7 +22,7 @@
 static void *_EXTScrollViewMagnificationContext = &_EXTScrollViewMagnificationContext;
 static CGFloat const _EXTDefaultMagnificationSteps[] = {0.1, 0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 2.0, 4.0, 8.0, 16.0, 32.0};
 static size_t const _EXTDefaultMagnificationStepsCount = sizeof(_EXTDefaultMagnificationSteps) / sizeof(_EXTDefaultMagnificationSteps[0]);
-static CGFloat _EXTMagnificationStepRoundingMultiplier = 100.0;
+static CGFloat const _EXTMagnificationStepRoundingMultiplier = 100.0;
 
 // We use -[NSMenuItem representedObject] to store the magnification that a zoom pop up menu item represents. Since
 // other magnifications are added to the pop up menu (for instance, when the user chooses zoom to fit) and we remove
