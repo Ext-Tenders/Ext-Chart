@@ -7,6 +7,7 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import <AppKit/AppKit.h>
 
 #import "EXTDocumentWindowController.h"
 #import "EXTDocument.h"
@@ -46,6 +47,8 @@ typedef enum : NSInteger {
     @property(nonatomic, strong) NSView *sidebarView;
     @property(nonatomic, weak) IBOutlet NSView *gridInspectorView;
     @property(nonatomic, weak) IBOutlet NSView *horizontalToolboxView;
+    @property(nonatomic, weak) IBOutlet NSView *generatorInspectorView;
+    @property(nonatomic, weak) IBOutlet NSTableView *generatorTableView;
 @end
 
 
@@ -126,7 +129,11 @@ typedef enum : NSInteger {
     {
         _inspectorView = [[EXTDocumentInspectorView alloc] initWithFrame:NSZeroRect];
 
+        // set up the subviews
         [_inspectorView addSubview:_horizontalToolboxView withTitle:@"Toolbox" collapsed:false centered:true];
+
+        [_inspectorView addSubview:_generatorInspectorView withTitle:@"Generators" collapsed:true centered:true];
+
         [_inspectorView addSubview:_gridInspectorView withTitle:@"Grid" collapsed:false centered:false];
 
         NSRect contentFrame = [[[self window] contentView] frame];
