@@ -7,30 +7,87 @@
 //
 
 #import "EXTGeneratorInspectorViewController.h"
-#import "EXTSpectralSequence.h"
+#import "EXTPolynomialSSeq.h"
 
-@interface EXTGeneratorInspectorViewController ()
+@interface EXTGeneratorInspectorViewController () <NSTableViewDelegate, NSTableViewDataSource>
+{
+    EXTSpectralSequence *_sseq;
+}
 
-@property (weak,nonatomic) EXTSpectralSequence *sseq;
+@property(nonatomic, strong) IBOutlet NSTableView *tableView;
+@property(nonatomic, strong) EXTSpectralSequence *sseq;
 
 @end
 
 @implementation EXTGeneratorInspectorViewController
 
-@synthesize sseq;
+@synthesize tableView;
+
+-(EXTSpectralSequence*) sseq {
+    return _sseq;
+}
+
+- (void)setSseq:(EXTSpectralSequence *)sseq {
+    _sseq = sseq;
+    
+    if ([[sseq class] isSubclassOfClass:[EXTPolynomialSSeq class]]) {
+        [self unbind:@"representedObject"];
+        [self bind:@"representedObject" toObject:((EXTPolynomialSSeq*)sseq) withKeyPath:@"generators" options:nil];
+    } else {
+        [self unbind:@"representedObject"];
+        [self setRepresentedObject:nil];
+    }
+    
+    [[self tableView] reloadData];
+}
 
 - (id)init {
-    return [super initWithNibName:@"EXTGeneratorInspectorViewController" bundle:nil];
+    return [self initWithNibName:@"EXTGeneratorInspectorViewController" bundle:nil];
 }
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
-    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-    if (self) {
-        // Initialization code here.
-    }
+    return [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
+}
+
+-(NSInteger) numberOfRowsInTableView:(NSTableView*)aTableView {
+    if (![self representedObject] ||
+        ![[self.representedObject class] isSubclassOfClass:[NSArray class]])
+        return 0;
     
-    return self;
+    return ((NSArray*)self.representedObject).count;
+}
+
+- (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row {
+    if (![self representedObject])
+        return nil;
+    
+    return [[[(NSArray*)[self representedObject] objectAtIndex:row] objectForKey:[tableColumn identifier]] description];
+}
+
+/*-(NSView *)tableView:(NSTableView *)tableView
+  viewForTableColumn:(NSTableColumn *)tableColumn
+                 row:(NSInteger)row {
+    if (![[self.representedObject class] isSubclassOfClass:[EXTPolynomialSSeq class]])
+        return nil;
+    
+    NSMutableDictionary *entry = ((EXTPolynomialSSeq*)self.representedObject).generators[row];
+    
+    NSTextField *textField = [tableView makeViewWithIdentifier:tableColumn.identifier owner:self];
+    textField.objectValue = [NSString stringWithFormat:@"%@", [[entry objectForKey:tableColumn.identifier] description]];
+    
+    return textField;
+}*/
+
+-(void) tableView:(NSTableView*)aTableView
+   setObjectValue:(id)object
+   forTableColumn:(NSTableColumn *)tableColumn
+              row:(NSInteger)row {
+    return;
+}
+
+-(void) viewDidLoad {
+    [tableView reloadData];
 }
 
 @end
