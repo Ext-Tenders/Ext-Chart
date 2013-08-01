@@ -351,15 +351,15 @@
 
 -(void) buildDifferentials {
     // add the d1 differentials
-    for (int index = 0; index < self.names.count; index++) {
-        EXTMayTag *tag = self.names[index];
+    for (NSDictionary *generator in self.generators) {
+        EXTMayTag *tag = [generator objectForKey:@"name"];
         int i = tag.i, j = tag.j;
         
         // these elements are genuinely primitive, so never support diff'ls.
         if (i == 1)
             continue;
         
-        EXTTriple *location = self.locations[index];
+        EXTTriple *location = [generator objectForKey:@"location"];
         EXTTerm *target = [self findTerm:[EXTTriple followDiffl:location page:1]];
         EXTDifferential *diff = [EXTDifferential differential:[self findTerm:location] end:target page:1];
         EXTPartialDefinition *partial = [EXTPartialDefinition new];
@@ -371,9 +371,14 @@
         for (int k = 1; k <= i-1; k++) {
             EXTMayTag *tagLeft = [EXTMayTag tagWithI:k J:(i-k+j)],
             *tagRight = [EXTMayTag tagWithI:(i-k) J:j];
-            int leftIndex = [self.names indexOfObject:tagLeft],
-            rightIndex = [self.names indexOfObject:tagRight];
-            EXTMatrix *product = [self productWithLeft:self.locations[leftIndex] right:self.locations[rightIndex]];
+            
+            NSDictionary *leftEntry = nil, *rightEntry = nil;
+            for (NSDictionary *workingEntry in self.generators)
+                if ([[workingEntry objectForKey:@"name"] isEqual:tagLeft])
+                    leftEntry = workingEntry;
+                else if ([[workingEntry objectForKey:@"name"] isEqual:tagRight])
+                    rightEntry = workingEntry;
+            EXTMatrix *product = [self productWithLeft:[leftEntry objectForKey:@"location"] right:[rightEntry objectForKey:@"location"]];
             partial.differential = [EXTMatrix sum:partial.differential with:product];
         }
         
@@ -382,7 +387,10 @@
     }
     
     // propagate the d1 differentials with Leibniz's rule
-    [self propagateLeibniz:self.locations page:1];
+    NSMutableArray *locations = [NSMutableArray array];
+    for (NSMutableDictionary *generator in self.generators)
+        [locations addObject:[generator objectForKey:@"location"]];
+    [self propagateLeibniz:locations page:1];
     
     // TODO: use nakamura's lemma to get the higher differentials.
     // XXX: right now i'm going to hard-code something that works for A(1)...

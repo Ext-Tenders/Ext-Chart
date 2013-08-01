@@ -29,15 +29,13 @@
 // some dramatic simplifications to how things are stored and computed.
 @interface EXTPolynomialSSeq : EXTSpectralSequence
 
-@property(strong,readonly) NSMutableArray* names;
-@property(strong,readonly) NSMutableArray* locations;
-@property(strong,readonly) NSMutableArray* upperBounds;
+@property(strong,readonly) NSMutableArray *generators;
 
 -(EXTPolynomialSSeq*) initWithUnit:(Class<EXTLocation>)locClass;
 +(EXTPolynomialSSeq*) sSeqWithUnit:(Class<EXTLocation>)locClass;
 
--(void) addPolyClass:(NSObject*)name location:(EXTLocation*)loc upTo:(int)bound;
--(void) resizePolyClass:(NSObject*)name upTo:(int)newBound;
+-(void) addPolyClass:(NSObject<NSCopying>*)name location:(EXTLocation*)loc upTo:(int)bound;
+-(void) resizePolyClass:(NSObject<NSCopying>*)name upTo:(int)newBound;
 
 -(EXTMatrix*) productWithLeft:(EXTLocation*)left right:(EXTLocation*)right;
 

@@ -114,13 +114,11 @@
 //
 @implementation EXTPolynomialSSeq
 
-@synthesize names, locations, upperBounds;
+@synthesize generators;
 
 - (id)initWithCoder:(NSCoder *)aDecoder {
     if (self = [super initWithCoder:aDecoder]) {
-        names = [aDecoder decodeObjectForKey:@"names"];
-        locations = [aDecoder decodeObjectForKey:@"locations"];
-        upperBounds = [aDecoder decodeObjectForKey:@"upperBounds"];
+        generators = [aDecoder decodeObjectForKey:@"generators"];
     }
     
     return self;
@@ -129,9 +127,7 @@
 - (void)encodeWithCoder:(NSCoder *)aCoder {
     [super encodeWithCoder:aCoder];
     
-    [aCoder encodeObject:names forKey:@"names"];
-    [aCoder encodeObject:locations forKey:@"locations"];
-    [aCoder encodeObject:upperBounds forKey:@"upperBounds"];
+    [aCoder encodeObject:generators forKey:@"generators"];
 }
 
 -(EXTMultiplicationTables*) multTables {
@@ -143,9 +139,7 @@
 -(EXTPolynomialSSeq*) init {
     self = [super init];
     
-    names = [NSMutableArray array];
-    locations = [NSMutableArray array];
-    upperBounds = [NSMutableArray array];
+    generators = [NSMutableArray array];
     
     return self;
 }
@@ -160,9 +154,7 @@
     // on super, which winds up here.  we can't call init on self to pull in the
     // code from the routine above this one, since that will just cause a big
     // loop back down to EXTMaySpectralSequence. i don't know. it's complicated.
-    names = [NSMutableArray array];
-    locations = [NSMutableArray array];
-    upperBounds = [NSMutableArray array];
+    generators = [NSMutableArray array];
     
     self.indexClass = locClass;
     
@@ -228,38 +220,47 @@
     return ret;
 }
 
--(void) addPolyClass:(NSObject*)name location:(EXTLocation*)loc upTo:(int)bound {
+-(void) addPolyClass:(NSObject<NSCopying>*)name location:(EXTLocation*)loc upTo:(int)bound {
     // update the navigation members
-    [names addObject:name];
-    [locations addObject:loc];
-    [upperBounds addObject:@0];
+    NSMutableDictionary *entry = [NSMutableDictionary new];
+    
+    [entry setObject:name forKey:@"name"];
+    [entry setObject:loc forKey:@"location"];
+    [entry setObject:@0 forKey:@"upperBound"];
+    
+    [generators addObject:entry];
     
     [self resizePolyClass:name upTo:bound];
     
     return;
 }
 
--(void) resizePolyClass:(NSObject*)name upTo:(int)newBound {
-    int index = [names indexOfObject:name];
+-(void) resizePolyClass:(NSObject<NSCopying>*)name upTo:(int)newBound {
+    NSMutableDictionary *entry = nil;
+    for (NSMutableDictionary *workingEntry in generators)
+        if ([[workingEntry objectForKey:@"name"] isEqual:name]) {
+            entry = workingEntry;
+            break;
+        }
     
     // TODO: we can only resize to be larger.  not sure if this is desirable, or
     // if i'll want to come back and allow for shrinking too.
-    if ([upperBounds[index] intValue] > newBound)
+    if ([[entry objectForKey:@"upperBound"] intValue] > newBound)
         return;
     
     // set up the array of counters
     EXTPolynomialTag *tag = [EXTPolynomialTag new];
-    tag.tags = [NSMutableDictionary dictionaryWithCapacity:names.count];
-    for (int i = 0; i < names.count; i++)
-        [tag.tags setObject:@0 forKey:names[i]];
-    [tag.tags setObject:@([upperBounds[index] intValue]+1) forKey:names[index]];
+    tag.tags = [NSMutableDictionary dictionaryWithCapacity:generators.count];
+    for (NSMutableDictionary *generator in generators)
+        [tag.tags setObject:@0 forKey:[generator objectForKey:@"name"]];
+    [tag.tags setObject:@([[entry objectForKey:@"upperBound"] intValue]+1) forKey:name];
     
     BOOL totalRollover = FALSE;
     while (!totalRollover) {
         // search for a term in the location encoded by the counter
         EXTLocation *workingLoc = [[self indexClass] identityLocation];
-        for (int i = 0; i < names.count; i++)
-            workingLoc = [[self indexClass] addLocation:workingLoc to:[[self indexClass] scale:locations[i] by:[[tag.tags objectForKey:names[i]] intValue]]];
+        for (NSDictionary *generator in generators)
+            workingLoc = [[self indexClass] addLocation:workingLoc to:[[self indexClass] scale:[generator objectForKey:@"location"] by:[[tag.tags objectForKey:[generator objectForKey:@"name"]] intValue]]];
         EXTTerm *term = [self findTerm:workingLoc];
         
         // if it doesn't exist, create it
@@ -273,19 +274,21 @@
         
         // increment the counter
         for (int i = 0;
-             i < names.count ? TRUE : !(totalRollover = TRUE);
+             i < generators.count ? TRUE : !(totalRollover = TRUE);
              i++) {
-            int value = [[tag.tags objectForKey:names[i]] intValue] + 1;
+            NSDictionary *generator = generators[i];
+            int value = [[tag.tags objectForKey:[generator objectForKey:@"name"]] intValue] + 1;
             
             // there are two kinds of roll-over
-            if ((i == index) && (value > newBound)) {
-                [tag.tags setObject:@([upperBounds[index] intValue] + 1) forKey:names[index]];
+            if ((generator == entry) && (value > newBound)) {
+                [tag.tags setObject:@([[generator objectForKey:@"upperBound"] intValue] + 1) forKey:name];
                 continue;
-            } else if ((i != index) && (value > [upperBounds[i] intValue])) {
-                [tag.tags setObject:@0 forKey:names[i]];
+            } else if ((generator != entry) &&
+                       (value > [[generator objectForKey:@"upperBound"] intValue])) {
+                [tag.tags setObject:@0 forKey:[generator objectForKey:@"name"]];
                 continue;
             } else {
-                [tag.tags setObject:@(value) forKey:names[i]];
+                [tag.tags setObject:@(value) forKey:[generator objectForKey:@"name"]];
                 break;
             }
         } // for: counter increment
@@ -295,7 +298,7 @@
     // MATRICES ACCORDINGLY.
     
     // store newBound as the new bound
-    upperBounds[index] = @(newBound);
+    [entry setObject:@(newBound) forKey:@"upperBound"];
     
     return;
 }
