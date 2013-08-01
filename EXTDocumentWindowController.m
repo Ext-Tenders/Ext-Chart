@@ -16,6 +16,7 @@
 #import "EXTArtBoard.h"
 #import "EXTScrollView.h"
 #import "EXTDocumentInspectorView.h"
+#import "EXTGeneratorInspectorViewController.h"
 
 
 #pragma mark - Private variables
@@ -47,12 +48,11 @@ typedef enum : NSInteger {
     @property(nonatomic, strong) NSView *sidebarView;
     @property(nonatomic, weak) IBOutlet NSView *gridInspectorView;
     @property(nonatomic, weak) IBOutlet NSView *horizontalToolboxView;
-    @property(nonatomic, weak) IBOutlet NSView *generatorInspectorView;
-    @property(nonatomic, weak) IBOutlet NSTableView *generatorTableView;
 @end
 
 
 @implementation EXTDocumentWindowController {
+    EXTGeneratorInspectorViewController *_generatorInspectorViewController;
     EXTDocumentInspectorView *_inspectorView;
     bool _sidebarHidden;
     bool _sidebarAnimating;
@@ -132,7 +132,7 @@ typedef enum : NSInteger {
         // set up the subviews
         [_inspectorView addSubview:_horizontalToolboxView withTitle:@"Toolbox" collapsed:false centered:true];
 
-        [_inspectorView addSubview:_generatorInspectorView withTitle:@"Generators" collapsed:true centered:true];
+        [_inspectorView addSubview:_generatorInspectorViewController.view withTitle:@"Generators" collapsed:true centered:true];
 
         [_inspectorView addSubview:_gridInspectorView withTitle:@"Grid" collapsed:false centered:false];
 
@@ -267,8 +267,14 @@ typedef enum : NSInteger {
         
         [super setDocument:document];
 
-        if (document)
+        if (document) {
             [[self chartView] bind:EXTChartViewSseqBindingName toObject:document withKeyPath:@"sseq" options:nil];
+            
+            if (!_generatorInspectorViewController) {
+                _generatorInspectorViewController = [EXTGeneratorInspectorViewController new];
+                [_generatorInspectorViewController bind:@"sseq" toObject:document withKeyPath:@"sseq" options:nil];
+            }
+        }
     }
 }
 

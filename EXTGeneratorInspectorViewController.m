@@ -7,12 +7,17 @@
 //
 
 #import "EXTGeneratorInspectorViewController.h"
+#import "EXTSpectralSequence.h"
 
 @interface EXTGeneratorInspectorViewController ()
+
+@property (weak,nonatomic) EXTSpectralSequence *sseq;
 
 @end
 
 @implementation EXTGeneratorInspectorViewController
+
+@synthesize sseq;
 
 - (id)init {
     return [super initWithNibName:@"EXTGeneratorInspectorViewController" bundle:nil];
