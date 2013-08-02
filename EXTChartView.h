@@ -41,6 +41,7 @@ typedef enum : NSInteger {
 @property(nonatomic, assign) NSUInteger selectedPageIndex;
 @property(nonatomic, assign) EXTToolboxTag selectedToolTag;
 
+- (void)displaySelectedPage;
 
 // Actions
 - (IBAction)nextPage:(id)sender;

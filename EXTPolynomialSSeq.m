@@ -272,6 +272,20 @@
         // now add the new tag to its names array
         [term.names addObject:[tag copy]];
         
+        // also need to modify all incoming and outgoing differentials.
+        EXTMatrix *inclusion = [EXTMatrix matrixWidth:(term.size-1) height:term.size];
+        for (int i = 0; i < term.size-1; i++)
+            [inclusion.presentation[i] setObject:@1 atIndex:i];
+        for (int i = 1; i < self.differentials.count; i++) {
+            EXTDifferential
+                *outgoing = [self findDifflWithSource:workingLoc onPage:i],
+                *incoming = [self findDifflWithTarget:workingLoc onPage:i];
+            for (EXTPartialDefinition *partial in outgoing.partialDefinitions)
+                partial.inclusion = [EXTMatrix newMultiply:inclusion by:partial.inclusion];
+            for (EXTPartialDefinition *partial in incoming.partialDefinitions)
+                partial.differential = [EXTMatrix newMultiply:inclusion by:partial.differential];
+        }
+        
         // increment the counter
         for (int i = 0;
              i < generators.count ? TRUE : !(totalRollover = TRUE);
@@ -430,6 +444,14 @@
     
     [dsum stripDuplicates];
     
+    return;
+}
+
+-(void) changeName:(NSObject<NSCopying>*)name to:(NSObject<NSCopying>*)newName {
+    return;
+}
+
+-(void) moveClass:(NSObject<NSCopying> *)name to:(NSObject<EXTLocation> *)loc {
     return;
 }
 

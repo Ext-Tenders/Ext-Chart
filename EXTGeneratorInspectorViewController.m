@@ -21,7 +21,7 @@
 
 @implementation EXTGeneratorInspectorViewController
 
-@synthesize tableView;
+@synthesize tableView, chartView;
 
 -(EXTSpectralSequence*) sseq {
     return _sseq;
@@ -65,24 +65,28 @@
     return [[[(NSArray*)[self representedObject] objectAtIndex:row] objectForKey:[tableColumn identifier]] description];
 }
 
-/*-(NSView *)tableView:(NSTableView *)tableView
-  viewForTableColumn:(NSTableColumn *)tableColumn
-                 row:(NSInteger)row {
-    if (![[self.representedObject class] isSubclassOfClass:[EXTPolynomialSSeq class]])
-        return nil;
-    
-    NSMutableDictionary *entry = ((EXTPolynomialSSeq*)self.representedObject).generators[row];
-    
-    NSTextField *textField = [tableView makeViewWithIdentifier:tableColumn.identifier owner:self];
-    textField.objectValue = [NSString stringWithFormat:@"%@", [[entry objectForKey:tableColumn.identifier] description]];
-    
-    return textField;
-}*/
-
 -(void) tableView:(NSTableView*)aTableView
    setObjectValue:(id)object
    forTableColumn:(NSTableColumn *)tableColumn
               row:(NSInteger)row {
+    if (![[_sseq class] isSubclassOfClass:[EXTPolynomialSSeq class]])
+        return;
+    EXTPolynomialSSeq *polySSeq = (EXTPolynomialSSeq*)_sseq;
+    
+    if ([[tableColumn identifier] isEqualToString:@"name"]) {
+        [polySSeq changeName:[polySSeq.generators[row] objectForKey:@"name"]
+                          to:object];
+    } else if ([[tableColumn identifier] isEqualToString:@"upperBound"]) {
+        [polySSeq resizePolyClass:[polySSeq.generators[row] objectForKey:@"name"] upTo:[object intValue]];
+        if (chartView.selectedPageIndex > 0) {
+            chartView.selectedPageIndex = 0;
+        } else {
+            [chartView displaySelectedPage];
+        }
+    } else if ([[tableColumn identifier] isEqualToString:@"location"]) {
+        EXTLocation *loc = [[polySSeq indexClass] convertFromString:object];
+        [polySSeq moveClass:[polySSeq.generators[row] objectForKey:@"name"] to:loc];
+    }
     return;
 }
 

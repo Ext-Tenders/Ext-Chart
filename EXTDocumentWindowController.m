@@ -273,7 +273,7 @@ typedef enum : NSInteger {
             if (!_generatorInspectorViewController) {
                 _generatorInspectorViewController = [EXTGeneratorInspectorViewController new];
                 [_generatorInspectorViewController bind:@"sseq" toObject:document withKeyPath:@"sseq" options:nil];
-            }
+                [_generatorInspectorViewController bind:@"chartView" toObject:self withKeyPath:@"chartView" options:nil];            }
         }
     }
 }

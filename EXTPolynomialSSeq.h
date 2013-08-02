@@ -46,4 +46,7 @@
                   with:(EXTLocation *)loc2
                 onPage:(int)page;
 
+-(void) changeName:(NSObject<NSCopying>*)name to:(NSObject<NSCopying>*)newName;
+-(void) moveClass:(NSObject<NSCopying>*)name to:(EXTLocation*)loc;
+
 @end
