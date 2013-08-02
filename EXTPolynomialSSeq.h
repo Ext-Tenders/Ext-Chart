@@ -47,6 +47,6 @@
                 onPage:(int)page;
 
 -(void) changeName:(NSObject<NSCopying>*)name to:(NSObject<NSCopying>*)newName;
--(void) moveClass:(NSObject<NSCopying>*)name to:(EXTLocation*)loc;
+-(void) deleteClass:(NSObject<NSCopying>*)name;
 
 @end

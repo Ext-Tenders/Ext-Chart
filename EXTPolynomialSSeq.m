@@ -34,6 +34,9 @@
 -(NSString*) description {
     NSString *ret = [NSMutableString string];
     
+    if (self.tags.count == 0)
+        return @"1";
+    
     for (NSString *key in tags.keyEnumerator) {
         ret = [ret stringByAppendingFormat:@" (%@)^{%@}", key.description, [tags objectForKey:key]];
     }
@@ -473,8 +476,51 @@
     return;
 }
 
--(void) moveClass:(NSObject<NSCopying> *)name to:(NSObject<EXTLocation> *)loc {
-    return;
+- (void)deleteClass:(NSObject<NSCopying> *)name {
+    for (EXTTerm *term in self.terms.allValues) {
+        NSMutableArray *indexList = [NSMutableArray array],
+                       *saveList = [NSMutableArray array];
+        
+        for (int index = 0; index < term.size; index++) {
+            EXTPolynomialTag *tag = term.names[index];
+            NSNumber *exponent = [tag.tags objectForKey:name];
+            if ((exponent) && ([exponent intValue] != 0))
+                continue;
+            [indexList addObject:@(index)];
+            [saveList addObject:tag];
+        }
+        
+        EXTMatrix *inclusion = [EXTMatrix matrixWidth:indexList.count height:term.size];
+        for (int index = 0; index < indexList.count; index++)
+            [inclusion.presentation[index] setObject:@1 atIndex:[indexList[index] intValue]];
+        
+        for (int page = 0; page < self.differentials.count; page++) {
+            EXTDifferential *outgoing = [self findDifflWithSource:term.location onPage:page],
+                            *incoming = [self findDifflWithTarget:term.location onPage:page];
+            
+            for (EXTPartialDefinition *partial in outgoing.partialDefinitions) {
+                NSArray *pair = [EXTMatrix formIntersection:inclusion with:partial.inclusion];
+                partial.inclusion = pair[0];
+                partial.differential = [EXTMatrix newMultiply:partial.differential by:pair[1]];
+            }
+            
+            for (EXTPartialDefinition *partial in incoming.partialDefinitions) {
+                NSArray *pair = [EXTMatrix formIntersection:partial.differential with:inclusion];
+                partial.inclusion = [EXTMatrix newMultiply:partial.inclusion by:pair[0]];
+                partial.differential = pair[1];
+            }
+        } // differential pages
+        
+        term.names = saveList;
+    } // term
+    
+    NSUInteger row = -1;
+    for (int i = 0; i < generators.count; i++)
+        if ([[generators[i] objectForKey:@"name"] isEqual:name]) {
+            row = i; break;
+        }
+    
+    [generators removeObjectAtIndex:row];
 }
 
 @end

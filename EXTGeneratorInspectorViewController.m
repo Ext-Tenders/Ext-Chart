@@ -15,6 +15,7 @@
 }
 
 @property(nonatomic, strong) IBOutlet NSTableView *tableView;
+@property(nonatomic, strong) IBOutlet NSTextField *textField;
 @property(nonatomic, strong) EXTSpectralSequence *sseq;
 
 @end
@@ -61,6 +62,10 @@
 - (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row {
     if (![self representedObject])
         return nil;
+    if (((NSArray*)[self representedObject]).count <= row) {
+        EXTLog(@"Bad row display");
+        return nil;
+    }
     
     return [[[(NSArray*)[self representedObject] objectAtIndex:row] objectForKey:[tableColumn identifier]] description];
 }
@@ -78,20 +83,41 @@
                           to:object];
     } else if ([[tableColumn identifier] isEqualToString:@"upperBound"]) {
         [polySSeq resizePolyClass:[polySSeq.generators[row] objectForKey:@"name"] upTo:[object intValue]];
-        if (chartView.selectedPageIndex > 0) {
-            chartView.selectedPageIndex = 0;
-        } else {
-            [chartView displaySelectedPage];
-        }
-    } else if ([[tableColumn identifier] isEqualToString:@"location"]) {
-        EXTLocation *loc = [[polySSeq indexClass] convertFromString:object];
-        [polySSeq moveClass:[polySSeq.generators[row] objectForKey:@"name"] to:loc];
+        [self causeRefresh];
     }
+    
     return;
 }
 
--(void) viewDidLoad {
+-(void) causeRefresh {
+    if (chartView.selectedPageIndex > 0) {
+        chartView.selectedPageIndex = 0;
+    } else {
+        [chartView displaySelectedPage];
+    }
+    
+    return;
+}
+
+-(IBAction)addButtonPressed:(id)sender {
+    NSLog(@"Add button pressed.");
+}
+
+-(IBAction)deleteButtonPressed:(id)sender {
+    NSInteger row = [tableView selectedRow];
+    
+    if (![[_sseq class] isSubclassOfClass:[EXTPolynomialSSeq class]])
+        return;
+    
+    EXTPolynomialSSeq *polySSeq = (EXTPolynomialSSeq*)_sseq;
+    [polySSeq deleteClass:[polySSeq.generators[row] objectForKey:@"name"]];
+    
+    [tableView deselectAll:sender];
     [tableView reloadData];
+    
+    [self causeRefresh];
+    
+    return;
 }
 
 @end
