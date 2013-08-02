@@ -227,6 +227,19 @@
     // update the navigation members
     NSMutableDictionary *entry = [NSMutableDictionary new];
     
+    // if there's no name, then it's a sign that we should make one up.
+    if (!name) {
+        NSMutableArray *names = [NSMutableArray array];
+        for (NSDictionary *dict in generators)
+            [names addObject:dict[@"name"]];
+        
+        int i = 0;
+        do {
+            i++;
+            name = [NSString stringWithFormat:@"x%d",i];
+        } while ([names indexOfObject:name] != NSNotFound);
+    }
+    
     [entry setObject:name forKey:@"name"];
     [entry setObject:loc forKey:@"location"];
     [entry setObject:@0 forKey:@"upperBound"];

@@ -100,6 +100,21 @@
 }
 
 -(IBAction)addButtonPressed:(id)sender {
+    if (![[_sseq class] isSubclassOfClass:[EXTPolynomialSSeq class]])
+        return;
+    
+    EXTPolynomialSSeq *polySSeq = (EXTPolynomialSSeq*) _sseq;
+    EXTLocation *loc = [[polySSeq indexClass] convertFromString:[self.textField stringValue]];
+    
+    if (!loc)
+        return;
+    
+    // it liiiiives!
+    [polySSeq addPolyClass:nil location:loc upTo:1];
+    
+    [tableView reloadData];
+    [self causeRefresh];
+    
     NSLog(@"Add button pressed.");
 }
 
