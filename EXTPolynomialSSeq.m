@@ -158,7 +158,7 @@
     
     self.indexClass = locClass;
     
-    EXTTerm *unit = [EXTTerm term:[locClass identityLocation] andNames:[NSMutableArray arrayWithObject:@"1"]];
+    EXTTerm *unit = [EXTTerm term:[locClass identityLocation] andNames:[NSMutableArray arrayWithObject:[EXTPolynomialTag new]]];
     [self.terms setObject:unit forKey:unit.location];
     
     return self;
@@ -170,7 +170,7 @@
     
     ret.indexClass = locClass;
     
-    EXTTerm *unit = [EXTTerm term:[locClass identityLocation] andNames:[NSMutableArray arrayWithObject:@"1"]];
+    EXTTerm *unit = [EXTTerm term:[locClass identityLocation] andNames:[NSMutableArray arrayWithObject:[EXTPolynomialTag new]]];
     [ret.terms setObject:unit forKey:unit.location];
     
     return ret;
@@ -448,6 +448,28 @@
 }
 
 -(void) changeName:(NSObject<NSCopying>*)name to:(NSObject<NSCopying>*)newName {
+    NSMutableDictionary *entry = nil;
+    
+    // if the name already exists, then die.  we don't want a conflict.
+    for (NSMutableDictionary *generator in generators) {
+        if ([generator[@"name"] isEqual:newName])
+            return;
+        if ([generator[@"name"] isEqual:name])
+            entry = generator;
+    }
+    
+    for (EXTTerm *term in self.terms.allValues) {
+        for (EXTPolynomialTag *tag in term.names) {
+            NSNumber *exponent = [tag.tags objectForKey:name];
+            if (!exponent)
+                continue;
+            [tag.tags setObject:exponent forKey:newName];
+            [tag.tags removeObjectForKey:name];
+        }
+    }
+    
+    entry[@"name"] = newName;
+    
     return;
 }
 
