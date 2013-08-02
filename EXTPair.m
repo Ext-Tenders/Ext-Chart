@@ -60,6 +60,19 @@
     return (end.b - start.b);
 }
 
++(EXTPair*) convertFromString:(NSString *)input {
+    NSInteger a = 0, b = 0;
+    NSScanner *scanner = [NSScanner scannerWithString:input];
+    [scanner scanString:@"(" intoString:nil];
+    if (![scanner scanInteger:&a])
+        return nil;
+    [scanner scanString:@"," intoString:nil];
+    if (![scanner scanInteger:&b])
+        return nil;
+    
+    return [EXTPair pairWithA:a B:b];
+}
+
 /// NSCoder, NSCopying routines ///
 
 -(EXTPair*) copyWithZone:(NSZone*)zone {

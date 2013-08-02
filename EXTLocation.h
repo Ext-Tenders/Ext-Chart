@@ -45,6 +45,9 @@ enum EXTLocationKinds {
 -(BOOL) isEqual:(NSObject<EXTLocation>*)a;
 -(NSUInteger) hash;
 
+// interaction with the UI
++(NSObject<EXTLocation>*) convertFromString:(NSString*)input;
+
 @end
 
 typedef NSObject<EXTLocation> EXTLocation;

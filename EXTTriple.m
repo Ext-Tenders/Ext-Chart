@@ -67,6 +67,22 @@
     return (start.c - end.c + 1);
 }
 
++(EXTTriple*) convertFromString:(NSString *)input {
+    NSInteger a = 0, b = 0, c = 0;
+    NSScanner *scanner = [NSScanner scannerWithString:input];
+    [scanner scanString:@"(" intoString:nil];
+    if (![scanner scanInteger:&a])
+        return nil;
+    [scanner scanString:@"," intoString:nil];
+    if (![scanner scanInteger:&b])
+        return nil;
+    [scanner scanString:@"," intoString:nil];
+    if (![scanner scanInteger:&c])
+        return nil;
+    
+    return [EXTTriple tripleWithA:a B:b C:c];
+}
+
 -(EXTTriple*) copyWithZone:(NSZone*)zone {
     return [[EXTTriple allocWithZone:zone] initWithA:self.a B:self.b C:self.c];
 }
