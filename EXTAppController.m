@@ -7,19 +7,7 @@
 //
 
 #import "EXTAppController.h"
-#import "EXTDemos.h"
-#import "EXTDocument.h"
 #import "EXTNewDocumentWindowController.h"
-#import "EXTMaySpectralSequence.h"
-
-
-typedef enum : NSInteger {
-    EXTAppControllerRandomExampleTag  = 0,
-    EXTAppControllerS5ExampleTag      = 1,
-    EXTAppControllerKUhC2ExampleTag   = 2,
-    EXTAppControllerA1MSSExampleTag   = 3,
-    EXTAppControllerMayExampleTag     = 4
-} EXTAppControllerExampleTag;
 
 
 @implementation EXTAppController {
@@ -38,45 +26,6 @@ typedef enum : NSInteger {
 - (BOOL)applicationOpenUntitledFile:(NSApplication *)sender {
     [self newDocument:nil];
     return YES;
-}
-
-- (IBAction)newExampleDocument:(id)sender
-{
-    NSAssert([sender respondsToSelector:@selector(tag)], @"This action only accepts senders that respond to -tag");
-    
-    EXTSpectralSequence *sseq;
-
-    switch ((EXTAppControllerExampleTag)[sender tag]) {
-        case EXTAppControllerRandomExampleTag:
-            sseq = [EXTDemos randomDemo];
-            break;
-
-        case EXTAppControllerS5ExampleTag:
-            sseq = [EXTDemos S5Demo];
-            break;
-            
-        case EXTAppControllerKUhC2ExampleTag:
-            sseq = [EXTDemos KUhC2Demo];
-            break;
-            
-        case EXTAppControllerA1MSSExampleTag:
-            sseq = [EXTDemos A1MSSDemo];
-            break;
-            
-        case EXTAppControllerMayExampleTag:
-            sseq = [EXTMaySpectralSequence fillToWidth:6];
-            break;
-
-        default:
-            sseq = nil;
-            break;
-    }
-
-    if (! sseq)
-        return;
-
-    EXTDocument *newDocument = [[NSDocumentController sharedDocumentController] openUntitledDocumentAndDisplay:YES error:NULL];
-    [newDocument setSseq:sseq];
 }
 
 @end
