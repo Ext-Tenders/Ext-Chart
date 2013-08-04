@@ -454,7 +454,7 @@
     // the point of doing that was to perform column reduction and find a
     // minimal spanning set for their image.
     EXTMatrix *enormousMat = [EXTMatrix matrixWidth:imageVectors.count
-                                             height:targetDimension];
+                                             height:sourceDimension];
     enormousMat.presentation = imageVectors;
     enormousMat = [enormousMat columnReduce];
     

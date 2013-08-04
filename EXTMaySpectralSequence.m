@@ -178,9 +178,7 @@
                 }
                 
                 // now we have to make a comparison based on filtration degree.
-                if (mayDegree > activeMayDegree) {
-                    activeMayDegree = mayDegree;
-                    
+                if (mayDegree > activeMayDegree) {                    
                     // convert the target tag to an EXTLocation
                     EXTTriple *targetLoc = [EXTTriple identityLocation];
                     for (EXTMayTag *workingTag in targetTag.tags) {
@@ -192,6 +190,7 @@
                     EXTTerm *tempTarget = [self findTerm:targetLoc];
                     if (tempTarget) {
                         endTerm = tempTarget;
+                        activeMayDegree = mayDegree;
                         ret = [EXTMatrix matrixWidth:startTerm.size height:endTerm.size];
                     }
                 }
@@ -232,6 +231,9 @@
         } while (leftover != order); // cartan loop
     } // term summand loop
     
+    if (!ret || !endTerm)
+        return nil;
+    
     return @[ret,endTerm];
 }
 
@@ -254,6 +256,8 @@
     
     EXTMatrix *startSquare = startSquarePair[0], *endSquare = endSquarePair[0];
     EXTTerm *newStart = startSquarePair[1], *newEnd = endSquarePair[1];
+    if (!newStart || !newEnd)
+        return;
     
     int newPage = [EXTTriple calculateDifflPage:newStart.location end:newEnd.location];
     if (newPage == -1) {
@@ -394,8 +398,13 @@
     
     // TODO: use nakamura's lemma to get the higher differentials.
     // XXX: right now i'm going to hard-code something that works for A(1)...
-    [self calculateNakamura:1 location:[EXTTriple tripleWithA:1 B:3 C:2] page:1];
-    [self propagateLeibniz:@[[EXTTriple tripleWithA:2 B:6 C:4], [EXTTriple tripleWithA:1 B:1 C:1], [EXTTriple tripleWithA:1 B:2 C:1]] page:2];
+    EXTTriple *h20 = [EXTTriple tripleWithA:1 B:3 C:2];
+    if ([self findTerm:h20])
+        [self calculateNakamura:1 location:h20 page:1];
+    
+    EXTTriple *h20squared = [EXTTriple tripleWithA:2 B:6 C:4];
+    if ([self findTerm:h20squared])
+        [self propagateLeibniz:@[h20squared, [EXTTriple tripleWithA:1 B:1 C:1], [EXTTriple tripleWithA:1 B:2 C:1]] page:2];
     
     return;
 }

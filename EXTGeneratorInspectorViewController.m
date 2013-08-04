@@ -114,8 +114,6 @@
     
     [tableView reloadData];
     [self causeRefresh];
-    
-    NSLog(@"Add button pressed.");
 }
 
 -(IBAction)deleteButtonPressed:(id)sender {

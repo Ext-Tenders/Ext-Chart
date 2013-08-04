@@ -64,11 +64,11 @@
         NSMutableArray *options = [NSMutableArray array];
         [options addObject:[[EXTNewDocumentOption alloc] initGroupWithName:@"Blank Document"]];
         [options addObject:[[EXTNewDocumentOption alloc] initWithName:@"Arbitrary Spectral Sequence"
-                                                          description:@"Generators can be arbitrary elements"
+                                                          description:@"Terms have no automatic multiplicative structure"
                                                           detailsView:_locationTypeView
                                               spectralSequenceFactory:^{return [EXTSpectralSequence new];}]];
         [options addObject:[[EXTNewDocumentOption alloc] initWithName:@"Polynomial Spectral Sequence"
-                                                          description:@"Generators can be integer tuples"
+                                                          description:@"Optimized to present E_1 as a polynomial algebra"
                                                           detailsView:_locationTypeView
                                               spectralSequenceFactory:^{
                                                   Class<EXTLocation> unit = ([_locationTypeMatrix selectedRow] == 0 ?
@@ -78,7 +78,7 @@
                                               }
                             ]];
         [options addObject:[[EXTNewDocumentOption alloc] initWithName:@"May Spectral Sequence"
-                                                          description:@"Winds of May, that dance on the sea"
+                                                          description:@"Computes the cohomology of the Steenrod algebra"
                                                           detailsView:_mayView
                                               spectralSequenceFactory:^{
                                                   const int width = [_mayWidthField intValue];
@@ -94,16 +94,16 @@
                                                           description:@"Random garbage"
                                                           detailsView:_exampleImageView
                                               spectralSequenceFactory:^{return [EXTDemos randomDemo];}]];
-        [options addObject:[[EXTNewDocumentOption alloc] initWithName:@"S5"
-                                                          description:@"Five-dimensional sphere"
+        [options addObject:[[EXTNewDocumentOption alloc] initWithName:@"Serre: S^1 -> CP^2 -> S^5"
+                                                          description:@"Serre spectral sequence for the above fibration"
                                                           detailsView:_exampleImageView
                                               spectralSequenceFactory:^{return [EXTDemos S5Demo];}]];
-        [options addObject:[[EXTNewDocumentOption alloc] initWithName:@"KUhC2"
-                                                          description:@"Potassium and, Uh, carbon"
+        [options addObject:[[EXTNewDocumentOption alloc] initWithName:@"C_2-Homotopy Fixed Point SS for KU"
+                                                          description:@"WARNING: Thrown off by the mod-2 coefficients"
                                                           detailsView:_exampleImageView
                                               spectralSequenceFactory:^{return [EXTDemos KUhC2Demo];}]];
-        [options addObject:[[EXTNewDocumentOption alloc] initWithName:@"A(1) MSS"
-                                                          description:@"America’s First Mathematical & Spiritual Society"
+        [options addObject:[[EXTNewDocumentOption alloc] initWithName:@"A(1) May Spectral Sequence"
+                                                          description:@"A 25x25 range of the May SS computing pi_* ko"
                                                           detailsView:_exampleImageView
                                               spectralSequenceFactory:^{return [EXTDemos A1MSSDemo];}]];
 
@@ -216,7 +216,8 @@
     const bool restrictSubalgebra = ([_mayRestrictToSubalgebraButton state] == NSOnState);
     const int An = [_maySubalgebraField intValue];
 
-    return width >= 4 && !(restrictSubalgebra && An <= 0);
+//    return width >= 4 && !(restrictSubalgebra && An <= 0);
+    return !(restrictSubalgebra && An <= 0);
 }
 
 @end
