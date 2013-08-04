@@ -138,38 +138,38 @@
 }
 
 - (void)tableViewSelectionDidChange:(NSNotification *)notification {
-    NSUInteger selectedRow = [_tableView selectedRow];
-    if (selectedRow == NSNotFound)
-        return;
-
+    [_nameField setStringValue:@""];
+    [_descriptionField setStringValue:@""];
     [[_detailsView subviews] makeObjectsPerformSelector:@selector(removeFromSuperview)];
 
-    EXTNewDocumentOption *option = [_options objectAtIndex:selectedRow];
-    [_nameField setStringValue:[option name]];
-    [_descriptionField setStringValue:[option description]];
+    NSInteger selectedRow = [_tableView selectedRow];
+    bool createButtonEnabled = false;
 
-    if ([option isGroup]) {
-        [_createDocumentButton setEnabled:false];
-    }
-    else {
-        bool createButtonEnabled = true;
+    if (selectedRow >= 0) {
+        EXTNewDocumentOption *option = [_options objectAtIndex:selectedRow];
+        [_nameField setStringValue:[option name]];
+        [_descriptionField setStringValue:[option description]];
 
-        NSView *currentOptionView = [option detailsView];
-        if (currentOptionView) {
-            [_detailsView addSubview:currentOptionView];
+        if (![option isGroup]) {
+            createButtonEnabled = true;
 
-            NSDictionary *views = NSDictionaryOfVariableBindings(currentOptionView);
-            [_detailsView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-0-[currentOptionView]-0-|" options:0 metrics:nil views:views]];
-            [_detailsView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-0-[currentOptionView]-0-|" options:0 metrics:nil views:views]];
+            NSView *currentOptionView = [option detailsView];
+            if (currentOptionView) {
+                [_detailsView addSubview:currentOptionView];
 
-            if (currentOptionView == _mayView)
-                createButtonEnabled = [self validateMayView];
-            else if (currentOptionView == _exampleImageView)
-                [_exampleImageView setImage:[NSImage imageNamed:_exampleImageNames[selectedRow - _firstExampleIndex]]];
+                NSDictionary *views = NSDictionaryOfVariableBindings(currentOptionView);
+                [_detailsView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-0-[currentOptionView]-0-|" options:0 metrics:nil views:views]];
+                [_detailsView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-0-[currentOptionView]-0-|" options:0 metrics:nil views:views]];
+                
+                if (currentOptionView == _mayView)
+                    createButtonEnabled = [self validateMayView];
+                else if (currentOptionView == _exampleImageView)
+                    [_exampleImageView setImage:[NSImage imageNamed:_exampleImageNames[selectedRow - _firstExampleIndex]]];
+            }
         }
-
-        [_createDocumentButton setEnabled:createButtonEnabled];
     }
+
+    [_createDocumentButton setEnabled:createButtonEnabled];
 }
 
 #pragma mark - NSControl delegate
