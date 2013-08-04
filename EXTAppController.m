@@ -9,6 +9,7 @@
 #import "EXTAppController.h"
 #import "EXTDemos.h"
 #import "EXTDocument.h"
+#import "EXTNewDocumentWindowController.h"
 #import "EXTMaySpectralSequence.h"
 
 
@@ -21,11 +22,23 @@ typedef enum : NSInteger {
 } EXTAppControllerExampleTag;
 
 
-@interface EXTAppController ()
-@end
+@implementation EXTAppController {
+    EXTNewDocumentWindowController *_newDocumentWindowController;
+}
 
+- (void)newDocument:(id)sender {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (!_newDocumentWindowController)
+            _newDocumentWindowController = [EXTNewDocumentWindowController new];
 
-@implementation EXTAppController
+        [_newDocumentWindowController showWindow:self];
+    });
+}
+
+- (BOOL)applicationOpenUntitledFile:(NSApplication *)sender {
+    [self newDocument:nil];
+    return YES;
+}
 
 - (IBAction)newExampleDocument:(id)sender
 {

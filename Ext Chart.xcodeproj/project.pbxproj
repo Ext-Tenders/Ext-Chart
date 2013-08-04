@@ -13,6 +13,12 @@
 		1467B26E178CF15E0084A2F6 /* EXTDocumentInspectorView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1467B26D178CF15E0084A2F6 /* EXTDocumentInspectorView.m */; };
 		1467B272178D13A80084A2F6 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1467B271178D13A80084A2F6 /* QuartzCore.framework */; };
 		149314581783B6EB0080EF28 /* EXTDocumentControlsView.m in Sources */ = {isa = PBXBuildFile; fileRef = 149314571783B6EA0080EF28 /* EXTDocumentControlsView.m */; };
+		149831A017AE04F3000380A5 /* EXTNewDocumentWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1498319E17AE04F3000380A5 /* EXTNewDocumentWindowController.m */; };
+		149831A117AE04F3000380A5 /* EXTNewDocument.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1498319F17AE04F3000380A5 /* EXTNewDocument.xib */; };
+		149831A617AE65EA000380A5 /* A1MSS Example.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 149831A217AE65EA000380A5 /* A1MSS Example.pdf */; };
+		149831A717AE65EA000380A5 /* KUhC2 Example.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 149831A317AE65EA000380A5 /* KUhC2 Example.pdf */; };
+		149831A817AE65EA000380A5 /* Random Example.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 149831A417AE65EA000380A5 /* Random Example.pdf */; };
+		149831A917AE65EA000380A5 /* S5 Example.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 149831A517AE65EA000380A5 /* S5 Example.pdf */; };
 		14CCA38C1794F21D002EF861 /* ArtBoardTool.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 14CCA3891794F21D002EF861 /* ArtBoardTool.pdf */; };
 		14CCA38D1794F21D002EF861 /* ArtBoardToolAlternate.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 14CCA38A1794F21D002EF861 /* ArtBoardToolAlternate.pdf */; };
 		14CCA38E1794F21D002EF861 /* Ext Chart.iconset in Resources */ = {isa = PBXBuildFile; fileRef = 14CCA38B1794F21D002EF861 /* Ext Chart.iconset */; };
@@ -65,6 +71,13 @@
 		1467B271178D13A80084A2F6 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk/System/Library/Frameworks/QuartzCore.framework; sourceTree = DEVELOPER_DIR; };
 		149314561783B6EA0080EF28 /* EXTDocumentControlsView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTDocumentControlsView.h; sourceTree = "<group>"; };
 		149314571783B6EA0080EF28 /* EXTDocumentControlsView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTDocumentControlsView.m; sourceTree = "<group>"; };
+		1498319D17AE04F3000380A5 /* EXTNewDocumentWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTNewDocumentWindowController.h; sourceTree = "<group>"; };
+		1498319E17AE04F3000380A5 /* EXTNewDocumentWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTNewDocumentWindowController.m; sourceTree = "<group>"; };
+		1498319F17AE04F3000380A5 /* EXTNewDocument.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = EXTNewDocument.xib; sourceTree = "<group>"; };
+		149831A217AE65EA000380A5 /* A1MSS Example.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = "A1MSS Example.pdf"; path = "Images/A1MSS Example.pdf"; sourceTree = "<group>"; };
+		149831A317AE65EA000380A5 /* KUhC2 Example.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = "KUhC2 Example.pdf"; path = "Images/KUhC2 Example.pdf"; sourceTree = "<group>"; };
+		149831A417AE65EA000380A5 /* Random Example.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = "Random Example.pdf"; path = "Images/Random Example.pdf"; sourceTree = "<group>"; };
+		149831A517AE65EA000380A5 /* S5 Example.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = "S5 Example.pdf"; path = "Images/S5 Example.pdf"; sourceTree = "<group>"; };
 		149A0EA6176C409C006F6142 /* NSCursor+EXTApplePrivate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSCursor+EXTApplePrivate.h"; sourceTree = "<group>"; };
 		14CCA3891794F21D002EF861 /* ArtBoardTool.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = ArtBoardTool.pdf; path = Images/ArtBoardTool.pdf; sourceTree = "<group>"; };
 		14CCA38A1794F21D002EF861 /* ArtBoardToolAlternate.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = ArtBoardToolAlternate.pdf; path = Images/ArtBoardToolAlternate.pdf; sourceTree = "<group>"; };
@@ -166,6 +179,30 @@
 			name = Support;
 			sourceTree = "<group>";
 		};
+		149831AA17AE6A0E000380A5 /* Toolbox */ = {
+			isa = PBXGroup;
+			children = (
+				38A92124179DDF06000B827D /* GeneratorTool.pdf */,
+				38A9211F179DCED8000B827D /* DifferentialTool.pdf */,
+				38A92120179DCED8000B827D /* MultiplicativeStructureTool.pdf */,
+				14CCA3891794F21D002EF861 /* ArtBoardTool.pdf */,
+				14CCA38A1794F21D002EF861 /* ArtBoardToolAlternate.pdf */,
+				14EF1A651756EE3C0012DD3C /* SelectTool.pdf */,
+			);
+			name = Toolbox;
+			sourceTree = "<group>";
+		};
+		149831AB17AE6A1A000380A5 /* Examples */ = {
+			isa = PBXGroup;
+			children = (
+				149831A217AE65EA000380A5 /* A1MSS Example.pdf */,
+				149831A317AE65EA000380A5 /* KUhC2 Example.pdf */,
+				149831A417AE65EA000380A5 /* Random Example.pdf */,
+				149831A517AE65EA000380A5 /* S5 Example.pdf */,
+			);
+			name = Examples;
+			sourceTree = "<group>";
+		};
 		149A0EA5176C4065006F6142 /* System Categories */ = {
 			isa = PBXGroup;
 			children = (
@@ -232,6 +269,8 @@
 				14064DC817A0C3B100E202D5 /* EXTDocumentWindowController+EXTChartViewDelegate.m */,
 				385BF10E17AAD8D5008CA5B6 /* EXTGeneratorInspectorViewController.h */,
 				385BF10F17AAD8D5008CA5B6 /* EXTGeneratorInspectorViewController.m */,
+				1498319D17AE04F3000380A5 /* EXTNewDocumentWindowController.h */,
+				1498319E17AE04F3000380A5 /* EXTNewDocumentWindowController.m */,
 			);
 			name = Controllers;
 			sourceTree = "<group>";
@@ -250,13 +289,9 @@
 		14EF1A611756ED430012DD3C /* Images */ = {
 			isa = PBXGroup;
 			children = (
-				38A92124179DDF06000B827D /* GeneratorTool.pdf */,
-				38A9211F179DCED8000B827D /* DifferentialTool.pdf */,
-				38A92120179DCED8000B827D /* MultiplicativeStructureTool.pdf */,
-				14CCA3891794F21D002EF861 /* ArtBoardTool.pdf */,
-				14CCA38A1794F21D002EF861 /* ArtBoardToolAlternate.pdf */,
 				14CCA38B1794F21D002EF861 /* Ext Chart.iconset */,
-				14EF1A651756EE3C0012DD3C /* SelectTool.pdf */,
+				149831AA17AE6A0E000380A5 /* Toolbox */,
+				149831AB17AE6A1A000380A5 /* Examples */,
 			);
 			name = Images;
 			sourceTree = "<group>";
@@ -266,6 +301,7 @@
 			children = (
 				1DDD58280DA1D0D100B32029 /* EXTDocument.xib */,
 				385BF10B17AAD8C2008CA5B6 /* EXTGeneratorInspectorViewController.xib */,
+				1498319F17AE04F3000380A5 /* EXTNewDocument.xib */,
 				1DDD582A0DA1D0D100B32029 /* MainMenu.xib */,
 			);
 			name = XIBs;
@@ -406,6 +442,11 @@
 				38A92123179DCED8000B827D /* MultiplicativeStructureTool.pdf in Resources */,
 				38A92125179DDF06000B827D /* GeneratorTool.pdf in Resources */,
 				385BF10D17AAD8C2008CA5B6 /* EXTGeneratorInspectorViewController.xib in Resources */,
+				149831A117AE04F3000380A5 /* EXTNewDocument.xib in Resources */,
+				149831A617AE65EA000380A5 /* A1MSS Example.pdf in Resources */,
+				149831A717AE65EA000380A5 /* KUhC2 Example.pdf in Resources */,
+				149831A817AE65EA000380A5 /* Random Example.pdf in Resources */,
+				149831A917AE65EA000380A5 /* S5 Example.pdf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -440,6 +481,7 @@
 				1467B26E178CF15E0084A2F6 /* EXTDocumentInspectorView.m in Sources */,
 				14064DC917A0C3B100E202D5 /* EXTDocumentWindowController+EXTChartViewDelegate.m in Sources */,
 				385BF11017AAD8D5008CA5B6 /* EXTGeneratorInspectorViewController.m in Sources */,
+				149831A017AE04F3000380A5 /* EXTNewDocumentWindowController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
