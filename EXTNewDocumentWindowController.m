@@ -210,14 +210,12 @@
 
 #pragma mark -
 
-// TODO: Ask Eric to, erm, validate this
 - (bool)validateMayView {
     const int width = [_mayWidthField intValue];
     const bool restrictSubalgebra = ([_mayRestrictToSubalgebraButton state] == NSOnState);
     const int An = [_maySubalgebraField intValue];
 
-//    return width >= 4 && !(restrictSubalgebra && An <= 0);
-    return !(restrictSubalgebra && An <= 0);
+    return width >= 0 && !(restrictSubalgebra && An <= 0);
 }
 
 @end
