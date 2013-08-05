@@ -20,12 +20,10 @@
 @synthesize names;
 @synthesize cycles;
 @synthesize boundaries;
+@synthesize displayBasis;
+@synthesize displayNames;
 
 #pragma mark *** initialization ***
-
--(int) size {
-    return names.count;
-}
 
 // setTerm re/initializes an EXTTerm with the desired values.
 -(id) setTerm:(EXTLocation*)whichLocation andNames:(NSMutableArray*)whichNames {
@@ -35,6 +33,8 @@
     [self setLocation:whichLocation];
     [self setBoundaries:[NSMutableArray array]];
     [self setCycles:[NSMutableArray array]];
+    [self setDisplayBasis:nil];
+    [self setDisplayNames:nil];
 
     [self setNames:whichNames];
 
@@ -64,6 +64,8 @@
 	{
         names = [coder decodeObjectForKey:@"names"];
         location = [coder decodeObjectForKey:@"location"];
+        displayBasis = [coder decodeObjectForKey:@"displayBasis"];
+        displayNames = [coder decodeObjectForKey:@"displayNames"];
         
         // start off with the default cycles and boundaries
         boundaries = [NSMutableArray array];
@@ -78,6 +80,8 @@
 - (void) encodeWithCoder:(NSCoder*) coder {
     [coder encodeObject:names forKey:@"names"];
 	[coder encodeObject:location forKey:@"location"];
+    [coder encodeObject:displayBasis forKey:@"displayBasis"];
+    [coder encodeObject:displayNames forKey:@"displayNames"];
 }
 
 #pragma mark *** drawing; TODO: SEPARATE THIS OUT ***
@@ -129,6 +133,10 @@
 + (id) sumOfTerms:(EXTTerm *)termOne and:(EXTTerm *)termTwo {
     NSLog(@"+sumOfTerms is not yet implemented.");
 	return nil; // allowed?
+}
+
+-(int) size {
+    return names.count;
 }
 
 // this assumes that the cycles from the page before have already been computed.

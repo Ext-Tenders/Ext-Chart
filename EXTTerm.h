@@ -9,6 +9,7 @@
 #import <Cocoa/Cocoa.h>
 #import "EXTDocument.h"
 #import "EXTLocation.h"
+#import "EXTMatrix.h"
 
 // forward prototypes for classes in other headers.
 @class EXTGrid;
@@ -20,23 +21,15 @@
 // TODO: for the moment, i'm only even trying to make F2-vector-spaces work. any
 // more sophisticated variant of modules is going to take a substantial rewrite.
 @interface EXTTerm : NSObject <NSCoding>
-    {
-        EXTLocation* location;          // position on grid
-        NSMutableArray* names;      // contains NSString's, basis element names
-        // TODO: this next item means we need to understand some kind of linear
-        // algebra, and how to name things inside a vector space.
-        NSMutableArray* cycles;     // contains NSArray's of Elements, which are
-                                    // bases for future pages
-        NSMutableArray* boundaries; // contains NSArray's of Elements, which are
-                                    // the subspaces of boundaries
-        
-        // TODO: add some list that keeps track of multiplicative structures
-    }
 
-    @property(retain) EXTLocation* location;
-    @property(retain) NSMutableArray* names;
-    @property(retain) NSMutableArray* cycles;
-    @property(retain) NSMutableArray* boundaries;
+    @property(retain) EXTLocation* location; // position on grid
+    @property(retain) NSMutableArray* names; // NSObjects with -description
+                                             // responders. basis element names.
+    @property(retain) NSMutableArray* cycles; // NSArrays of cycle group bases
+    @property(retain) NSMutableArray* boundaries; // ...  of bdry group bases
+    @property(retain) EXTMatrix *displayBasis; // change of basis matrix, used
+                                               // to display in a nonstd basis
+    @property(retain) NSMutableArray* displayNames; // labels for display
 
     // a constructor
     +(id) term:(EXTLocation*)whichLocation andNames:(NSMutableArray*)whichNames;
