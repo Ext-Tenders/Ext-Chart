@@ -277,6 +277,7 @@
         EXTPartialDefinition *partial = [EXTPartialDefinition new];
         partial.differential = [EXTMatrix newMultiply:endSquare by:oldPartial.differential];
         partial.inclusion = [EXTMatrix newMultiply:startSquare by:oldPartial.inclusion];
+        partial.description = [NSString stringWithFormat:@"Nakamura's lemma applied to Sq^%d on %@ in E%d",order,location,page];
         [diff.partialDefinitions addObject:partial];
         // TODO: it's not clear that the rest of the code requires the inclusion
         // map to be an inclusion.  if it does, we should insert something to
@@ -384,6 +385,7 @@
                     rightEntry = workingEntry;
             EXTMatrix *product = [self productWithLeft:[leftEntry objectForKey:@"location"] right:[rightEntry objectForKey:@"location"]];
             partial.differential = [EXTMatrix sum:partial.differential with:product];
+            partial.description = [NSString stringWithFormat:@"May d1 differential on %@",tag];
         }
         
         [diff.partialDefinitions addObject:partial];

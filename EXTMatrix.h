@@ -26,9 +26,11 @@
 
 @property (retain) EXTMatrix *inclusion;
 @property (retain) EXTMatrix *differential;
-@property (assign) bool automaticallyGenerated;
+@property (assign,readonly) bool automaticallyGenerated;
+@property (retain) NSString *description;
 
 -(BOOL) isEqual:(id)object;
+-(void) manuallyGenerated;
 
 @end
 

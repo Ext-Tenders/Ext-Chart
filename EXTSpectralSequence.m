@@ -226,6 +226,7 @@
                 EXTMatrix *dx1 = [EXTMatrix hadamardProduct:partial.differential with:idP];
                 newPartial.inclusion = [EXTMatrix newMultiply:i1 by:ix1];
                 newPartial.differential = [EXTMatrix newMultiply:i2 by:dx1];
+                partial.description = [NSString stringWithFormat:@"Tensored up from %@ (x) %@",d1.start.location,P.location];
                 [partialsForThisD addObject:partial];
             }
             
@@ -294,6 +295,7 @@
                 EXTMatrix *dx1 = [EXTMatrix hadamardProduct:idA with:partial.differential];
                 newPartial.inclusion = [EXTMatrix newMultiply:i1 by:ix1];
                 newPartial.differential = [EXTMatrix newMultiply:i2 by:dx1];
+                partial.description = [NSString stringWithFormat:@"Tensored up from %@ (x) %@",A.location,d2.start.location];
                 [partialsForThisD addObject:partial];
             }
             

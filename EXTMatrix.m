@@ -15,6 +15,7 @@
 @synthesize inclusion;
 @synthesize differential;
 @synthesize automaticallyGenerated;
+@synthesize description;
 
 -(EXTPartialDefinition*) init {
     if (!(self = [super init])) return nil;
@@ -23,6 +24,8 @@
     // appropriate initialization calls to EXTMatrix factories.
     inclusion = nil;
     differential = nil;
+    automaticallyGenerated = true;
+    description = nil;
     
     return self;
 }
@@ -39,20 +42,24 @@
 -(void) encodeWithCoder:(NSCoder *)aCoder {
     [aCoder encodeObject:inclusion forKey:@"inclusion"];
     [aCoder encodeObject:differential forKey:@"differential"];
+    [aCoder encodeBool:automaticallyGenerated forKey:@"automaticallyGenerated"];
+    [aCoder encodeObject:description forKey:@"description"];
 }
 
 -(id) initWithCoder:(NSCoder *)aDecoder {
     if (self = [super init]) {
         inclusion = [aDecoder decodeObjectForKey:@"inclusion"];
         differential = [aDecoder decodeObjectForKey:@"differential"];
+        automaticallyGenerated = [aDecoder decodeBoolForKey:@"automaticallyGenerated"];
+        description = [aDecoder decodeObjectForKey:@"description"];
     }
     
     return self;
 }
 
-// TODO: make the boolean flag into (change to true)-only, like a dirty flag.
-// use this to decide whether to prompt the user when deleting partial
-// definitions, or generally when performing any other destructive operation.
+-(void) manuallyGenerated {
+    automaticallyGenerated = false;
+}
 
 @end
 

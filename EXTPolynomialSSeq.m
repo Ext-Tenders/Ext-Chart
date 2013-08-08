@@ -215,6 +215,7 @@
         partial.differential = [self productWithLeft:leftTerm.location
                                                right:rightTerm.location];
         partial.inclusion = [EXTMatrix identity:partial.differential.width];
+        partial.description = [NSString stringWithFormat:@"Inferred from polynomial structure."];
         [self.multTables addPartialDefinition:partial
                                            to:leftTerm.location
                                          with:rightTerm.location];
@@ -324,9 +325,6 @@
         } // for: counter increment
     } // while
     
-    // XXX: CHECK ALL DIFFERENTIALS THAT TOUCH THESE CLASSES, AND MODIFY THEIR
-    // MATRICES ACCORDINGLY.
-    
     // store newBound as the new bound
     [entry setObject:@(newBound) forKey:@"upperBound"];
     
@@ -397,6 +395,7 @@
         allZero.inclusion = [EXTMatrix identity:sumterm.size];
         allZero.differential = [EXTMatrix matrixWidth:sumterm.size
                                                height:targetterm.size];
+        allZero.description = [NSString stringWithFormat:@"Leibniz rule on %@ and %@",loc1,loc2];
         [dsum.partialDefinitions addObject:allZero];
     } else if (d1Zero && !d2Zero) {
         for (EXTPartialDefinition *partial2 in d2.partialDefinitions) {
@@ -410,6 +409,7 @@
             partial.inclusion =
                 [EXTMatrix newMultiply:muAB by:[EXTMatrix hadamardProduct:[EXTMatrix identity:A.size] with:partial2.inclusion]];
             partial.differential = [EXTMatrix newMultiply:muAY by:[EXTMatrix hadamardProduct:[EXTMatrix identity:A.size] with:partial2.differential]];
+            partial.description = [NSString stringWithFormat:@"Leibniz rule on %@ and %@",loc1,loc2];
             
             [dsum.partialDefinitions addObject:partial];
         }
@@ -425,6 +425,7 @@
             partial.inclusion =
                 [EXTMatrix newMultiply:muAB by:[EXTMatrix hadamardProduct:partial1.inclusion with:[EXTMatrix identity:B.size]]];
             partial.differential = [EXTMatrix newMultiply:muXB by:[EXTMatrix hadamardProduct:partial1.differential with:[EXTMatrix identity:B.size]]];
+            partial.description = [NSString stringWithFormat:@"Leibniz rule on %@ and %@",loc1,loc2];
             
             [dsum.partialDefinitions addObject:partial];
         }
@@ -450,6 +451,7 @@
             EXTPartialDefinition *partial = [EXTPartialDefinition new];
             partial.inclusion = [EXTMatrix newMultiply:muAB by:[EXTMatrix newMultiply:leftInclusion by:pair[0]]];
             partial.differential = [EXTMatrix sum:[EXTMatrix newMultiply:leftMultiply by:pair[0]] with:[EXTMatrix newMultiply:rightMultiply by:pair[1]]];
+            partial.description = [NSString stringWithFormat:@"Leibniz rule on %@ and %@",loc1,loc2];
             
             [dsum.partialDefinitions addObject:partial];
         }
