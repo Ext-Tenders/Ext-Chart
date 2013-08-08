@@ -35,6 +35,8 @@ typedef enum : NSUInteger {
      */
     @property(nonatomic, assign, readonly) NSRect drawingRect;
 
+    @property(nonatomic, assign) bool hasShadow;
+
     - (id)initWithFrame:(NSRect)frame;
 
     - (void)fillRect;

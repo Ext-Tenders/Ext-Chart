@@ -170,6 +170,9 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
 		[_grid drawGridInRect:rect];
 
     // Art board borders
+    // If we aren’t drawing to the screen (e.g., when exporting the art board as PDF), the
+    // art board looks nicer without a shadow
+    [_artBoard setHasShadow:[[NSGraphicsContext currentContext] isDrawingToScreen]];
 	[_artBoard strokeRect];   // we're drawing the entire artboard frame.   probably OK.
 
 	// Axes
@@ -257,8 +260,10 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
 }
 
 - (void)setShowsGrid:(bool)showsGrid {
-	_showsGrid = showsGrid;
-	[self setNeedsDisplay:YES];
+    if (showsGrid != _showsGrid) {
+        _showsGrid = showsGrid;
+        [self setNeedsDisplay:YES];
+    }
 }
 
 - (void)setSelectedToolTag:(EXTToolboxTag)selectedToolTag {
