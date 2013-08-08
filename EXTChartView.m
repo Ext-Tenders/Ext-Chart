@@ -222,7 +222,7 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
     // That path could be a constant, so wouldn't need to be rebuilt.
 
     Class toolClass = _EXTClassFromToolTag(_selectedToolTag);
-	NSBezierPath *newHighlightPath = [toolClass makeHighlightPathAtPoint:location onGrid: _grid onPage:_selectedPageIndex];
+	NSBezierPath *newHighlightPath = [toolClass makeHighlightPathAtPoint:location onGrid: _grid onPage:_selectedPageIndex locClass:self.sseq.indexClass];
 
     // We may be resetting the highlight because the mouse has moved, the page has changed, or the highlighting {true, false}
     // status has changed, so we always flag both the previous location and the new location as dirty.

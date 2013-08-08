@@ -54,6 +54,10 @@
     return [EXTPair pairWithA:(b.a+1) B:(b.b-page)];
 }
 
++(NSPoint) followDifflForDisplay:(NSPoint)loc page:(int)page spacing:(CGFloat)spacing {
+    return NSMakePoint(loc.x-1.0*spacing, loc.y+spacing*(CGFloat)page);
+}
+
 +(int) calculateDifflPage:(EXTPair*)start end:(EXTPair*)end {
     if ((start.a + 1 != end.a))
         return -1;

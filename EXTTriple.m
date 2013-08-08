@@ -61,6 +61,10 @@
     return [EXTTriple tripleWithA:(a.a - 1) B:(a.b) C:(a.c - 1 + page)];
 }
 
++(NSPoint) followDifflForDisplay:(NSPoint)loc page:(int)page spacing:(CGFloat)spacing {
+    return NSMakePoint(loc.x-spacing*1.0, loc.y+spacing*1.0);
+}
+
 +(int) calculateDifflPage:(EXTTriple*)start end:(EXTTriple*)end {
     if ((start.b != end.b) || (start.a + 1 != end.a))
         return -1;

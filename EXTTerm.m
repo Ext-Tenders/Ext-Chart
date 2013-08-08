@@ -94,7 +94,7 @@
         [terms setObject:self forKey:self.location];
 }
 
-+ (NSBezierPath *) makeHighlightPathAtPoint: (NSPoint)point onGrid:(EXTGrid *)theGrid onPage:(NSInteger)thePage {
++ (NSBezierPath *) makeHighlightPathAtPoint: (NSPoint)point onGrid:(EXTGrid *)theGrid onPage:(NSInteger)thePage locClass:(Class<EXTLocation>)locClass {
 	return [NSBezierPath bezierPathWithRect:[theGrid enclosingGridRect:point]];
 }
 

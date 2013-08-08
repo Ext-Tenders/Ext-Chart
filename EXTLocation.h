@@ -38,6 +38,7 @@ enum EXTLocationKinds {
 
 // these record the affine translation by a differential
 +(NSObject<EXTLocation>*) followDiffl:(NSObject<EXTLocation>*)a page:(int)page;
++(NSPoint) followDifflForDisplay:(NSPoint)loc page:(int)page spacing:(CGFloat)spacing;
 +(NSObject<EXTLocation>*) reverseDiffl:(NSObject<EXTLocation>*)b page:(int)page;
 +(int) calculateDifflPage:(NSObject<EXTLocation>*)start end:(NSObject<EXTLocation>*)end;
 

@@ -40,6 +40,7 @@
 
     // UI messages
     +(id) dealWithClick:(NSPoint)location document:(EXTDocument*)document;
+    + (NSBezierPath *) makeHighlightPathAtPoint: (NSPoint)point onGrid:(EXTGrid *)theGrid onPage:(NSInteger)thePage locClass:(Class<EXTLocation>)locClass;
 
     -(BOOL) checkForSanity;
 @end
