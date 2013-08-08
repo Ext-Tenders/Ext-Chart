@@ -32,7 +32,7 @@
 }
 
 @property(strong) NSMutableDictionary *tables;
-@property(strong) EXTSpectralSequence* sSeq;
+@property(weak) EXTSpectralSequence* sSeq;
 @property(strong) EXTTerm *unitTerm;
 @property(strong) NSMutableArray *unitClass;
 
