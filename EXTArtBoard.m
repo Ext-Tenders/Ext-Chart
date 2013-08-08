@@ -101,7 +101,8 @@ NS_INLINE void EXTArtBoardComputeHotSpotFrames(const NSRect frame,
 	{
         [documentRectanglePath setLineWidth:_EXTArtBoardBorderWidth];
         [_EXTArtBoardBorderColour set];
-        [_EXTArtBoardShadow set];
+        if (_hasShadow)
+            [_EXTArtBoardShadow set];
         [documentRectanglePath stroke];
     }
 	[NSGraphicsContext restoreGraphicsState];
