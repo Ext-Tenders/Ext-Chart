@@ -24,6 +24,8 @@ typedef enum : NSInteger {
 
 
 @protocol EXTChartViewDelegate <NSObject>
+    @property(nonatomic, weak) NSObject *highlightedObject;
+
     - (void)computeGroupsForPage:(NSUInteger)pageNumber;
     - (void)drawPageNumber:(NSUInteger)pageNumber ll:(NSPoint)lowerLeftCoord ur:(NSPoint)upperRightCoord withSpacing:(CGFloat)gridSpacing;
 @end

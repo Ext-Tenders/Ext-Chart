@@ -35,8 +35,10 @@
 		31D403C013DA04D8006A8C06 /* EXTDifferential.m in Sources */ = {isa = PBXBuildFile; fileRef = 31D403BF13DA04D8006A8C06 /* EXTDifferential.m */; };
 		31D5D2E513F6933B00F1B2F9 /* EXTArtBoard.m in Sources */ = {isa = PBXBuildFile; fileRef = 31D5D2E413F6933B00F1B2F9 /* EXTArtBoard.m */; };
 		3841EBD2177380C000ADA929 /* EXTZeroRange.m in Sources */ = {isa = PBXBuildFile; fileRef = 3841EBD1177380C000ADA929 /* EXTZeroRange.m */; };
-		385BF10D17AAD8C2008CA5B6 /* EXTGeneratorInspectorViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 385BF10B17AAD8C2008CA5B6 /* EXTGeneratorInspectorViewController.xib */; };
+		385BF10D17AAD8C2008CA5B6 /* EXTGeneratorInspectorView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 385BF10B17AAD8C2008CA5B6 /* EXTGeneratorInspectorView.xib */; };
 		385BF11017AAD8D5008CA5B6 /* EXTGeneratorInspectorViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 385BF10F17AAD8D5008CA5B6 /* EXTGeneratorInspectorViewController.m */; };
+		3869FCF817B4587100D0D740 /* EXTDifferentialPaneController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3869FCF617B4587100D0D740 /* EXTDifferentialPaneController.m */; };
+		3869FCF917B4587100D0D740 /* EXTDifferentialPane.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3869FCF717B4587100D0D740 /* EXTDifferentialPane.xib */; };
 		3896548D16F538D90008FB8D /* EXTMatrix.m in Sources */ = {isa = PBXBuildFile; fileRef = 3896548C16F538D90008FB8D /* EXTMatrix.m */; };
 		389FB38D17498AF500D0FE75 /* EXTMultiplicationTables.m in Sources */ = {isa = PBXBuildFile; fileRef = 389FB38C17498AF500D0FE75 /* EXTMultiplicationTables.m */; };
 		38A1AB6E1727009C00F9F9D5 /* todo.md in Resources */ = {isa = PBXBuildFile; fileRef = 38A1AB6D1727009C00F9F9D5 /* todo.md */; };
@@ -110,9 +112,12 @@
 		31D5D2E413F6933B00F1B2F9 /* EXTArtBoard.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTArtBoard.m; sourceTree = "<group>"; };
 		3841EBD0177380C000ADA929 /* EXTZeroRange.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTZeroRange.h; sourceTree = "<group>"; };
 		3841EBD1177380C000ADA929 /* EXTZeroRange.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTZeroRange.m; sourceTree = "<group>"; };
-		385BF10C17AAD8C2008CA5B6 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/EXTGeneratorInspectorViewController.xib; sourceTree = "<group>"; };
+		385BF10C17AAD8C2008CA5B6 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/EXTGeneratorInspectorView.xib; sourceTree = "<group>"; };
 		385BF10E17AAD8D5008CA5B6 /* EXTGeneratorInspectorViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTGeneratorInspectorViewController.h; sourceTree = "<group>"; };
 		385BF10F17AAD8D5008CA5B6 /* EXTGeneratorInspectorViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTGeneratorInspectorViewController.m; sourceTree = "<group>"; };
+		3869FCF517B4587100D0D740 /* EXTDifferentialPaneController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTDifferentialPaneController.h; sourceTree = "<group>"; };
+		3869FCF617B4587100D0D740 /* EXTDifferentialPaneController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTDifferentialPaneController.m; sourceTree = "<group>"; };
+		3869FCF717B4587100D0D740 /* EXTDifferentialPane.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = EXTDifferentialPane.xib; sourceTree = "<group>"; };
 		3896548B16F538D90008FB8D /* EXTMatrix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTMatrix.h; sourceTree = "<group>"; };
 		3896548C16F538D90008FB8D /* EXTMatrix.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTMatrix.m; sourceTree = "<group>"; };
 		389FB38B17498AF500D0FE75 /* EXTMultiplicationTables.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTMultiplicationTables.h; sourceTree = "<group>"; };
@@ -259,6 +264,8 @@
 			children = (
 				31C77BA613E63F6800E9DBFC /* EXTAppController.h */,
 				31C77BA713E63F6800E9DBFC /* EXTAppController.m */,
+				3869FCF517B4587100D0D740 /* EXTDifferentialPaneController.h */,
+				3869FCF617B4587100D0D740 /* EXTDifferentialPaneController.m */,
 				14EF1A6917584C080012DD3C /* EXTDocumentWindowController.h */,
 				14EF1A6A17584C080012DD3C /* EXTDocumentWindowController.m */,
 				14064DC717A0C3B100E202D5 /* EXTDocumentWindowController+EXTChartViewDelegate.h */,
@@ -295,8 +302,9 @@
 		14EF1A641756EE020012DD3C /* XIBs */ = {
 			isa = PBXGroup;
 			children = (
+				3869FCF717B4587100D0D740 /* EXTDifferentialPane.xib */,
 				1DDD58280DA1D0D100B32029 /* EXTDocument.xib */,
-				385BF10B17AAD8C2008CA5B6 /* EXTGeneratorInspectorViewController.xib */,
+				385BF10B17AAD8C2008CA5B6 /* EXTGeneratorInspectorView.xib */,
 				1498319F17AE04F3000380A5 /* EXTNewDocument.xib */,
 				1DDD582A0DA1D0D100B32029 /* MainMenu.xib */,
 			);
@@ -449,12 +457,13 @@
 				38A92122179DCED8000B827D /* DifferentialTool.pdf in Resources */,
 				38A92123179DCED8000B827D /* MultiplicativeStructureTool.pdf in Resources */,
 				38A92125179DDF06000B827D /* GeneratorTool.pdf in Resources */,
-				385BF10D17AAD8C2008CA5B6 /* EXTGeneratorInspectorViewController.xib in Resources */,
+				385BF10D17AAD8C2008CA5B6 /* EXTGeneratorInspectorView.xib in Resources */,
 				149831A117AE04F3000380A5 /* EXTNewDocument.xib in Resources */,
 				149831A617AE65EA000380A5 /* A1MSS Example.pdf in Resources */,
 				149831A717AE65EA000380A5 /* KUhC2 Example.pdf in Resources */,
 				149831A817AE65EA000380A5 /* Random Example.pdf in Resources */,
 				149831A917AE65EA000380A5 /* S5 Example.pdf in Resources */,
+				3869FCF917B4587100D0D740 /* EXTDifferentialPane.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -490,6 +499,7 @@
 				14064DC917A0C3B100E202D5 /* EXTDocumentWindowController+EXTChartViewDelegate.m in Sources */,
 				385BF11017AAD8D5008CA5B6 /* EXTGeneratorInspectorViewController.m in Sources */,
 				149831A017AE04F3000380A5 /* EXTNewDocumentWindowController.m in Sources */,
+				3869FCF817B4587100D0D740 /* EXTDifferentialPaneController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -520,12 +530,12 @@
 			name = MainMenu.xib;
 			sourceTree = "<group>";
 		};
-		385BF10B17AAD8C2008CA5B6 /* EXTGeneratorInspectorViewController.xib */ = {
+		385BF10B17AAD8C2008CA5B6 /* EXTGeneratorInspectorView.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
 				385BF10C17AAD8C2008CA5B6 /* English */,
 			);
-			name = EXTGeneratorInspectorViewController.xib;
+			name = EXTGeneratorInspectorView.xib;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */

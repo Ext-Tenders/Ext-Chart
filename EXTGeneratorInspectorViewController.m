@@ -43,7 +43,7 @@
 }
 
 - (id)init {
-    return [self initWithNibName:@"EXTGeneratorInspectorViewController" bundle:nil];
+    return [self initWithNibName:@"EXTGeneratorInspectorView" bundle:nil];
 }
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil

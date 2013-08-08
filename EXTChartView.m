@@ -330,9 +330,9 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
         [self setSelectedPageIndex:_selectedPageIndex - 1];
 }
 
-// This is odd: we do not receive -swipeWithEvent: until the user scrolls the view using
-// a two-finger scroll gesture. This same behaviour happens if the scroll view implements
-// -swipeWithEvent:.
+// This is odd: we do not receive -swipeWithEvent: until the user scrolls the
+// view using a two-finger scroll gesture. This same behaviour happens if the
+// scroll view implements -swipeWithEvent:.
 // See http://stackoverflow.com/questions/15854301
 - (void)swipeWithEvent:(NSEvent *)event {
 	CGFloat x = [event deltaX];
@@ -461,6 +461,8 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
     EXTToolboxTag tag = [sender tag];
     if (tag <= 0 || tag >= _EXTToolTagCount)
         return;
+    
+    self.delegate.highlightedObject = nil;
 
     [self setSelectedToolTag:tag];
 }

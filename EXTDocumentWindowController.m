@@ -17,6 +17,7 @@
 #import "EXTScrollView.h"
 #import "EXTDocumentInspectorView.h"
 #import "EXTGeneratorInspectorViewController.h"
+#import "EXTDifferentialPaneController.h"
 
 
 #pragma mark - Private variables
@@ -48,11 +49,14 @@ typedef enum : NSInteger {
     @property(nonatomic, strong) NSView *sidebarView;
     @property(nonatomic, weak) IBOutlet NSView *gridInspectorView;
     @property(nonatomic, weak) IBOutlet NSView *horizontalToolboxView;
+
+    @property(nonatomic, weak) NSObject *highlightedObject;
 @end
 
 
 @implementation EXTDocumentWindowController {
     EXTGeneratorInspectorViewController *_generatorInspectorViewController;
+    EXTDifferentialPaneController *_differentialPaneController;
     EXTDocumentInspectorView *_inspectorView;
     bool _sidebarHidden;
     bool _sidebarAnimating;
@@ -61,7 +65,10 @@ typedef enum : NSInteger {
 #pragma mark - Life cycle
 
 - (id)init {
-    return [super initWithWindowNibName:@"EXTDocument"];
+    if (self = [super initWithWindowNibName:@"EXTDocument"])
+        self.highlightedObject = nil;
+    
+    return self;
 }
 
 - (void)windowDidLoad {
@@ -133,7 +140,13 @@ typedef enum : NSInteger {
         [_inspectorView addSubview:_horizontalToolboxView withTitle:@"Toolbox" collapsed:false centered:true];
 
         [_inspectorView addSubview:_generatorInspectorViewController.view withTitle:@"Generators" collapsed:true centered:true];
-
+        
+        if (!_differentialPaneController) {
+            _differentialPaneController = [EXTDifferentialPaneController new];
+            [_differentialPaneController bind:@"representedObject" toObject:self withKeyPath:@"highlightedObject" options:nil];
+        }
+        //[_inspectorView addSubview:_differentialPaneController.view withTitle:@"Differential" collapsed:true centered:true];
+        
         [_inspectorView addSubview:_gridInspectorView withTitle:@"Grid" collapsed:false centered:false];
 
         NSRect contentFrame = [[[self window] contentView] frame];
