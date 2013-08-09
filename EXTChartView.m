@@ -467,6 +467,14 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
     [self setSelectedToolTag:tag];
 }
 
+#pragma mark - Resizing
+
+// Chart views shouldn’t be resized. However, it seems that Restoration changes the chart view frame as part of
+// the enclosing scrollview subview autoresizing process. We simple ignore this when it happens.
+- (void)resizeWithOldSuperviewSize:(NSSize)oldSize {
+    // Do nothing
+}
+
 #pragma mark - NSUserInterfaceValidations
 
 - (BOOL)validateUserInterfaceItem:(id<NSValidatedUserInterfaceItem>)item {
