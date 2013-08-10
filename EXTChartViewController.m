@@ -284,6 +284,15 @@
     // TODO: draw certain multiplicative structures?
 }
 
+- (void)chartView:(EXTChartView *)chartView mouseDownAtGridLocation:(NSPoint)gridLocation {
+    DLog(@"mouse down at grid location %@", NSStringFromPoint(gridLocation));
+    // TODO: reenable clicks.  the idea is that both terms and differentials
+    // present the same 'insertable' interface, which is called here.
+
+    // TODO: review why the tool needs the document
+//    [currentTool dealWithClick:point document:_delegate];
+}
+
 - (Class<EXTLocation>)indexClassForChartView:(EXTChartView *)chartView {
     return _document.sseq.indexClass;
 }

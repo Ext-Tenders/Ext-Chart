@@ -33,6 +33,8 @@ typedef enum : NSInteger {
           withSpacing:(CGFloat)gridSpacing;
 
     - (Class<EXTLocation>)indexClassForChartView:(EXTChartView *)chartView;
+
+    - (void)chartView:(EXTChartView *)chartView mouseDownAtGridLocation:(NSPoint)gridLocation;
 @end
 
 
