@@ -67,11 +67,10 @@
                                                           description:@"Terms have no automatic multiplicative structure"
                                                           detailsView:_locationTypeView
                                               spectralSequenceFactory:^{
-                                                  EXTSpectralSequence *ret = [EXTSpectralSequence new];
-                                                  [ret setIndexClass:([_locationTypeMatrix selectedRow] == 0 ?
-                                                                      [EXTPair class] :
-                                                                      [EXTTriple class])];
-                                                  return ret;}]];
+                                                  Class<EXTLocation> unit = ([_locationTypeMatrix selectedRow] == 0 ?
+                                                                             [EXTPair class] :
+                                                                             [EXTTriple class]);
+                                                  return [EXTSpectralSequence sSeqWithIndexingClass:unit];}]];
         [options addObject:[[EXTNewDocumentOption alloc] initWithName:@"Polynomial Spectral Sequence"
                                                           description:@"Optimized to present E_1 as a polynomial algebra"
                                                           detailsView:_locationTypeView
@@ -79,7 +78,7 @@
                                                   Class<EXTLocation> unit = ([_locationTypeMatrix selectedRow] == 0 ?
                                                                              [EXTPair class] :
                                                                              [EXTTriple class]);
-                                                  return [EXTPolynomialSSeq sSeqWithUnit:unit];
+                                                  return [EXTPolynomialSSeq sSeqWithIndexingClass:unit];
                                               }
                             ]];
         [options addObject:[[EXTNewDocumentOption alloc] initWithName:@"May Spectral Sequence"

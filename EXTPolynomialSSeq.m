@@ -147,34 +147,21 @@
     return self;
 }
 
--(EXTPolynomialSSeq*) initWithUnit:(Class<EXTLocation>)locClass {
-    self = [super init];
-    
-    // TODO: it's weird to me to have this code in two adjacent places, but i
-    // can't think of a way around this that doesn't run into problems with
-    // polymorphism.  like, for instance, suppose that self is actually of class
-    // EXTMaySpectralSequence; it calls init on itself, which then calls init
-    // on super, which winds up here.  we can't call init on self to pull in the
-    // code from the routine above this one, since that will just cause a big
-    // loop back down to EXTMaySpectralSequence. i don't know. it's complicated.
-    generators = [NSMutableArray array];
-    
-    self.indexClass = locClass;
-    
-    EXTTerm *unit = [EXTTerm term:[locClass identityLocation] andNames:[NSMutableArray arrayWithObject:[EXTPolynomialTag new]]];
-    [self.terms setObject:unit forKey:unit.location];
+-(EXTPolynomialSSeq*) initWithIndexingClass:(Class<EXTLocation>)locClass {
+    if (self = [super initWithIndexingClass:locClass]) {
+        generators = [NSMutableArray array];
+        
+        EXTTerm *unit = [EXTTerm term:[locClass identityLocation]
+                             andNames:[NSMutableArray arrayWithObject:[EXTPolynomialTag new]]];
+        [self.terms setObject:unit forKey:unit.location];
+    }
     
     return self;
 }
 
 // return an almost-empty spectral sequence
-+(EXTPolynomialSSeq*) sSeqWithUnit:(Class<EXTLocation>)locClass {
-    EXTPolynomialSSeq *ret = [EXTPolynomialSSeq new];
-    
-    ret.indexClass = locClass;
-    
-    EXTTerm *unit = [EXTTerm term:[locClass identityLocation] andNames:[NSMutableArray arrayWithObject:[EXTPolynomialTag new]]];
-    [ret.terms setObject:unit forKey:unit.location];
++(EXTPolynomialSSeq*) sSeqWithIndexingClass:(Class<EXTLocation>)locClass {
+    EXTPolynomialSSeq *ret = [[EXTPolynomialSSeq alloc] initWithIndexingClass:locClass];
     
     return ret;
 }
@@ -184,8 +171,7 @@
 // return value independent of the parent polynomial spectral sequence.  so,
 // this should be considered a DESTRUCTIVE method.
 -(EXTSpectralSequence*) upcastToSSeq {
-    EXTSpectralSequence *ret = [EXTSpectralSequence new];
-    ret.indexClass = self.indexClass;
+    EXTSpectralSequence *ret = [EXTSpectralSequence sSeqWithIndexingClass:self.indexClass];
     ret.multTables.unitTerm = [self findTerm:[self.indexClass identityLocation]];
     
     // for the most part, we're already tracking the structure of a general sseq

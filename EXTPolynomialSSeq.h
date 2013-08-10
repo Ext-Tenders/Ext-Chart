@@ -31,8 +31,8 @@
 
 @property(strong,readonly) NSMutableArray *generators;
 
--(EXTPolynomialSSeq*) initWithUnit:(Class<EXTLocation>)locClass;
-+(EXTPolynomialSSeq*) sSeqWithUnit:(Class<EXTLocation>)locClass;
+-(EXTPolynomialSSeq*) initWithIndexingClass:(Class<EXTLocation>)locClass;
++(EXTPolynomialSSeq*) sSeqWithIndexingClass:(Class<EXTLocation>)locClass;
 
 -(void) addPolyClass:(NSObject<NSCopying>*)name location:(EXTLocation*)loc upTo:(int)bound;
 -(void) resizePolyClass:(NSObject<NSCopying>*)name upTo:(int)newBound;

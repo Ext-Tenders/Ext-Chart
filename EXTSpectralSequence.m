@@ -18,20 +18,6 @@
 
 @synthesize terms, differentials, multTables, indexClass, zeroRanges;
 
--(EXTSpectralSequence*) init {
-    self = [super init];
-    
-    // and allocate the internal parts of things
-    terms = [NSMutableDictionary dictionary];
-    differentials = [NSMutableArray array];
-    differentials[0] = [NSMutableDictionary dictionary];
-    multTables = [EXTMultiplicationTables multiplicationTables:self];
-    indexClass = [EXTPair class];
-    zeroRanges = [NSMutableArray array];
-
-    return self;
-}
-
 - (id)initWithCoder:(NSCoder *)aDecoder {
     if (self = [super init]) {
         terms = [aDecoder decodeObjectForKey:@"terms"];
@@ -86,6 +72,41 @@
     }
 }
 
+-(EXTSpectralSequence*) initWithIndexingClass:(Class<EXTLocation>)locClass {
+    if (self = [super init]) {
+        terms = [NSMutableDictionary dictionary];
+        differentials = [NSMutableArray array];
+        differentials[0] = [NSMutableDictionary dictionary];
+        multTables = [EXTMultiplicationTables multiplicationTables:self];
+        indexClass = locClass;
+        zeroRanges = [NSMutableArray array];
+    }
+    
+    return self;
+}
+
+-(EXTSpectralSequence*) init {
+    self = [super init];
+    
+    // and allocate the internal parts of things
+    terms = [NSMutableDictionary dictionary];
+    differentials = [NSMutableArray array];
+    differentials[0] = [NSMutableDictionary dictionary];
+    multTables = [EXTMultiplicationTables multiplicationTables:self];
+    indexClass = [EXTPair class];
+    zeroRanges = [NSMutableArray array];
+    
+    return self;
+}
+
++(EXTSpectralSequence*) sSeqWithIndexingClass:(Class<EXTLocation>)locClass {
+    return [[EXTSpectralSequence alloc] initWithIndexingClass:locClass];
+}
+
++(EXTSpectralSequence*) sSeqWithUnit:(Class<EXTLocation>)locClass {
+    return [EXTSpectralSequence buildLaurentSSeq:@"1" location:[locClass identityLocation] upTo:0 downTo:0];
+}
+
 
 // returns an EXTSpectralSequence which is given by the tensor product of the
 // current spectral sequence with an incoming collection of classes with
@@ -101,7 +122,7 @@
 // the existing ranges well when computing e.g. the leibniz rule.
 -(EXTSpectralSequence*) tensorWithSSeq:(EXTSpectralSequence *)p {
     // what we'll eventually be returning.
-    EXTSpectralSequence *ret = [EXTSpectralSequence new];
+    EXTSpectralSequence *ret = [EXTSpectralSequence sSeqWithIndexingClass:self.indexClass];
 
     NSMutableArray *tensorTerms = [NSMutableArray array];
     
@@ -470,10 +491,6 @@
     }
     
     return l;
-}
-
-+(EXTSpectralSequence*) sSeqWithUnit:(Class<EXTLocation>)locClass {
-    return [EXTSpectralSequence buildLaurentSSeq:@"1" location:[locClass identityLocation] upTo:0 downTo:0];
 }
 
 -(EXTTerm*) findTerm:(EXTLocation *)loc {

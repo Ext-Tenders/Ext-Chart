@@ -81,7 +81,7 @@
 @implementation EXTMaySpectralSequence
 
 -(id) init {    
-    return self = [super initWithUnit:[EXTTriple class]];
+    return self = [super initWithIndexingClass:[EXTTriple class]];
 }
 
 // TODO: should this routine be memoized?

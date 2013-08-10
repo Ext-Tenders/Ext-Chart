@@ -21,9 +21,11 @@
 @property(nonatomic, strong) NSMutableDictionary *terms;
 @property(nonatomic, strong) NSMutableArray *differentials;
 @property(nonatomic, strong) EXTMultiplicationTables *multTables;
-@property(nonatomic, assign) Class<EXTLocation> indexClass;
+@property(nonatomic, assign, readonly) Class<EXTLocation> indexClass;
 @property(nonatomic, strong) NSMutableArray *zeroRanges;
 
+-(EXTSpectralSequence*) initWithIndexingClass:(Class<EXTLocation>)locClass;
++(EXTSpectralSequence*) sSeqWithIndexingClass:(Class<EXTLocation>)locClass;
 +(EXTSpectralSequence*) sSeqWithUnit:(Class<EXTLocation>)locClass;
 -(EXTSpectralSequence*) tensorWithSSeq:(EXTSpectralSequence*)p;
 
