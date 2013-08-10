@@ -40,6 +40,8 @@
 - (void) addDifferential:(EXTDifferential*)diff;
 - (EXTDifferential*)findDifflWithSource:(EXTLocation*)loc onPage:(int)page;
 - (EXTDifferential*)findDifflWithTarget:(EXTLocation*)loc onPage:(int)page;
+- (NSArray*)findDifflsSourcedUnderPoint:(NSPoint)point onPage:(int)page;
+- (NSArray*)findTermsUnderPoint:(NSPoint)point;
 
 -(void) computeGroupsForPage:(int)page;
 
