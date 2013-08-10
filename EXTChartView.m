@@ -238,7 +238,7 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
         [self resetHighlightRectAtLocation:mousePoint];
     }
 
-    [_delegate computeGroupsForPage:_selectedPageIndex];
+    [_delegate willDisplayPage:_selectedPageIndex];
     [self setNeedsDisplay:YES];
 }
 
@@ -462,7 +462,7 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
     if (tag <= 0 || tag >= _EXTToolTagCount)
         return;
     
-    self.delegate.highlightedObject = nil;
+//    self.delegate.highlightedObject = nil;
 
     [self setSelectedToolTag:tag];
 }

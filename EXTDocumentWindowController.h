@@ -14,6 +14,3 @@
 @interface EXTDocumentWindowController : NSWindowController
     @property(nonatomic, readonly) EXTDocument *extDocument;
 @end
-
-@interface EXTDocumentWindowController (EXTChartViewDelegate) <EXTChartViewDelegate>
-@end
