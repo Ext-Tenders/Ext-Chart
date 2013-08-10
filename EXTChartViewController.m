@@ -37,7 +37,7 @@
     [super setView:view];
 
     self.chartView.delegate = self;
-    [view bind:EXTChartViewSseqBindingName toObject:_document withKeyPath:@"sseq" options:nil];
+    [self.chartView displaySelectedPage];
 }
 
 + (id)new {
@@ -60,7 +60,7 @@
 
 #pragma mark - EXTChartViewDelegate
 
-- (void)willDisplayPage:(NSUInteger)pageNumber {
+- (void)chartView:(EXTChartView *)chartView willDisplayPage:(NSUInteger)pageNumber {
     [_document.sseq computeGroupsForPage:pageNumber];
 }
 
@@ -119,10 +119,11 @@
 // this performs the culling and delegation calls for drawing a page of the SS
 // TODO: does this need spacing to be passed in?  probably a lot of data passing
 // needs to be investigated and untangled... :(
-- (void)drawPageNumber:(NSUInteger)pageNumber
-                    ll:(NSPoint)lowerLeft
-                    ur:(NSPoint)upperRight
-           withSpacing:(CGFloat)spacing {
+- (void)chartView:(EXTChartView *)chartView
+   drawPageNumber:(NSUInteger)pageNumber
+        lowerLeft:(NSPoint)lowerLeft
+       upperRight:(NSPoint)upperRight
+      withSpacing:(CGFloat)spacing {
 
     // start by initializing the array of counts
     int width = (int)(upperRight.x - lowerLeft.x + 1),
@@ -281,6 +282,10 @@
     }
     
     // TODO: draw certain multiplicative structures?
+}
+
+- (Class<EXTLocation>)indexClassForChartView:(EXTChartView *)chartView {
+    return _document.sseq.indexClass;
 }
 
 @end

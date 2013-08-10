@@ -21,12 +21,10 @@ static NSColor *_EXTDefaultHighlightColor = nil;
 
 #pragma mark - Exported variables
 
-NSString * const EXTChartViewSseqBindingName = @"sseq";
 NSString * const EXTChartViewSelectedPageIndexBindingName = @"selectedPageIndex";
 
 #pragma mark - Private variables
 
-static void *_EXTChartViewSseqContext = &_EXTChartViewSseqContext;
 static void *_EXTChartViewSelectedPageIndexContext = &_EXTChartViewSelectedPageIndexContext;
 static void *_EXTChartViewArtBoardDrawingRectContext = &_EXTChartViewArtBoardDrawingRectContext;
 static void *_EXTChartViewGridAnyKeyContext = &_EXTChartViewGridAnyKeyContext;
@@ -68,7 +66,6 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
 + (void)initialize
 {
     if (self == [EXTChartView class]) {
-        [self exposeBinding:EXTChartViewSseqBindingName];
         [self exposeBinding:EXTChartViewSelectedPageIndexBindingName];
 
         _EXTDefaultHighlightColor = [NSColor colorWithCalibratedRed:0.0 green:1.0 blue:1.0 alpha:1.0];
@@ -202,10 +199,11 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
 
     // TODO: this may be drawing too narrow a window, resulting in blank Ext
     // charts if the scroll is dragged too slowly.
-    [_delegate drawPageNumber:_selectedPageIndex
-                           ll:[self convertPointToGrid:lowerLeftPoint]
-                           ur:[self convertPointToGrid:upperRightPoint]
-                  withSpacing:[_grid gridSpacing]];
+    [_delegate chartView:self
+          drawPageNumber:_selectedPageIndex
+               lowerLeft:[self convertPointToGrid:lowerLeftPoint]
+              upperRight:[self convertPointToGrid:upperRightPoint]
+             withSpacing:[_grid gridSpacing]];
 
     //  // restore the graphics context
     //	[theContext restoreGraphicsState];
@@ -222,7 +220,10 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
     // That path could be a constant, so wouldn't need to be rebuilt.
 
     Class toolClass = _EXTClassFromToolTag(_selectedToolTag);
-	NSBezierPath *newHighlightPath = [toolClass makeHighlightPathAtPoint:location onGrid: _grid onPage:_selectedPageIndex locClass:self.sseq.indexClass];
+	NSBezierPath *newHighlightPath = [toolClass makeHighlightPathAtPoint:location
+                                                                  onGrid:_grid
+                                                                  onPage:_selectedPageIndex
+                                                                locClass:[_delegate indexClassForChartView:self]];
 
     // We may be resetting the highlight because the mouse has moved, the page has changed, or the highlighting {true, false}
     // status has changed, so we always flag both the previous location and the new location as dirty.
@@ -238,18 +239,11 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
         [self resetHighlightRectAtLocation:mousePoint];
     }
 
-    [_delegate willDisplayPage:_selectedPageIndex];
+    [_delegate chartView:self willDisplayPage:_selectedPageIndex];
     [self setNeedsDisplay:YES];
 }
 
 #pragma mark - Properties
-
-- (void)setSseq:(EXTSpectralSequence *)sseq {
-    if (sseq != _sseq) {
-        _sseq = sseq;
-        [self displaySelectedPage];
-    }
-}
 
 - (void)setSelectedPageIndex:(NSUInteger)selectedPageIndex {
     // TODO: should check whether the argument lies in {min, max} page indices
@@ -352,12 +346,6 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
 	else if (context == _EXTChartViewGridAnyKeyContext) {
 		[self setNeedsDisplay:YES];
 	}
-    else if (context == _EXTChartViewSseqContext) {
-        EXTSpectralSequence *newSseq = [object valueForKeyPath:keyPath];
-
-        if (newSseq != NSNotApplicableMarker)
-            [self setSseq:newSseq];
-    }
     else if (context == _EXTChartViewSelectedPageIndexContext) {
         NSNumber *selectedPageNumber = [object valueForKeyPath:keyPath];
 
