@@ -146,6 +146,7 @@ typedef enum : NSInteger {
         if (!_differentialPaneController) {
             _differentialPaneController = [EXTDifferentialPaneController new];
             [_chartViewController addObserver:_differentialPaneController forKeyPath:@"selectedObject" options:NSKeyValueObservingOptionNew context:nil];
+            [_differentialPaneController bind:@"chartView" toObject:self withKeyPath:@"chartView" options:nil];
         }
         [_inspectorView addSubview:_differentialPaneController.view withTitle:@"Differential" collapsed:true centered:true];
         
@@ -284,7 +285,8 @@ typedef enum : NSInteger {
             if (!_generatorInspectorViewController) {
                 _generatorInspectorViewController = [EXTGeneratorInspectorViewController new];
                 [_generatorInspectorViewController bind:@"sseq" toObject:document withKeyPath:@"sseq" options:nil];
-                [_generatorInspectorViewController bind:@"chartView" toObject:self withKeyPath:@"chartView" options:nil];            }
+                [_generatorInspectorViewController bind:@"chartView" toObject:self withKeyPath:@"chartView" options:nil];
+            }
         }
     }
 }

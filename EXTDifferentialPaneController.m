@@ -19,6 +19,8 @@
 
 @implementation EXTDifferentialPaneController
 
+@synthesize chartView;
+
 - (id)init {
     return [self initWithNibName:@"EXTDifferentialPane" bundle:nil];
 }
@@ -69,6 +71,23 @@
 
 - (void)doubleClick:(id)sender {
     DLog(@"Double-clicked.");
+    return;
+}
+
+-(IBAction)deleteButtonPressed:(id)sender {
+    NSInteger row = [self.tableView selectedRow];
+    
+    if (![[self.representedObject class] isSubclassOfClass:[EXTDifferential class]])
+        return;
+    
+    EXTDifferential *diffl = self.representedObject;
+    
+    [diffl.partialDefinitions removeObjectAtIndex:row];
+    
+    [self.tableView deselectAll:sender];
+    [self.tableView reloadData];
+    [self.chartView displaySelectedPage];
+    
     return;
 }
 
