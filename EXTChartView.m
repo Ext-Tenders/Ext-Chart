@@ -412,23 +412,18 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
 
 
 - (void)mouseDown:(NSEvent *)event {
-	const NSPoint locationPoint = [self convertPoint:[event locationInWindow] fromView:nil];
-    const EXTArtBoardMouseDragOperation artBoardDragOperation = [_artBoard mouseDragOperationAtPoint:locationPoint];
-    Class toolClass = _EXTClassFromToolTag(_selectedToolTag);
+	const NSPoint location = [self convertPoint:[event locationInWindow] fromView:nil];
 
-    if (_selectedToolTag == _EXTArtboardToolTag && artBoardDragOperation != EXTArtBoardMouseDragOperationNone) {
-		[self _extDragArtBoardWithEvent:event];
+    if (_selectedToolTag == _EXTArtboardToolTag) {
+        const EXTArtBoardMouseDragOperation artBoardDragOperation = [_artBoard mouseDragOperationAtPoint:location];
+        if (artBoardDragOperation != EXTArtBoardMouseDragOperationNone) {
+            [self _extDragArtBoardWithEvent:event];
+        }
 	}
-    else if (toolClass) {
-        // TODO: reenable clicks.  the idea is that both terms and differentials
-        // present the same 'insertable' interface, which is called here.
-
-        //        NSPoint point = [_grid convertToGridCoordinates:locationPoint];
-
-        // TODO: review why the tool needs the document
-        //        [currentTool dealWithClick:point document:_delegate];
-
-		[self setNeedsDisplayInRect:[self _extHighlightDrawingRect]];
+    else {
+        const NSPoint gridLocation = [_grid nearestGridPoint:location];
+        [_delegate chartView:self mouseDownAtGridLocation:gridLocation];
+        [self setNeedsDisplayInRect:[self _extHighlightDrawingRect]]; // TODO: is this necessary?
 	}
 }
 
