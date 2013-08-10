@@ -66,7 +66,12 @@
         [options addObject:[[EXTNewDocumentOption alloc] initWithName:@"Arbitrary Spectral Sequence"
                                                           description:@"Terms have no automatic multiplicative structure"
                                                           detailsView:_locationTypeView
-                                              spectralSequenceFactory:^{return [EXTSpectralSequence new];}]];
+                                              spectralSequenceFactory:^{
+                                                  EXTSpectralSequence *ret = [EXTSpectralSequence new];
+                                                  [ret setIndexClass:([_locationTypeMatrix selectedRow] == 0 ?
+                                                                      [EXTPair class] :
+                                                                      [EXTTriple class])];
+                                                  return ret;}]];
         [options addObject:[[EXTNewDocumentOption alloc] initWithName:@"Polynomial Spectral Sequence"
                                                           description:@"Optimized to present E_1 as a polynomial algebra"
                                                           detailsView:_locationTypeView
