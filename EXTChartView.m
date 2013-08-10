@@ -238,7 +238,7 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
         [self resetHighlightRectAtLocation:mousePoint];
     }
 
-    [_delegate computeGroupsForPage:_selectedPageIndex];
+    [_delegate willDisplayPage:_selectedPageIndex];
     [self setNeedsDisplay:YES];
 }
 

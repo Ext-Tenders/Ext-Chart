@@ -60,7 +60,7 @@
 
 #pragma mark - EXTChartViewDelegate
 
-- (void)computeGroupsForPage:(NSUInteger)pageNumber {
+- (void)willDisplayPage:(NSUInteger)pageNumber {
     [_document.sseq computeGroupsForPage:pageNumber];
 }
 
