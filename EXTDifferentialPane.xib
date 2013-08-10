@@ -118,7 +118,7 @@
 										<string key="NSFrameSize">{206, 152}</string>
 										<reference key="NSSuperview" ref="506535781"/>
 										<reference key="NSWindow"/>
-										<reference key="NSNextKeyView" ref="849164426"/>
+										<reference key="NSNextKeyView" ref="403333179"/>
 										<string key="NSReuseIdentifierKey">_NS:13</string>
 										<bool key="NSEnabled">YES</bool>
 										<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
@@ -143,8 +143,8 @@
 										<array class="NSMutableArray" key="NSTableColumns">
 											<object class="NSTableColumn" id="414202945">
 												<string key="NSIdentifier">dimension</string>
-												<double key="NSWidth">40</double>
-												<double key="NSMinWidth">40</double>
+												<double key="NSWidth">30</double>
+												<double key="NSMinWidth">30</double>
 												<double key="NSMaxWidth">1000</double>
 												<object class="NSTableHeaderCell" key="NSHeaderCell">
 													<int key="NSCellFlags">75497536</int>
@@ -193,12 +193,11 @@
 												</object>
 												<int key="NSResizingMask">3</int>
 												<bool key="NSIsResizeable">YES</bool>
-												<bool key="NSIsEditable">YES</bool>
 												<reference key="NSTableView" ref="671112317"/>
 											</object>
 											<object class="NSTableColumn" id="240674331">
 												<string key="NSIdentifier">description</string>
-												<double key="NSWidth">160</double>
+												<double key="NSWidth">170</double>
 												<double key="NSMinWidth">40</double>
 												<double key="NSMaxWidth">1000</double>
 												<object class="NSTableHeaderCell" key="NSHeaderCell">
@@ -220,7 +219,6 @@
 												</object>
 												<int key="NSResizingMask">3</int>
 												<bool key="NSIsResizeable">YES</bool>
-												<bool key="NSIsEditable">YES</bool>
 												<reference key="NSTableView" ref="671112317"/>
 											</object>
 										</array>
@@ -240,7 +238,7 @@
 											</object>
 										</object>
 										<double key="NSRowHeight">17</double>
-										<int key="NSTvFlags">-700448768</int>
+										<int key="NSTvFlags">-767557632</int>
 										<reference key="NSDelegate"/>
 										<reference key="NSDataSource"/>
 										<int key="NSColumnAutoresizingStyle">4</int>
@@ -307,7 +305,7 @@
 						<string key="NSFrame">{{0, 19}, {208, 170}}</string>
 						<reference key="NSSuperview" ref="1005"/>
 						<reference key="NSWindow"/>
-						<reference key="NSNextKeyView" ref="506535781"/>
+						<reference key="NSNextKeyView" ref="849164426"/>
 						<string key="NSReuseIdentifierKey">_NS:9</string>
 						<int key="NSsFlags">133682</int>
 						<reference key="NSVScroller" ref="403333179"/>
@@ -531,7 +529,7 @@
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">51</int>
+			<int key="maxID">53</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">

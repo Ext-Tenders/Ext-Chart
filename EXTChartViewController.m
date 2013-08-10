@@ -285,12 +285,21 @@
 }
 
 - (void)chartView:(EXTChartView *)chartView mouseDownAtGridLocation:(NSPoint)gridLocation {
-    DLog(@"mouse down at grid location %@", NSStringFromPoint(gridLocation));
-    // TODO: reenable clicks.  the idea is that both terms and differentials
-    // present the same 'insertable' interface, which is called here.
-
-    // TODO: review why the tool needs the document
-//    [currentTool dealWithClick:point document:_delegate];
+    // TODO: lots!
+    switch (chartView.selectedToolTag) {
+        case _EXTDifferentialToolTag: {
+            NSArray *diffls = [_document.sseq findDifflsSourcedUnderPoint:gridLocation onPage:chartView.selectedPageIndex];
+            if (diffls.count == 1)
+                self.selectedObject = diffls[0];
+            else
+                self.selectedObject = nil;
+            
+            break;
+        }
+            
+        default:
+            break;
+    }
 }
 
 - (Class<EXTLocation>)indexClassForChartView:(EXTChartView *)chartView {

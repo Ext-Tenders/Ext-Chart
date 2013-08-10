@@ -421,7 +421,7 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
         }
 	}
     else {
-        const NSPoint gridLocation = [_grid nearestGridPoint:location];
+        const NSPoint gridLocation = [_grid convertToGridCoordinates:location];
         [_delegate chartView:self mouseDownAtGridLocation:gridLocation];
         [self setNeedsDisplayInRect:[self _extHighlightDrawingRect]]; // TODO: is this necessary?
 	}

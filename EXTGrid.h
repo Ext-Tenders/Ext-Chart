@@ -27,6 +27,7 @@ extern NSString * const EXTGridAnyKey;
 
 - (NSPoint)nearestGridPoint:(NSPoint)point; // used for snapping to grid
 - (NSPoint)convertToGridCoordinates:(NSPoint)point;
+- (NSPoint)lowerLeftGridPoint:(NSPoint)point;
 
 - (NSRect)enclosingGridRect:(NSPoint)point;
 - (void) drawEnclosingRectAtPoint: (NSPoint)point;

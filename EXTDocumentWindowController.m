@@ -145,9 +145,9 @@ typedef enum : NSInteger {
         
         if (!_differentialPaneController) {
             _differentialPaneController = [EXTDifferentialPaneController new];
-            [_differentialPaneController bind:@"representedObject" toObject:self withKeyPath:@"highlightedObject" options:nil];
+            [_chartViewController addObserver:_differentialPaneController forKeyPath:@"selectedObject" options:NSKeyValueObservingOptionNew context:nil];
         }
-        //[_inspectorView addSubview:_differentialPaneController.view withTitle:@"Differential" collapsed:true centered:true];
+        [_inspectorView addSubview:_differentialPaneController.view withTitle:@"Differential" collapsed:true centered:true];
         
         [_inspectorView addSubview:_gridInspectorView withTitle:@"Grid" collapsed:false centered:false];
 
@@ -197,6 +197,7 @@ typedef enum : NSInteger {
 
 - (void)windowWillClose:(NSNotification *)notification {
     [_chartScrollView removeObserver:self forKeyPath:@"magnification"];
+    [_chartViewController removeObserver:_differentialPaneController forKeyPath:@"selectedObject"];
 }
 
 #pragma mark - Zoom

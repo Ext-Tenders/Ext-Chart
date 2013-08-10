@@ -28,6 +28,11 @@
     return [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
 }
 
+- (void)awakeFromNib {
+    [self.tableView setTarget:self];
+    [self.tableView setDoubleAction:@selector(doubleClick:)];
+}
+
 -(NSInteger)numberOfRowsInTableView:(NSTableView *)tableView {
     if (![[self.representedObject class] isSubclassOfClass:[EXTDifferential class]])
         return 0;
@@ -51,6 +56,20 @@
     }
     
     return nil;
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
+    if ([keyPath isEqualToString:@"selectedObject"]) {
+        self.representedObject = change[NSKeyValueChangeNewKey];
+        [self.tableView reloadData];
+    }
+    
+    return;
+}
+
+- (void)doubleClick:(id)sender {
+    DLog(@"Double-clicked.");
+    return;
 }
 
 @end
