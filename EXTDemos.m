@@ -135,10 +135,11 @@
 +(EXTSpectralSequence*) randomDemo {
     EXTSpectralSequence *ret = [EXTSpectralSequence new];
     
-    // XXX: this doesn't catch collisions.
     for (int i = 0; i < 40; i++) {
-        EXTPair *location =
-        [EXTPair pairWithA:(arc4random()%30) B:(arc4random()%30)];
+        // it's OK if there are collisions, since a "new" EXTTerm will just
+        // bump the old one out of the dictionary.
+        EXTPair *location = [EXTPair pairWithA:(arc4random()%30)
+                                             B:(arc4random()%30)];
         NSArray *names = nil;
         
         if ((location.a < 2) || (location.b < 5))

@@ -14,7 +14,6 @@
 @class EXTPage;
 
 // this class models a differential in the spectral sequence.
-// XXX: we don't implement NSCoding!
 @interface EXTDifferential : NSObject <NSCoding>
     {
         EXTTerm *start, *end;

@@ -37,10 +37,6 @@
     object.end = end;
     object.page = page;
     
-    // XXX: this requires that we ONLY add differentials to the next page. this
-    // is probably NOT the behavior that we want.  i've changed this to use
-    // page 0 instead, but that is probably ALSO not what we want.  this needs
-    // to be thought through.
     [object setPresentation:[EXTMatrix matrixWidth:[start dimension:0] height:[end dimension:0]]];
     object.wellDefined = false;
     object.partialDefinitions = [NSMutableArray array];
