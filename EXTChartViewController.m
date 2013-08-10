@@ -1,20 +1,67 @@
 //
-//  EXTDocumentWindowController+EXTChartViewDelegate.m
+//  EXTChartViewController.m
 //  Ext Chart
 //
-//  Created by Bavarious on 24/07/2013.
+//  Created by Bavarious on 10/08/2013.
 //  Copyright (c) 2013 Harvard University. All rights reserved.
 //
 
-#import "EXTDocumentWindowController+EXTChartViewDelegate.h"
+#import "EXTChartViewController.h"
+#import "EXTChartView.h"
+#import "EXTDocument.h"
 #import "EXTSpectralSequence.h"
+#import "EXTTerm.h"
 #import "EXTDifferential.h"
 
+@interface EXTChartViewController () <EXTChartViewDelegate>
+    @property(nonatomic, weak) id selectedObject;
+@end
 
-@implementation EXTDocumentWindowController (EXTChartViewDelegate)
+@implementation EXTChartViewController {
+    EXTDocument *_document;
+}
+
+#pragma mark - Life cycle
+
+- (id)initWithDocument:(EXTDocument *)document {
+    self = [super init];
+    if (self)
+        _document = document;
+    return self;
+}
+
+- (void)setView:(NSView *)view {
+    NSAssert([view isKindOfClass:[EXTChartView class]], @"EXTChartViewController controls EXTChartViews only");
+    NSAssert(_document, @"EXTChartViewController needs a document");
+
+    [super setView:view];
+
+    self.chartView.delegate = self;
+    [view bind:EXTChartViewSseqBindingName toObject:_document withKeyPath:@"sseq" options:nil];
+}
+
++ (id)new {
+    return [super new];
+}
+
+- (id)init {
+    return [super init];
+}
+
+- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
+    return [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
+}
+
+#pragma mark - Properties
+
+- (EXTChartView *)chartView {
+    return (EXTChartView *)[self view];
+}
+
+#pragma mark - EXTChartViewDelegate
 
 - (void)computeGroupsForPage:(NSUInteger)pageNumber {
-    [[[self extDocument] sseq] computeGroupsForPage:pageNumber];
+    [_document.sseq computeGroupsForPage:pageNumber];
 }
 
 // TODO: Talk to Eric about creating an NS_INLINE NSValue *_EXTDotRect() function
@@ -76,7 +123,7 @@
                     ll:(NSPoint)lowerLeft
                     ur:(NSPoint)upperRight
            withSpacing:(CGFloat)spacing {
-    
+
     // start by initializing the array of counts
     int width = (int)(upperRight.x - lowerLeft.x + 1),
     height = (int)(upperRight.y - lowerLeft.y + 1);
@@ -97,7 +144,7 @@
     // they get drawn.  this will probably need to be changed when we move to
     // Z-mods, since those have lots of interesting quotients which need to
     // represented visually.
-    for (EXTTerm *term in self.extDocument.sseq.terms.allValues) {
+    for (EXTTerm *term in _document.sseq.terms.allValues) {
         NSPoint point = [[term location] makePoint];
 
         if (point.x >= lowerLeft.x && point.x <= upperRight.x &&
@@ -149,11 +196,11 @@
     }
 
     // iterate also through the available differentials
-    if (pageNumber >= self.extDocument.sseq.differentials.count)
+    if (pageNumber >= _document.sseq.differentials.count)
         return;
 
     [[NSColor blackColor] set];
-    for (EXTDifferential *differential in ((NSDictionary*)self.extDocument.sseq.differentials[pageNumber]).allValues) {
+    for (EXTDifferential *differential in ((NSDictionary*)_document.sseq.differentials[pageNumber]).allValues) {
         // some sanity checks to make sure this differential is worth drawing
         if ([differential page] != pageNumber)
             continue;
@@ -232,13 +279,8 @@
             [line stroke];
         }
     }
-
+    
     // TODO: draw certain multiplicative structures?
 }
-
-- (void)drawPagesUpTo:(NSUInteger)pageNumber {
-    // TODO: what’s this supposed to do?
-}
-
 
 @end

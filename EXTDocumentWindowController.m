@@ -16,6 +16,7 @@
 #import "EXTArtBoard.h"
 #import "EXTScrollView.h"
 #import "EXTDocumentInspectorView.h"
+#import "EXTChartViewController.h"
 #import "EXTGeneratorInspectorViewController.h"
 #import "EXTDifferentialPaneController.h"
 
@@ -55,6 +56,7 @@ typedef enum : NSInteger {
 
 
 @implementation EXTDocumentWindowController {
+    EXTChartViewController *_chartViewController;
     EXTGeneratorInspectorViewController *_generatorInspectorViewController;
     EXTDifferentialPaneController *_differentialPaneController;
     EXTDocumentInspectorView *_inspectorView;
@@ -98,8 +100,8 @@ typedef enum : NSInteger {
 
     // Chart view
     {
-        [_chartView setDelegate:self];
-        [_chartView bind:EXTChartViewSseqBindingName toObject:[self document] withKeyPath:@"sseq" options:nil];
+        _chartViewController = [[EXTChartViewController alloc] initWithDocument:self.extDocument];
+        _chartViewController.view = _chartView;
     }
 
     // Chart scroll view
