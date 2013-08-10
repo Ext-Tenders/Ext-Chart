@@ -20,12 +20,19 @@ typedef enum : NSInteger {
 } EXTToolboxTag;
 
 
-@class EXTArtBoard, EXTGrid, EXTSpectralSequence;
-
+@class EXTChartView, EXTArtBoard, EXTGrid, EXTSpectralSequence;
+@protocol EXTLocation;
 
 @protocol EXTChartViewDelegate <NSObject>
-    - (void)willDisplayPage:(NSUInteger)pageNumber;
-    - (void)drawPageNumber:(NSUInteger)pageNumber ll:(NSPoint)lowerLeftCoord ur:(NSPoint)upperRightCoord withSpacing:(CGFloat)gridSpacing;
+    - (void)chartView:(EXTChartView *)chartView willDisplayPage:(NSUInteger)pageNumber;
+
+    - (void)chartView:(EXTChartView *)chartView
+       drawPageNumber:(NSUInteger)pageNumber
+            lowerLeft:(NSPoint)lowerLeftCoord
+           upperRight:(NSPoint)upperRightCoord
+          withSpacing:(CGFloat)gridSpacing;
+
+    - (Class<EXTLocation>)indexClassForChartView:(EXTChartView *)chartView;
 @end
 
 
@@ -36,7 +43,6 @@ typedef enum : NSInteger {
 @property(nonatomic, readonly) EXTGrid *grid;
 @property(nonatomic, strong) NSColor *highlightColor;
 
-@property(nonatomic, strong) EXTSpectralSequence *sseq;
 @property(nonatomic, weak) id<EXTChartViewDelegate> delegate;
 @property(nonatomic, assign) NSUInteger selectedPageIndex;
 @property(nonatomic, assign) EXTToolboxTag selectedToolTag;
@@ -52,5 +58,4 @@ typedef enum : NSInteger {
 
 #pragma mark - Exported variables
 
-extern NSString * const EXTChartViewSseqBindingName;
 extern NSString * const EXTChartViewSelectedPageIndexBindingName;

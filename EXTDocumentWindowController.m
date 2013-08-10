@@ -277,14 +277,9 @@ typedef enum : NSInteger {
     NSAssert(!document || [document isKindOfClass:[EXTDocument class]], @"This window controller accepts EXTDocument documents only");
 
     if (document != [self document]) {
-        if ([self document])
-            [[self chartView] unbind:EXTChartViewSseqBindingName];
-        
         [super setDocument:document];
 
         if (document) {
-            [[self chartView] bind:EXTChartViewSseqBindingName toObject:document withKeyPath:@"sseq" options:nil];
-            
             if (!_generatorInspectorViewController) {
                 _generatorInspectorViewController = [EXTGeneratorInspectorViewController new];
                 [_generatorInspectorViewController bind:@"sseq" toObject:document withKeyPath:@"sseq" options:nil];
