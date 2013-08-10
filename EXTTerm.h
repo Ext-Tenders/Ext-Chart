@@ -38,11 +38,6 @@
     // TODO: a direct sum constructor might be nice?
 
     -(int) size;
-
-
-    // this gets called when the Term tool receives a click event
-    +(id) dealWithClick:(NSPoint)location document:(EXTDocument*)document;
-
     -(int) dimension:(int)whichPage; // useful for drawing
     -(void) computeCycles:(int)whichPage sSeq:(EXTSpectralSequence*)sSeq;
     -(void) computeBoundaries:(int)whichPage sSeq:(EXTSpectralSequence*)sSeq;

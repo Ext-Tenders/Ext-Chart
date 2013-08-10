@@ -490,16 +490,6 @@
         [minimalIndices addObject:imageIndices[i]];
     }
     
-    /*
-    // XXX: ideally we would set some kind of flag saying we were poorly defined
-     
-    // then, if we have too few vectors left to be of full rank...
-    if (minimalVectors.count != sourceDimension)
-        wellDefined = false; // ... then mark that we failed
-    else
-        wellDefined = true;  // ... otherwise, mark that we're good to go.
-     */
-    
     // we want to extend this basis of the cycle groups to a basis of the entire
     // E_1 term.  start by augmenting to a matrix containing a definite surplus
     // of basis vectors.

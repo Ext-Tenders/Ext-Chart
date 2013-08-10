@@ -221,6 +221,7 @@
     return dim;
 }
 
+/*
 // XXX: this should deal with EXTLocation in a sane way.
 +(id) dealWithClick:(NSPoint)location document:(EXTDocument*)document {
     EXTPair	*pointPair = [EXTPair pairWithA:(int)(location.x)
@@ -230,6 +231,6 @@
     [document.sseq.terms setObject:term forKey:term.location];
     
     return term;
-}
+} */
 
 @end
