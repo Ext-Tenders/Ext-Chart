@@ -61,3 +61,4 @@ typedef enum : NSInteger {
 #pragma mark - Exported variables
 
 extern NSString * const EXTChartViewSelectedPageIndexBindingName;
+extern NSString * const EXTChartViewHighlightColorPreferenceKey;

@@ -7,6 +7,7 @@
 //
 
 #import "EXTGrid.h"
+#import "NSUserDefaults+EXTAdditions.h"
 
 
 #pragma mark - Public variables
@@ -14,26 +15,31 @@
 // I guess a string constant is an exposed binding.
 NSString * const EXTGridAnyKey = @"anyGridKey";
 
+NSString * const EXTGridColorPreferenceKey = @"EXTGridColor";
+NSString * const EXTGridSpacingPreferenceKey = @"EXTGridSpacing";
+NSString * const EXTGridEmphasisColorPreferenceKey = @"EXTGridEmphasisColor";
+NSString * const EXTGridEmphasisSpacingPreferenceKey = @"EXTGridEmphasisSpacing";
+NSString * const EXTGridAxisColorPreferenceKey = @"EXTGridAxisColor";
+
 
 #pragma mark - Private variables
 
 static const CGFloat _EXTGridLineWidth = 0.25;
-static const CGFloat _EXTDefaultGridSpacing = 9.0;
-static const NSUInteger _EXTDefaultEmphasisSpacing = 8;
-static NSColor *_EXTDefaultGridColor = nil;
-static NSColor *_EXTDefaultEmphasisGridColor = nil;
-static NSColor *_EXTDefaultAxisColor = nil;
+
 
 @implementation EXTGrid
 
 #pragma mark - Life cycle
 
-+ (void)initialize {
-    if (self == [EXTGrid class]) {
-        _EXTDefaultGridColor = [NSColor lightGrayColor];
-        _EXTDefaultEmphasisGridColor = [NSColor darkGrayColor];
-        _EXTDefaultAxisColor = [NSColor blueColor];
-    }
++ (void)load {
+    NSDictionary *defaults = @{
+                               EXTGridColorPreferenceKey : [NSArchiver archivedDataWithRootObject:[NSColor lightGrayColor]],
+                               EXTGridSpacingPreferenceKey : @(9.0),
+                               EXTGridEmphasisColorPreferenceKey : [NSArchiver archivedDataWithRootObject:[NSColor darkGrayColor]],
+                               EXTGridEmphasisSpacingPreferenceKey : @(8),
+                               EXTGridAxisColorPreferenceKey : [NSArchiver archivedDataWithRootObject:[NSColor blueColor]],
+                               };
+    [[NSUserDefaults standardUserDefaults] registerDefaults:defaults];
 }
 
 - (id)init {
@@ -43,12 +49,14 @@ static NSColor *_EXTDefaultAxisColor = nil;
 
 	_boundsRect = NSZeroRect;
 
-	_gridSpacing = _EXTDefaultGridSpacing;
-	_emphasisSpacing = _EXTDefaultEmphasisSpacing;
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
 
-	_gridColor = _EXTDefaultGridColor;
-	_emphasisGridColor = _EXTDefaultEmphasisGridColor;
-	_axisColor = _EXTDefaultAxisColor;
+	_gridSpacing = [defaults doubleForKey:EXTGridSpacingPreferenceKey];
+	_emphasisSpacing = [defaults integerForKey:EXTGridEmphasisSpacingPreferenceKey];
+
+	_gridColor = [defaults extColorForKey:EXTGridColorPreferenceKey];
+	_emphasisGridColor = [defaults extColorForKey:EXTGridEmphasisColorPreferenceKey];
+	_axisColor = [defaults extColorForKey:EXTGridAxisColorPreferenceKey];
 
 	_gridPath = [self makeGridInRect:_boundsRect withFactor:1];
 	_emphasisGridPath = [self makeGridInRect:_boundsRect withFactor:_emphasisSpacing];
@@ -56,14 +64,15 @@ static NSColor *_EXTDefaultAxisColor = nil;
     return self;
 }
 
-- (void)resetToDefaults{
-	self.gridSpacing = _EXTDefaultGridSpacing;
-	self.emphasisSpacing = _EXTDefaultEmphasisSpacing;
-	
-	self.gridColor = _EXTDefaultGridColor;
-	self.emphasisGridColor = _EXTDefaultEmphasisGridColor;
-	self.axisColor = _EXTDefaultAxisColor;
-	
+- (void)resetToDefaults {
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+
+	self.gridSpacing = [defaults doubleForKey:EXTGridSpacingPreferenceKey];
+	self.emphasisSpacing = [defaults integerForKey:EXTGridEmphasisSpacingPreferenceKey];
+
+	self.gridColor = [defaults objectForKey:EXTGridColorPreferenceKey];
+	self.emphasisGridColor = [defaults objectForKey:EXTGridEmphasisColorPreferenceKey];
+	self.axisColor = [defaults objectForKey:EXTGridAxisColorPreferenceKey];
 }
 
 #pragma mark *** generating the gridPath ***

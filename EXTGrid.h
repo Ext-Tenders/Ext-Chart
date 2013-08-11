@@ -8,8 +8,6 @@
 
 #import <Cocoa/Cocoa.h>
 
-extern NSString * const EXTGridAnyKey;
-
 @interface EXTGrid : NSObject
 
 @property(nonatomic, strong) NSColor *gridColor, *emphasisGridColor, *axisColor;
@@ -33,3 +31,13 @@ extern NSString * const EXTGridAnyKey;
 - (void) drawEnclosingRectAtPoint: (NSPoint)point;
 
 @end
+
+#pragma mark - Public variables
+
+extern NSString * const EXTGridAnyKey;
+
+extern NSString * const EXTGridColorPreferenceKey;
+extern NSString * const EXTGridSpacingPreferenceKey;
+extern NSString * const EXTGridEmphasisColorPreferenceKey;
+extern NSString * const EXTGridEmphasisSpacingPreferenceKey;
+extern NSString * const EXTGridAxisColorPreferenceKey;

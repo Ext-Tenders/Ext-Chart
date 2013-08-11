@@ -14,14 +14,14 @@
 #import "EXTTerm.h"
 #import "EXTDifferential.h"
 #import "EXTSpectralSequence.h"
-
-
-static NSColor *_EXTDefaultHighlightColor = nil;
+#import "NSUserDefaults+EXTAdditions.h"
 
 
 #pragma mark - Exported variables
 
 NSString * const EXTChartViewSelectedPageIndexBindingName = @"selectedPageIndex";
+NSString * const EXTChartViewHighlightColorPreferenceKey = @"EXTChartViewHighlightColor";
+
 
 #pragma mark - Private variables
 
@@ -30,6 +30,7 @@ static void *_EXTChartViewArtBoardDrawingRectContext = &_EXTChartViewArtBoardDra
 static void *_EXTChartViewGridAnyKeyContext = &_EXTChartViewGridAnyKeyContext;
 
 static CGFloat const _EXTHighlightLineWidth = 0.5;
+
 
 #pragma mark - Private functions
 
@@ -63,13 +64,12 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
 
 #pragma mark - Life cycle
 
-+ (void)initialize
-{
-    if (self == [EXTChartView class]) {
-        [self exposeBinding:EXTChartViewSelectedPageIndexBindingName];
++ (void)load {
+    [self exposeBinding:EXTChartViewSelectedPageIndexBindingName];
 
-        _EXTDefaultHighlightColor = [NSColor colorWithCalibratedRed:0.0 green:1.0 blue:1.0 alpha:1.0];
-    }
+    NSColor *highlightColor = [NSColor colorWithCalibratedRed:0.0 green:1.0 blue:1.0 alpha:1.0];
+    NSDictionary *defaults = @{EXTChartViewHighlightColorPreferenceKey : [NSArchiver archivedDataWithRootObject:highlightColor]};
+    [[NSUserDefaults standardUserDefaults] registerDefaults:defaults];
 }
 
 - (id)initWithFrame:(NSRect)frame {
@@ -118,7 +118,7 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
         // Highlighting
 		{
             _highlighting = true;
-            _highlightColor = _EXTDefaultHighlightColor;
+            _highlightColor = [[NSUserDefaults standardUserDefaults] extColorForKey:EXTChartViewHighlightColorPreferenceKey];
             _highlightRect = NSZeroRect; // we initialize the highlight rect to something stupid.   It will change before it is drawn.
             [self setHighlightPath:[NSBezierPath bezierPathWithRect:_highlightRect]];
         }

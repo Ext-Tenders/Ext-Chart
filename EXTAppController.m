@@ -8,10 +8,12 @@
 
 #import "EXTAppController.h"
 #import "EXTNewDocumentWindowController.h"
+#import "EXTPreferencesWindowController.h"
 
 
 @implementation EXTAppController {
     EXTNewDocumentWindowController *_newDocumentWindowController;
+    EXTPreferencesWindowController *_preferencesWindowController;
 }
 
 - (void)newDocument:(id)sender {
@@ -26,6 +28,16 @@
 - (BOOL)applicationOpenUntitledFile:(NSApplication *)sender {
     [self newDocument:nil];
     return YES;
+}
+
+- (IBAction)showPreferences:(id)sender {
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        if (!_preferencesWindowController)
+            _preferencesWindowController = [EXTPreferencesWindowController new];
+    });
+
+    [_preferencesWindowController showWindow:nil];
 }
 
 @end

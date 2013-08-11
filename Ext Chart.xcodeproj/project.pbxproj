@@ -9,8 +9,11 @@
 /* Begin PBXBuildFile section */
 		093AEADD13E10759003E9F58 /* EXTPair.m in Sources */ = {isa = PBXBuildFile; fileRef = 093AEADC13E10759003E9F58 /* EXTPair.m */; };
 		143F3DFE176D615100FB92B3 /* EXTUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 143F3DFD176D615100FB92B3 /* EXTUtilities.m */; };
+		1460B40C17B735BD00B575E3 /* EXTPreferencesWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1460B40B17B735BD00B575E3 /* EXTPreferencesWindowController.m */; };
+		1460B40E17B7360700B575E3 /* EXTPreferences.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1460B40D17B7360700B575E3 /* EXTPreferences.xib */; };
 		1467B26E178CF15E0084A2F6 /* EXTDocumentInspectorView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1467B26D178CF15E0084A2F6 /* EXTDocumentInspectorView.m */; };
 		1467B272178D13A80084A2F6 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1467B271178D13A80084A2F6 /* QuartzCore.framework */; };
+		14741D7217B7535A00AF73D9 /* NSUserDefaults+EXTAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 14741D7117B7535A00AF73D9 /* NSUserDefaults+EXTAdditions.m */; };
 		149314581783B6EB0080EF28 /* EXTDocumentControlsView.m in Sources */ = {isa = PBXBuildFile; fileRef = 149314571783B6EA0080EF28 /* EXTDocumentControlsView.m */; };
 		149831A017AE04F3000380A5 /* EXTNewDocumentWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1498319E17AE04F3000380A5 /* EXTNewDocumentWindowController.m */; };
 		149831A117AE04F3000380A5 /* EXTNewDocument.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1498319F17AE04F3000380A5 /* EXTNewDocument.xib */; };
@@ -66,9 +69,14 @@
 		13E42FBA07B3F13500E4EEF1 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
 		143F3DFC176D615100FB92B3 /* EXTUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTUtilities.h; sourceTree = "<group>"; };
 		143F3DFD176D615100FB92B3 /* EXTUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTUtilities.m; sourceTree = "<group>"; };
+		1460B40A17B735BD00B575E3 /* EXTPreferencesWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTPreferencesWindowController.h; sourceTree = "<group>"; };
+		1460B40B17B735BD00B575E3 /* EXTPreferencesWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTPreferencesWindowController.m; sourceTree = "<group>"; };
+		1460B40D17B7360700B575E3 /* EXTPreferences.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = EXTPreferences.xib; sourceTree = "<group>"; };
 		1467B26C178CF15E0084A2F6 /* EXTDocumentInspectorView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTDocumentInspectorView.h; sourceTree = "<group>"; };
 		1467B26D178CF15E0084A2F6 /* EXTDocumentInspectorView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTDocumentInspectorView.m; sourceTree = "<group>"; };
 		1467B271178D13A80084A2F6 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk/System/Library/Frameworks/QuartzCore.framework; sourceTree = DEVELOPER_DIR; };
+		14741D7017B7535A00AF73D9 /* NSUserDefaults+EXTAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSUserDefaults+EXTAdditions.h"; sourceTree = "<group>"; };
+		14741D7117B7535A00AF73D9 /* NSUserDefaults+EXTAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSUserDefaults+EXTAdditions.m"; sourceTree = "<group>"; };
 		149314561783B6EA0080EF28 /* EXTDocumentControlsView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTDocumentControlsView.h; sourceTree = "<group>"; };
 		149314571783B6EA0080EF28 /* EXTDocumentControlsView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTDocumentControlsView.m; sourceTree = "<group>"; };
 		1498319D17AE04F3000380A5 /* EXTNewDocumentWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTNewDocumentWindowController.h; sourceTree = "<group>"; };
@@ -212,6 +220,8 @@
 			isa = PBXGroup;
 			children = (
 				149A0EA6176C409C006F6142 /* NSCursor+EXTApplePrivate.h */,
+				14741D7017B7535A00AF73D9 /* NSUserDefaults+EXTAdditions.h */,
+				14741D7117B7535A00AF73D9 /* NSUserDefaults+EXTAdditions.m */,
 			);
 			name = "System Categories";
 			sourceTree = "<group>";
@@ -274,6 +284,8 @@
 				385BF10F17AAD8D5008CA5B6 /* EXTGeneratorInspectorViewController.m */,
 				1498319D17AE04F3000380A5 /* EXTNewDocumentWindowController.h */,
 				1498319E17AE04F3000380A5 /* EXTNewDocumentWindowController.m */,
+				1460B40A17B735BD00B575E3 /* EXTPreferencesWindowController.h */,
+				1460B40B17B735BD00B575E3 /* EXTPreferencesWindowController.m */,
 			);
 			name = Controllers;
 			sourceTree = "<group>";
@@ -307,6 +319,7 @@
 				385BF10B17AAD8C2008CA5B6 /* EXTGeneratorInspectorView.xib */,
 				1498319F17AE04F3000380A5 /* EXTNewDocument.xib */,
 				1DDD582A0DA1D0D100B32029 /* MainMenu.xib */,
+				1460B40D17B7360700B575E3 /* EXTPreferences.xib */,
 			);
 			name = XIBs;
 			sourceTree = "<group>";
@@ -464,6 +477,7 @@
 				149831A817AE65EA000380A5 /* Random Example.pdf in Resources */,
 				149831A917AE65EA000380A5 /* S5 Example.pdf in Resources */,
 				3869FCF917B4587100D0D740 /* EXTDifferentialPane.xib in Resources */,
+				1460B40E17B7360700B575E3 /* EXTPreferences.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -500,6 +514,8 @@
 				149831A017AE04F3000380A5 /* EXTNewDocumentWindowController.m in Sources */,
 				3869FCF817B4587100D0D740 /* EXTDifferentialPaneController.m in Sources */,
 				14D78E5D17B5E44000B1BB52 /* EXTChartViewController.m in Sources */,
+				1460B40C17B735BD00B575E3 /* EXTPreferencesWindowController.m in Sources */,
+				14741D7217B7535A00AF73D9 /* NSUserDefaults+EXTAdditions.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
