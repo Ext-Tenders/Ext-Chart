@@ -17,12 +17,12 @@
 }
 
 - (void)newDocument:(id)sender {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if (!_newDocumentWindowController)
-            _newDocumentWindowController = [EXTNewDocumentWindowController new];
-
-        [_newDocumentWindowController showWindow:self];
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        _newDocumentWindowController = [EXTNewDocumentWindowController new];
     });
+
+    [_newDocumentWindowController showWindow:self];
 }
 
 - (BOOL)applicationOpenUntitledFile:(NSApplication *)sender {
@@ -33,8 +33,7 @@
 - (IBAction)showPreferences:(id)sender {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        if (!_preferencesWindowController)
-            _preferencesWindowController = [EXTPreferencesWindowController new];
+        _preferencesWindowController = [EXTPreferencesWindowController new];
     });
 
     [_preferencesWindowController showWindow:nil];
