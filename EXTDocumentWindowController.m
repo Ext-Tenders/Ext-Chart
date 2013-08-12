@@ -150,7 +150,7 @@ typedef enum : NSInteger {
         }
         [_inspectorView addSubview:_differentialPaneController.view withTitle:@"Differential" collapsed:true centered:true];
         
-        [_inspectorView addSubview:_gridInspectorView withTitle:@"Grid" collapsed:false centered:false];
+        [_inspectorView addSubview:_gridInspectorView withTitle:@"Grid" collapsed:true centered:false];
 
         NSRect contentFrame = [[[self window] contentView] frame];
         NSSize scrollViewSize = [NSScrollView contentSizeForFrameSize:[_inspectorView frame].size hasHorizontalScroller:NO hasVerticalScroller:YES borderType:NSNoBorder];
