@@ -19,6 +19,7 @@ static const CGFloat _EXTHeaderHeight = 30.0;
 static const CGFloat _EXTContentTopPadding = 1.0; // space between the header and the content view
 static const CGFloat _EXTContentBottomPadding = 5.0;
 static NSDictionary *_EXTTitleAttributes = nil;
+static NSGradient *_EXTHeaderGradient = nil;
 
 #pragma mark - Private functions
 
@@ -130,6 +131,11 @@ NS_INLINE NSSize _EXTGroupSizeForContentSize(NSSize contentSize) {
         _EXTTitleAttributes = @{NSFontAttributeName : [NSFont boldSystemFontOfSize:13.0],
                                 NSParagraphStyleAttributeName : titleParagraphStyle,
                                 NSShadowAttributeName : shadow};
+        _EXTHeaderGradient = [[NSGradient alloc] initWithColorsAndLocations:
+                              [NSColor colorWithCalibratedWhite:0.953 alpha:1.0], 0.0,
+                              [NSColor colorWithCalibratedWhite:0.929 alpha:1.0], 0.3,
+                              [NSColor colorWithCalibratedWhite:0.800 alpha:1.0], 1.0,
+                              nil];
     }
 }
 
@@ -203,18 +209,17 @@ NS_INLINE NSSize _EXTGroupSizeForContentSize(NSSize contentSize) {
 - (void)drawRect:(NSRect)dirtyRect {
     const NSRect bounds = [self bounds];
     const CGFloat borderWidth = 1.0;
-    NSColor *borderColor = [NSColor colorWithCalibratedWhite:0.5 alpha:1.0];
+    NSColor *borderColor = [NSColor colorWithCalibratedWhite:0.4 alpha:1.0];
 
     // Border clip
-    NSBezierPath *borderPath = [NSBezierPath bezierPathWithRoundedRect:NSInsetRect(bounds, borderWidth / 2, borderWidth / 2) xRadius:10.0 yRadius:10.0];
+    NSBezierPath *borderPath = [NSBezierPath bezierPathWithRoundedRect:NSInsetRect(bounds, borderWidth / 2, borderWidth / 2) xRadius:5.0 yRadius:5.0];
     [borderPath setLineWidth:borderWidth];
     [borderPath addClip];
     {
         // Header
         const NSRect headerFrame = [self _extHeaderFrame];
         if (NSIntersectsRect(dirtyRect, headerFrame)) {
-            [[NSColor colorWithCalibratedWhite:0.8 alpha:1.0] setFill];
-            NSRectFill(headerFrame);
+            [_EXTHeaderGradient drawInRect:headerFrame angle:90];
 
             NSRect headerBorderFrame, dummyRect;
             NSDivideRect(headerFrame, &headerBorderFrame, &dummyRect, 1.0, NSMaxYEdge);
