@@ -15,11 +15,21 @@
 @property IBOutlet NSButton *addButton;
 @property IBOutlet NSButton *deleteButton;
 
+@property IBOutlet NSPanel *sheet;
+@property IBOutlet NSTextField *descriptionField;
+@property IBOutlet NSButton *okButton;
+@property IBOutlet NSButton *cancelButton;
+
 @end
 
 @implementation EXTDifferentialPaneController
+{
+    EXTPartialDefinition *_partial;
+}
 
 @synthesize chartView;
+
+#pragma mark differential inspector pane
 
 - (id)init {
     return [self initWithNibName:@"EXTDifferentialPane" bundle:nil];
@@ -69,11 +79,6 @@
     return;
 }
 
-- (void)doubleClick:(id)sender {
-    DLog(@"Double-clicked.");
-    return;
-}
-
 -(IBAction)deleteButtonPressed:(id)sender {
     NSInteger row = [self.tableView selectedRow];
     
@@ -89,6 +94,46 @@
     [self.chartView displaySelectedPage];
     
     return;
+}
+
+- (void)doubleClick:(id)sender {
+    if (![[self.representedObject class] isSubclassOfClass:[EXTDifferential class]])
+        return;
+    EXTDifferential *diff = self.representedObject;
+    
+    if ((self.tableView.selectedRow < 0) || (self.tableView.selectedRow >= diff.partialDefinitions.count))
+        return;
+    _partial = diff.partialDefinitions[self.tableView.selectedRow];
+    
+    // initialize the pieces of the sheet.
+    self.descriptionField.stringValue = [_partial.description copy];
+    
+    // and display
+    [NSApp beginSheet:self.sheet
+       modalForWindow:self.tableView.window
+        modalDelegate:self
+       didEndSelector:@selector(didEndSheet:returnCode:contextInfo:)
+          contextInfo:nil];
+    
+    return;
+}
+
+#pragma mark differential editor sheet
+
+- (void)didEndSheet:(NSWindow *)sheet returnCode:(NSInteger)returnCode contextInfo:(void *)contextInfo {
+    [sheet orderOut:self];
+    return;
+}
+
+- (IBAction)okButtonPressed:(id)sender {
+    // read the data from the sheet into the partial differential.
+    _partial.description = self.descriptionField.stringValue;
+    
+    [NSApp endSheet:_sheet];
+}
+
+- (IBAction)cancelButtonPressed:(id)sender {
+    [NSApp endSheet:_sheet];
 }
 
 @end
