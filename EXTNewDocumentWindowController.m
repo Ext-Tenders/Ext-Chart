@@ -176,6 +176,11 @@
     [_createDocumentButton setEnabled:createButtonEnabled];
 }
 
+- (BOOL)tableView:(NSTableView *)tableView shouldSelectRow:(NSInteger)row {
+    EXTNewDocumentOption *option = [_options objectAtIndex:row];
+    return ![option isGroup];
+}
+
 #pragma mark - NSControl delegate
 
 - (void)controlTextDidChange:(NSNotification *)obj {
