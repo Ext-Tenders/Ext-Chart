@@ -47,7 +47,7 @@ typedef enum : NSInteger {
     @property(nonatomic, weak) IBOutlet NSView *controlsView;
     @property(nonatomic, weak) IBOutlet NSPopUpButton *zoomPopUpButton;
 
-    @property(nonatomic, strong) NSView *sidebarView;
+    @property(nonatomic, strong) IBOutlet NSView *sidebarView;
     @property(nonatomic, weak) IBOutlet NSView *gridInspectorView;
     @property(nonatomic, weak) IBOutlet NSView *horizontalToolboxView;
 
@@ -152,7 +152,8 @@ typedef enum : NSInteger {
         
         [_inspectorView addSubview:_gridInspectorView withTitle:@"Grid" collapsed:true centered:false];
 
-        NSRect contentFrame = [[[self window] contentView] frame];
+        const NSRect contentFrame = [[[self window] contentView] frame];
+        
         NSSize scrollViewSize = [NSScrollView contentSizeForFrameSize:[_inspectorView frame].size hasHorizontalScroller:NO hasVerticalScroller:YES borderType:NSNoBorder];
         scrollViewSize.height = contentFrame.size.height;
         NSScrollView *inspectorScrollView = [[NSScrollView alloc] initWithFrame:(NSRect){NSZeroPoint, scrollViewSize}];
@@ -165,10 +166,13 @@ typedef enum : NSInteger {
         [inspectorScrollView setBackgroundColor:[NSColor windowBackgroundColor]];
         [inspectorScrollView setDocumentView:_inspectorView];
 
-        NSRect sidebarFrame = {{NSMaxX(contentFrame), 0.0}, scrollViewSize};
-        _sidebarView = [[NSView alloc] initWithFrame:sidebarFrame];
+        NSRect mainFrame = [_mainView frame];
+        mainFrame.size.width = contentFrame.size.width - scrollViewSize.width;
+        [_mainView setFrameSize:mainFrame.size];
+
+        NSRect sidebarFrame = {{NSMaxX(mainFrame), 0.0}, scrollViewSize};
+        [_sidebarView setFrame:sidebarFrame];
         [_sidebarView setWantsLayer:YES];
-        [_sidebarView setAutoresizingMask:NSViewHeightSizable | NSViewMinXMargin];
         [_sidebarView addSubview:inspectorScrollView];
 
         // Sidebar left border
@@ -182,18 +186,9 @@ typedef enum : NSInteger {
         [sidebarLeftBorderLayer setShadowOpacity:1.0];
         [sidebarLeftBorderLayer setShadowOffset:(CGSize){1.0, 0.0}];
         [[_sidebarView layer] addSublayer:sidebarLeftBorderLayer];
-        
-        [[[self window] contentView] addSubview:_sidebarView];
-        _sidebarHidden = true;
     }
 
-    // Ready, set, go
     [[self window] makeFirstResponder:_chartView];
-
-    // For debug only at the moment, but this may evolve to a preference
-    // $ defaults write edu.harvard.math.Ext-Chart EXTInspectorVisible -bool YES
-    if ([[NSUserDefaults standardUserDefaults] boolForKey:@"EXTInspectorVisible"])
-        [self toggleInspector:nil];
 }
 
 - (void)windowWillClose:(NSNotification *)notification {
