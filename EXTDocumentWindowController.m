@@ -163,7 +163,7 @@ typedef enum : NSInteger {
         [inspectorScrollView setBorderType:NSNoBorder];
         [inspectorScrollView setAutoresizingMask:NSViewWidthSizable | NSViewHeightSizable];
         [inspectorScrollView setDrawsBackground:YES];
-        [inspectorScrollView setBackgroundColor:[NSColor windowBackgroundColor]];
+        [inspectorScrollView setBackgroundColor:[EXTDocumentInspectorView backgroundColor]];
         [inspectorScrollView setDocumentView:_inspectorView];
 
         NSRect mainFrame = [_mainView frame];

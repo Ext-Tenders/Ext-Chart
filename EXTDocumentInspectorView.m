@@ -103,7 +103,7 @@ NS_INLINE NSSize _EXTGroupSizeForContentSize(NSSize contentSize) {
 }
 
 - (void)drawRect:(NSRect)dirtyRect {
-    [[NSColor windowBackgroundColor] setFill];
+    [[EXTDocumentInspectorView backgroundColor] setFill];
     NSRectFill(dirtyRect);
 }
 
@@ -113,6 +113,11 @@ NS_INLINE NSSize _EXTGroupSizeForContentSize(NSSize contentSize) {
 
 - (BOOL)isOpaque {
     return YES;
+}
+
++ (NSColor *)backgroundColor {
+//    return [NSColor windowBackgroundColor];
+    return [NSColor blueColor];
 }
 
 @end
