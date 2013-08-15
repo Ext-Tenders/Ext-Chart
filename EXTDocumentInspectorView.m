@@ -116,8 +116,7 @@ NS_INLINE NSSize _EXTGroupSizeForContentSize(NSSize contentSize) {
 }
 
 + (NSColor *)backgroundColor {
-//    return [NSColor windowBackgroundColor];
-    return [NSColor blueColor];
+    return [NSColor windowBackgroundColor];
 }
 
 @end
