@@ -15,10 +15,8 @@
 @property IBOutlet NSButton *addButton;
 @property IBOutlet NSButton *deleteButton;
 
-@property IBOutlet NSPanel *sheet;
+@property IBOutlet NSPopover *popover;
 @property IBOutlet NSTextField *descriptionField;
-@property IBOutlet NSButton *okButton;
-@property IBOutlet NSButton *cancelButton;
 
 @end
 
@@ -109,31 +107,19 @@
     self.descriptionField.stringValue = [_partial.description copy];
     
     // and display
-    [NSApp beginSheet:self.sheet
-       modalForWindow:self.tableView.window
-        modalDelegate:self
-       didEndSelector:@selector(didEndSheet:returnCode:contextInfo:)
-          contextInfo:nil];
+    [self.popover showRelativeToRect:[self.tableView rectOfRow:self.tableView.selectedRow] ofView:self.tableView preferredEdge:NSMinXEdge];
     
     return;
 }
 
-#pragma mark differential editor sheet
+#pragma mark differential editor popover
 
-- (void)didEndSheet:(NSWindow *)sheet returnCode:(NSInteger)returnCode contextInfo:(void *)contextInfo {
-    [sheet orderOut:self];
-    return;
-}
-
-- (IBAction)okButtonPressed:(id)sender {
-    // read the data from the sheet into the partial differential.
+- (void)popoverWillClose:(NSNotification *)notification {
     _partial.description = self.descriptionField.stringValue;
     
-    [NSApp endSheet:_sheet];
-}
-
-- (IBAction)cancelButtonPressed:(id)sender {
-    [NSApp endSheet:_sheet];
+    [_tableView reloadData];
+    
+    return;
 }
 
 @end
