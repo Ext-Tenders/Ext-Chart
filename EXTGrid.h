@@ -21,7 +21,6 @@
 - (void) drawGridInRect:(NSRect)rect;
 - (void) drawGrid;
 - (void) drawAxes;
-- (void) resetToDefaults;
 
 - (NSPoint)nearestGridPoint:(NSPoint)point; // used for snapping to grid
 - (NSPoint)convertToGridCoordinates:(NSPoint)point;

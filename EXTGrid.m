@@ -64,17 +64,6 @@ static const CGFloat _EXTGridLineWidth = 0.25;
     return self;
 }
 
-- (void)resetToDefaults {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-
-	self.gridSpacing = [defaults doubleForKey:EXTGridSpacingPreferenceKey];
-	self.emphasisSpacing = [defaults integerForKey:EXTGridEmphasisSpacingPreferenceKey];
-
-	self.gridColor = [defaults objectForKey:EXTGridColorPreferenceKey];
-	self.emphasisGridColor = [defaults objectForKey:EXTGridEmphasisColorPreferenceKey];
-	self.axisColor = [defaults objectForKey:EXTGridAxisColorPreferenceKey];
-}
-
 #pragma mark *** generating the gridPath ***
 
 // makeGridInRect:withFactor:makes a grid in the rectangle with spacing self.gridSpacing*factor, with the origin of the coordinate system guaranteed to be on gridlines.

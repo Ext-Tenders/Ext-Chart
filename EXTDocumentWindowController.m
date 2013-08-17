@@ -20,6 +20,7 @@
 #import "EXTGridInspectorViewController.h"
 #import "EXTGeneratorInspectorViewController.h"
 #import "EXTDifferentialPaneController.h"
+#import "NSUserDefaults+EXTAdditions.h"
 
 
 #pragma mark - Private variables
@@ -395,7 +396,15 @@ typedef enum : NSInteger {
 }
 
 - (IBAction)resetGridToDefaults:(id)sender {
-    [[_chartView grid] resetToDefaults];
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    EXTDocument *doc = self.extDocument;
+
+	doc.gridSpacing = [defaults doubleForKey:EXTGridSpacingPreferenceKey];
+	doc.gridEmphasisSpacing = [defaults integerForKey:EXTGridEmphasisSpacingPreferenceKey];
+
+	doc.gridColor = [defaults extColorForKey:EXTGridColorPreferenceKey];
+	doc.gridEmphasisColor = [defaults extColorForKey:EXTGridEmphasisColorPreferenceKey];
+	doc.axisColor = [defaults extColorForKey:EXTGridAxisColorPreferenceKey];
 }
 
 #pragma mark - NSUserInterfaceValidations
