@@ -7,6 +7,7 @@
 //
 
 #import "EXTGridInspectorViewController.h"
+#import "EXTDocumentWindowController.h"
 #import "EXTDocument.h"
 
 
