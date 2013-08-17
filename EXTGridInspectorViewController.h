@@ -9,5 +9,5 @@
 #import <Cocoa/Cocoa.h>
 #import "EXTDocumentWindowController.h"
 
-@interface EXTGridInspectorViewController : NSViewController <EXTDocumentInspectorViewDelegate>
+@interface EXTGridInspectorViewController : NSViewController
 @end

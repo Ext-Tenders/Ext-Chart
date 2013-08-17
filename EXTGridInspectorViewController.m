@@ -10,7 +10,7 @@
 #import "EXTDocument.h"
 
 
-@interface EXTGridInspectorViewController ()
+@interface EXTGridInspectorViewController () <EXTDocumentInspectorViewDelegate>
     @property(nonatomic, weak) IBOutlet NSButton *showGridButton;
     @property(nonatomic, weak) IBOutlet NSColorWell *gridColorWell;
     @property(nonatomic, weak) IBOutlet NSTextField *gridSpacingField;
