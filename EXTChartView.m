@@ -66,6 +66,8 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
 
 + (void)load {
     [self exposeBinding:EXTChartViewSelectedPageIndexBindingName];
+    [self exposeBinding:@"grid"];
+    [self exposeBinding:@"highlightColor"];
 
     NSColor *highlightColor = [NSColor colorWithCalibratedRed:0.0 green:1.0 blue:1.0 alpha:1.0];
     NSDictionary *defaults = @{EXTChartViewHighlightColorPreferenceKey : [NSArchiver archivedDataWithRootObject:highlightColor]};

@@ -17,6 +17,7 @@
 #import "EXTScrollView.h"
 #import "EXTDocumentInspectorView.h"
 #import "EXTChartViewController.h"
+#import "EXTGridInspectorViewController.h"
 #import "EXTGeneratorInspectorViewController.h"
 #import "EXTDifferentialPaneController.h"
 
@@ -42,13 +43,11 @@ typedef enum : NSInteger {
 
 @interface EXTDocumentWindowController () <NSWindowDelegate, NSUserInterfaceValidations>
     @property(nonatomic, weak) IBOutlet NSView *mainView;
-    @property(nonatomic, weak) IBOutlet EXTChartView *chartView;
     @property(nonatomic, weak) IBOutlet EXTScrollView *chartScrollView;
     @property(nonatomic, weak) IBOutlet NSView *controlsView;
     @property(nonatomic, weak) IBOutlet NSPopUpButton *zoomPopUpButton;
 
     @property(nonatomic, strong) IBOutlet NSView *sidebarView;
-    @property(nonatomic, weak) IBOutlet NSView *gridInspectorView;
     @property(nonatomic, weak) IBOutlet NSView *horizontalToolboxView;
 
     @property(nonatomic, weak) NSObject *highlightedObject;
@@ -57,8 +56,10 @@ typedef enum : NSInteger {
 
 @implementation EXTDocumentWindowController {
     EXTChartViewController *_chartViewController;
+    EXTGridInspectorViewController *_gridInspectorViewController;
     EXTGeneratorInspectorViewController *_generatorInspectorViewController;
     EXTDifferentialPaneController *_differentialPaneController;
+    NSArray *_inspectorViewDelegates;
     EXTDocumentInspectorView *_inspectorView;
     bool _sidebarHidden;
     bool _sidebarAnimating;
@@ -102,6 +103,14 @@ typedef enum : NSInteger {
     {
         _chartViewController = [[EXTChartViewController alloc] initWithDocument:self.extDocument];
         _chartViewController.view = _chartView;
+
+        [_chartView bind:@"highlightColor" toObject:self.extDocument withKeyPath:@"highlightColor" options:nil];
+        
+        [_chartView.grid bind:@"gridColor" toObject:self.extDocument withKeyPath:@"gridColor" options:nil];
+        [_chartView.grid bind:@"emphasisGridColor" toObject:self.extDocument withKeyPath:@"gridEmphasisColor" options:nil];
+        [_chartView.grid bind:@"axisColor" toObject:self.extDocument withKeyPath:@"axisColor" options:nil];
+        [_chartView.grid bind:@"gridSpacing" toObject:self.extDocument withKeyPath:@"gridSpacing" options:nil];
+        [_chartView.grid bind:@"emphasisSpacing" toObject:self.extDocument withKeyPath:@"gridEmphasisSpacing" options:nil];
     }
 
     // Chart scroll view
@@ -141,16 +150,24 @@ typedef enum : NSInteger {
         // set up the subviews
         [_inspectorView addSubview:_horizontalToolboxView withTitle:@"Toolbox" collapsed:false centered:true];
 
+        _generatorInspectorViewController = [EXTGeneratorInspectorViewController new];
+        [_generatorInspectorViewController bind:@"sseq" toObject:self.document withKeyPath:@"sseq" options:nil];
+        [_generatorInspectorViewController bind:@"chartView" toObject:self withKeyPath:@"chartView" options:nil];
         [_inspectorView addSubview:_generatorInspectorViewController.view withTitle:@"Generators" collapsed:true centered:true];
         
-        if (!_differentialPaneController) {
-            _differentialPaneController = [EXTDifferentialPaneController new];
-            [_chartViewController addObserver:_differentialPaneController forKeyPath:@"selectedObject" options:NSKeyValueObservingOptionNew context:nil];
-            [_differentialPaneController bind:@"chartView" toObject:self withKeyPath:@"chartView" options:nil];
-        }
+        _differentialPaneController = [EXTDifferentialPaneController new];
+        [_chartViewController addObserver:_differentialPaneController forKeyPath:@"selectedObject" options:NSKeyValueObservingOptionNew context:nil];
+        [_differentialPaneController bind:@"chartView" toObject:self withKeyPath:@"chartView" options:nil];
         [_inspectorView addSubview:_differentialPaneController.view withTitle:@"Differential" collapsed:true centered:true];
-        
-        [_inspectorView addSubview:_gridInspectorView withTitle:@"Grid" collapsed:true centered:false];
+
+        _gridInspectorViewController = [EXTGridInspectorViewController new];
+        [_inspectorView addSubview:_gridInspectorViewController.view withTitle:@"Grid" collapsed:true centered:false];
+
+        _inspectorViewDelegates = @[
+                                    @{@"view" : _generatorInspectorViewController.view, @"delegate" : _generatorInspectorViewController},
+                                    @{@"view" : _differentialPaneController.view, @"delegate" : _differentialPaneController},
+                                    @{@"view" : _gridInspectorViewController.view, @"delegate" : _gridInspectorViewController},
+                                    ];
 
         const NSRect contentFrame = [[[self window] contentView] frame];
         
@@ -186,6 +203,13 @@ typedef enum : NSInteger {
         [sidebarLeftBorderLayer setShadowOpacity:1.0];
         [sidebarLeftBorderLayer setShadowOffset:(CGSize){1.0, 0.0}];
         [[_sidebarView layer] addSublayer:sidebarLeftBorderLayer];
+
+        // Now that the sidebar is set up, notify delegates
+        for (NSDictionary *viewDelegatePair in _inspectorViewDelegates) {
+            id<EXTDocumentInspectorViewDelegate> delegate = viewDelegatePair[@"delegate"];
+            if (delegate && [delegate respondsToSelector:@selector(documentWindowController:didAddInspectorView:)])
+                [delegate documentWindowController:self didAddInspectorView:viewDelegatePair[@"view"]];
+        }
     }
 
     [[self window] makeFirstResponder:_chartView];
@@ -194,6 +218,12 @@ typedef enum : NSInteger {
 - (void)windowWillClose:(NSNotification *)notification {
     [_chartScrollView removeObserver:self forKeyPath:@"magnification"];
     [_chartViewController removeObserver:_differentialPaneController forKeyPath:@"selectedObject"];
+
+    for (NSDictionary *viewDelegatePair in _inspectorViewDelegates) {
+        id<EXTDocumentInspectorViewDelegate> delegate = viewDelegatePair[@"delegate"];
+        if (delegate && [delegate respondsToSelector:@selector(documentWindowController:willRemoveInspectorView:)])
+            [delegate documentWindowController:self willRemoveInspectorView:viewDelegatePair[@"view"]];
+    }
 }
 
 #pragma mark - Zoom
@@ -269,22 +299,6 @@ typedef enum : NSInteger {
 }
 
 #pragma mark - Properties
-
-- (void)setDocument:(NSDocument *)document {
-    NSAssert(!document || [document isKindOfClass:[EXTDocument class]], @"This window controller accepts EXTDocument documents only");
-
-    if (document != [self document]) {
-        [super setDocument:document];
-
-        if (document) {
-            if (!_generatorInspectorViewController) {
-                _generatorInspectorViewController = [EXTGeneratorInspectorViewController new];
-                [_generatorInspectorViewController bind:@"sseq" toObject:document withKeyPath:@"sseq" options:nil];
-                [_generatorInspectorViewController bind:@"chartView" toObject:self withKeyPath:@"chartView" options:nil];
-            }
-        }
-    }
-}
 
 - (EXTDocument *)extDocument {
     return [self document];

@@ -12,6 +12,7 @@
 #import "EXTArtBoard.h"
 #import "EXTDocumentWindowController.h"
 #import "EXTDemos.h"
+#import "NSUserDefaults+EXTAdditions.h"
 
 
 #define PRESENT_FILE_VERSION 1
@@ -19,15 +20,7 @@
 
 
 @interface EXTDocument ()
-    {
-        // view configuration
-        CGFloat gridSpacing;
-        NSSize extDocumentSize;
-        NSPoint extDocumentOrigin;
-        NSColor *gridLineColor;
-    }
-
-    @property(nonatomic, weak) EXTDocumentWindowController *windowController;
+    @property(nonatomic, readonly) EXTDocumentWindowController *windowController;
 @end
 
 @implementation EXTDocument
@@ -38,6 +31,15 @@
     self = [super init];
     if (self) {
         _sseq = [EXTSpectralSequence new];
+
+        NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+
+        _gridColor = [defaults extColorForKey:EXTGridColorPreferenceKey];
+        _gridEmphasisColor = [defaults extColorForKey:EXTGridEmphasisColorPreferenceKey];
+        _axisColor = [defaults extColorForKey:EXTGridAxisColorPreferenceKey];
+        _highlightColor = [defaults extColorForKey:EXTChartViewHighlightColorPreferenceKey];
+        _gridSpacing = [defaults doubleForKey:EXTGridSpacingPreferenceKey];
+        _gridEmphasisSpacing = [defaults integerForKey:EXTGridEmphasisSpacingPreferenceKey];
     }
     return self;
 }
@@ -56,14 +58,18 @@
 
 - (NSData *)dataOfType:(NSString *)typeName error:(NSError **)outError {
     NSMutableData* data = [NSMutableData data];
-    NSKeyedArchiver* arch = [[NSKeyedArchiver alloc]
-                             initForWritingWithMutableData:data];
+    NSKeyedArchiver* arch = [[NSKeyedArchiver alloc] initForWritingWithMutableData:data];
 
-    // TODO: at the moment, i'm just writing the model out to disk.  however,
-    // the routine is structured so that we can add other keys to the root
-    // object for other document settings, like spacing and color and so forth.
-    [arch encodeObject:_sseq forKey:@"sseq"];
     [arch encodeInteger:PRESENT_FILE_VERSION forKey:@"fileVersion"];
+
+    [arch encodeObject:_sseq forKey:@"sseq"];
+
+    [arch encodeObject:_gridColor forKey:@"gridColor"];
+    [arch encodeObject:_gridEmphasisColor forKey:@"gridEmphasisColor"];
+    [arch encodeObject:_axisColor forKey:@"axisColor"];
+    [arch encodeObject:_highlightColor forKey:@"highlightColor"];
+    [arch encodeDouble:_gridSpacing forKey:@"gridSpacing"];
+    [arch encodeInteger:_gridEmphasisSpacing forKey:@"gridEmphasisSpacing"];
 
     [arch finishEncoding];
 
@@ -84,6 +90,24 @@
     }
 
     self.sseq = [unarchiver decodeObjectForKey:@"sseq"];
+
+    if ([unarchiver containsValueForKey:@"gridColor"])
+        self.gridColor = [unarchiver decodeObjectForKey:@"gridColor"];
+
+    if ([unarchiver containsValueForKey:@"gridEmphasisColor"])
+        self.gridEmphasisColor = [unarchiver decodeObjectForKey:@"gridEmphasisColor"];
+
+    if ([unarchiver containsValueForKey:@"axisColor"])
+        self.axisColor = [unarchiver decodeObjectForKey:@"axisColor"];
+
+    if ([unarchiver containsValueForKey:@"highlightColor"])
+        self.highlightColor = [unarchiver decodeObjectForKey:@"highlightColor"];
+
+    if ([unarchiver containsValueForKey:@"gridSpacing"])
+        self.gridSpacing = [unarchiver decodeDoubleForKey:@"gridSpacing"];
+
+    if ([unarchiver containsValueForKey:@"gridEmphasisSpacing"])
+        self.gridEmphasisSpacing = [unarchiver decodeIntegerForKey:@"gridEmphasisSpacing"];
 
     return YES;
 }

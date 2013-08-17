@@ -9,8 +9,19 @@
 #import <Cocoa/Cocoa.h>
 #import "EXTChartView.h"
 
+
 @class EXTDocument;
+@class EXTDocumentWindowController;
+
+
+@protocol EXTDocumentInspectorViewDelegate <NSObject>
+@optional
+    - (void)documentWindowController:(EXTDocumentWindowController *)windowController didAddInspectorView:(NSView *)inspectorView;
+    - (void)documentWindowController:(EXTDocumentWindowController *)windowController willRemoveInspectorView:(NSView *)inspectorView;
+@end
+
 
 @interface EXTDocumentWindowController : NSWindowController
+    @property(nonatomic, weak) IBOutlet EXTChartView *chartView;
     @property(nonatomic, readonly) EXTDocument *extDocument;
 @end

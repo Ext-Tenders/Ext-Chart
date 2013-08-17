@@ -14,6 +14,14 @@
 
 @interface EXTDocument : NSDocument
     @property(nonatomic, strong) EXTSpectralSequence *sseq;
+
+    // User interface configuration
+    @property(nonatomic, strong) NSColor *gridColor;
+    @property(nonatomic, strong) NSColor *gridEmphasisColor;
+    @property(nonatomic, strong) NSColor *axisColor;
+    @property(nonatomic, strong) NSColor *highlightColor;
+    @property(nonatomic, assign) CGFloat gridSpacing;
+    @property(nonatomic, assign) NSInteger gridEmphasisSpacing;
 @end
 
 // Notes: need something to specify the size (width, height) of the document, origin location, serre or adams convention?

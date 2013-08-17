@@ -25,8 +25,10 @@
 		14CCA38D1794F21D002EF861 /* ArtBoardToolAlternate.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 14CCA38A1794F21D002EF861 /* ArtBoardToolAlternate.pdf */; };
 		14CCA38E1794F21D002EF861 /* Ext Chart.iconset in Resources */ = {isa = PBXBuildFile; fileRef = 14CCA38B1794F21D002EF861 /* Ext Chart.iconset */; };
 		14D78E5D17B5E44000B1BB52 /* EXTChartViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 14D78E5C17B5E44000B1BB52 /* EXTChartViewController.m */; };
+		14E757CD17BF128F008BED48 /* EXTGridInspectorViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 14E757CC17BF128F008BED48 /* EXTGridInspectorViewController.m */; };
 		14EF1A661756EE3C0012DD3C /* SelectTool.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 14EF1A651756EE3C0012DD3C /* SelectTool.pdf */; };
 		14EF1A6B17584C080012DD3C /* EXTDocumentWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 14EF1A6A17584C080012DD3C /* EXTDocumentWindowController.m */; };
+		14F930BB17BF39EC0000176A /* EXTGridInspectorView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 14F930BA17BF39EC0000176A /* EXTGridInspectorView.xib */; };
 		1DDD582C0DA1D0D100B32029 /* EXTDocument.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1DDD58280DA1D0D100B32029 /* EXTDocument.xib */; };
 		1DDD582D0DA1D0D100B32029 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1DDD582A0DA1D0D100B32029 /* MainMenu.xib */; };
 		317707C413D784B0003475A2 /* EXTGrid.m in Sources */ = {isa = PBXBuildFile; fileRef = 317707C313D784B0003475A2 /* EXTGrid.m */; };
@@ -92,9 +94,12 @@
 		14CCA38B1794F21D002EF861 /* Ext Chart.iconset */ = {isa = PBXFileReference; lastKnownFileType = folder.iconset; name = "Ext Chart.iconset"; path = "Images/Ext Chart.iconset"; sourceTree = "<group>"; };
 		14D78E5B17B5E44000B1BB52 /* EXTChartViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTChartViewController.h; sourceTree = "<group>"; };
 		14D78E5C17B5E44000B1BB52 /* EXTChartViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTChartViewController.m; sourceTree = "<group>"; };
+		14E757CB17BF128F008BED48 /* EXTGridInspectorViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTGridInspectorViewController.h; sourceTree = "<group>"; };
+		14E757CC17BF128F008BED48 /* EXTGridInspectorViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTGridInspectorViewController.m; sourceTree = "<group>"; };
 		14EF1A651756EE3C0012DD3C /* SelectTool.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = SelectTool.pdf; path = Images/SelectTool.pdf; sourceTree = "<group>"; };
 		14EF1A6917584C080012DD3C /* EXTDocumentWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTDocumentWindowController.h; sourceTree = "<group>"; };
 		14EF1A6A17584C080012DD3C /* EXTDocumentWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTDocumentWindowController.m; sourceTree = "<group>"; };
+		14F930BA17BF39EC0000176A /* EXTGridInspectorView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = EXTGridInspectorView.xib; sourceTree = "<group>"; };
 		1DDD58290DA1D0D100B32029 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/EXTDocument.xib; sourceTree = "<group>"; };
 		1DDD582B0DA1D0D100B32029 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		2564AD2C0F5327BB00F57823 /* Ext_Chart_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Ext_Chart_Prefix.pch; sourceTree = "<group>"; };
@@ -286,6 +291,8 @@
 				1498319E17AE04F3000380A5 /* EXTNewDocumentWindowController.m */,
 				1460B40A17B735BD00B575E3 /* EXTPreferencesWindowController.h */,
 				1460B40B17B735BD00B575E3 /* EXTPreferencesWindowController.m */,
+				14E757CB17BF128F008BED48 /* EXTGridInspectorViewController.h */,
+				14E757CC17BF128F008BED48 /* EXTGridInspectorViewController.m */,
 			);
 			name = Controllers;
 			sourceTree = "<group>";
@@ -317,6 +324,7 @@
 				3869FCF717B4587100D0D740 /* EXTDifferentialPane.xib */,
 				1DDD58280DA1D0D100B32029 /* EXTDocument.xib */,
 				385BF10B17AAD8C2008CA5B6 /* EXTGeneratorInspectorView.xib */,
+				14F930BA17BF39EC0000176A /* EXTGridInspectorView.xib */,
 				1498319F17AE04F3000380A5 /* EXTNewDocument.xib */,
 				1DDD582A0DA1D0D100B32029 /* MainMenu.xib */,
 				1460B40D17B7360700B575E3 /* EXTPreferences.xib */,
@@ -478,6 +486,7 @@
 				149831A917AE65EA000380A5 /* S5 Example.pdf in Resources */,
 				3869FCF917B4587100D0D740 /* EXTDifferentialPane.xib in Resources */,
 				1460B40E17B7360700B575E3 /* EXTPreferences.xib in Resources */,
+				14F930BB17BF39EC0000176A /* EXTGridInspectorView.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -516,6 +525,7 @@
 				14D78E5D17B5E44000B1BB52 /* EXTChartViewController.m in Sources */,
 				1460B40C17B735BD00B575E3 /* EXTPreferencesWindowController.m in Sources */,
 				14741D7217B7535A00AF73D9 /* NSUserDefaults+EXTAdditions.m in Sources */,
+				14E757CD17BF128F008BED48 /* EXTGridInspectorViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

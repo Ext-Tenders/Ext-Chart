@@ -8,7 +8,15 @@
 
 #import <Cocoa/Cocoa.h>
 
+
+@class EXTDocumentInspectorView;
+
+
 @interface EXTDocumentInspectorView : NSView
-    - (void)addSubview:(NSView *)subview withTitle:(NSString *)title collapsed:(bool)collapsed centered:(bool)centered;
+    - (void)addSubview:(NSView *)subview
+             withTitle:(NSString *)title
+             collapsed:(bool)collapsed
+              centered:(bool)centered;
+
     + (NSColor *)backgroundColor;
 @end
