@@ -109,9 +109,9 @@
     
     // initialize the pieces of the sheet.
     self.descriptionField.stringValue = [_partial.description copy];
-    self.inclusionEditor.representedObject = _partial.inclusion;
+    self.inclusionEditor.representedObject = [_partial.inclusion copy];
     self.inclusionEditor.rowNames = diff.start.names;
-    self.actionEditor.representedObject = _partial.differential;
+    self.actionEditor.representedObject = [_partial.differential copy];
     self.actionEditor.rowNames = diff.end.names;
     self.automaticallyGeneratedCB.state = _partial.automaticallyGenerated;
     // XXX: make this update when we edit the EXTMatrix's data.
@@ -127,7 +127,14 @@
 #pragma mark differential editor popover
 
 - (void)popoverWillClose:(NSNotification *)notification {
+    if (![_partial.description isEqualToString:self.descriptionField.stringValue] ||
+        ![self.inclusionEditor.representedObject isEqual:_partial.inclusion] ||
+        ![self.actionEditor.representedObject isEqual:_partial.differential])
+        [_partial manuallyGenerated];
+    
     _partial.description = self.descriptionField.stringValue;
+    _partial.inclusion = self.inclusionEditor.representedObject;
+    _partial.differential = self.actionEditor.representedObject;
     
     [_tableView reloadData];
     [self.chartView displaySelectedPage];
