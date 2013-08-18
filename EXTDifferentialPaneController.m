@@ -105,7 +105,8 @@
     
     EXTPartialDefinition *partial = [EXTPartialDefinition new];
     partial.inclusion = [EXTMatrix matrixWidth:0 height:diff.start.size];
-    partial.differential = [EXTMatrix matrixWidth:0 height:diff.end.size];
+    partial.action = [EXTMatrix matrixWidth:0 height:diff.end.size];
+    [partial manuallyGenerated];
     
     [diff.partialDefinitions addObject:partial];
     [self.tableView reloadData];
@@ -129,7 +130,7 @@
         self.descriptionField.stringValue = [_partial.description copy];
     self.inclusionEditor.representedObject = [_partial.inclusion copy];
     self.inclusionEditor.rowNames = diff.start.names;
-    self.actionEditor.representedObject = [_partial.differential copy];
+    self.actionEditor.representedObject = [_partial.action copy];
     self.actionEditor.rowNames = diff.end.names;
     self.automaticallyGeneratedCB.state = _partial.automaticallyGenerated;
     // XXX: make this update when we edit the EXTMatrix's data.
@@ -147,12 +148,12 @@
 - (void)popoverWillClose:(NSNotification *)notification {
     if (![_partial.description isEqualToString:self.descriptionField.stringValue] ||
         ![self.inclusionEditor.representedObject isEqual:_partial.inclusion] ||
-        ![self.actionEditor.representedObject isEqual:_partial.differential])
+        ![self.actionEditor.representedObject isEqual:_partial.action])
         [_partial manuallyGenerated];
     
     _partial.description = self.descriptionField.stringValue;
     _partial.inclusion = self.inclusionEditor.representedObject;
-    _partial.differential = self.actionEditor.representedObject;
+    _partial.action = self.actionEditor.representedObject;
     
     [_tableView reloadData];
     [self.chartView displaySelectedPage];

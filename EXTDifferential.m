@@ -84,7 +84,7 @@
         bool discardThis = false;
         
         [partial1.inclusion modularReduction];
-        [partial1.differential modularReduction];
+        [partial1.action modularReduction];
         
         for (EXTPartialDefinition *partial2 in reducedPartials) {
             if ([partial2 isEqual:partial1])
@@ -103,11 +103,11 @@
 
 -(BOOL) checkForSanity {
     for (EXTPartialDefinition *partial in partialDefinitions) {
-        if (partial.inclusion.width != partial.differential.width)
+        if (partial.inclusion.width != partial.action.width)
             return false;
         if (partial.inclusion.height != start.size)
             return false;
-        if (partial.differential.height != end.size)
+        if (partial.action.height != end.size)
             return false;
     }
     

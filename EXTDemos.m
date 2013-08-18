@@ -70,7 +70,7 @@
     EXTDifferential *diff = [EXTDifferential differential:start end:end page:1];
     EXTPartialDefinition *partial = [EXTPartialDefinition new];
     EXTMatrix *mat = [EXTMatrix identity:1];
-    partial.inclusion = partial.differential = mat;
+    partial.inclusion = partial.action = mat;
     [diff.partialDefinitions addObject:partial];
     [ret addDifferential:diff];
     
@@ -103,7 +103,7 @@
     EXTDifferential *diff = [EXTDifferential differential:beta2 end:[ret findTerm:[EXTPair pairWithA:3 B:3]] page:3];
     EXTPartialDefinition *diffdefn = [EXTPartialDefinition new];
     EXTMatrix *one = [EXTMatrix identity:1];
-    diffdefn.differential = diffdefn.inclusion = one;
+    diffdefn.action = diffdefn.inclusion = one;
     [diff.partialDefinitions addObject:diffdefn];
     [ret addDifferential:diff];
     
@@ -112,7 +112,7 @@
     EXTDifferential *diff2 = [EXTDifferential differential:eta end:[ret findTerm:[EXTPair pairWithA:0 B:4]] page:3];
     EXTPartialDefinition *diff2defn = [EXTPartialDefinition new];
     EXTMatrix *zero = [EXTMatrix matrixWidth:1 height:1];
-    diff2defn.differential = zero;
+    diff2defn.action = zero;
     diff2defn.inclusion = one;
     [diff2.partialDefinitions addObject:diff2defn];
     [ret addDifferential:diff2];
@@ -121,7 +121,7 @@
     EXTTerm *betaneg2 = [ret findTerm:[EXTPair pairWithA:-4 B:0]];
     EXTDifferential *diff3 = [EXTDifferential differential:betaneg2 end:[ret findTerm:[EXTPair pairWithA:-5 B:3]] page:3];
     EXTPartialDefinition *diff3defn = [EXTPartialDefinition new];
-    diff3defn.differential = one;
+    diff3defn.action = one;
     diff3defn.inclusion = one;
     [diff3.partialDefinitions addObject:diff3defn];
     [ret addDifferential:diff3];
@@ -208,11 +208,11 @@
     EXTDifferential *firstdiff = [EXTDifferential differential:e end:x page:2];
     EXTPartialDefinition *firstpartial = [EXTPartialDefinition new];
     EXTMatrix *inclusion = [EXTMatrix matrixWidth:1 height:1];
-    EXTMatrix *differential = [EXTMatrix matrixWidth:1 height:1];
+    EXTMatrix *action = [EXTMatrix matrixWidth:1 height:1];
     [[inclusion.presentation objectAtIndex:0] setObject:@1 atIndex:0];
-    [[differential.presentation objectAtIndex:0] setObject:@1 atIndex:0];
+    [[action.presentation objectAtIndex:0] setObject:@1 atIndex:0];
     firstpartial.inclusion = inclusion;
-    firstpartial.differential = differential;
+    firstpartial.action = action;
     firstdiff.partialDefinitions[0] = firstpartial;
     [ret addDifferential:firstdiff];
     
@@ -224,7 +224,7 @@
     [matrix.presentation[0] setObject:@1 atIndex:0];
     EXTPartialDefinition *partialDefinition = [EXTPartialDefinition new];
     partialDefinition.inclusion = matrix;
-    partialDefinition.differential = matrix;
+    partialDefinition.action = matrix;
     [ret.multTables addPartialDefinition:partialDefinition to:[e location] with:[x location]];
     [ret.multTables addPartialDefinition:partialDefinition to:[ex location] with:[x location]];
     [ret.multTables addPartialDefinition:partialDefinition to:[e location] with:[x2 location]];

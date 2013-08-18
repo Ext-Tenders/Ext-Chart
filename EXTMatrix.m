@@ -10,12 +10,17 @@
 #import "EXTMatrix.h"
 
 // little class to keep track of partial subdefinitions of a parent matrix
-@implementation EXTPartialDefinition
+@implementation EXTPartialDefinition {
+    bool automaticallyGenerated;
+}
 
 @synthesize inclusion;
-@synthesize differential;
-@synthesize automaticallyGenerated;
+@synthesize action;
 @synthesize description;
+
+-(bool) automaticallyGenerated {
+    return automaticallyGenerated;
+}
 
 -(EXTPartialDefinition*) init {
     if (!(self = [super init])) return nil;
@@ -23,7 +28,7 @@
     // we don't keep track of enough information about dimensions to make the
     // appropriate initialization calls to EXTMatrix factories.
     inclusion = nil;
-    differential = nil;
+    action = nil;
     automaticallyGenerated = true;
     description = nil;
     
@@ -36,12 +41,12 @@
     
     EXTPartialDefinition *target = (EXTPartialDefinition*)object;
     
-    return ([self.differential isEqual:target.differential] && [self.inclusion isEqual:target.inclusion]);
+    return ([self.action isEqual:target.action] && [self.inclusion isEqual:target.inclusion]);
 }
 
 -(void) encodeWithCoder:(NSCoder *)aCoder {
     [aCoder encodeObject:inclusion forKey:@"inclusion"];
-    [aCoder encodeObject:differential forKey:@"differential"];
+    [aCoder encodeObject:action forKey:@"action"];
     [aCoder encodeBool:automaticallyGenerated forKey:@"automaticallyGenerated"];
     [aCoder encodeObject:description forKey:@"description"];
 }
@@ -49,7 +54,7 @@
 -(id) initWithCoder:(NSCoder *)aDecoder {
     if (self = [super init]) {
         inclusion = [aDecoder decodeObjectForKey:@"inclusion"];
-        differential = [aDecoder decodeObjectForKey:@"differential"];
+        action = [aDecoder decodeObjectForKey:@"action"];
         automaticallyGenerated = [aDecoder decodeBoolForKey:@"automaticallyGenerated"];
         description = [aDecoder decodeObjectForKey:@"description"];
     }
@@ -547,7 +552,7 @@
             EXTPartialDefinition *pdiffl =
                 [partialDefinitions
                     objectAtIndex:[[minimalParents objectAtIndex:i] intValue]];
-            EXTMatrix *diffl = [pdiffl differential];
+            EXTMatrix *diffl = [pdiffl action];
             differentialInCoordinates.presentation[i] =
                 [[diffl presentation]
                     objectAtIndex:[[minimalIndices objectAtIndex:i] intValue]];

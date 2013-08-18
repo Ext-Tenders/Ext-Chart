@@ -244,9 +244,9 @@
             for (EXTPartialDefinition *partial in d1.partialDefinitions) {
                 EXTPartialDefinition *newPartial = [EXTPartialDefinition new];
                 EXTMatrix *ix1 = [EXTMatrix hadamardProduct:partial.inclusion with:idP];
-                EXTMatrix *dx1 = [EXTMatrix hadamardProduct:partial.differential with:idP];
+                EXTMatrix *dx1 = [EXTMatrix hadamardProduct:partial.action with:idP];
                 newPartial.inclusion = [EXTMatrix newMultiply:i1 by:ix1];
-                newPartial.differential = [EXTMatrix newMultiply:i2 by:dx1];
+                newPartial.action = [EXTMatrix newMultiply:i2 by:dx1];
                 partial.description = [NSString stringWithFormat:@"Tensored up from %@ (x) %@",d1.start.location,P.location];
                 [partialsForThisD addObject:partial];
             }
@@ -313,9 +313,9 @@
             for (EXTPartialDefinition *partial in d2.partialDefinitions) {
                 EXTPartialDefinition *newPartial = [EXTPartialDefinition new];
                 EXTMatrix *ix1 = [EXTMatrix hadamardProduct:idA with:partial.inclusion];
-                EXTMatrix *dx1 = [EXTMatrix hadamardProduct:idA with:partial.differential];
+                EXTMatrix *dx1 = [EXTMatrix hadamardProduct:idA with:partial.action];
                 newPartial.inclusion = [EXTMatrix newMultiply:i1 by:ix1];
-                newPartial.differential = [EXTMatrix newMultiply:i2 by:dx1];
+                newPartial.action = [EXTMatrix newMultiply:i2 by:dx1];
                 partial.description = [NSString stringWithFormat:@"Tensored up from %@ (x) %@",A.location,d2.start.location];
                 [partialsForThisD addObject:partial];
             }
@@ -435,7 +435,7 @@
                 }
                 
                 // now, we use this to build the differential presentation.
-                tensorPartial.differential = [EXTMatrix newMultiply:i1 by:[EXTMatrix hadamardProduct:leftPartial.differential with:rightPartial.differential]];
+                tensorPartial.action = [EXTMatrix newMultiply:i1 by:[EXTMatrix hadamardProduct:leftPartial.action with:rightPartial.action]];
                 
                 // store to the table
                 [ret.multTables addPartialDefinition:tensorPartial
@@ -484,7 +484,7 @@
         if (targetTerm) {
             EXTMatrix *product = [EXTMatrix identity:1];
             EXTPartialDefinition *def = [EXTPartialDefinition new];
-            def.inclusion = def.differential = product;
+            def.inclusion = def.action = product;
             [l.multTables addPartialDefinition:def to:leftTerm.location
                                                  with:rightTerm.location];
         }

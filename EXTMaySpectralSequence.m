@@ -275,7 +275,7 @@
     // C <-- A <-- I --> B --> D.
     for (EXTPartialDefinition *oldPartial in underlyingDiff.partialDefinitions) {
         EXTPartialDefinition *partial = [EXTPartialDefinition new];
-        partial.differential = [EXTMatrix newMultiply:endSquare by:oldPartial.differential];
+        partial.action = [EXTMatrix newMultiply:endSquare by:oldPartial.action];
         partial.inclusion = [EXTMatrix newMultiply:startSquare by:oldPartial.inclusion];
         partial.description = [NSString stringWithFormat:@"Nakamura's lemma applied to Sq^%d on %@ in E%d",order,location,page];
         [diff.partialDefinitions addObject:partial];
@@ -369,7 +369,7 @@
         EXTDifferential *diff = [EXTDifferential differential:[self findTerm:location] end:target page:1];
         EXTPartialDefinition *partial = [EXTPartialDefinition new];
         partial.inclusion = [EXTMatrix identity:1];
-        partial.differential = [EXTMatrix matrixWidth:1 height:target.size];
+        partial.action = [EXTMatrix matrixWidth:1 height:target.size];
         
         // the formula for the May d_1 comes straight from the Steenrod
         // diagonal: d_1 h_{i,j} = sum_{k=1}^{i-1} h_{k,i-k+j} h_{i-k,j}
@@ -384,7 +384,7 @@
                 else if ([[workingEntry objectForKey:@"name"] isEqual:tagRight])
                     rightEntry = workingEntry;
             EXTMatrix *product = [self productWithLeft:[leftEntry objectForKey:@"location"] right:[rightEntry objectForKey:@"location"]];
-            partial.differential = [EXTMatrix sum:partial.differential with:product];
+            partial.action = [EXTMatrix sum:partial.action with:product];
             partial.description = [NSString stringWithFormat:@"May d1 differential on %@",tag];
         }
         

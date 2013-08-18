@@ -310,7 +310,7 @@
         // we're going to end up with the zero differential off the source.
         EXTPartialDefinition *allZero = [EXTPartialDefinition new];
         allZero.inclusion = [EXTMatrix identity:sumterm.size];
-        allZero.differential = [EXTMatrix matrixWidth:sumterm.size
+        allZero.action = [EXTMatrix matrixWidth:sumterm.size
                                                height:targetterm.size];
         [dsum.partialDefinitions addObject:allZero];
     } else if (d1Zero && !d2Zero) {
@@ -326,8 +326,8 @@
                 // to the multiplication cospan A|Y <-< K --> Z.  define these
                 // so we have access to them.
                 EXTMatrix
-                    *j = partial2.inclusion, *partialJ = partial2.differential,
-                    *k = AYmult.inclusion, *muK = AYmult.differential;
+                    *j = partial2.inclusion, *partialJ = partial2.action,
+                    *k = AYmult.inclusion, *muK = AYmult.action;
                 
                 // from A|B <-< A|J --> A|Y <-< K --> Z, build the pullback
                 // cospan A|B <-< V --> Z.
@@ -340,7 +340,7 @@
                         
                 // store this to a list of partial definitions.
                 EXTPartialDefinition *partial = [EXTPartialDefinition new];
-                partial.inclusion = v; partial.differential = partialV;
+                partial.inclusion = v; partial.action = partialV;
                 [dsum.partialDefinitions addObject:partial];
             }
         }
@@ -358,8 +358,8 @@
                 // A|Y <-< K --> Z and X|B <-< L --> Z.  define these so we have
                 // access to them.
                 EXTMatrix
-                    *i = partial1.inclusion, *partialI = partial1.differential,
-                    *l = XBmult.inclusion, *muL = XBmult.differential;
+                    *i = partial1.inclusion, *partialI = partial1.action,
+                    *l = XBmult.inclusion, *muL = XBmult.action;
                         
                 // first, produce the tensored up cospan A|B <-< I|B --> X|B.
                 EXTMatrix
@@ -374,7 +374,7 @@
                         
                 // store this to a list of partial definitions.
                 EXTPartialDefinition *partial = [EXTPartialDefinition new];
-                partial.inclusion = u; partial.differential = partialU;
+                partial.inclusion = u; partial.action = partialU;
                 [dsum.partialDefinitions addObject:partial];
             }
         }
@@ -396,10 +396,10 @@
                 // A|Y <-< K --> Z and X|B <-< L --> Z.  define these so we have
                 // access to them.
                 EXTMatrix
-                    *i = partial1.inclusion, *partialI = partial1.differential,
-                    *j = partial2.inclusion, *partialJ = partial2.differential,
-                    *k = AYmult.inclusion, *muK = AYmult.differential,
-                    *l = XBmult.inclusion, *muL = XBmult.differential;
+                    *i = partial1.inclusion, *partialI = partial1.action,
+                    *j = partial2.inclusion, *partialJ = partial2.action,
+                    *k = AYmult.inclusion, *muK = AYmult.action,
+                    *l = XBmult.inclusion, *muL = XBmult.action;
                         
                 // first, produce the tensored up cospan A|B <-< I|B --> X|B.
                 EXTMatrix
@@ -434,7 +434,7 @@
                         
                 // store this to a list of partial definitions.
                 EXTPartialDefinition *partial = [EXTPartialDefinition new];
-                partial.inclusion = w; partial.differential = partialW;
+                partial.inclusion = w; partial.action = partialW;
                 [dsum.partialDefinitions addObject:partial];
             }
         }

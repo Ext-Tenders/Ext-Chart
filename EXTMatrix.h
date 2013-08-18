@@ -18,14 +18,10 @@
 //
 // such partial definitions are not trivial to stitch together, and so to do
 // that successfully, we just record all the definitions we have, together.
-@interface EXTPartialDefinition : NSObject <NSCoding> {
-    EXTMatrix *inclusion;
-    EXTMatrix *differential;
-    bool automaticallyGenerated;
-}
+@interface EXTPartialDefinition : NSObject <NSCoding>
 
 @property (retain) EXTMatrix *inclusion;
-@property (retain) EXTMatrix *differential;
+@property (retain) EXTMatrix *action;
 @property (assign,readonly) bool automaticallyGenerated;
 @property (retain) NSString *description;
 
