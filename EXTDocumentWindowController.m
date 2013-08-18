@@ -152,8 +152,6 @@ typedef enum : NSInteger {
         [_inspectorView addSubview:_horizontalToolboxView withTitle:@"Toolbox" collapsed:false centered:true];
 
         _generatorInspectorViewController = [EXTGeneratorInspectorViewController new];
-        [_generatorInspectorViewController bind:@"sseq" toObject:self.document withKeyPath:@"sseq" options:nil];
-        [_generatorInspectorViewController bind:@"chartView" toObject:self withKeyPath:@"chartView" options:nil];
         [_inspectorView addSubview:_generatorInspectorViewController.view withTitle:@"Generators" collapsed:true centered:true];
         
         _differentialPaneController = [EXTDifferentialPaneController new];

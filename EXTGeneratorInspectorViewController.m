@@ -7,67 +7,68 @@
 //
 
 #import "EXTGeneratorInspectorViewController.h"
+#import "EXTDocumentWindowController.h"
 #import "EXTPolynomialSSeq.h"
 
-@interface EXTGeneratorInspectorViewController () <NSTableViewDelegate, NSTableViewDataSource>
-{
-    EXTSpectralSequence *_sseq;
-}
-
+@interface EXTGeneratorInspectorViewController () <EXTDocumentInspectorViewDelegate, NSTableViewDelegate, NSTableViewDataSource>
 @property(nonatomic, strong) IBOutlet NSTableView *tableView;
 @property(nonatomic, strong) IBOutlet NSTextField *textField;
 @property(nonatomic, strong) EXTSpectralSequence *sseq;
-
+@property(nonatomic, strong) NSMutableArray *generators;
+@property(nonatomic, weak) EXTChartView *chartView;
 @end
 
 @implementation EXTGeneratorInspectorViewController
 
-@synthesize tableView, chartView;
-
--(EXTSpectralSequence*) sseq {
-    return _sseq;
-}
-
-- (void)setSseq:(EXTSpectralSequence *)sseq {
-    _sseq = sseq;
-    
-    if ([[sseq class] isSubclassOfClass:[EXTPolynomialSSeq class]]) {
-        [self unbind:@"representedObject"];
-        [self bind:@"representedObject" toObject:((EXTPolynomialSSeq*)sseq) withKeyPath:@"generators" options:nil];
-    } else {
-        [self unbind:@"representedObject"];
-        [self setRepresentedObject:nil];
-    }
-    
-    [[self tableView] reloadData];
-}
+#pragma mark - Life cycle
 
 - (id)init {
     return [self initWithNibName:@"EXTGeneratorInspectorView" bundle:nil];
 }
 
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
-{
-    return [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
+#pragma mark - Properties
+
+- (void)setSseq:(EXTSpectralSequence *)sseq {
+    _sseq = sseq;
+    
+    if ([sseq isKindOfClass:[EXTPolynomialSSeq class]]) {
+        [self unbind:@"generators"];
+        [self bind:@"generators" toObject:sseq withKeyPath:@"generators" options:nil];
+    } else {
+        [self unbind:@"generators"];
+        self.generators = nil;
+    }
+    
+    [_tableView reloadData];
 }
 
+#pragma mark - EXTDocumentInspectorViewDelegate
+
+- (void)documentWindowController:(EXTDocumentWindowController *)windowController didAddInspectorView:(NSView *)inspectorView {
+    [self bind:@"sseq" toObject:windowController.document withKeyPath:@"sseq" options:nil];
+    [self bind:@"chartView" toObject:windowController withKeyPath:@"chartView" options:nil];
+}
+
+- (void)documentWindowController:(EXTDocumentWindowController *)windowController willRemoveInspectorView:(NSView *)inspectorView {
+    [self unbind:@"generators"];
+    [self unbind:@"sseq"];
+    [self unbind:@"chartView"];
+
+    self.generators = nil;
+    self.sseq = nil;
+    self.chartView = nil;
+}
+
+#pragma mark - NSTableViewDataSource
+
 -(NSInteger) numberOfRowsInTableView:(NSTableView*)aTableView {
-    if (![self representedObject] ||
-        ![[self.representedObject class] isSubclassOfClass:[NSArray class]])
-        return 0;
-    
-    return ((NSArray*)self.representedObject).count;
+    return self.generators.count;
 }
 
 - (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row {
-    if (![self representedObject])
-        return nil;
-    if (((NSArray*)[self representedObject]).count <= row) {
-        EXTLog(@"Bad row display");
-        return nil;
-    }
-    
-    return [[[(NSArray*)[self representedObject] objectAtIndex:row] objectForKey:[tableColumn identifier]] description];
+    NSAssert(row >= 0 && row < self.generators.count, @"Table view row index is out of bounds");
+
+    return [[[self.generators objectAtIndex:row] objectForKey:[tableColumn identifier]] description];
 }
 
 -(void) tableView:(NSTableView*)aTableView
@@ -90,10 +91,10 @@
 }
 
 -(void) causeRefresh {
-    if (chartView.selectedPageIndex > 0) {
-        chartView.selectedPageIndex = 0;
+    if (_chartView.selectedPageIndex > 0) {
+        _chartView.selectedPageIndex = 0;
     } else {
-        [chartView displaySelectedPage];
+        [_chartView displaySelectedPage];
     }
     
     return;
@@ -112,12 +113,12 @@
     // it liiiiives!
     [polySSeq addPolyClass:nil location:loc upTo:1];
     
-    [tableView reloadData];
+    [_tableView reloadData];
     [self causeRefresh];
 }
 
 -(IBAction)deleteButtonPressed:(id)sender {
-    NSInteger row = [tableView selectedRow];
+    NSInteger row = [_tableView selectedRow];
     
     if (![[_sseq class] isSubclassOfClass:[EXTPolynomialSSeq class]])
         return;
@@ -125,8 +126,8 @@
     EXTPolynomialSSeq *polySSeq = (EXTPolynomialSSeq*)_sseq;
     [polySSeq deleteClass:[polySSeq.generators[row] objectForKey:@"name"]];
     
-    [tableView deselectAll:sender];
-    [tableView reloadData];
+    [_tableView deselectAll:sender];
+    [_tableView reloadData];
     
     [self causeRefresh];
     

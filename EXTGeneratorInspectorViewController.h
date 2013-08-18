@@ -7,10 +7,6 @@
 //
 
 #import <Cocoa/Cocoa.h>
-#import "EXTChartView.h"
 
 @interface EXTGeneratorInspectorViewController : NSViewController
-
-@property(nonatomic, weak) EXTChartView *chartView;
-
 @end
