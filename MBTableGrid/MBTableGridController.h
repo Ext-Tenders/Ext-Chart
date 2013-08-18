@@ -24,7 +24,7 @@
  */
 
 #import <Cocoa/Cocoa.h>
-#import <MBTableGrid/MBTableGrid.h>
+#import "MBTableGrid.h"
 
 @interface MBTableGridController : NSObject <MBTableGridDataSource> {
 	IBOutlet MBTableGrid *tableGrid;

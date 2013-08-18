@@ -39,6 +39,13 @@
 		31D403BB13DA0476006A8C06 /* EXTTerm.m in Sources */ = {isa = PBXBuildFile; fileRef = 31D403BA13DA0476006A8C06 /* EXTTerm.m */; };
 		31D403C013DA04D8006A8C06 /* EXTDifferential.m in Sources */ = {isa = PBXBuildFile; fileRef = 31D403BF13DA04D8006A8C06 /* EXTDifferential.m */; };
 		31D5D2E513F6933B00F1B2F9 /* EXTArtBoard.m in Sources */ = {isa = PBXBuildFile; fileRef = 31D5D2E413F6933B00F1B2F9 /* EXTArtBoard.m */; };
+		3804BF6617C0775C00A74325 /* MBTableGrid.m in Sources */ = {isa = PBXBuildFile; fileRef = 3804BF5B17C0775C00A74325 /* MBTableGrid.m */; };
+		3804BF6717C0775C00A74325 /* MBTableGridCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 3804BF5D17C0775C00A74325 /* MBTableGridCell.m */; };
+		3804BF6817C0775C00A74325 /* MBTableGridContentView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3804BF5F17C0775C00A74325 /* MBTableGridContentView.m */; };
+		3804BF6917C0775C00A74325 /* MBTableGridController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3804BF6117C0775C00A74325 /* MBTableGridController.m */; };
+		3804BF6A17C0775C00A74325 /* MBTableGridHeaderCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 3804BF6317C0775C00A74325 /* MBTableGridHeaderCell.m */; };
+		3804BF6B17C0775C00A74325 /* MBTableGridHeaderView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3804BF6517C0775C00A74325 /* MBTableGridHeaderView.m */; };
+		3804BF6E17C07D7300A74325 /* EXTMatrixEditor.m in Sources */ = {isa = PBXBuildFile; fileRef = 3804BF6D17C07D7300A74325 /* EXTMatrixEditor.m */; };
 		3841EBD2177380C000ADA929 /* EXTZeroRange.m in Sources */ = {isa = PBXBuildFile; fileRef = 3841EBD1177380C000ADA929 /* EXTZeroRange.m */; };
 		385BF10D17AAD8C2008CA5B6 /* EXTGeneratorInspectorView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 385BF10B17AAD8C2008CA5B6 /* EXTGeneratorInspectorView.xib */; };
 		385BF11017AAD8D5008CA5B6 /* EXTGeneratorInspectorViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 385BF10F17AAD8D5008CA5B6 /* EXTGeneratorInspectorViewController.m */; };
@@ -123,6 +130,20 @@
 		31D403BF13DA04D8006A8C06 /* EXTDifferential.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTDifferential.m; sourceTree = "<group>"; };
 		31D5D2E313F6933B00F1B2F9 /* EXTArtBoard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTArtBoard.h; sourceTree = "<group>"; };
 		31D5D2E413F6933B00F1B2F9 /* EXTArtBoard.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTArtBoard.m; sourceTree = "<group>"; };
+		3804BF5A17C0775C00A74325 /* MBTableGrid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MBTableGrid.h; path = MBTableGrid/MBTableGrid.h; sourceTree = "<group>"; };
+		3804BF5B17C0775C00A74325 /* MBTableGrid.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MBTableGrid.m; path = MBTableGrid/MBTableGrid.m; sourceTree = "<group>"; };
+		3804BF5C17C0775C00A74325 /* MBTableGridCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MBTableGridCell.h; path = MBTableGrid/MBTableGridCell.h; sourceTree = "<group>"; };
+		3804BF5D17C0775C00A74325 /* MBTableGridCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MBTableGridCell.m; path = MBTableGrid/MBTableGridCell.m; sourceTree = "<group>"; };
+		3804BF5E17C0775C00A74325 /* MBTableGridContentView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MBTableGridContentView.h; path = MBTableGrid/MBTableGridContentView.h; sourceTree = "<group>"; };
+		3804BF5F17C0775C00A74325 /* MBTableGridContentView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MBTableGridContentView.m; path = MBTableGrid/MBTableGridContentView.m; sourceTree = "<group>"; };
+		3804BF6017C0775C00A74325 /* MBTableGridController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MBTableGridController.h; path = MBTableGrid/MBTableGridController.h; sourceTree = "<group>"; };
+		3804BF6117C0775C00A74325 /* MBTableGridController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MBTableGridController.m; path = MBTableGrid/MBTableGridController.m; sourceTree = "<group>"; };
+		3804BF6217C0775C00A74325 /* MBTableGridHeaderCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MBTableGridHeaderCell.h; path = MBTableGrid/MBTableGridHeaderCell.h; sourceTree = "<group>"; };
+		3804BF6317C0775C00A74325 /* MBTableGridHeaderCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MBTableGridHeaderCell.m; path = MBTableGrid/MBTableGridHeaderCell.m; sourceTree = "<group>"; };
+		3804BF6417C0775C00A74325 /* MBTableGridHeaderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MBTableGridHeaderView.h; path = MBTableGrid/MBTableGridHeaderView.h; sourceTree = "<group>"; };
+		3804BF6517C0775C00A74325 /* MBTableGridHeaderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MBTableGridHeaderView.m; path = MBTableGrid/MBTableGridHeaderView.m; sourceTree = "<group>"; };
+		3804BF6C17C07D7300A74325 /* EXTMatrixEditor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTMatrixEditor.h; sourceTree = "<group>"; };
+		3804BF6D17C07D7300A74325 /* EXTMatrixEditor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTMatrixEditor.m; sourceTree = "<group>"; };
 		3841EBD0177380C000ADA929 /* EXTZeroRange.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTZeroRange.h; sourceTree = "<group>"; };
 		3841EBD1177380C000ADA929 /* EXTZeroRange.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTZeroRange.m; sourceTree = "<group>"; };
 		385BF10C17AAD8C2008CA5B6 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/EXTGeneratorInspectorView.xib; sourceTree = "<group>"; };
@@ -372,6 +393,9 @@
 		2A37F4AFFDCFA73011CA2CEA /* Other Sources */ = {
 			isa = PBXGroup;
 			children = (
+				3804BF6C17C07D7300A74325 /* EXTMatrixEditor.h */,
+				3804BF6D17C07D7300A74325 /* EXTMatrixEditor.m */,
+				3804BF5917C0772800A74325 /* MBTableGrid */,
 				2564AD2C0F5327BB00F57823 /* Ext_Chart_Prefix.pch */,
 				2A37F4B0FDCFA73011CA2CEA /* main.m */,
 			);
@@ -396,6 +420,25 @@
 				1058C7A8FEA54F5311CA2CBB /* Other Frameworks */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		3804BF5917C0772800A74325 /* MBTableGrid */ = {
+			isa = PBXGroup;
+			children = (
+				3804BF5A17C0775C00A74325 /* MBTableGrid.h */,
+				3804BF5B17C0775C00A74325 /* MBTableGrid.m */,
+				3804BF5C17C0775C00A74325 /* MBTableGridCell.h */,
+				3804BF5D17C0775C00A74325 /* MBTableGridCell.m */,
+				3804BF5E17C0775C00A74325 /* MBTableGridContentView.h */,
+				3804BF5F17C0775C00A74325 /* MBTableGridContentView.m */,
+				3804BF6017C0775C00A74325 /* MBTableGridController.h */,
+				3804BF6117C0775C00A74325 /* MBTableGridController.m */,
+				3804BF6217C0775C00A74325 /* MBTableGridHeaderCell.h */,
+				3804BF6317C0775C00A74325 /* MBTableGridHeaderCell.m */,
+				3804BF6417C0775C00A74325 /* MBTableGridHeaderView.h */,
+				3804BF6517C0775C00A74325 /* MBTableGridHeaderView.m */,
+			);
+			name = MBTableGrid;
 			sourceTree = "<group>";
 		};
 		3869FCF417B442AE00D0D740 /* Locations */ = {
@@ -526,6 +569,13 @@
 				1460B40C17B735BD00B575E3 /* EXTPreferencesWindowController.m in Sources */,
 				14741D7217B7535A00AF73D9 /* NSUserDefaults+EXTAdditions.m in Sources */,
 				14E757CD17BF128F008BED48 /* EXTGridInspectorViewController.m in Sources */,
+				3804BF6617C0775C00A74325 /* MBTableGrid.m in Sources */,
+				3804BF6717C0775C00A74325 /* MBTableGridCell.m in Sources */,
+				3804BF6817C0775C00A74325 /* MBTableGridContentView.m in Sources */,
+				3804BF6917C0775C00A74325 /* MBTableGridController.m in Sources */,
+				3804BF6A17C0775C00A74325 /* MBTableGridHeaderCell.m in Sources */,
+				3804BF6B17C0775C00A74325 /* MBTableGridHeaderView.m in Sources */,
+				3804BF6E17C07D7300A74325 /* EXTMatrixEditor.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
