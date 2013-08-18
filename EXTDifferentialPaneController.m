@@ -17,6 +17,7 @@
 
 @property IBOutlet NSPopover *popover;
 @property IBOutlet NSTextField *descriptionField;
+@property IBOutlet NSButton *automaticallyGeneratedCB;
 
 @end
 
@@ -105,6 +106,8 @@
     
     // initialize the pieces of the sheet.
     self.descriptionField.stringValue = [_partial.description copy];
+    self.automaticallyGeneratedCB.state = _partial.automaticallyGenerated;
+    // XXX: make this update when we edit the EXTMatrix's data.
     
     // and display
     [self.popover showRelativeToRect:[self.tableView rectOfRow:self.tableView.selectedRow] ofView:self.tableView preferredEdge:NSMinXEdge];
