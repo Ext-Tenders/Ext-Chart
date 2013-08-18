@@ -98,6 +98,23 @@
     return;
 }
 
+-(IBAction)addButtonPressed:(id)sender {
+    if (![[self.representedObject class] isSubclassOfClass:[EXTDifferential class]])
+        return;
+    EXTDifferential *diff = self.representedObject;
+    
+    EXTPartialDefinition *partial = [EXTPartialDefinition new];
+    partial.inclusion = [EXTMatrix matrixWidth:0 height:diff.start.size];
+    partial.differential = [EXTMatrix matrixWidth:0 height:diff.end.size];
+    
+    [diff.partialDefinitions addObject:partial];
+    [self.tableView reloadData];
+    [self.tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:(diff.partialDefinitions.count-1)] byExtendingSelection:NO];
+    [self doubleClick:sender];
+    
+    return;
+}
+
 - (void)doubleClick:(id)sender {
     if (![[self.representedObject class] isSubclassOfClass:[EXTDifferential class]])
         return;
@@ -108,7 +125,8 @@
     _partial = diff.partialDefinitions[self.tableView.selectedRow];
     
     // initialize the pieces of the sheet.
-    self.descriptionField.stringValue = [_partial.description copy];
+    if (_partial.description)
+        self.descriptionField.stringValue = [_partial.description copy];
     self.inclusionEditor.representedObject = [_partial.inclusion copy];
     self.inclusionEditor.rowNames = diff.start.names;
     self.actionEditor.representedObject = [_partial.differential copy];
