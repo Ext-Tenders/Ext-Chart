@@ -54,7 +54,10 @@
     if (!representedObject)
         return;
     
-    [representedObject.presentation[columnIndex] setObject:@([anObject intValue]) atIndex:rowIndex];
+    NSMutableArray *presentation = representedObject.presentation;
+    NSMutableArray *column = presentation[columnIndex];
+    NSInteger value = [anObject intValue];
+    column[rowIndex] = @(value);
     
     return;
 }

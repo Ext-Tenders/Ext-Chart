@@ -18,11 +18,14 @@
 
 @property IBOutlet NSPopover *popover;
 @property IBOutlet NSTextField *descriptionField;
+@property IBOutlet NSTextField *dimensionField;
 @property IBOutlet NSButton *automaticallyGeneratedCB;
 @property IBOutlet EXTMatrixEditor *inclusionEditor;
 @property IBOutlet EXTMatrixEditor *actionEditor;
 
 @end
+
+
 
 @implementation EXTDifferentialPaneController
 {
@@ -128,6 +131,7 @@
     // initialize the pieces of the sheet.
     if (_partial.description)
         self.descriptionField.stringValue = [_partial.description copy];
+    self.dimensionField.stringValue = [NSString stringWithFormat:@"%ld", _partial.inclusion.width];
     self.inclusionEditor.representedObject = [_partial.inclusion copy];
     self.inclusionEditor.rowNames = diff.start.names;
     self.actionEditor.representedObject = [_partial.action copy];
@@ -157,6 +161,40 @@
     
     [_tableView reloadData];
     [self.chartView displaySelectedPage];
+    
+    return;
+}
+
+-(IBAction)dimensionFieldWasEdited:(id)sender {
+    NSUInteger value = self.dimensionField.intValue;
+    EXTMatrix *inclusion = self.inclusionEditor.representedObject;
+    EXTMatrix *action = self.actionEditor.representedObject;
+    
+    // three things can happen.
+    // first, if this is the same dimension, we don't need to do anything.
+    if (value == inclusion.width)
+        return;
+    
+    EXTMatrix *newInclusion = [EXTMatrix matrixWidth:value height:inclusion.height],
+              *newAction = [EXTMatrix matrixWidth:value height:action.height];
+    
+    // or, if this dimension is smaller than the one we were, we should modify
+    // the dimensions of our matrices and lop them off / extend accordingly.
+    for (int i = 0; i < MIN(value,inclusion.width); i++)
+        for (int j = 0; j < inclusion.height; j++)
+            newInclusion.presentation[i][j] = inclusion.presentation[i][j];
+    
+    for (int i = 0; i < MIN(value,action.width); i++)
+        for (int j = 0; j < action.height; j++)
+            newAction.presentation[i][j] = action.presentation[i][j];
+    
+    // store the fresh matrices
+    self.actionEditor.representedObject = newAction;
+    self.inclusionEditor.representedObject = newInclusion;
+    
+    // since we changed something, we should have the matrix editors reload.
+    [self.inclusionEditor reloadData];
+    [self.actionEditor reloadData];
     
     return;
 }
