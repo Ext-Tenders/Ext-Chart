@@ -51,7 +51,11 @@
 }
 
 - (void)tableGrid:(MBTableGrid *)aTableGrid setObjectValue:(id)anObject forColumn:(NSUInteger)columnIndex row:(NSUInteger)rowIndex {
-    DLog(@"Haven't implemented matrix editing yet.");
+    if (!representedObject)
+        return;
+    
+    [representedObject.presentation[columnIndex] setObject:@([anObject intValue]) atIndex:rowIndex];
+    
     return;
 }
 
