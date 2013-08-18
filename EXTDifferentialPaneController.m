@@ -130,6 +130,7 @@
     _partial.description = self.descriptionField.stringValue;
     
     [_tableView reloadData];
+    [self.chartView displaySelectedPage];
     
     return;
 }
