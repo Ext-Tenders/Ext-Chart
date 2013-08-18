@@ -8,6 +8,7 @@
 
 #import "EXTDifferentialPaneController.h"
 #import "EXTDifferential.h"
+#import "EXTMatrixEditor.h"
 
 @interface EXTDifferentialPaneController ()
 
@@ -18,6 +19,8 @@
 @property IBOutlet NSPopover *popover;
 @property IBOutlet NSTextField *descriptionField;
 @property IBOutlet NSButton *automaticallyGeneratedCB;
+@property IBOutlet EXTMatrixEditor *inclusionEditor;
+@property IBOutlet EXTMatrixEditor *actionEditor;
 
 @end
 
@@ -106,11 +109,17 @@
     
     // initialize the pieces of the sheet.
     self.descriptionField.stringValue = [_partial.description copy];
+    self.inclusionEditor.representedObject = _partial.inclusion;
+    self.inclusionEditor.rowNames = diff.start.names;
+    self.actionEditor.representedObject = _partial.differential;
+    self.actionEditor.rowNames = diff.end.names;
     self.automaticallyGeneratedCB.state = _partial.automaticallyGenerated;
     // XXX: make this update when we edit the EXTMatrix's data.
     
     // and display
     [self.popover showRelativeToRect:[self.tableView rectOfRow:self.tableView.selectedRow] ofView:self.tableView preferredEdge:NSMinXEdge];
+    [self.inclusionEditor reloadData];
+    [self.actionEditor reloadData];
     
     return;
 }

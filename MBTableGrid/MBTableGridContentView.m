@@ -97,6 +97,9 @@
     
 	NSUInteger numberOfColumns = [self tableGrid].numberOfColumns;
 	NSUInteger numberOfRows = [self tableGrid].numberOfRows;
+    
+    if (numberOfColumns == 0 || numberOfRows == 0)
+        return;
 	
 	NSUInteger firstColumn = NSNotFound;
 	NSUInteger lastColumn = numberOfColumns - 1;
@@ -509,9 +512,11 @@
 
 - (NSRect)rectOfColumn:(NSUInteger)columnIndex
 {
-    
     float width = [[self tableGrid] _widthForColumn:columnIndex];
 
+    if (columnIndex >= self.tableGrid.numberOfColumns)
+        return NSMakeRect(0, 0, width, [self frame].size.height);
+    
 	NSRect rect = NSMakeRect(0, 0, width, [self frame].size.height);
 	//rect.origin.x += 60.0 * columnIndex;
 	
