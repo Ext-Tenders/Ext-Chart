@@ -104,7 +104,6 @@ NSString *MBTableGridRowDataType = @"MBTableGridRowDataType";
 		
 		// Set the default cell
 		MBTableGridCell *defaultCell = [[MBTableGridCell alloc] initTextCell:@""];
-		[defaultCell setBezeled:YES];
 		[defaultCell setScrollable:YES];
 		[defaultCell setLineBreakMode:NSLineBreakByTruncatingTail];
 		[self setCell:defaultCell];
