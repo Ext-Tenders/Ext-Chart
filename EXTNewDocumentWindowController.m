@@ -115,7 +115,9 @@
 
         _options = [options copy];
     }
-    
+
+    [_tableView setTarget:self];
+    [_tableView setDoubleAction:@selector(createDocument:)];
     [_tableView reloadData];
     [_tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:1] byExtendingSelection:NO];
 }
@@ -195,6 +197,9 @@
 #pragma mark - Actions
 
 - (IBAction)createDocument:(id)sender {
+    if (![_createDocumentButton isEnabled])
+        return;
+    
     EXTNewDocumentOption *option = [_options objectAtIndex:[_tableView selectedRow]];
 
     NSDocumentController *docController = [NSDocumentController sharedDocumentController];
