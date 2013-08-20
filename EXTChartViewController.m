@@ -13,6 +13,10 @@
 #import "EXTTerm.h"
 #import "EXTDifferential.h"
 
+
+static NSCache *_EXTLayerCache = nil;
+
+
 @interface EXTChartViewController () <EXTChartViewDelegate>
     @property(nonatomic, weak) id selectedObject;
 @end
@@ -22,6 +26,11 @@
 }
 
 #pragma mark - Life cycle
+
++ (void)initialize {
+    if (self == [EXTChartViewController class])
+        _EXTLayerCache = [NSCache new];
+}
 
 - (id)initWithDocument:(EXTDocument *)document {
     self = [super init];
@@ -62,58 +71,6 @@
 
 - (void)chartView:(EXTChartView *)chartView willDisplayPage:(NSUInteger)pageNumber {
     [_document.sseq computeGroupsForPage:pageNumber];
-}
-
-// TODO: Talk to Eric about creating an NS_INLINE NSValue *_EXTDotRect() function
-- (NSArray *)dotPositions:(int)count
-                        x:(CGFloat)x
-                        y:(CGFloat)y
-                  spacing:(CGFloat)spacing {
-
-    switch (count) {
-        case 1:
-            return @[[NSValue valueWithRect:
-                      NSMakeRect(x*spacing + 2.0/6.0*spacing,
-                                 y*spacing + 2.0/6.0*spacing,
-                                 2.0*spacing/6.0,
-                                 2.0*spacing/6.0)]];
-
-        case 2:
-            return @[[NSValue valueWithRect:
-                      NSMakeRect(x*spacing + 1.0/6.0*spacing,
-                                 y*spacing + 1.0/6.0*spacing,
-                                 2.0*spacing/6.0,
-                                 2.0*spacing/6.0)],
-                     [NSValue valueWithRect:
-                      NSMakeRect(x*spacing + 3.0/6.0*spacing,
-                                 y*spacing + 3.0/6.0*spacing,
-                                 2.0*spacing/6.0,
-                                 2.0*spacing/6.0)]];
-
-        case 3:
-            return @[[NSValue valueWithRect:
-                      NSMakeRect(x*spacing + 0.66/6.0*spacing,
-                                 y*spacing + 1.0/6.0*spacing,
-                                 2.0*spacing/6.0,
-                                 2.0*spacing/6.0)],
-                     [NSValue valueWithRect:
-                      NSMakeRect(x*spacing + 2.0/6.0*spacing,
-                                 y*spacing + 3.0/6.0*spacing,
-                                 2.0*spacing/6.0,
-                                 2.0*spacing/6.0)],
-                     [NSValue valueWithRect:
-                      NSMakeRect(x*spacing + 3.33/6.0*spacing,
-                                 y*spacing + 1.0/6.0*spacing,
-                                 2.0*spacing/6.0,
-                                 2.0*spacing/6.0)]];
-
-        default:
-            return @[[NSValue valueWithRect:
-                      NSMakeRect(x*spacing+0.15*spacing,
-                                 y*spacing+0.15*spacing,
-                                 0.7*spacing,
-                                 0.7*spacing)]];
-    }
 }
 
 // this performs the culling and delegation calls for drawing a page of the SS
@@ -158,7 +115,9 @@
     }
 
     // actually loop through the available positions and perform the draw.
-    [[NSColor blackColor] set];
+    CGContextRef currentCGContext = [[NSGraphicsContext currentContext] graphicsPort];
+    CGRect layerFrame = {.size = {spacing, spacing}};
+    
     for (int i = (int)lowerLeft.x; i <= upperRight.x; i++) {
         NSArray *column = (NSArray*)counts[i - (int)lowerLeft.x];
         for (int j = (int)lowerLeft.y; j <= upperRight.y; j++) {
@@ -168,31 +127,10 @@
             if (count == 0)
                 continue;
 
-            NSArray *dotPositions = [self dotPositions:count
-                                                     x:(float)i
-                                                     y:(float)j
-                                               spacing:spacing];
-
-            NSBezierPath* path = [NSBezierPath new];
-
-            if (count <= 3) {
-                for (int i = 0; i < count; i++)
-                    [path appendBezierPathWithOvalInRect:
-                     [dotPositions[i] rectValue]];
-
-                [path fill];
-            } else {
-                NSString *output = [NSString stringWithFormat:@"%d", count];
-                NSFont *font = output.length >= 2 ? [NSFont fontWithName:@"Palatino-Roman" size:4.5] : [NSFont fontWithName:@"Palatino-Roman" size:5.0];
-                NSMutableParagraphStyle *paragraphStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
-                [paragraphStyle setAlignment:NSCenterTextAlignment];
-                NSDictionary *attributes = [NSDictionary dictionaryWithObjects:@[paragraphStyle,font] forKeys:@[NSParagraphStyleAttributeName,NSFontAttributeName]];
-                NSRect frame = NSMakeRect((float)i * spacing, ((float)j - 0.1) * spacing, spacing, spacing);
-                [output drawInRect:frame withAttributes:attributes];
-
-                [path appendBezierPathWithOvalInRect:[dotPositions[0] rectValue]];
-                [path stroke];
-            }
+            CGLayerRef dotLayer = [[self class] newDotLayerForCount:count];
+            layerFrame.origin = (CGPoint){i * spacing, j * spacing};
+            CGContextDrawLayerInRect(currentCGContext, layerFrame, dotLayer);
+            CGLayerRelease(dotLayer);
         }
     }
 
@@ -243,14 +181,14 @@
         NSPoint pointStart = [differential.start.location makePoint],
         pointEnd = [differential.end.location makePoint];
 
-        NSArray *startRects = [self dotPositions:[startPosition[0] intValue]
-                                               x:pointStart.x
-                                               y:pointStart.y
-                                         spacing:spacing],
-        *endRects = [self dotPositions:[endPosition[0] intValue]
-                                     x:pointEnd.x
-                                     y:pointEnd.y
-                               spacing:spacing];
+        NSArray *startRects = [[self class] dotPositionsForCount:[startPosition[0] intValue]
+                                                               x:pointStart.x
+                                                               y:pointStart.y
+                                                         spacing:spacing],
+        *endRects = [[self class] dotPositionsForCount:[endPosition[0] intValue]
+                                                     x:pointEnd.x
+                                                     y:pointEnd.y
+                                               spacing:spacing];
 
         for (int i = 0; i < imageSize; i++) {
             // get and update the offsets
@@ -304,6 +242,129 @@
 
 - (Class<EXTLocation>)indexClassForChartView:(EXTChartView *)chartView {
     return _document.sseq.indexClass;
+}
+
+
+#pragma mark - Drawing support
+
+// TODO: Talk to Eric about creating an NS_INLINE NSValue *_EXTDotRect() function
++ (NSArray *)dotPositionsForCount:(int)count
+                                x:(CGFloat)x
+                                y:(CGFloat)y
+                          spacing:(CGFloat)spacing {
+
+    switch (count) {
+        case 1:
+            return @[[NSValue valueWithRect:
+                      NSMakeRect(x*spacing + 2.0/6.0*spacing,
+                                 y*spacing + 2.0/6.0*spacing,
+                                 2.0*spacing/6.0,
+                                 2.0*spacing/6.0)]];
+
+        case 2:
+            return @[[NSValue valueWithRect:
+                      NSMakeRect(x*spacing + 1.0/6.0*spacing,
+                                 y*spacing + 1.0/6.0*spacing,
+                                 2.0*spacing/6.0,
+                                 2.0*spacing/6.0)],
+                     [NSValue valueWithRect:
+                      NSMakeRect(x*spacing + 3.0/6.0*spacing,
+                                 y*spacing + 3.0/6.0*spacing,
+                                 2.0*spacing/6.0,
+                                 2.0*spacing/6.0)]];
+
+        case 3:
+            return @[[NSValue valueWithRect:
+                      NSMakeRect(x*spacing + 0.66/6.0*spacing,
+                                 y*spacing + 1.0/6.0*spacing,
+                                 2.0*spacing/6.0,
+                                 2.0*spacing/6.0)],
+                     [NSValue valueWithRect:
+                      NSMakeRect(x*spacing + 2.0/6.0*spacing,
+                                 y*spacing + 3.0/6.0*spacing,
+                                 2.0*spacing/6.0,
+                                 2.0*spacing/6.0)],
+                     [NSValue valueWithRect:
+                      NSMakeRect(x*spacing + 3.33/6.0*spacing,
+                                 y*spacing + 1.0/6.0*spacing,
+                                 2.0*spacing/6.0,
+                                 2.0*spacing/6.0)]];
+
+        default:
+            return @[[NSValue valueWithRect:
+                      NSMakeRect(x*spacing+0.15*spacing,
+                                 y*spacing+0.15*spacing,
+                                 0.7*spacing,
+                                 0.7*spacing)]];
+    }
+}
+
++ (CGLayerRef)newDotLayerForCount:(int)count {
+    CGLayerRef layer = (__bridge CGLayerRef)[_EXTLayerCache objectForKey:@(count)];
+    if (layer)
+        return CGLayerRetain(layer);
+
+    // Since dot layers contain vectors only, we can draw them with fixed size and let Quartz
+    // scale layers when needed
+    const CGFloat spacing = 9.0;
+    const CGSize size = {spacing, spacing};
+    const CGRect frame = {.size = size};
+
+    NSMutableData *PDFData = [NSMutableData data];
+    CGDataConsumerRef dataConsumer = CGDataConsumerCreateWithCFData((__bridge CFMutableDataRef)PDFData);
+    CGContextRef PDFContext = CGPDFContextCreate(dataConsumer, &frame, NULL);
+
+    layer = CGLayerCreateWithContext(PDFContext, size, NULL);
+    CGContextRef layerContext = CGLayerGetContext(layer);
+
+    NSGraphicsContext *drawingContext = [NSGraphicsContext graphicsContextWithGraphicsPort:layerContext flipped:NO];
+    [NSGraphicsContext saveGraphicsState];
+    [NSGraphicsContext setCurrentContext:drawingContext];
+    CGContextBeginPage(PDFContext, &frame);
+    {
+        NSArray *dotPositions = [[self class] dotPositionsForCount:count x:0.0 y:0.0 spacing:spacing];
+
+        if (count <= 3) {
+            NSBezierPath *path = [NSBezierPath bezierPath];
+            for (NSValue *rectObject in dotPositions)
+                [path appendBezierPathWithOvalInRect:[rectObject rectValue]];
+            [path fill];
+        }
+        else {
+            static dispatch_once_t labelAttributesOnceToken;
+            static NSDictionary *singleDigitAttributes, *multiDigitAttributes;
+            dispatch_once(&labelAttributesOnceToken, ^{
+                NSMutableParagraphStyle *paragraphStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
+                [paragraphStyle setAlignment:NSCenterTextAlignment];
+
+                NSFont *singleDigitFont = [NSFont fontWithName:@"Palatino-Roman" size:5.0];
+                NSFont *multiDigitFont = [NSFont fontWithName:@"Palatino-Roman" size:4.5];
+
+                singleDigitAttributes = @{NSFontAttributeName : singleDigitFont,
+                                          NSParagraphStyleAttributeName : paragraphStyle};
+                multiDigitAttributes = @{NSFontAttributeName : multiDigitFont,
+                                         NSParagraphStyleAttributeName : paragraphStyle};
+            });
+
+            const NSRect drawingFrame = [dotPositions[0] rectValue];
+            [[NSBezierPath bezierPathWithOvalInRect:drawingFrame] stroke];
+
+            NSRect textFrame = drawingFrame;
+            textFrame.origin.y += 0.05 * spacing;
+            NSString *label = [NSString stringWithFormat:@"%d", count];
+            [label drawInRect:textFrame withAttributes:(label.length == 1 ? singleDigitAttributes : multiDigitAttributes)];
+
+        }
+    }
+    CGContextEndPage(PDFContext);
+    CGPDFContextClose(PDFContext);
+    CGContextRelease(PDFContext);
+    CGDataConsumerRelease(dataConsumer);
+    [NSGraphicsContext restoreGraphicsState];
+
+    [_EXTLayerCache setObject:(__bridge id)layer forKey:@(count)];
+
+    return layer;
 }
 
 @end
