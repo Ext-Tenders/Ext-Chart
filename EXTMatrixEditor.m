@@ -7,6 +7,7 @@
 //
 
 #import "EXTMatrixEditor.h"
+#import "MBTableGridHeaderView.h"
 
 @interface EXTMatrixEditor () <MBTableGridDataSource, MBTableGridDelegate>
 
@@ -23,9 +24,16 @@
         representedObject = nil;
         self.dataSource = self;
         self.delegate = self;
+
+        [self _extResetRowHeaderToolTips];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(rowHeaderViewFrameDidChange:) name:NSViewFrameDidChangeNotification object:[self rowHeaderView]];
     }
     
     return self;
+}
+
+- (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 - (void)drawRect:(NSRect)dirtyRect
@@ -82,6 +90,24 @@
 
 - (NSColor *)tableGrid:(MBTableGrid *)aTableGrid backgroundColorForColumn:(NSUInteger)columnIndex row:(NSUInteger)rowIndex {
     return nil;
+}
+
+#pragma mark - NSToolTipOwner
+
+- (NSString *)view:(NSView *)view stringForToolTip:(NSToolTipTag)tag point:(NSPoint)point userData:(void *)data {
+    NSUInteger rowIndex = (NSUInteger)floor(point.y / 19.0 /* row height */);
+    return [self tableGrid:self headerStringForRow:rowIndex];
+}
+
+- (void)_extResetRowHeaderToolTips {
+    [[self rowHeaderView] removeAllToolTips];
+    [[self rowHeaderView] addToolTipRect:[[self rowHeaderView] bounds] owner:self userData:NULL];
+}
+
+#pragma mark - Notifications
+
+- (void)rowHeaderViewFrameDidChange:(NSNotification *)notification {
+    [self _extResetRowHeaderToolTips];
 }
 
 @end
