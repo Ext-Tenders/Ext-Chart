@@ -133,9 +133,9 @@
         self.descriptionField.stringValue = [_partial.description copy];
     self.dimensionField.stringValue = [NSString stringWithFormat:@"%ld", _partial.inclusion.width];
     self.inclusionEditor.representedObject = [_partial.inclusion copy];
-    self.inclusionEditor.rowNames = diff.start.names;
+    self.inclusionEditor.rowNames = [diff.start.names valueForKey:@"description"];
     self.actionEditor.representedObject = [_partial.action copy];
-    self.actionEditor.rowNames = diff.end.names;
+    self.actionEditor.rowNames = [diff.end.names valueForKey:@"description"];
     self.automaticallyGeneratedCB.state = _partial.automaticallyGenerated;
     // XXX: make this update when we edit the EXTMatrix's data.
     
