@@ -15,6 +15,8 @@
 @property IBOutlet NSTableView *tableView;
 @property IBOutlet NSButton *addButton;
 @property IBOutlet NSButton *deleteButton;
+@property IBOutlet NSTextField *sourceLabel;
+@property IBOutlet NSTextField *targetLabel;
 
 @property IBOutlet NSPopover *popover;
 @property IBOutlet NSTextField *descriptionField;
@@ -48,6 +50,19 @@
 - (void)awakeFromNib {
     [self.tableView setTarget:self];
     [self.tableView setDoubleAction:@selector(doubleClick:)];
+}
+
+- (void)setRepresentedObject:(id)representedObject {
+    [super setRepresentedObject:representedObject];
+    
+    if ([[representedObject class] isSubclassOfClass:[EXTDifferential class]]) {
+        EXTDifferential *diff = representedObject;
+        self.sourceLabel.stringValue = [NSString stringWithFormat:@"Source: %@",diff.start.location];
+        self.targetLabel.stringValue = [NSString stringWithFormat:@"Target: %@",diff.end.location];
+    } else {
+        self.sourceLabel.stringValue = @"Source:";
+        self.targetLabel.stringValue = @"Target:";
+    }
 }
 
 -(NSInteger)numberOfRowsInTableView:(NSTableView *)tableView {
