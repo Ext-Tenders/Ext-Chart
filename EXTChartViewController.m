@@ -220,17 +220,67 @@ static NSCache *_EXTLayerCache = nil;
     }
     
     // TODO: draw certain multiplicative structures?
+    
+    // TODO: draw highlighted object.
 }
 
 - (void)chartView:(EXTChartView *)chartView mouseDownAtGridLocation:(NSPoint)gridLocation {
     // TODO: lots!
     switch (chartView.selectedToolTag) {
         case _EXTDifferentialToolTag: {
-            NSArray *diffls = [_document.sseq findDifflsSourcedUnderPoint:gridLocation onPage:chartView.selectedPageIndex];
-            if (diffls.count == 1)
-                self.selectedObject = diffls[0];
-            else
+            NSArray *terms = [_document.sseq findTermsUnderPoint:gridLocation];
+            NSUInteger oldIndex = NSNotFound;
+            NSUInteger page = self.chartView.selectedPageIndex;
+            
+            // if there's nothing under this click, just quit now.
+            if (terms.count == 0) {
                 self.selectedObject = nil;
+                return;
+            }
+            
+            // if we used to have something selected, and it was a differential
+            // on this page, then we should find its position in our list.
+            if ([[self.selectedObject class] isSubclassOfClass:[EXTDifferential class]] &&
+                (((EXTDifferential*)self.selectedObject).page == page))
+                oldIndex = [terms indexOfObject:((EXTDifferential*)self.selectedObject).start];
+            
+            // the new index is one past the old index, unless we have to wrap.
+            int newIndex = oldIndex;
+            EXTTerm *source = nil, *end = nil;
+            EXTDifferential *diff = nil;
+            if (oldIndex == NSNotFound) {
+                oldIndex = 0;
+                newIndex = 0;
+            }
+            do {
+                if (newIndex == (terms.count - 1))
+                    newIndex = 0;
+                else
+                    newIndex = newIndex + 1;
+                source = terms[newIndex];
+                diff = [_document.sseq findDifflWithSource:source.location onPage:page];
+                
+                // if we've found it, good!  quit!
+                if (diff) {
+                    self.selectedObject = diff;
+                    break;
+                }
+                
+                // if there's no differential, then let's try to build it.
+                EXTLocation *endLoc = [[source.location class] followDiffl:source.location page:page];
+                end = [_document.sseq findTerm:endLoc];
+                
+                if (end) {
+                    // but if there is, let's build it and set it up.
+                    diff = [EXTDifferential newDifferential:source end:end page:page];
+                    [_document.sseq addDifferential:diff];
+                    self.selectedObject = diff;
+                    break;
+                }
+                
+                // if there's no target term, then this won't work, and we
+                // should cycle.
+            } while (newIndex != oldIndex);
             
             break;
         }
