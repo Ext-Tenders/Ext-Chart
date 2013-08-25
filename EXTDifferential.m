@@ -114,10 +114,6 @@
     return true;
 }
 
-+(id) dealWithClick:(NSPoint)location document:(EXTDocument *)document {
-    return nil;
-}
-
 // IMPORTANT NOTE: this DOESN'T actually return a properly initialized object.
 // instead, the start and end pointers are set to the EXTLocation of the term
 // they refer to.  this must be dereferenced before storing the differential.
