@@ -528,7 +528,7 @@
     NSMutableDictionary *difflsOnPage = self.differentials[page];
     
     for (EXTLocation *loc in difflsOnPage) {
-        EXTIntPoint difflPoint = [loc makePoint];
+        EXTIntPoint difflPoint = [loc gridPoint];
         if (EXTEqualIntPoints(difflPoint, point))
             [ret addObject:[difflsOnPage objectForKey:loc]];
     }
@@ -540,7 +540,7 @@
     NSMutableArray *ret = [NSMutableArray array];
     
     for (EXTLocation *loc in terms) {
-        EXTIntPoint termPoint = [loc makePoint];
+        EXTIntPoint termPoint = [loc gridPoint];
         if (EXTEqualIntPoints(termPoint, point))
             [ret addObject:[terms objectForKey:loc]];
     }

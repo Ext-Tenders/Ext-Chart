@@ -18,7 +18,7 @@
 -(id) initWithA:(int)aa B:(int)bb C:(int)cc;
 +(id) tripleWithA:(int)aa B:(int)bb C:(int)cc;
 
--(EXTIntPoint) makePoint;
+-(EXTIntPoint) gridPoint;
 -(NSString *) description;
 +(EXTTriple*) identityLocation;
 +(EXTTriple*) negate:(EXTTriple*)loc;

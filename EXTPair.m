@@ -26,7 +26,7 @@
 	return pair;
 }
 
-- (EXTIntPoint) makePoint {
+- (EXTIntPoint) gridPoint {
     return (EXTIntPoint){[self a], [self b]};
 }
 

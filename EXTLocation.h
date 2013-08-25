@@ -27,7 +27,7 @@ enum EXTLocationKinds {
 @protocol EXTLocation <NSObject, NSCopying, NSCoding>
 
 // these translate the EXTLocation data into other (potentially lossy) formats
--(EXTIntPoint) makePoint;
+-(EXTIntPoint) gridPoint;
 -(NSString *) description;
 
 // these say that EXTLocation forms a Z-module

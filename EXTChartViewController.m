@@ -105,7 +105,7 @@ static NSCache *_EXTLayerCache = nil;
     // Z-mods, since those have lots of interesting quotients which need to
     // represented visually.
     for (EXTTerm *term in _document.sseq.terms.allValues) {
-        EXTIntPoint point = [[term location] makePoint];
+        EXTIntPoint point = [[term location] gridPoint];
 
         if (EXTIntPointInRect(point, gridRect)) {
             NSMutableArray *column = (NSMutableArray*)counts[(int)(point.x-gridRect.origin.x)];
@@ -158,8 +158,8 @@ static NSCache *_EXTLayerCache = nil;
         if ([differential page] != pageNumber)
             continue;
 
-        const EXTIntPoint startPoint = [differential.start.location makePoint];
-        const EXTIntPoint endPoint = [differential.end.location makePoint];
+        const EXTIntPoint startPoint = differential.start.location.gridPoint;
+        const EXTIntPoint endPoint = differential.end.location.gridPoint;
         const bool startPointInGridRect = EXTIntPointInRect(startPoint, gridRect);
         const bool endPointInGridRect = EXTIntPointInRect(endPoint, gridRect);
         if (!startPointInGridRect && !endPointInGridRect)
@@ -433,7 +433,7 @@ static NSCache *_EXTLayerCache = nil;
 - (void)_extDrawGridSelectionBackgroundForTerm:(EXTTerm *)term inGridRect:(EXTIntRect)gridRect {
     const CGFloat selectionInset = 0.25;
 
-    if (EXTIntPointInRect([[term location] makePoint], gridRect)) {
+    if (EXTIntPointInRect(term.location.gridPoint, gridRect)) {
         NSColor *bgcolor = [[[self chartView] highlightColor] blendedColorWithFraction:0.8 ofColor:[NSColor whiteColor]];
         [bgcolor setFill];
         const NSRect squareSelection = NSInsetRect([self _extBoundingRectForTerm:term], selectionInset, selectionInset);
@@ -458,7 +458,7 @@ static NSCache *_EXTLayerCache = nil;
 - (NSRect)_extBoundingRectForTerm:(EXTTerm *)term {
     EXTChartView *chartView = [self chartView];
     const CGFloat spacing = [[chartView grid] gridSpacing];
-    const EXTIntPoint gridLocation = [[term location] makePoint];
+    const EXTIntPoint gridLocation = term.location.gridPoint;
     const NSRect boundingRect = {
         .origin.x = gridLocation.x * spacing,
         .origin.y = gridLocation.y * spacing,

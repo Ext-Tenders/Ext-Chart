@@ -28,7 +28,7 @@
 }
 
 // more generally, maybe this could be replaced with an arbitrary projection mtx
--(EXTIntPoint) makePoint {
+-(EXTIntPoint) gridPoint {
     return (EXTIntPoint){[self b] - [self a], [self a]};
 }
 
