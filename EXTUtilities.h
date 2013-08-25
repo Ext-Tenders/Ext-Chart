@@ -28,3 +28,56 @@ static bool __attribute__((__overloadable__, __always_inline__)) EXTEpsilonEqual
 /*! Boolean to string conversions */
 static NSString * __attribute__((__always_inline__)) EXTBoolToString(bool x) { return x ? @"true" : @"false"; }
 static const char * __attribute__((__always_inline__)) EXTBoolToCString(bool x) { return x ? "true" : "false"; }
+
+/*! Integer coordinate space */
+typedef struct {
+    NSInteger x;
+    NSInteger y;
+} EXTIntPoint;
+
+typedef struct {
+    NSInteger width;
+    NSInteger height;
+} EXTIntSize;
+
+typedef struct {
+    EXTIntPoint origin;
+    EXTIntSize size;
+} EXTIntRect;
+
+static inline bool EXTEqualIntPoints(EXTIntPoint point1, EXTIntPoint point2) {
+    return point1.x == point2.x && point1.y == point2.y;
+}
+
+static inline EXTIntPoint EXTIntPointFromNSPoint(NSPoint point) {
+    return (EXTIntPoint){(NSInteger)point.x, (NSInteger)point.y};
+}
+
+static inline NSString *EXTStringFromIntPoint(EXTIntPoint point) {
+    return [NSString stringWithFormat:@"(%ld, %ld)", point.x, point.y];
+}
+
+static inline NSString *EXTStringFromIntSize(EXTIntSize size) {
+    return [NSString stringWithFormat:@"(%ld, %ld)", size.width, size.height];
+}
+
+static inline NSString *EXTStringFromIntRect(EXTIntRect rect) {
+    return [NSString stringWithFormat:@"(%@, %@)", EXTStringFromIntPoint(rect.origin), EXTStringFromIntSize(rect.size)];
+}
+
+
+/*! This function assumes the origin is located at the bottom left corner. Points lying on the bottom or left edges
+ are considered part of the rectangle; points lying on the upper or right edges are _not_ part of the rectangle. */
+static inline bool EXTIntPointInRect(EXTIntPoint point, EXTIntRect rect) {
+    return (point.x >= rect.origin.x &&
+            point.y >= rect.origin.y &&
+            point.x < rect.origin.x + rect.size.width &&
+            point.y < rect.origin.y + rect.size.height);
+}
+
+static inline EXTIntPoint EXTIntUpperRightPointOfRect(EXTIntRect rect) {
+    return (EXTIntPoint){
+        .x = rect.origin.x + rect.size.width,
+        .y = rect.origin.y + rect.size.height
+    };
+}

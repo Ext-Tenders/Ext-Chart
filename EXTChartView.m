@@ -137,17 +137,17 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
 
 #pragma mark - Grid point conversion
 
-// Converts user space coordinates to (p, q) coordinates
-- (NSPoint)convertPointToGrid:(NSPoint)point {
+// Converts user space coordinates to (p, q) grid coordinates
+- (EXTIntPoint)convertPointToGrid:(NSPoint)point {
     const CGFloat gridSpacing = [_grid gridSpacing];
-    return (NSPoint){
-        .x = floor(point.x / gridSpacing),
-        .y = floor(point.y / gridSpacing)
+    return (EXTIntPoint){
+        .x = (NSInteger)floor(point.x / gridSpacing),
+        .y = (NSInteger)floor(point.y / gridSpacing)
     };
 }
 
-// Convert (p, q) coordinates to user space coordinates
-- (NSPoint)convertPointFromGrid:(NSPoint)gridPoint {
+// Converts grid (p, q) coordinates to user space coordinates
+- (NSPoint)convertPointFromGrid:(EXTIntPoint)gridPoint {
     const CGFloat gridSpacing = [_grid gridSpacing];
     return (NSPoint){
         .x = gridPoint.x * gridSpacing,
@@ -157,16 +157,16 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
 
 #pragma mark - Drawing
 
-- (void)drawRect:(NSRect)rect {
+- (void)drawRect:(NSRect)dirtyRect {
     // View background
-    NSDrawWindowBackground(rect);
+    NSDrawWindowBackground(dirtyRect);
 
     // Art board background
 	[_artBoard fillRect]; // TODO: draw only the intersection of rect and the art board
 
     // Grid
 	if (_showsGrid)
-		[_grid drawGridInRect:rect];
+		[_grid drawGridInRect:dirtyRect];
 
     // Art board borders
     // If we aren’t drawing to the screen (e.g., when exporting the art board as PDF), the
@@ -195,17 +195,20 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
 	//	[xform concat];
 
 
-	// the code for the objects.
-    const NSPoint lowerLeftPoint = rect.origin;
-    const NSPoint upperRightPoint = {NSMaxX(rect), NSMaxY(rect)};
+    // Convert dirtyRect to the grid coordinate space
+    const EXTIntPoint lowerLeftPoint = [self convertPointToGrid:dirtyRect.origin];
+    const EXTIntPoint upperRightPoint = [self convertPointToGrid:(NSPoint){NSMaxX(dirtyRect), NSMaxY(dirtyRect)}];
+    const EXTIntRect gridDirtyRect = {
+        .origin = lowerLeftPoint,
+        .size.width = upperRightPoint.x - lowerLeftPoint.x + 1,
+        .size.height = upperRightPoint.y - lowerLeftPoint.y + 1
+    };
 
     // TODO: this may be drawing too narrow a window, resulting in blank Ext
     // charts if the scroll is dragged too slowly.
     [_delegate chartView:self
           drawPageNumber:_selectedPageIndex
-               lowerLeft:[self convertPointToGrid:lowerLeftPoint]
-              upperRight:[self convertPointToGrid:upperRightPoint]
-             withSpacing:[_grid gridSpacing]];
+              inGridRect:gridDirtyRect];
 
     //  // restore the graphics context
     //	[theContext restoreGraphicsState];
@@ -423,7 +426,7 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
         }
 	}
     else {
-        const NSPoint gridLocation = [_grid convertToGridCoordinates:location];
+        const EXTIntPoint gridLocation = EXTIntPointFromNSPoint([_grid convertToGridCoordinates:location]);
         [_delegate chartView:self mouseDownAtGridLocation:gridLocation];
         [self setNeedsDisplayInRect:[self _extHighlightDrawingRect]]; // TODO: is this necessary?
 	}

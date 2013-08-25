@@ -17,7 +17,7 @@
 -(id) initWithA:(int)aa B:(int)bb;
 +(id) pairWithA:(int)aa B:(int)bb;
 
--(NSPoint) makePoint;
+-(EXTIntPoint) makePoint;
 -(NSString *) description;
 +(EXTPair*) addLocation:(EXTPair*)a to:(EXTPair*)b;
 +(EXTPair*) identityLocation;

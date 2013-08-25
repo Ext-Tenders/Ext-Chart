@@ -28,8 +28,8 @@
 }
 
 // more generally, maybe this could be replaced with an arbitrary projection mtx
--(NSPoint) makePoint {
-    return NSMakePoint([self b] - [self a], [self a]);
+-(EXTIntPoint) makePoint {
+    return (EXTIntPoint){[self b] - [self a], [self a]};
 }
 
 -(NSString*) description {

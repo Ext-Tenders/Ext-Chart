@@ -519,7 +519,7 @@
     return [self findDifflWithSource:startLoc onPage:page];
 }
 
-- (NSArray*)findDifflsSourcedUnderPoint:(NSPoint)point onPage:(int)page {
+- (NSArray*)findDifflsSourcedUnderPoint:(EXTIntPoint)point onPage:(int)page {
     NSMutableArray *ret = [NSMutableArray array];
     
     if (page >= differentials.count)
@@ -528,25 +528,21 @@
     NSMutableDictionary *difflsOnPage = self.differentials[page];
     
     for (EXTLocation *loc in difflsOnPage) {
-        NSPoint difflPoint = [loc makePoint];
-        if (((int)difflPoint.x != (int)point.x) ||
-            ((int)difflPoint.y != (int)point.y))
-            continue;
-        [ret addObject:[difflsOnPage objectForKey:loc]];
+        EXTIntPoint difflPoint = [loc makePoint];
+        if (EXTEqualIntPoints(difflPoint, point))
+            [ret addObject:[difflsOnPage objectForKey:loc]];
     }
     
     return ret;
 }
 
-- (NSArray*)findTermsUnderPoint:(NSPoint)point {
+- (NSArray*)findTermsUnderPoint:(EXTIntPoint)point {
     NSMutableArray *ret = [NSMutableArray array];
     
     for (EXTLocation *loc in terms) {
-        NSPoint termPoint = [loc makePoint];
-        if (((int)termPoint.x != (int)point.x) ||
-            ((int)termPoint.y != (int)point.y))
-            continue;
-        [ret addObject:[terms objectForKey:loc]];
+        EXTIntPoint termPoint = [loc makePoint];
+        if (EXTEqualIntPoints(termPoint, point))
+            [ret addObject:[terms objectForKey:loc]];
     }
     
     return ret;

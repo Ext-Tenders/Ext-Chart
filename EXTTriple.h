@@ -18,7 +18,7 @@
 -(id) initWithA:(int)aa B:(int)bb C:(int)cc;
 +(id) tripleWithA:(int)aa B:(int)bb C:(int)cc;
 
--(NSPoint) makePoint;
+-(EXTIntPoint) makePoint;
 -(NSString *) description;
 +(EXTTriple*) identityLocation;
 +(EXTTriple*) negate:(EXTTriple*)loc;

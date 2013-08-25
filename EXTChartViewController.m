@@ -85,21 +85,12 @@ static NSCache *_EXTLayerCache = nil;
 }
 
 // this performs the culling and delegation calls for drawing a page of the SS
-// TODO: does this need spacing to be passed in?  probably a lot of data passing
-// needs to be investigated and untangled... :(
-- (void)chartView:(EXTChartView *)chartView
-   drawPageNumber:(NSUInteger)pageNumber
-        lowerLeft:(NSPoint)lowerLeft
-       upperRight:(NSPoint)upperRight
-      withSpacing:(CGFloat)spacing {
-
+- (void)chartView:(EXTChartView *)chartView drawPageNumber:(const NSUInteger)pageNumber inGridRect:(const EXTIntRect)gridRect {
     // start by initializing the array of counts
-    int width = (int)(upperRight.x - lowerLeft.x + 1),
-    height = (int)(upperRight.y - lowerLeft.y + 1);
-    NSMutableArray *counts = [NSMutableArray arrayWithCapacity:width];
-    for (int i = 0; i < width; i++) {
-        NSMutableArray *row = [NSMutableArray arrayWithCapacity:height];
-        for (int j = 0; j < height; j++)
+    NSMutableArray *counts = [NSMutableArray arrayWithCapacity:gridRect.size.width];
+    for (int i = 0; i < gridRect.size.width; i++) {
+        NSMutableArray *row = [NSMutableArray arrayWithCapacity:gridRect.size.height];
+        for (int j = 0; j < gridRect.size.height; j++)
             [row setObject:[NSMutableArray arrayWithArray:@[@0, @0]] atIndexedSubscript:j];
         [counts setObject:row atIndexedSubscript:i];
     }
@@ -113,19 +104,12 @@ static NSCache *_EXTLayerCache = nil;
     // they get drawn.  this will probably need to be changed when we move to
     // Z-mods, since those have lots of interesting quotients which need to
     // represented visually.
-    const NSRect gridDirtyRect = {
-        .origin = lowerLeft,
-        .size.width = upperRight.x - lowerLeft.x,
-        .size.height = upperRight.y - lowerLeft.y
-    };
-
     for (EXTTerm *term in _document.sseq.terms.allValues) {
-        NSPoint point = [[term location] makePoint];
+        EXTIntPoint point = [[term location] makePoint];
 
-        if (point.x >= lowerLeft.x && point.x <= upperRight.x &&
-            point.y >= lowerLeft.y && point.y <= upperRight.y) {
-            NSMutableArray *column = (NSMutableArray*)counts[(int)(point.x-lowerLeft.x)];
-            NSMutableArray *tuple = column[(int)(point.y-lowerLeft.y)];
+        if (EXTIntPointInRect(point, gridRect)) {
+            NSMutableArray *column = (NSMutableArray*)counts[(int)(point.x-gridRect.origin.x)];
+            NSMutableArray *tuple = column[(int)(point.y-gridRect.origin.y)];
             int offset = [tuple[0] intValue];
             tuple[0] = @(offset + [term dimension:pageNumber]);
         }
@@ -134,30 +118,32 @@ static NSCache *_EXTLayerCache = nil;
     // Draw grid square selection background if needed
     if (_selectedObject) {
         if ([_selectedObject isKindOfClass:[EXTTerm class]]) {
-            [self _extDrawGridSelectionBackgroundForTerm:_selectedObject inRect:gridDirtyRect spacing:spacing];
+            [self _extDrawGridSelectionBackgroundForTerm:_selectedObject inGridRect:gridRect];
         }
         else if ([_selectedObject isKindOfClass:[EXTDifferential class]]) {
             EXTDifferential *selectedDifferential = _selectedObject;
-            [self _extDrawGridSelectionBackgroundForTerm:[selectedDifferential start] inRect:gridDirtyRect spacing:spacing];
-            [self _extDrawGridSelectionBackgroundForTerm:[selectedDifferential end] inRect:gridDirtyRect spacing:spacing];
+            [self _extDrawGridSelectionBackgroundForTerm:[selectedDifferential start] inGridRect:gridRect];
+            [self _extDrawGridSelectionBackgroundForTerm:[selectedDifferential end] inGridRect:gridRect];
         }
     }
 
     // actually loop through the available positions and perform the draw.
+    const CGFloat gridSpacing = [[[self chartView] grid] gridSpacing];
+    const EXTIntPoint upperRight = EXTIntUpperRightPointOfRect(gridRect);
     CGContextRef currentCGContext = [[NSGraphicsContext currentContext] graphicsPort];
-    CGRect layerFrame = {.size = {spacing, spacing}};
+    CGRect layerFrame = {.size = {gridSpacing, gridSpacing}};
     
-    for (int i = (int)lowerLeft.x; i <= upperRight.x; i++) {
-        NSArray *column = (NSArray*)counts[i - (int)lowerLeft.x];
-        for (int j = (int)lowerLeft.y; j <= upperRight.y; j++) {
-            NSArray *tuple = column[j - (int)lowerLeft.y];
+    for (NSInteger i = gridRect.origin.x; i < upperRight.x; i++) {
+        NSArray *column = (NSArray *)counts[i - gridRect.origin.x];
+        for (NSInteger j = gridRect.origin.y; j < upperRight.y; j++) {
+            NSArray *tuple = column[j - gridRect.origin.y];
             int count = [tuple[0] intValue];
 
             if (count == 0)
                 continue;
 
-            CGLayerRef dotLayer = [[self class] newDotLayerForCount:count];
-            layerFrame.origin = (CGPoint){i * spacing, j * spacing};
+            CGLayerRef dotLayer = [self newDotLayerForCount:count];
+            layerFrame.origin = (CGPoint){i * gridSpacing, j * gridSpacing};
             CGContextDrawLayerInRect(currentCGContext, layerFrame, dotLayer);
             CGLayerRelease(dotLayer);
         }
@@ -172,12 +158,11 @@ static NSCache *_EXTLayerCache = nil;
         if ([differential page] != pageNumber)
             continue;
 
-        NSPoint start = [differential.start.location makePoint],
-        end = [differential.end.location makePoint];
-        if (((start.x < lowerLeft.x || start.x > upperRight.x) ||
-             (start.y < lowerLeft.y || start.y > upperRight.y)) &&
-            ((end.x < lowerLeft.x || end.x > upperRight.x) ||
-             (end.y < lowerLeft.y || end.y > upperRight.y)))
+        const EXTIntPoint startPoint = [differential.start.location makePoint];
+        const EXTIntPoint endPoint = [differential.end.location makePoint];
+        const bool startPointInGridRect = EXTIntPointInRect(startPoint, gridRect);
+        const bool endPointInGridRect = EXTIntPointInRect(endPoint, gridRect);
+        if (!startPointInGridRect && !endPointInGridRect)
             continue;
 
         int imageSize = [differential.presentation image].count;
@@ -192,31 +177,22 @@ static NSCache *_EXTLayerCache = nil;
         *startPosition = [NSMutableArray arrayWithArray:@[@0, @0]],
         *endPosition = [NSMutableArray arrayWithArray:@[@0, @0]];
 
-        if (start.x >= lowerLeft.x && start.x <= upperRight.x &&
-            start.y >= lowerLeft.y && start.y <= upperRight.y) {
-            NSMutableArray *column = (NSMutableArray*)counts[(int)(start.x-lowerLeft.x)];
-            if ((int)(start.y-lowerLeft.y) < height)
-                startPosition = column[(int)(start.y-lowerLeft.y)];
+        if (EXTIntPointInRect(startPoint, gridRect)) {
+            NSMutableArray *column = (NSMutableArray*)counts[startPoint.x - gridRect.origin.x];
+            const NSInteger startPointYOffset = startPoint.y - gridRect.origin.y;
+            NSAssert(startPointYOffset < gridRect.size.height, @"start point is not in grid rect; potential index out of bounds doom");
+            startPosition = column[startPointYOffset];
         }
 
-        if (end.x >= lowerLeft.x && end.x <= upperRight.x &&
-            end.y >= lowerLeft.y && end.y <= upperRight.y) {
-            NSMutableArray *column = (NSMutableArray*)counts[(int)(end.x-lowerLeft.x)];
-            if ((int)(end.y-lowerLeft.y) < height)
-                endPosition = column[(int)(end.y-lowerLeft.y)];
+        if (EXTIntPointInRect(endPoint, gridRect)) {
+            NSMutableArray *column = (NSMutableArray*)counts[endPoint.x - gridRect.origin.x];
+            const NSInteger endPointYOffset = endPoint.y - gridRect.origin.y;
+            NSAssert(endPointYOffset < gridRect.size.height, @"end point is not in grid rect; potential index out of bounds doom");
+            endPosition = column[endPointYOffset];
         }
 
-        NSPoint pointStart = [differential.start.location makePoint],
-        pointEnd = [differential.end.location makePoint];
-
-        NSArray *startRects = [[self class] dotPositionsForCount:[startPosition[0] intValue]
-                                                               x:pointStart.x
-                                                               y:pointStart.y
-                                                         spacing:spacing],
-        *endRects = [[self class] dotPositionsForCount:[endPosition[0] intValue]
-                                                     x:pointEnd.x
-                                                     y:pointEnd.y
-                                               spacing:spacing];
+        NSArray *startRects = [self dotPositionsForCount:[startPosition[0] intValue] atGridPoint:startPoint];
+        NSArray *endRects = [self dotPositionsForCount:[endPosition[0] intValue] atGridPoint:endPoint];
 
         const bool differentialSelected = (differential == _selectedObject);
         
@@ -260,7 +236,7 @@ static NSCache *_EXTLayerCache = nil;
     // TODO: draw highlighted object.
 }
 
-- (void)chartView:(EXTChartView *)chartView mouseDownAtGridLocation:(NSPoint)gridLocation {
+- (void)chartView:(EXTChartView *)chartView mouseDownAtGridLocation:(EXTIntPoint)gridLocation {
     // TODO: lots!
     switch (chartView.selectedToolTag) {
         case _EXTDifferentialToolTag: {
@@ -333,59 +309,60 @@ static NSCache *_EXTLayerCache = nil;
 
 #pragma mark - Drawing support
 
-// TODO: Talk to Eric about creating an NS_INLINE NSValue *_EXTDotRect() function
-+ (NSArray *)dotPositionsForCount:(int)count
-                                x:(CGFloat)x
-                                y:(CGFloat)y
-                          spacing:(CGFloat)spacing {
-
+/* Returns an array of NSValue-boxed rectangles. The number of elements in the array
+ represents the number of dots should be drawn for a given (term) count at the grid
+ square with origin at `point`. Each rectangle describes the position and size of the
+ dot in user coordinate space. */
+- (NSArray *)dotPositionsForCount:(int)count atGridPoint:(EXTIntPoint)point {
+    const CGFloat gridSpacing = [[[self chartView] grid] gridSpacing];
+    
     switch (count) {
         case 1:
             return @[[NSValue valueWithRect:
-                      NSMakeRect(x*spacing + 2.0/6.0*spacing,
-                                 y*spacing + 2.0/6.0*spacing,
-                                 2.0*spacing/6.0,
-                                 2.0*spacing/6.0)]];
+                      NSMakeRect(point.x*gridSpacing + 2.0/6.0*gridSpacing,
+                                 point.y*gridSpacing + 2.0/6.0*gridSpacing,
+                                 2.0*gridSpacing/6.0,
+                                 2.0*gridSpacing/6.0)]];
 
         case 2:
             return @[[NSValue valueWithRect:
-                      NSMakeRect(x*spacing + 1.0/6.0*spacing,
-                                 y*spacing + 1.0/6.0*spacing,
-                                 2.0*spacing/6.0,
-                                 2.0*spacing/6.0)],
+                      NSMakeRect(point.x*gridSpacing + 1.0/6.0*gridSpacing,
+                                 point.y*gridSpacing + 1.0/6.0*gridSpacing,
+                                 2.0*gridSpacing/6.0,
+                                 2.0*gridSpacing/6.0)],
                      [NSValue valueWithRect:
-                      NSMakeRect(x*spacing + 3.0/6.0*spacing,
-                                 y*spacing + 3.0/6.0*spacing,
-                                 2.0*spacing/6.0,
-                                 2.0*spacing/6.0)]];
+                      NSMakeRect(point.x*gridSpacing + 3.0/6.0*gridSpacing,
+                                 point.y*gridSpacing + 3.0/6.0*gridSpacing,
+                                 2.0*gridSpacing/6.0,
+                                 2.0*gridSpacing/6.0)]];
 
         case 3:
             return @[[NSValue valueWithRect:
-                      NSMakeRect(x*spacing + 0.66/6.0*spacing,
-                                 y*spacing + 1.0/6.0*spacing,
-                                 2.0*spacing/6.0,
-                                 2.0*spacing/6.0)],
+                      NSMakeRect(point.x*gridSpacing + 0.66/6.0*gridSpacing,
+                                 point.y*gridSpacing + 1.0/6.0*gridSpacing,
+                                 2.0*gridSpacing/6.0,
+                                 2.0*gridSpacing/6.0)],
                      [NSValue valueWithRect:
-                      NSMakeRect(x*spacing + 2.0/6.0*spacing,
-                                 y*spacing + 3.0/6.0*spacing,
-                                 2.0*spacing/6.0,
-                                 2.0*spacing/6.0)],
+                      NSMakeRect(point.x*gridSpacing + 2.0/6.0*gridSpacing,
+                                 point.y*gridSpacing + 3.0/6.0*gridSpacing,
+                                 2.0*gridSpacing/6.0,
+                                 2.0*gridSpacing/6.0)],
                      [NSValue valueWithRect:
-                      NSMakeRect(x*spacing + 3.33/6.0*spacing,
-                                 y*spacing + 1.0/6.0*spacing,
-                                 2.0*spacing/6.0,
-                                 2.0*spacing/6.0)]];
+                      NSMakeRect(point.x*gridSpacing + 3.33/6.0*gridSpacing,
+                                 point.y*gridSpacing + 1.0/6.0*gridSpacing,
+                                 2.0*gridSpacing/6.0,
+                                 2.0*gridSpacing/6.0)]];
 
         default:
             return @[[NSValue valueWithRect:
-                      NSMakeRect(x*spacing+0.15*spacing,
-                                 y*spacing+0.15*spacing,
-                                 0.7*spacing,
-                                 0.7*spacing)]];
+                      NSMakeRect(point.x*gridSpacing+0.15*gridSpacing,
+                                 point.y*gridSpacing+0.15*gridSpacing,
+                                 0.7*gridSpacing,
+                                 0.7*gridSpacing)]];
     }
 }
 
-+ (CGLayerRef)newDotLayerForCount:(int)count {
+- (CGLayerRef)newDotLayerForCount:(int)count {
     CGLayerRef layer = (__bridge CGLayerRef)[_EXTLayerCache objectForKey:@(count)];
     if (layer)
         return CGLayerRetain(layer);
@@ -408,7 +385,7 @@ static NSCache *_EXTLayerCache = nil;
     [NSGraphicsContext setCurrentContext:drawingContext];
     CGContextBeginPage(PDFContext, &frame);
     {
-        NSArray *dotPositions = [[self class] dotPositionsForCount:count x:0.0 y:0.0 spacing:spacing];
+        NSArray *dotPositions = [self dotPositionsForCount:count atGridPoint:(EXTIntPoint){0}];
 
         if (count <= 3) {
             NSBezierPath *path = [NSBezierPath bezierPath];
@@ -453,10 +430,10 @@ static NSCache *_EXTLayerCache = nil;
     return layer;
 }
 
-- (void)_extDrawGridSelectionBackgroundForTerm:(EXTTerm *)term inRect:(NSRect)dirtyRect spacing:(CGFloat)spacing {
+- (void)_extDrawGridSelectionBackgroundForTerm:(EXTTerm *)term inGridRect:(EXTIntRect)gridRect {
     const CGFloat selectionInset = 0.25;
 
-    if (NSPointInRect([[term location] makePoint], dirtyRect)) {
+    if (EXTIntPointInRect([[term location] makePoint], gridRect)) {
         NSColor *bgcolor = [[[self chartView] highlightColor] blendedColorWithFraction:0.8 ofColor:[NSColor whiteColor]];
         [bgcolor setFill];
         const NSRect squareSelection = NSInsetRect([self _extBoundingRectForTerm:term], selectionInset, selectionInset);
@@ -464,6 +441,7 @@ static NSCache *_EXTLayerCache = nil;
     }
 }
 
+/* Returns the bounding rect of a given object in user coordinate space */
 - (NSRect)_extBoundingRectForObject:(id)object {
     if ([object isKindOfClass:[EXTTerm class]]) {
         return [self _extBoundingRectForTerm:object];
@@ -480,10 +458,10 @@ static NSCache *_EXTLayerCache = nil;
 - (NSRect)_extBoundingRectForTerm:(EXTTerm *)term {
     EXTChartView *chartView = [self chartView];
     const CGFloat spacing = [[chartView grid] gridSpacing];
-    const NSPoint location = [[term location] makePoint];
+    const EXTIntPoint gridLocation = [[term location] makePoint];
     const NSRect boundingRect = {
-        .origin.x = location.x * spacing,
-        .origin.y = location.y * spacing,
+        .origin.x = gridLocation.x * spacing,
+        .origin.y = gridLocation.y * spacing,
         .size.width = spacing,
         .size.height = spacing
     };

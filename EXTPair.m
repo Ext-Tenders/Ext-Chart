@@ -26,8 +26,8 @@
 	return pair;
 }
 
-- (NSPoint) makePoint {
-	return NSMakePoint([self a], [self b]);
+- (EXTIntPoint) makePoint {
+    return (EXTIntPoint){[self a], [self b]};
 }
 
 +(EXTPair*) addLocation:(EXTPair *)a to:(EXTPair *)b {
