@@ -23,7 +23,7 @@
 - (void) drawAxes;
 
 - (NSPoint)nearestGridPoint:(NSPoint)point; // used for snapping to grid
-- (NSPoint)convertToGridCoordinates:(NSPoint)point;
+- (EXTIntPoint)convertPointToGrid:(NSPoint)point;
 - (NSPoint)lowerLeftGridPoint:(NSPoint)point;
 
 - (NSRect)enclosingGridRect:(NSPoint)point;

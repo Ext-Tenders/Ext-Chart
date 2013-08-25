@@ -186,11 +186,11 @@ static const CGFloat _EXTGridLineWidth = 0.25;
     return newPoint;
 }
 
-- (NSPoint)convertToGridCoordinates:(NSPoint)point{
-	NSPoint newPoint;
-	newPoint.x = floor(point.x/_gridSpacing);
-	newPoint.y = floor(point.y/_gridSpacing);
-	return newPoint;
+- (EXTIntPoint)convertPointToGrid:(NSPoint)point {
+    return (EXTIntPoint){
+        .x = (NSInteger)floor(point.x / _gridSpacing),
+        .y = (NSInteger)floor(point.y / _gridSpacing)
+    };
 }
 
 - (NSPoint) lowerLeftGridPoint:(NSPoint)point{

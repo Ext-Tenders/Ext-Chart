@@ -135,26 +135,6 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
-#pragma mark - Grid point conversion
-
-// Converts user space coordinates to (p, q) grid coordinates
-- (EXTIntPoint)convertPointToGrid:(NSPoint)point {
-    const CGFloat gridSpacing = [_grid gridSpacing];
-    return (EXTIntPoint){
-        .x = (NSInteger)floor(point.x / gridSpacing),
-        .y = (NSInteger)floor(point.y / gridSpacing)
-    };
-}
-
-// Converts grid (p, q) coordinates to user space coordinates
-- (NSPoint)convertPointFromGrid:(EXTIntPoint)gridPoint {
-    const CGFloat gridSpacing = [_grid gridSpacing];
-    return (NSPoint){
-        .x = gridPoint.x * gridSpacing,
-        .y = gridPoint.y * gridSpacing
-    };
-}
-
 #pragma mark - Drawing
 
 - (void)drawRect:(NSRect)dirtyRect {
@@ -196,8 +176,8 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
 
 
     // Convert dirtyRect to the grid coordinate space
-    const EXTIntPoint lowerLeftPoint = [self convertPointToGrid:dirtyRect.origin];
-    const EXTIntPoint upperRightPoint = [self convertPointToGrid:(NSPoint){NSMaxX(dirtyRect), NSMaxY(dirtyRect)}];
+    const EXTIntPoint lowerLeftPoint = [_grid convertPointToGrid:dirtyRect.origin];
+    const EXTIntPoint upperRightPoint = [_grid convertPointToGrid:(NSPoint){NSMaxX(dirtyRect), NSMaxY(dirtyRect)}];
     const EXTIntRect gridDirtyRect = {
         .origin = lowerLeftPoint,
         .size.width = upperRightPoint.x - lowerLeftPoint.x + 1,
@@ -426,8 +406,7 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
         }
 	}
     else {
-        const EXTIntPoint gridLocation = EXTIntPointFromNSPoint([_grid convertToGridCoordinates:location]);
-        [_delegate chartView:self mouseDownAtGridLocation:gridLocation];
+        [_delegate chartView:self mouseDownAtGridLocation:[_grid convertPointToGrid:location]];
         [self setNeedsDisplayInRect:[self _extHighlightDrawingRect]]; // TODO: is this necessary?
 	}
 }
