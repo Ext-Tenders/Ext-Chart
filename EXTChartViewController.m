@@ -8,6 +8,7 @@
 
 #import "EXTChartViewController.h"
 #import "EXTChartView.h"
+#import "EXTGrid.h"
 #import "EXTDocument.h"
 #import "EXTSpectralSequence.h"
 #import "EXTTerm.h"
@@ -67,6 +68,16 @@ static NSCache *_EXTLayerCache = nil;
     return (EXTChartView *)[self view];
 }
 
+- (void)setSelectedObject:(id)selectedObject {
+    if (selectedObject == _selectedObject)
+        return;
+
+    EXTChartView *chartView = [self chartView];
+    [chartView setNeedsDisplayInRect:[self _extBoundingRectForObject:_selectedObject]]; // clear the previous selection
+    _selectedObject = selectedObject;
+    [chartView setNeedsDisplayInRect:[self _extBoundingRectForObject:selectedObject]]; // draw the new selection
+}
+
 #pragma mark - EXTChartViewDelegate
 
 - (void)chartView:(EXTChartView *)chartView willDisplayPage:(NSUInteger)pageNumber {
@@ -102,6 +113,12 @@ static NSCache *_EXTLayerCache = nil;
     // they get drawn.  this will probably need to be changed when we move to
     // Z-mods, since those have lots of interesting quotients which need to
     // represented visually.
+    const NSRect gridDirtyRect = {
+        .origin = lowerLeft,
+        .size.width = upperRight.x - lowerLeft.x,
+        .size.height = upperRight.y - lowerLeft.y
+    };
+
     for (EXTTerm *term in _document.sseq.terms.allValues) {
         NSPoint point = [[term location] makePoint];
 
@@ -111,6 +128,18 @@ static NSCache *_EXTLayerCache = nil;
             NSMutableArray *tuple = column[(int)(point.y-lowerLeft.y)];
             int offset = [tuple[0] intValue];
             tuple[0] = @(offset + [term dimension:pageNumber]);
+        }
+    }
+
+    // Draw grid square selection background if needed
+    if (_selectedObject) {
+        if ([_selectedObject isKindOfClass:[EXTTerm class]]) {
+            [self _extDrawGridSelectionBackgroundForTerm:_selectedObject inRect:gridDirtyRect spacing:spacing];
+        }
+        else if ([_selectedObject isKindOfClass:[EXTDifferential class]]) {
+            EXTDifferential *selectedDifferential = _selectedObject;
+            [self _extDrawGridSelectionBackgroundForTerm:[selectedDifferential start] inRect:gridDirtyRect spacing:spacing];
+            [self _extDrawGridSelectionBackgroundForTerm:[selectedDifferential end] inRect:gridDirtyRect spacing:spacing];
         }
     }
 
@@ -138,7 +167,6 @@ static NSCache *_EXTLayerCache = nil;
     if (pageNumber >= _document.sseq.differentials.count)
         return;
 
-    [[NSColor blackColor] set];
     for (EXTDifferential *differential in ((NSDictionary*)_document.sseq.differentials[pageNumber]).allValues) {
         // some sanity checks to make sure this differential is worth drawing
         if ([differential page] != pageNumber)
@@ -190,6 +218,13 @@ static NSCache *_EXTLayerCache = nil;
                                                      y:pointEnd.y
                                                spacing:spacing];
 
+        const bool differentialSelected = (differential == _selectedObject);
+        
+        if (differentialSelected)
+            [[[self chartView] highlightColor] set];
+        else
+            [[NSColor blackColor] set];
+
         for (int i = 0; i < imageSize; i++) {
             // get and update the offsets
             int startOffset = [startPosition[1] intValue],
@@ -214,7 +249,8 @@ static NSCache *_EXTLayerCache = nil;
             [line lineToPoint:
              NSMakePoint(endRect.origin.x + endRect.size.width,
                          endRect.origin.y + endRect.size.height/2)];
-            [line setLineWidth:0.25];
+            [line setLineWidth:(differentialSelected ? 1.0 : 0.25)];
+            [line setLineCapStyle:NSRoundLineCapStyle];
             [line stroke];
         }
     }
@@ -415,6 +451,44 @@ static NSCache *_EXTLayerCache = nil;
     [_EXTLayerCache setObject:(__bridge id)layer forKey:@(count)];
 
     return layer;
+}
+
+- (void)_extDrawGridSelectionBackgroundForTerm:(EXTTerm *)term inRect:(NSRect)dirtyRect spacing:(CGFloat)spacing {
+    const CGFloat selectionInset = 0.25;
+
+    if (NSPointInRect([[term location] makePoint], dirtyRect)) {
+        NSColor *bgcolor = [[[self chartView] highlightColor] blendedColorWithFraction:0.8 ofColor:[NSColor whiteColor]];
+        [bgcolor setFill];
+        const NSRect squareSelection = NSInsetRect([self _extBoundingRectForTerm:term], selectionInset, selectionInset);
+        NSRectFill(squareSelection);
+    }
+}
+
+- (NSRect)_extBoundingRectForObject:(id)object {
+    if ([object isKindOfClass:[EXTTerm class]]) {
+        return [self _extBoundingRectForTerm:object];
+    }
+    else if ([object isKindOfClass:[EXTDifferential class]]) {
+        EXTDifferential *differential = object;
+        return NSUnionRect([self _extBoundingRectForTerm:[differential start]],
+                           [self _extBoundingRectForTerm:[differential end]]);
+    }
+
+    return NSZeroRect;
+}
+
+- (NSRect)_extBoundingRectForTerm:(EXTTerm *)term {
+    EXTChartView *chartView = [self chartView];
+    const CGFloat spacing = [[chartView grid] gridSpacing];
+    const NSPoint location = [[term location] makePoint];
+    const NSRect boundingRect = {
+        .origin.x = location.x * spacing,
+        .origin.y = location.y * spacing,
+        .size.width = spacing,
+        .size.height = spacing
+    };
+
+    return boundingRect;
 }
 
 @end
