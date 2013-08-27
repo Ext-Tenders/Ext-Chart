@@ -204,11 +204,7 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
     // We could eliminate the currentTool's need to know about the grid by taking one path, and translating and scaling it.
     // That path could be a constant, so wouldn't need to be rebuilt.
 
-    Class toolClass = _EXTClassFromToolTag(_selectedToolTag);
-	NSBezierPath *newHighlightPath = [toolClass makeHighlightPathAtPoint:location
-                                                                  onGrid:_grid
-                                                                  onPage:_selectedPageIndex
-                                                                locClass:[_delegate indexClassForChartView:self]];
+    NSBezierPath *newHighlightPath = [_delegate chartView:self highlightPathAtLocation:location];
 
     // We may be resetting the highlight because the mouse has moved, the page has changed, or the highlighting {true, false}
     // status has changed, so we always flag both the previous location and the new location as dirty.
@@ -437,7 +433,7 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
 #pragma mark - Resizing
 
 // Chart views shouldn’t be resized. However, it seems that Restoration changes the chart view frame as part of
-// the enclosing scrollview subview autoresizing process. We simple ignore this when it happens.
+// the enclosing scrollview subview autoresizing process. We simply ignore this when it happens.
 - (void)resizeWithOldSuperviewSize:(NSSize)oldSize {
     // Do nothing
 }

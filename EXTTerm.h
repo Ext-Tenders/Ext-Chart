@@ -43,7 +43,5 @@
     -(void) computeBoundaries:(int)whichPage sSeq:(EXTSpectralSequence*)sSeq;
 
     // TODO: here are some other routines that i haven't investigated yet.
-    // TODO: this drawing code must be offloaded into some other module!!
-    + (NSBezierPath *)makeHighlightPathAtPoint:(NSPoint)point onGrid:(EXTGrid *)theGrid onPage:(NSInteger)page locClass:(Class<EXTLocation>)locClass;
     - (void)addSelfToSS:(EXTDocument*)theDocument;
 @end

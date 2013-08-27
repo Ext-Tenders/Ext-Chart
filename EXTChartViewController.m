@@ -86,6 +86,36 @@ static NSCache *_EXTLayerCache = nil;
     [_document.sseq computeGroupsForPage:pageNumber];
 }
 
+- (NSBezierPath *)chartView:(EXTChartView *)chartView highlightPathAtLocation:(NSPoint)location {
+    NSBezierPath *highlightPath = nil;
+
+    switch (chartView.selectedToolTag) {
+        case _EXTSelectionToolTag:
+        case _EXTGeneratorToolTag: {
+            EXTGrid *grid = chartView.grid;
+            const NSRect gridSquareRect = [grid viewBoundingRectForGridPoint:[grid convertPointFromView:location]];
+            highlightPath = [NSBezierPath bezierPathWithRect:gridSquareRect];
+            break;
+        }
+        case _EXTDifferentialToolTag: {
+            // TODO: why does +followDifflForDisplay:page:spacing: needs grid spacing?
+            EXTGrid *grid = chartView.grid;
+            const NSPoint targetPoint = [_document.sseq.indexClass followDifflForDisplay:location page:chartView.selectedPageIndex spacing:grid.gridSpacing];
+
+            const NSRect baseGridSquareRect = [grid viewBoundingRectForGridPoint:[grid convertPointFromView:location]];
+            const NSRect targetGridSquareRect = [grid viewBoundingRectForGridPoint:[grid convertPointFromView:targetPoint]];
+
+            highlightPath = [NSBezierPath bezierPathWithRect:baseGridSquareRect];
+            [highlightPath appendBezierPathWithRect:targetGridSquareRect];
+            break;
+        }
+        default:
+            highlightPath = nil;
+    }
+
+    return highlightPath;
+}
+
 // this performs the culling and delegation calls for drawing a page of the SS
 - (void)chartView:(EXTChartView *)chartView drawPageNumber:(const NSUInteger)pageNumber inGridRect:(const EXTIntRect)gridRect {
     // start by initializing the array of counts
@@ -304,11 +334,6 @@ static NSCache *_EXTLayerCache = nil;
             break;
     }
 }
-
-- (Class<EXTLocation>)indexClassForChartView:(EXTChartView *)chartView {
-    return _document.sseq.indexClass;
-}
-
 
 #pragma mark - Drawing support
 

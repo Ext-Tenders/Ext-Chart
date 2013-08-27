@@ -37,8 +37,5 @@
     -(void) assemblePresentation;
     -(void) stripDuplicates;
 
-    // UI messages
-    + (NSBezierPath *) makeHighlightPathAtPoint: (NSPoint)point onGrid:(EXTGrid *)theGrid onPage:(NSInteger)thePage locClass:(Class<EXTLocation>)locClass;
-
     -(BOOL) checkForSanity;
 @end
