@@ -97,8 +97,8 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
 
             // Align the art board to the grid
             NSRect artBoardFrame = [_artBoard frame];
-            artBoardFrame.origin = [_grid nearestGridPoint:artBoardFrame.origin];
-            const NSPoint originOppositePoint = [_grid nearestGridPoint:(NSPoint){NSMaxX(artBoardFrame), NSMaxY(artBoardFrame)}];
+            artBoardFrame.origin = [_grid convertPointToView:[_grid nearestGridPoint:artBoardFrame.origin]];
+            const NSPoint originOppositePoint = [_grid convertPointToView:[_grid nearestGridPoint:(NSPoint){NSMaxX(artBoardFrame), NSMaxY(artBoardFrame)}]];
             artBoardFrame.size.width = originOppositePoint.x - NSMinX(artBoardFrame);
             artBoardFrame.size.height = originOppositePoint.y - NSMinY(artBoardFrame);
             [_artBoard setFrame:artBoardFrame];
@@ -176,8 +176,8 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
 
 
     // Convert dirtyRect to the grid coordinate space
-    const EXTIntPoint lowerLeftPoint = [_grid convertPointToGrid:dirtyRect.origin];
-    const EXTIntPoint upperRightPoint = [_grid convertPointToGrid:(NSPoint){NSMaxX(dirtyRect), NSMaxY(dirtyRect)}];
+    const EXTIntPoint lowerLeftPoint = [_grid convertPointFromView:dirtyRect.origin];
+    const EXTIntPoint upperRightPoint = [_grid convertPointFromView:(NSPoint){NSMaxX(dirtyRect), NSMaxY(dirtyRect)}];
     const EXTIntRect gridDirtyRect = {
         .origin = lowerLeftPoint,
         .size.width = upperRightPoint.x - lowerLeftPoint.x + 1,
@@ -365,7 +365,7 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
 	// ripped off from sketch.   according to apple's document, it is better not to override the event loop like this.  Also, see the DragItemAround code for what I think is a better way to organize this.
 
     const NSRect originalVisibleRect = [[self enclosingScrollView] documentVisibleRect];
-    NSPoint lastPoint = [_grid nearestGridPoint:[self convertPoint:[event locationInWindow] fromView:nil]];
+    NSPoint lastPoint = [_grid convertPointToView:[_grid nearestGridPoint:[self convertPoint:[event locationInWindow] fromView:nil]]];
 
     [_artBoard startDragOperationAtPoint:lastPoint];
 
@@ -376,7 +376,7 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
     // Since we are sequestering event loop processing, check for the Escape key here to cancel the drag operation
 	while ([event type] != NSLeftMouseUp && !isEscapeKeyEvent(event)) {
 		event = [[self window] nextEventMatchingMask:(NSLeftMouseDraggedMask | NSLeftMouseUpMask | NSKeyDownMask)];
-        const NSPoint currentPoint = [_grid nearestGridPoint:[self convertPoint:[event locationInWindow] fromView:nil]];
+        const NSPoint currentPoint = [_grid convertPointToView:[_grid nearestGridPoint:[self convertPoint:[event locationInWindow] fromView:nil]]];
 
         if ([event type] == NSLeftMouseDragged) {
             if (! NSEqualPoints(lastPoint, currentPoint)) {
@@ -406,7 +406,7 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
         }
 	}
     else {
-        [_delegate chartView:self mouseDownAtGridLocation:[_grid convertPointToGrid:location]];
+        [_delegate chartView:self mouseDownAtGridLocation:[_grid convertPointFromView:location]];
         [self setNeedsDisplayInRect:[self _extHighlightDrawingRect]]; // TODO: is this necessary?
 	}
 }

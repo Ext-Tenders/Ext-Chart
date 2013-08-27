@@ -459,17 +459,8 @@ static NSCache *_EXTLayerCache = nil;
 }
 
 - (NSRect)_extBoundingRectForTerm:(EXTTerm *)term {
-    EXTChartView *chartView = [self chartView];
-    const CGFloat spacing = [[chartView grid] gridSpacing];
-    const EXTIntPoint gridLocation = term.location.gridPoint;
-    const NSRect boundingRect = {
-        .origin.x = gridLocation.x * spacing,
-        .origin.y = gridLocation.y * spacing,
-        .size.width = spacing,
-        .size.height = spacing
-    };
-
-    return boundingRect;
+    EXTGrid *grid = self.chartView.grid;
+    return [grid viewBoundingRectForGridPoint:term.location.gridPoint];
 }
 
 @end

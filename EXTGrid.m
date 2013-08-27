@@ -138,9 +138,9 @@ static const CGFloat _EXTGridLineWidth = 0.25;
 	[path stroke];
 }
 
-- (void) drawEnclosingRectAtPoint: (NSPoint)point{
-	NSRect gridRect = [self enclosingGridRect:point];
-	NSBezierPath *rectanglePath = [NSBezierPath bezierPathWithRect:gridRect];
+- (void)drawEnclosingRectAtPoint:(NSPoint)point {
+    const NSRect gridSquareRect = [self viewBoundingRectForGridPoint:[self convertPointFromView:point]];
+	NSBezierPath *rectanglePath = [NSBezierPath bezierPathWithRect:gridSquareRect];
 	[rectanglePath setLineWidth:.5];
 	[[NSColor blueColor] setStroke];
 	[rectanglePath stroke];
@@ -172,42 +172,35 @@ static const CGFloat _EXTGridLineWidth = 0.25;
 
 }
 
-#pragma mark *** grid points ***
+#pragma mark - Conversion between grid & view coordinate spaces
 
-//stolen from SKTGrid
-
-- (NSPoint)nearestGridPoint:(NSPoint)point {
-	NSPoint newPoint;
-	newPoint.x = floor((point.x / _gridSpacing) + 0.5) * _gridSpacing;
-	newPoint.y = floor((point.y / _gridSpacing) + 0.5) * _gridSpacing;
-//	newPoint.x = ceil((point.x / gridSpacing)) * gridSpacing;
-//	newPoint.y = ceil((point.y / gridSpacing)) * gridSpacing;
-
-    return newPoint;
-}
-
-- (EXTIntPoint)convertPointToGrid:(NSPoint)point {
+- (EXTIntPoint)convertPointFromView:(NSPoint)viewPoint {
     return (EXTIntPoint){
-        .x = (NSInteger)floor(point.x / _gridSpacing),
-        .y = (NSInteger)floor(point.y / _gridSpacing)
+        .x = (NSInteger)floor(viewPoint.x / _gridSpacing),
+        .y = (NSInteger)floor(viewPoint.y / _gridSpacing)
     };
 }
 
-- (NSPoint) lowerLeftGridPoint:(NSPoint)point{
-	NSPoint newPoint;
-	newPoint.x = floor(point.x/_gridSpacing)*_gridSpacing;
-	newPoint.y = floor(point.y/_gridSpacing)*_gridSpacing;
-	return newPoint;
+- (EXTIntPoint)nearestGridPoint:(NSPoint)viewPoint {
+    return (EXTIntPoint){
+        .x = (NSInteger)floor((viewPoint.x / _gridSpacing) + 0.5),
+        .y = (NSInteger)floor((viewPoint.y / _gridSpacing) + 0.5)
+    };
 }
 
-- (NSRect)enclosingGridRect:(NSPoint)point {
-	NSRect enclosingRect;
-	enclosingRect.origin.x = floor(point.x/_gridSpacing)*_gridSpacing;
-	enclosingRect.origin.y = floor(point.y/_gridSpacing)*_gridSpacing;
-	enclosingRect.size.width = _gridSpacing;
-	enclosingRect.size.height = _gridSpacing;
-	
-	return enclosingRect;	
+- (NSPoint)convertPointToView:(EXTIntPoint)gridPoint {
+    return (NSPoint){
+        .x = gridPoint.x * _gridSpacing,
+        .y = gridPoint.y * _gridSpacing
+    };
+}
+
+- (NSRect)viewBoundingRectForGridPoint:(EXTIntPoint)gridSquareOrigin {
+    return (NSRect){
+        .origin = [self convertPointToView:gridSquareOrigin],
+        .size.width = _gridSpacing,
+        .size.height = _gridSpacing
+    };
 }
 
 #pragma mark *** KVO stuff ***

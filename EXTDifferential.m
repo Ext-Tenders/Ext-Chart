@@ -137,14 +137,15 @@
 
 #pragma mark *** overridden EXTTool methods***
 
-+ (NSBezierPath *) makeHighlightPathAtPoint:(NSPoint)point onGrid:(EXTGrid *)theGrid onPage:(NSInteger)page locClass:(Class<EXTLocation>)locClass {
-    
-	NSRect baseRect = [theGrid enclosingGridRect:point];
-    NSPoint targetPoint = [locClass followDifflForDisplay:point page:page spacing:[theGrid gridSpacing]];
-	NSRect targetRect = [theGrid enclosingGridRect:targetPoint];
-    
-	NSBezierPath *newPath = [NSBezierPath bezierPathWithRect:baseRect];
-	[newPath appendBezierPathWithRect:targetRect];
++ (NSBezierPath *)makeHighlightPathAtPoint:(NSPoint)point onGrid:(EXTGrid *)grid onPage:(NSInteger)page locClass:(Class<EXTLocation>)locClass {
+    // TODO: why does +followDifflForDisplay:page:spacing: needs grid spacing?
+    const NSPoint targetPoint = [locClass followDifflForDisplay:point page:page spacing:[grid gridSpacing]];
+
+    const NSRect baseGridSquareRect = [grid viewBoundingRectForGridPoint:[grid convertPointFromView:point]];
+    const NSRect targetGridSquareRect = [grid viewBoundingRectForGridPoint:[grid convertPointFromView:targetPoint]];
+
+	NSBezierPath *newPath = [NSBezierPath bezierPathWithRect:baseGridSquareRect];
+	[newPath appendBezierPathWithRect:targetGridSquareRect];
 	
 	return newPath;
 }

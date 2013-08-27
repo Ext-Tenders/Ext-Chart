@@ -16,19 +16,26 @@
 @property(nonatomic, assign) NSRect boundsRect;
 @property(nonatomic, strong) NSBezierPath *gridPath, *emphasisGridPath;
 
+// Drawing
 -(NSBezierPath *) makeGridInRect: (NSRect) rect withFactor:(NSUInteger) factor;
 
 - (void) drawGridInRect:(NSRect)rect;
 - (void) drawGrid;
 - (void) drawAxes;
 
-- (NSPoint)nearestGridPoint:(NSPoint)point; // used for snapping to grid
-- (EXTIntPoint)convertPointToGrid:(NSPoint)point;
-- (NSPoint)lowerLeftGridPoint:(NSPoint)point;
-
-- (NSRect)enclosingGridRect:(NSPoint)point;
 - (void) drawEnclosingRectAtPoint: (NSPoint)point;
 
+/*! Given a view point, returns the grid point representing the origin of the grid square containing that view point */
+- (EXTIntPoint)convertPointFromView:(NSPoint)viewPoint;
+
+/*! Given a view point, returns the grid point nearest to that view point */
+- (EXTIntPoint)nearestGridPoint:(NSPoint)viewPoint;
+
+/*! Given a grid point, returns the corresponding point in view coordinate space */
+- (NSPoint)convertPointToView:(EXTIntPoint)gridPoint;
+
+/*! Given a grid point, returns a grid square rectangle in view coordinate space whose origin matches the grid point */
+- (NSRect)viewBoundingRectForGridPoint:(EXTIntPoint)gridSquareOrigin;
 @end
 
 #pragma mark - Public variables

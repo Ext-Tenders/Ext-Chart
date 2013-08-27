@@ -94,8 +94,9 @@
         [terms setObject:self forKey:self.location];
 }
 
-+ (NSBezierPath *) makeHighlightPathAtPoint: (NSPoint)point onGrid:(EXTGrid *)theGrid onPage:(NSInteger)thePage locClass:(Class<EXTLocation>)locClass {
-	return [NSBezierPath bezierPathWithRect:[theGrid enclosingGridRect:point]];
++ (NSBezierPath *)makeHighlightPathAtPoint:(NSPoint)point onGrid:(EXTGrid *)grid onPage:(NSInteger)page locClass:(Class<EXTLocation>)locClass {
+    const NSRect gridSquareRect = [grid viewBoundingRectForGridPoint:[grid convertPointFromView:point]];
+	return [NSBezierPath bezierPathWithRect:gridSquareRect];
 }
 
 #pragma mark *** not yet sure how to classify this (it's an init, in some sense) ***
