@@ -98,12 +98,11 @@ static NSCache *_EXTLayerCache = nil;
             break;
         }
         case _EXTDifferentialToolTag: {
-            // TODO: why does +followDifflForDisplay:page:spacing: needs grid spacing?
             EXTGrid *grid = chartView.grid;
-            const NSPoint targetPoint = [_document.sseq.indexClass followDifflForDisplay:location page:chartView.selectedPageIndex spacing:grid.gridSpacing];
-
-            const NSRect baseGridSquareRect = [grid viewBoundingRectForGridPoint:[grid convertPointFromView:location]];
-            const NSRect targetGridSquareRect = [grid viewBoundingRectForGridPoint:[grid convertPointFromView:targetPoint]];
+            const EXTIntPoint sourceGridPoint = [grid convertPointFromView:location];
+            const EXTIntPoint targetGridPoint = [_document.sseq.indexClass followDifflForDisplay:sourceGridPoint page:chartView.selectedPageIndex];
+            const NSRect baseGridSquareRect = [grid viewBoundingRectForGridPoint:sourceGridPoint];
+            const NSRect targetGridSquareRect = [grid viewBoundingRectForGridPoint:targetGridPoint];
 
             highlightPath = [NSBezierPath bezierPathWithRect:baseGridSquareRect];
             [highlightPath appendBezierPathWithRect:targetGridSquareRect];
