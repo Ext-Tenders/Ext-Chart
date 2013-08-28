@@ -82,6 +82,12 @@ static NSCache *_EXTLayerCache = nil;
 
 #pragma mark - EXTChartViewDelegate
 
+// this message means the page number just changed.  this gets called *before*
+// a redisplay message is issued, letting us do things like drop highlights.
+- (void)pageChangedIn:(EXTChartView*)chartView {
+    self.selectedObject = nil;
+}
+
 - (void)chartView:(EXTChartView *)chartView willDisplayPage:(NSUInteger)pageNumber {
     [_document.sseq computeGroupsForPage:pageNumber];
 }

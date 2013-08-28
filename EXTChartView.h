@@ -36,6 +36,8 @@ typedef enum : NSInteger {
            inGridRect:(EXTIntRect)gridRect;
 
     - (void)chartView:(EXTChartView *)chartView mouseDownAtGridLocation:(EXTIntPoint)gridLocation;
+
+    - (void)pageChangedIn:(EXTChartView*)chartView;
 @end
 
 
