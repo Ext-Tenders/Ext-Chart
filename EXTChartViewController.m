@@ -99,7 +99,7 @@ static NSCache *_EXTLayerCache = nil;
 
         case _EXTDifferentialToolTag: {
             EXTGrid *grid = chartView.grid;
-            const EXTIntPoint targetGridPoint = [_document.sseq.indexClass followDifflForDisplay:gridLocation page:chartView.selectedPageIndex];
+            const EXTIntPoint targetGridPoint = [_document.sseq.indexClass followDifflAtGridLocation:gridLocation page:chartView.selectedPageIndex];
             const NSRect sourceRect = [grid viewBoundingRectForGridPoint:gridLocation];
             const NSRect targetRect = [grid viewBoundingRectForGridPoint:targetGridPoint];
 

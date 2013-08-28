@@ -54,7 +54,7 @@
     return [EXTPair pairWithA:(b.a+1) B:(b.b-page)];
 }
 
-+(EXTIntPoint) followDifflForDisplay:(EXTIntPoint)gridLocation page:(int)page {
++(EXTIntPoint) followDifflAtGridLocation:(EXTIntPoint)gridLocation page:(int)page {
     return (EXTIntPoint){gridLocation.x - 1, gridLocation.y + page};
 }
 

@@ -61,7 +61,7 @@
     return [EXTTriple tripleWithA:(a.a - 1) B:(a.b) C:(a.c - 1 + page)];
 }
 
-+(EXTIntPoint) followDifflForDisplay:(EXTIntPoint)gridLocation page:(int)page {
++(EXTIntPoint) followDifflAtGridLocation:(EXTIntPoint)gridLocation page:(int)page {
     return (EXTIntPoint){gridLocation.x - 1, gridLocation.y + 1};
 }
 
