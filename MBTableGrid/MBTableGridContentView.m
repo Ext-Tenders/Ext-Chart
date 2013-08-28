@@ -84,6 +84,7 @@
 		isDraggingColumnOrRow = NO;
 		
 		_cell = [[MBTableGridCell alloc] initTextCell:@""];
+        [_cell setBordered:YES];
 		[_cell setScrollable:YES];
 		[_cell setLineBreakMode:NSLineBreakByTruncatingTail];
 	}
@@ -263,7 +264,8 @@
 
 - (void)mouseDown:(NSEvent *)theEvent
 {
-	// Setup the timer for autoscrolling 
+    
+    // Setup the timer for autoscrolling
 	// (the simply calling autoscroll: from mouseDragged: only works as long as the mouse is moving)
 	autoscrollTimer = [NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(_timerAutoscrollCallback:) userInfo:nil repeats:YES];
 	
@@ -321,9 +323,13 @@
 			[self tableGrid].selectedRowIndexes = [NSIndexSet indexSetWithIndex:mouseDownRow];
 			[[self tableGrid] _setStickyColumn:MBTableGridLeftEdge row:MBTableGridTopEdge];
 		}
+        
+        [self setNeedsDisplay:YES];
+        
 	} else if([theEvent clickCount] == 2) {
 		// Double click
 		[self editSelectedCell:self];
+        [self setNeedsDisplay:YES];
 	}
 }
 
@@ -372,6 +378,7 @@
 		// Set the sticky edges
 		[[self tableGrid] _setStickyColumn:columnEdge row:rowEdge];
 		
+        [self setNeedsDisplay:YES];
 	}
 	
 //	[self autoscroll:theEvent];
