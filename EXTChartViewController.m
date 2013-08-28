@@ -86,28 +86,28 @@ static NSCache *_EXTLayerCache = nil;
     [_document.sseq computeGroupsForPage:pageNumber];
 }
 
-- (NSBezierPath *)chartView:(EXTChartView *)chartView highlightPathAtLocation:(NSPoint)location {
-    NSBezierPath *highlightPath = nil;
+- (NSBezierPath *)chartView:(EXTChartView *)chartView highlightPathForTool:(EXTToolboxTag)toolTag page:(NSUInteger)page gridLocation:(EXTIntPoint)gridLocation {
+    NSBezierPath *highlightPath;
 
-    switch (chartView.selectedToolTag) {
+    switch (toolTag) {
         case _EXTSelectionToolTag:
         case _EXTGeneratorToolTag: {
-            EXTGrid *grid = chartView.grid;
-            const NSRect gridSquareRect = [grid viewBoundingRectForGridPoint:[grid convertPointFromView:location]];
-            highlightPath = [NSBezierPath bezierPathWithRect:gridSquareRect];
+            const NSRect gridSquareInView = [[chartView grid] viewBoundingRectForGridPoint:gridLocation];
+            highlightPath = [NSBezierPath bezierPathWithRect:gridSquareInView];
             break;
         }
+
         case _EXTDifferentialToolTag: {
             EXTGrid *grid = chartView.grid;
-            const EXTIntPoint sourceGridPoint = [grid convertPointFromView:location];
-            const EXTIntPoint targetGridPoint = [_document.sseq.indexClass followDifflForDisplay:sourceGridPoint page:chartView.selectedPageIndex];
-            const NSRect baseGridSquareRect = [grid viewBoundingRectForGridPoint:sourceGridPoint];
-            const NSRect targetGridSquareRect = [grid viewBoundingRectForGridPoint:targetGridPoint];
+            const EXTIntPoint targetGridPoint = [_document.sseq.indexClass followDifflForDisplay:gridLocation page:chartView.selectedPageIndex];
+            const NSRect sourceRect = [grid viewBoundingRectForGridPoint:gridLocation];
+            const NSRect targetRect = [grid viewBoundingRectForGridPoint:targetGridPoint];
 
-            highlightPath = [NSBezierPath bezierPathWithRect:baseGridSquareRect];
-            [highlightPath appendBezierPathWithRect:targetGridSquareRect];
+            highlightPath = [NSBezierPath bezierPathWithRect:sourceRect];
+            [highlightPath appendBezierPathWithRect:targetRect];
             break;
         }
+
         default:
             highlightPath = nil;
     }

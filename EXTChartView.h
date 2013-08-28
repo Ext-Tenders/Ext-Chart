@@ -26,7 +26,10 @@ typedef enum : NSInteger {
 @protocol EXTChartViewDelegate <NSObject>
     - (void)chartView:(EXTChartView *)chartView willDisplayPage:(NSUInteger)pageNumber;
 
-    - (NSBezierPath *)chartView:(EXTChartView *)chartView highlightPathAtLocation:(NSPoint)location;
+    - (NSBezierPath *)chartView:(EXTChartView *)chartView
+           highlightPathForTool:(EXTToolboxTag)toolTag
+                           page:(NSUInteger)page
+                   gridLocation:(EXTIntPoint)gridLocation;
 
     - (void)chartView:(EXTChartView *)chartView
        drawPageNumber:(NSUInteger)pageNumber
