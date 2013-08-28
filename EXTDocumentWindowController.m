@@ -20,12 +20,14 @@
 #import "EXTGridInspectorViewController.h"
 #import "EXTGeneratorInspectorViewController.h"
 #import "EXTDifferentialPaneController.h"
+#import "EXTDifferential.h"
 #import "NSUserDefaults+EXTAdditions.h"
 
 
 #pragma mark - Private variables
 
 static void *_EXTScrollViewMagnificationContext = &_EXTScrollViewMagnificationContext;
+static void *_EXTChartViewControllerSelectedObjectContext = &_EXTChartViewControllerSelectedObjectContext;
 static CGFloat const _EXTDefaultMagnificationSteps[] = {0.1, 0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 2.0, 4.0, 8.0, 16.0, 32.0};
 static size_t const _EXTDefaultMagnificationStepsCount = sizeof(_EXTDefaultMagnificationSteps) / sizeof(_EXTDefaultMagnificationSteps[0]);
 static CGFloat const _EXTMagnificationStepRoundingMultiplier = 100.0;
@@ -51,7 +53,7 @@ typedef enum : NSInteger {
     @property(nonatomic, strong) IBOutlet NSView *sidebarView;
     @property(nonatomic, weak) IBOutlet NSView *horizontalToolboxView;
 
-    @property(nonatomic, weak) NSObject *highlightedObject;
+    @property(nonatomic, weak) IBOutlet NSTextField *highlightLabel;
 @end
 
 
@@ -69,8 +71,9 @@ typedef enum : NSInteger {
 #pragma mark - Life cycle
 
 - (id)init {
-    if (self = [super initWithWindowNibName:@"EXTDocument"])
-        self.highlightedObject = nil;
+    if (self = [super initWithWindowNibName:@"EXTDocument"]) {
+        // initialization goes here
+    }
     
     return self;
 }
@@ -104,6 +107,8 @@ typedef enum : NSInteger {
     {
         _chartViewController = [[EXTChartViewController alloc] initWithDocument:self.extDocument];
         _chartViewController.view = _chartView;
+        
+        [_chartViewController addObserver:self forKeyPath:@"selectedObject" options:NSKeyValueObservingOptionNew context:_EXTChartViewControllerSelectedObjectContext];
 
         [_chartView bind:@"highlightColor" toObject:self.extDocument withKeyPath:@"highlightColor" options:nil];
         
@@ -217,6 +222,7 @@ typedef enum : NSInteger {
 - (void)windowWillClose:(NSNotification *)notification {
     [_chartScrollView removeObserver:self forKeyPath:@"magnification"];
     [_chartViewController removeObserver:_differentialPaneController forKeyPath:@"selectedObject"];
+    [_chartViewController removeObserver:self forKeyPath:@"selectedObject"];
 
     for (NSDictionary *viewDelegatePair in _inspectorViewDelegates) {
         id<EXTDocumentInspectorViewDelegate> delegate = viewDelegatePair[@"delegate"];
@@ -303,7 +309,6 @@ typedef enum : NSInteger {
     return [self document];
 }
 
-
 #pragma mark - Key-value observing
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
@@ -339,8 +344,15 @@ typedef enum : NSInteger {
             [_zoomPopUpButton selectItemAtIndex:stepIndex];
 
         [[self window] invalidateCursorRectsForView:[_chartScrollView documentView]];
-    }
-    else
+    } else if (context == _EXTChartViewControllerSelectedObjectContext) {
+        NSObject *newValue = change[NSKeyValueChangeNewKey];
+        if ([newValue isKindOfClass:[EXTDifferential class]]) {
+            EXTDifferential *diff = (EXTDifferential*)newValue;
+            self.highlightLabel.stringValue = [NSString stringWithFormat:@"Differential: %@ → %@",diff.start.location,diff.end.location];
+        } else {
+            self.highlightLabel.stringValue = @"No selection.";
+        }
+    } else
         [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
 }
 

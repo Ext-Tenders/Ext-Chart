@@ -76,6 +76,8 @@ static NSCache *_EXTLayerCache = nil;
     [chartView setNeedsDisplayInRect:[self _extBoundingRectForObject:_selectedObject]]; // clear the previous selection
     _selectedObject = selectedObject;
     [chartView setNeedsDisplayInRect:[self _extBoundingRectForObject:selectedObject]]; // draw the new selection
+    
+    return;
 }
 
 #pragma mark - EXTChartViewDelegate
