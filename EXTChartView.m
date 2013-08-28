@@ -229,6 +229,7 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
     // TODO: should check whether the argument lies in {min, max} page indices
     if (selectedPageIndex != _selectedPageIndex) {
         _selectedPageIndex = selectedPageIndex;
+        [self.delegate pageChangedIn:self];
         [self displaySelectedPage];
     }
 }
