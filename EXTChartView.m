@@ -52,6 +52,7 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
 @interface EXTChartView () {
 	NSTrackingArea *_trackingArea;
 	NSBezierPath *_highlightPath;
+    NSClipView *_clipView; // the content view of the enclosing scroll view. We track its bounds changed notification
 }
 
 @property(nonatomic, assign) bool highlighting;
@@ -129,6 +130,21 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
     [_artBoard removeObserver:self forKeyPath:@"drawingRect" context:_EXTChartViewArtBoardDrawingRectContext];
     [_grid removeObserver:self forKeyPath:EXTGridAnyKey context:_EXTChartViewGridAnyKeyContext];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
+- (void)viewDidMoveToSuperview {
+    NSView *superview = [self superview];
+    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+
+    if (_clipView)
+        [nc removeObserver:self name:NSViewBoundsDidChangeNotification object:_clipView];
+
+    if ([superview isKindOfClass:[NSClipView class]]) {
+        _clipView = (NSClipView *)superview;
+        [nc addObserver:self selector:@selector(_extClipViewBoundsDidChange:) name:NSViewBoundsDidChangeNotification object:superview];
+    }
+    else
+        _clipView = nil;
 }
 
 #pragma mark - Drawing
@@ -343,6 +359,10 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
 
 - (NSRect)rectForSmartMagnificationAtPoint:(NSPoint)location inRect:(NSRect)visibleRect {
     return [_artBoard frame];
+}
+
+- (void)_extClipViewBoundsDidChange:(NSNotification *)notification {
+    [self _extResetHighlightPath];
 }
 
 #pragma mark - Mouse tracking and cursor
