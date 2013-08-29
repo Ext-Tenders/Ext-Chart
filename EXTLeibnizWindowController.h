@@ -7,9 +7,13 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import "EXTSpectralSequence.h"
 
 @interface EXTLeibnizWindowController : NSWindowController
 
+@property (weak,nonatomic) EXTSpectralSequence *sseq;
+
 -(void)showWindow:(id)sender;
+-(void)mouseDownAtGridLocation:(EXTIntPoint)gridLocation;
 
 @end

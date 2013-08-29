@@ -590,6 +590,9 @@
 
 // propagates differentials along a specified lattice of EXTLocations
 -(void) propagateLeibniz:(NSArray*)locations page:(int)page {
+    if (locations.count == 0)
+        return;
+    
     NSMutableArray *maxes = [NSMutableArray arrayWithCapacity:locations.count];
     Class<EXTLocation> locClass = [(EXTLocation*)locations[0] class];
     

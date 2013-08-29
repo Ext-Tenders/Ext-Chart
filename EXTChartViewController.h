@@ -7,6 +7,8 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import "EXTLeibnizWindowController.h"
+
 
 @class EXTChartView;
 @class EXTDocument;
@@ -14,6 +16,8 @@
 @interface EXTChartViewController : NSViewController
     @property(nonatomic, readonly) EXTChartView *chartView;
     @property(nonatomic, readonly) id selectedObject;
+    @property(nonatomic, weak) EXTLeibnizWindowController *leibnizWindowController;
+
 
     // Designated initialiser
     - (id)initWithDocument:(EXTDocument *)document;

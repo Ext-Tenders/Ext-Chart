@@ -221,8 +221,9 @@ typedef enum : NSInteger {
     {
         // set up tool handlers
         _leibnizWindowController = [[EXTLeibnizWindowController alloc] initWithWindowNibName:@"EXTLeibnizWindow"];
+        [_chartViewController setLeibnizWindowController:_leibnizWindowController];
 
-        [self.extDocument addObserver:_leibnizWindowController forKeyPath:@"sseq" options:NSKeyValueObservingOptionNew context:nil];
+        _leibnizWindowController.sseq = self.extDocument.sseq;
         [self.chartView addObserver:_leibnizWindowController forKeyPath:@"selectedPageIndex" options:NSKeyValueObservingOptionNew context:nil];
     }
 
@@ -234,7 +235,6 @@ typedef enum : NSInteger {
     [_chartViewController removeObserver:_differentialPaneController forKeyPath:@"selectedObject"];
     [_chartViewController removeObserver:self forKeyPath:@"selectedObject"];
     
-    [self.extDocument removeObserver:_leibnizWindowController forKeyPath:@"sseq"];
     [self.chartView removeObserver:_leibnizWindowController forKeyPath:@"selectedPageIndex"];
 
     for (NSDictionary *viewDelegatePair in _inspectorViewDelegates) {

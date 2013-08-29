@@ -14,12 +14,13 @@
 #import "EXTTerm.h"
 #import "EXTDifferential.h"
 
-
 static NSCache *_EXTLayerCache = nil;
 
 
 @interface EXTChartViewController () <EXTChartViewDelegate>
-    @property(nonatomic, weak) id selectedObject;
+
+@property(nonatomic, weak) id selectedObject;
+
 @end
 
 @implementation EXTChartViewController {
@@ -275,6 +276,12 @@ static NSCache *_EXTLayerCache = nil;
 }
 
 - (void)chartView:(EXTChartView *)chartView mouseDownAtGridLocation:(EXTIntPoint)gridLocation {
+    // first, see if a modal tool is open.
+    if ([self.leibnizWindowController.window isVisible]) {
+        [self.leibnizWindowController mouseDownAtGridLocation:gridLocation];
+        return;
+    }
+    
     // TODO: lots!
     switch (chartView.selectedToolTag) {
         case _EXTDifferentialToolTag: {

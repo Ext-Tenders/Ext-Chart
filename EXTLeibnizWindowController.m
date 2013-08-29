@@ -7,8 +7,8 @@
 //
 
 #import "EXTLeibnizWindowController.h"
-#import "EXTSpectralSequence.h"
 #import "EXTLocation.h"
+#import "EXTTerm.h"
 
 @interface EXTLeibnizWindowController ()
 
@@ -16,8 +16,7 @@
 @property IBOutlet NSButton *deleteButton;
 @property IBOutlet NSButton *OKButton;
 
-@property (weak,nonatomic) EXTSpectralSequence *sseq;
-@property (assign,nonatomic,readonly) NSUInteger page;
+@property (assign,nonatomic) NSUInteger selectedPageIndex;
 
 // list of EXTLocations
 @property (strong) NSMutableArray *list;
@@ -49,7 +48,7 @@
 }
 
 -(IBAction)OKPressed:(id)sender {
-    [self.sseq propagateLeibniz:self.list page:self.page];
+    [self.sseq propagateLeibniz:self.list page:self.selectedPageIndex];
     
     [self close];
     return;
@@ -67,6 +66,40 @@
 
 -(NSInteger)numberOfRowsInTableView:(NSTableView *)tableView {
     return self.list.count;
+}
+
+- (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row {
+    return ((EXTLocation*)self.list[row]).description;
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath
+                      ofObject:(id)object
+                        change:(NSDictionary *)change
+                       context:(void *)context {
+    if ([keyPath isEqualToString:@"sseq"]) {
+        self.sseq = change[NSKeyValueChangeNewKey];
+    } else if ([keyPath isEqualToString:@"selectedPageIndex"]) {
+        self.selectedPageIndex = [change[NSKeyValueChangeNewKey] intValue];
+    } else
+        [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
+    
+    return;
+}
+
+-(void)mouseDownAtGridLocation:(EXTIntPoint)gridLocation {
+    NSArray *termsUnderClick = [self.sseq findTermsUnderPoint:gridLocation];
+    
+    for (int i = 0; i < termsUnderClick.count; i++) {
+        EXTTerm *term = termsUnderClick[i];
+        NSUInteger position = [self.list indexOfObject:term.location];
+        if (position == NSNotFound) {
+            [self.list addObject:term.location];
+            break;
+        }
+    }
+    
+    [self.tableView reloadData];
+    return;
 }
 
 @end
