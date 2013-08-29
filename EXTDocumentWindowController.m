@@ -21,6 +21,7 @@
 #import "EXTGeneratorInspectorViewController.h"
 #import "EXTDifferentialPaneController.h"
 #import "EXTDifferential.h"
+#import "EXTLeibnizWindowController.h"
 #import "NSUserDefaults+EXTAdditions.h"
 
 
@@ -62,6 +63,7 @@ typedef enum : NSInteger {
     EXTGridInspectorViewController *_gridInspectorViewController;
     EXTGeneratorInspectorViewController *_generatorInspectorViewController;
     EXTDifferentialPaneController *_differentialPaneController;
+    EXTLeibnizWindowController *_leibnizWindowController;
     NSArray *_inspectorViewDelegates;
     EXTDocumentInspectorView *_inspectorView;
     bool _sidebarHidden;
@@ -215,6 +217,14 @@ typedef enum : NSInteger {
                 [delegate documentWindowController:self didAddInspectorView:viewDelegatePair[@"view"]];
         }
     }
+    
+    {
+        // set up tool handlers
+        _leibnizWindowController = [[EXTLeibnizWindowController alloc] initWithWindowNibName:@"EXTLeibnizWindow"];
+
+        [self.extDocument addObserver:_leibnizWindowController forKeyPath:@"sseq" options:NSKeyValueObservingOptionNew context:nil];
+        [self.chartView addObserver:_leibnizWindowController forKeyPath:@"selectedPageIndex" options:NSKeyValueObservingOptionNew context:nil];
+    }
 
     [[self window] makeFirstResponder:_chartView];
 }
@@ -223,6 +233,9 @@ typedef enum : NSInteger {
     [_chartScrollView removeObserver:self forKeyPath:@"magnification"];
     [_chartViewController removeObserver:_differentialPaneController forKeyPath:@"selectedObject"];
     [_chartViewController removeObserver:self forKeyPath:@"selectedObject"];
+    
+    [self.extDocument removeObserver:_leibnizWindowController forKeyPath:@"sseq"];
+    [self.chartView removeObserver:_leibnizWindowController forKeyPath:@"selectedPageIndex"];
 
     for (NSDictionary *viewDelegatePair in _inspectorViewDelegates) {
         id<EXTDocumentInspectorViewDelegate> delegate = viewDelegatePair[@"delegate"];
@@ -415,6 +428,11 @@ typedef enum : NSInteger {
 	doc.gridColor = [defaults extColorForKey:EXTGridColorPreferenceKey];
 	doc.gridEmphasisColor = [defaults extColorForKey:EXTGridEmphasisColorPreferenceKey];
 	doc.axisColor = [defaults extColorForKey:EXTGridAxisColorPreferenceKey];
+}
+
+- (IBAction)startLeibnizPropagation:(id)sender {
+    [_leibnizWindowController showWindow:sender];
+    return;
 }
 
 #pragma mark - NSUserInterfaceValidations

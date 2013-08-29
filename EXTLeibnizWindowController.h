@@ -10,4 +10,6 @@
 
 @interface EXTLeibnizWindowController : NSWindowController
 
+-(void)showWindow:(id)sender;
+
 @end

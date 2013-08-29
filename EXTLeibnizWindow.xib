@@ -68,7 +68,7 @@
 											<string key="NSFrameSize">{208, 151}</string>
 											<reference key="NSSuperview" ref="129028663"/>
 											<reference key="NSWindow"/>
-											<reference key="NSNextKeyView" ref="98422702"/>
+											<reference key="NSNextKeyView" ref="316561114"/>
 											<string key="NSReuseIdentifierKey">_NS:13</string>
 											<bool key="NSEnabled">YES</bool>
 											<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
@@ -231,7 +231,7 @@
 							<string key="NSFrame">{{20, 61}, {210, 169}}</string>
 							<reference key="NSSuperview" ref="149230658"/>
 							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView" ref="316561114"/>
+							<reference key="NSNextKeyView" ref="129028663"/>
 							<string key="NSReuseIdentifierKey">_NS:9</string>
 							<int key="NSsFlags">133682</int>
 							<reference key="NSVScroller" ref="98422702"/>
@@ -274,7 +274,6 @@
 							<string key="NSFrame">{{177, 13}, {59, 32}}</string>
 							<reference key="NSSuperview" ref="149230658"/>
 							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView"/>
 							<string key="NSReuseIdentifierKey">_NS:9</string>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="193410462">
@@ -300,7 +299,7 @@
 					<reference key="NSNextKeyView" ref="362768141"/>
 					<string key="NSReuseIdentifierKey">_NS:21</string>
 				</object>
-				<string key="NSScreenRect">{{0, 0}, {1440, 878}}</string>
+				<string key="NSScreenRect">{{0, 0}, {1440, 900}}</string>
 				<string key="NSMaxSize">{10000000000000, 10000000000000}</string>
 				<bool key="NSWindowIsRestorable">YES</bool>
 			</object>
@@ -664,7 +663,7 @@
 				<string key="-2.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="-3.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="24.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<boolean value="YES" key="24.NSWindowTemplate.visibleAtLaunch"/>
+				<boolean value="NO" key="24.NSWindowTemplate.visibleAtLaunch"/>
 				<array class="NSMutableArray" key="25.IBNSViewMetadataConstraints">
 					<reference ref="671962850"/>
 					<reference ref="235892780"/>
@@ -710,6 +709,20 @@
 				<object class="IBPartialClassDescription">
 					<string key="className">EXTLeibnizWindowController</string>
 					<string key="superclassName">NSWindowController</string>
+					<dictionary class="NSMutableDictionary" key="actions">
+						<string key="OKPressed:">id</string>
+						<string key="deletePressed:">id</string>
+					</dictionary>
+					<dictionary class="NSMutableDictionary" key="actionInfosByName">
+						<object class="IBActionInfo" key="OKPressed:">
+							<string key="name">OKPressed:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="deletePressed:">
+							<string key="name">deletePressed:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+					</dictionary>
 					<dictionary class="NSMutableDictionary" key="outlets">
 						<string key="OKButton">NSButton</string>
 						<string key="deleteButton">NSButton</string>
