@@ -222,6 +222,7 @@ typedef enum : NSInteger {
         // set up tool handlers
         _leibnizWindowController = [[EXTLeibnizWindowController alloc] initWithWindowNibName:@"EXTLeibnizWindow"];
         [_chartViewController setLeibnizWindowController:_leibnizWindowController];
+        [_leibnizWindowController setChartView:_chartView];
 
         _leibnizWindowController.sseq = self.extDocument.sseq;
         [self.chartView addObserver:_leibnizWindowController forKeyPath:@"selectedPageIndex" options:NSKeyValueObservingOptionNew context:nil];

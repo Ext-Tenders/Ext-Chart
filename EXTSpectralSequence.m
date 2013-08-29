@@ -80,6 +80,7 @@
         multTables = [EXTMultiplicationTables multiplicationTables:self];
         indexClass = locClass;
         zeroRanges = [NSMutableArray array];
+        [zeroRanges addObject:[EXTZeroRangeStrict newWithSSeq:self]];
     }
     
     return self;
@@ -95,6 +96,7 @@
     multTables = [EXTMultiplicationTables multiplicationTables:self];
     indexClass = [EXTPair class];
     zeroRanges = [NSMutableArray array];
+    [zeroRanges addObject:[EXTZeroRangeStrict newWithSSeq:self]];
     
     return self;
 }
