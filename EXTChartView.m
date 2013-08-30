@@ -200,11 +200,8 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
 }
 
 - (void)displaySelectedPage {
-    if (_highlighting) {
-        NSPoint mousePoint = [[[self enclosingScrollView] window] mouseLocationOutsideOfEventStream];
-        mousePoint = [self convertPoint:mousePoint fromView:nil];
+    if (_highlighting)
         [self _extResetHighlightPath];
-    }
 
     [_delegate chartView:self willDisplayPage:_selectedPageIndex];
     [self setNeedsDisplay:YES];
