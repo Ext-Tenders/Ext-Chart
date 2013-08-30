@@ -401,18 +401,6 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
     [self _extResetHighlightPath];
 }
 
-- (IBAction)changeTool:(id)sender {
-    NSAssert([sender respondsToSelector:@selector(tag)], @"This action requires senders that respond to -tag");
-
-    EXTToolboxTag tag = [sender tag];
-    if (tag <= 0 || tag >= _EXTToolTagCount)
-        return;
-    
-//    self.delegate.highlightedObject = nil;
-
-    [self setSelectedToolTag:tag];
-}
-
 - (void)updateTrackingAreas {
     [super updateTrackingAreas];
 
@@ -438,11 +426,6 @@ NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
 #pragma mark - NSUserInterfaceValidations
 
 - (BOOL)validateUserInterfaceItem:(id<NSValidatedUserInterfaceItem>)item {
-    if ([item action] == @selector(changeTool:)) {
-        if ([(id)item respondsToSelector:@selector(setState:)]) {
-            [(id)item setState:([item tag] == _selectedToolTag ? NSOnState : NSOffState)];
-        }
-    }
     
     return [self respondsToSelector:[item action]];
 }

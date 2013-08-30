@@ -58,7 +58,6 @@ typedef enum : NSInteger {
 - (IBAction)nextPage:(id)sender;
 - (IBAction)previousPage:(id)sender;
 - (IBAction)zoomToFit:(id)sender;
-- (IBAction)changeTool:(id)sender;
 @end
 
 #pragma mark - Exported variables

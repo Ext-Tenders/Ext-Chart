@@ -436,6 +436,18 @@ typedef enum : NSInteger {
     return;
 }
 
+
+- (IBAction)changeTool:(id)sender {
+    NSAssert([sender respondsToSelector:@selector(tag)], @"This action requires senders that respond to -tag");
+
+    EXTToolboxTag tag = [sender tag];
+    if (tag <= 0 || tag >= _EXTToolTagCount)
+        return;
+
+    [_chartViewController setSelectedObject:nil];
+    [_chartView setSelectedToolTag:tag];
+}
+
 #pragma mark - NSUserInterfaceValidations
 
 - (BOOL)validateUserInterfaceItem:(id<NSValidatedUserInterfaceItem>)item {
@@ -444,6 +456,11 @@ typedef enum : NSInteger {
     else if ([item action] == @selector(toggleFullScreen:) && [(id)item isKindOfClass:[NSMenuItem class]]) {
         bool fullScreen = [[self window] styleMask] & NSFullScreenWindowMask;
         [(NSMenuItem *)item setTitle:fullScreen ? @"Exit Full Screen" : @"Enter Full Screen"];
+    }
+    else if ([item action] == @selector(changeTool:)) {
+        if ([(id)item respondsToSelector:@selector(setState:)]) {
+            [(id)item setState:([item tag] == [_chartView selectedToolTag] ? NSOnState : NSOffState)];
+        }
     }
 
     return [self respondsToSelector:[item action]];

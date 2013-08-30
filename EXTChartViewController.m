@@ -18,10 +18,8 @@ static NSCache *_EXTLayerCache = nil;
 
 
 @interface EXTChartViewController () <EXTChartViewDelegate>
-
-@property(nonatomic, weak) id selectedObject;
-
 @end
+
 
 @implementation EXTChartViewController {
     EXTDocument *_document;
