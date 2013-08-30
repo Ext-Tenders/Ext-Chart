@@ -147,7 +147,7 @@ typedef enum : NSInteger {
 
     // Toolbox matrix
     {
-        [_chartView setSelectedToolTag:_EXTSelectionToolTag];
+        [_chartView setSelectedToolTag:_EXTGeneratorToolTag];
     }
 
 

@@ -10,12 +10,11 @@
 #import <Cocoa/Cocoa.h>
 
 typedef enum : NSInteger {
-    _EXTSelectionToolTag = 1,
-    _EXTArtboardToolTag = 2,
-    _EXTGeneratorToolTag = 3,
-    _EXTDifferentialToolTag = 4,
-    _EXTEraseToolTag = 5,
-    _EXTMarqueeToolTag = 6,
+    _EXTGeneratorToolTag = 1,
+    _EXTDifferentialToolTag = 2,
+    _EXTMultiplicativeStructure = 3,
+    _EXTArtboardToolTag = 4,
+    _EXTMarqueeToolTag = 5,
     _EXTToolTagCount
 } EXTToolboxTag;
 

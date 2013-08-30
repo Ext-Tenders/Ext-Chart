@@ -95,7 +95,6 @@ static NSCache *_EXTLayerCache = nil;
     NSBezierPath *highlightPath;
 
     switch (toolTag) {
-        case _EXTSelectionToolTag:
         case _EXTGeneratorToolTag: {
             const NSRect gridSquareInView = [[chartView grid] viewBoundingRectForGridPoint:gridLocation];
             highlightPath = [NSBezierPath bezierPathWithRect:gridSquareInView];

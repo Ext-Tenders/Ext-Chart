@@ -36,9 +36,6 @@ static CGFloat const _EXTHighlightLineWidth = 0.5;
 
 NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
     switch (tag) {
-        case _EXTSelectionToolTag:
-            // TODO: this can’t be right
-            return [EXTDifferential class];
         case _EXTGeneratorToolTag:
             return [EXTTerm class];
         case _EXTDifferentialToolTag:
