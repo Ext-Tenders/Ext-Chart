@@ -43,13 +43,16 @@
 }
 
 - (void)showWindow:(id)sender {
+    [self.tableView deselectAll:nil];
     self.list = [NSMutableArray array];
+    [self.tableView reloadData];
     [super showWindow:sender];
 }
 
 -(IBAction)OKPressed:(id)sender {
     [self.sseq propagateLeibniz:self.list page:self.selectedPageIndex];
-    
+
+    [self.chartView displaySelectedPage];
     [self close];
     return;
 }
@@ -76,9 +79,7 @@
                       ofObject:(id)object
                         change:(NSDictionary *)change
                        context:(void *)context {
-    if ([keyPath isEqualToString:@"sseq"]) {
-        self.sseq = change[NSKeyValueChangeNewKey];
-    } else if ([keyPath isEqualToString:@"selectedPageIndex"]) {
+    if ([keyPath isEqualToString:@"selectedPageIndex"]) {
         self.selectedPageIndex = [change[NSKeyValueChangeNewKey] intValue];
     } else
         [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
