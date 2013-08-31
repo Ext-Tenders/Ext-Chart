@@ -32,20 +32,6 @@ static void *_EXTChartViewGridAnyKeyContext = &_EXTChartViewGridAnyKeyContext;
 static CGFloat const _EXTHighlightLineWidth = 0.5;
 
 
-#pragma mark - Private functions
-
-NS_INLINE Class _EXTClassFromToolTag(EXTToolboxTag tag) {
-    switch (tag) {
-        case _EXTGeneratorToolTag:
-            return [EXTTerm class];
-        case _EXTDifferentialToolTag:
-            return [EXTDifferential class];
-        default:
-            return Nil;
-    }
-}
-
-
 @interface EXTChartView () {
 	NSTrackingArea *_trackingArea;
 	NSBezierPath *_highlightPath;
