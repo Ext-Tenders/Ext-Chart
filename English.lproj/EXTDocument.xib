@@ -594,6 +594,14 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
+						<string key="label">toolboxView</string>
+						<reference key="source" ref="512844837"/>
+						<reference key="destination" ref="967477368"/>
+					</object>
+					<int key="connectionID">100504</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
 						<string key="label">delegate</string>
 						<reference key="source" ref="275939982"/>
 						<reference key="destination" ref="512844837"/>
@@ -626,19 +634,19 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBBindingConnection" key="connection">
-						<string key="label">selectedTag: chartView.selectedToolTag</string>
+						<string key="label">selectedTag: selectedToolTag</string>
 						<reference key="source" ref="142460500"/>
 						<reference key="destination" ref="512844837"/>
 						<object class="NSNibBindingConnector" key="connector">
 							<reference key="NSSource" ref="142460500"/>
 							<reference key="NSDestination" ref="512844837"/>
-							<string key="NSLabel">selectedTag: chartView.selectedToolTag</string>
+							<string key="NSLabel">selectedTag: selectedToolTag</string>
 							<string key="NSBinding">selectedTag</string>
-							<string key="NSKeyPath">chartView.selectedToolTag</string>
+							<string key="NSKeyPath">selectedToolTag</string>
 							<int key="NSNibBindingConnectorVersion">2</int>
 						</object>
 					</object>
-					<int key="connectionID">100355</int>
+					<int key="connectionID">100503</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
@@ -1033,7 +1041,7 @@
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">100501</int>
+			<int key="maxID">100504</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -1075,58 +1083,25 @@
 				<object class="IBPartialClassDescription">
 					<string key="className">EXTDocumentWindowController</string>
 					<string key="superclassName">NSWindowController</string>
-					<dictionary class="NSMutableDictionary" key="actions">
-						<string key="applyMagnification:">id</string>
-						<string key="changeTool:">id</string>
-						<string key="exportArtBoard:">id</string>
-						<string key="resetGridToDefaults:">id</string>
-						<string key="startLeibnizPropagation:">id</string>
-						<string key="toggleInspector:">id</string>
-						<string key="zoomIn:">id</string>
-						<string key="zoomOut:">id</string>
-					</dictionary>
-					<dictionary class="NSMutableDictionary" key="actionInfosByName">
-						<object class="IBActionInfo" key="applyMagnification:">
-							<string key="name">applyMagnification:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="changeTool:">
-							<string key="name">changeTool:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="exportArtBoard:">
-							<string key="name">exportArtBoard:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="resetGridToDefaults:">
-							<string key="name">resetGridToDefaults:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="startLeibnizPropagation:">
+					<object class="NSMutableDictionary" key="actions">
+						<string key="NS.key.0">startLeibnizPropagation:</string>
+						<string key="NS.object.0">id</string>
+					</object>
+					<object class="NSMutableDictionary" key="actionInfosByName">
+						<string key="NS.key.0">startLeibnizPropagation:</string>
+						<object class="IBActionInfo" key="NS.object.0">
 							<string key="name">startLeibnizPropagation:</string>
 							<string key="candidateClassName">id</string>
 						</object>
-						<object class="IBActionInfo" key="toggleInspector:">
-							<string key="name">toggleInspector:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="zoomIn:">
-							<string key="name">zoomIn:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="zoomOut:">
-							<string key="name">zoomOut:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-					</dictionary>
+					</object>
 					<dictionary class="NSMutableDictionary" key="outlets">
 						<string key="chartScrollView">EXTScrollView</string>
 						<string key="chartView">EXTChartView</string>
 						<string key="controlsView">NSView</string>
 						<string key="highlightLabel">NSTextField</string>
-						<string key="horizontalToolboxView">NSView</string>
 						<string key="mainView">NSView</string>
 						<string key="sidebarView">NSView</string>
+						<string key="toolboxView">NSView</string>
 						<string key="zoomPopUpButton">NSPopUpButton</string>
 					</dictionary>
 					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
@@ -1146,16 +1121,16 @@
 							<string key="name">highlightLabel</string>
 							<string key="candidateClassName">NSTextField</string>
 						</object>
-						<object class="IBToOneOutletInfo" key="horizontalToolboxView">
-							<string key="name">horizontalToolboxView</string>
-							<string key="candidateClassName">NSView</string>
-						</object>
 						<object class="IBToOneOutletInfo" key="mainView">
 							<string key="name">mainView</string>
 							<string key="candidateClassName">NSView</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="sidebarView">
 							<string key="name">sidebarView</string>
+							<string key="candidateClassName">NSView</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="toolboxView">
+							<string key="name">toolboxView</string>
 							<string key="candidateClassName">NSView</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="zoomPopUpButton">

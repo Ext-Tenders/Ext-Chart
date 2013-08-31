@@ -55,6 +55,8 @@ typedef enum : NSInteger {
     @property(nonatomic, weak) IBOutlet NSView *toolboxView;
 
     @property(nonatomic, weak) IBOutlet NSTextField *highlightLabel;
+
+    @property(nonatomic, assign) EXTToolboxTag selectedToolTag;
 @end
 
 
@@ -145,9 +147,10 @@ typedef enum : NSInteger {
         [_chartView scrollRectToVisible:visibleRect];
     }
 
-    // Toolbox matrix
+    // Toolbox view
     {
-        [_chartView setSelectedToolTag:_EXTGeneratorToolTag];
+        [self setSelectedToolTag:_EXTGeneratorToolTag];
+        [_chartView bind:@"selectedToolTag" toObject:self withKeyPath:@"selectedToolTag" options:nil];
     }
 
 
