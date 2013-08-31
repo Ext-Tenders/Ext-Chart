@@ -237,6 +237,10 @@ static NSCache *_EXTLayerCache = nil;
         else
             [[NSColor blackColor] set];
 
+        NSBezierPath *line = [NSBezierPath bezierPath];
+        [line setLineWidth:(differentialSelected ? 1.0 : 0.25)];
+        [line setLineCapStyle:NSRoundLineCapStyle];
+
         for (int i = 0; i < imageSize; i++) {
             // get and update the offsets
             int startOffset = [startPosition[1] intValue],
@@ -254,7 +258,6 @@ static NSCache *_EXTLayerCache = nil;
             NSRect startRect = [startRects[startOffset] rectValue],
             endRect = [endRects[endOffset] rectValue];
 
-            NSBezierPath *line = [NSBezierPath bezierPath];
             [line moveToPoint:
              NSMakePoint(startRect.origin.x,
                          startRect.origin.y + startRect.size.height/2)];
@@ -262,10 +265,9 @@ static NSCache *_EXTLayerCache = nil;
             [line lineToPoint:
              NSMakePoint(endRect.origin.x + endRect.size.width - 0.1*gridSpacing,
                          endRect.origin.y + endRect.size.height/2)];
-            [line setLineWidth:(differentialSelected ? 1.0 : 0.25)];
-            [line setLineCapStyle:NSRoundLineCapStyle];
-            [line stroke];
         }
+
+        [line stroke];
     }
     
     // TODO: draw certain multiplicative structures?
