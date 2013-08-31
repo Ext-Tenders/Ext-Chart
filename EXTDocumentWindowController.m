@@ -52,7 +52,7 @@ typedef enum : NSInteger {
     @property(nonatomic, weak) IBOutlet NSPopUpButton *zoomPopUpButton;
 
     @property(nonatomic, strong) IBOutlet NSView *sidebarView;
-    @property(nonatomic, weak) IBOutlet NSView *horizontalToolboxView;
+    @property(nonatomic, weak) IBOutlet NSView *toolboxView;
 
     @property(nonatomic, weak) IBOutlet NSTextField *highlightLabel;
 @end
@@ -156,7 +156,7 @@ typedef enum : NSInteger {
         _inspectorView = [[EXTDocumentInspectorView alloc] initWithFrame:NSZeroRect];
 
         // set up the subviews
-        [_inspectorView addSubview:_horizontalToolboxView withTitle:@"Toolbox" collapsed:false centered:true];
+        [_inspectorView addSubview:_toolboxView withTitle:@"Toolbox" collapsed:false centered:true];
 
         _generatorInspectorViewController = [EXTGeneratorInspectorViewController new];
         [_inspectorView addSubview:_generatorInspectorViewController.view withTitle:@"Generators" collapsed:true centered:true];
