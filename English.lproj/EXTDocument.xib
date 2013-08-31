@@ -54,7 +54,7 @@
 				<nil key="NSUserInterfaceItemIdentifier"/>
 				<string key="NSWindowContentMinSize">{600, 400}</string>
 				<object class="NSView" key="NSWindowView" id="568628114">
-					<reference key="NSNextResponder"/>
+					<nil key="NSNextResponder"/>
 					<int key="NSvFlags">256</int>
 					<array class="NSMutableArray" key="NSSubviews">
 						<object class="NSCustomView" id="638200451">
@@ -374,13 +374,11 @@
 							<int key="NSvFlags">273</int>
 							<string key="NSFrame">{{790, 0}, {210, 608}}</string>
 							<reference key="NSSuperview" ref="568628114"/>
-							<reference key="NSNextKeyView"/>
 							<string key="NSReuseIdentifierKey">_NS:9</string>
 							<string key="NSClassName">NSView</string>
 						</object>
 					</array>
 					<string key="NSFrameSize">{1000, 608}</string>
-					<reference key="NSSuperview"/>
 					<reference key="NSNextKeyView" ref="638200451"/>
 				</object>
 				<string key="NSScreenRect">{{0, 0}, {1920, 1058}}</string>
@@ -517,7 +515,7 @@
 				<reference key="NSWindow"/>
 				<reference key="NSNextKeyView" ref="142460500"/>
 				<string key="NSReuseIdentifierKey">_NS:9</string>
-				<string key="NSClassName">NSView</string>
+				<string key="NSClassName">EXTToolboxView</string>
 			</object>
 		</array>
 		<object class="IBObjectContainer" key="IBDocument.Objects">
@@ -833,7 +831,7 @@
 							<reference ref="142460500"/>
 						</array>
 						<reference key="parent" ref="0"/>
-						<string key="objectName">Horizontal Toolbox View</string>
+						<string key="objectName">Toolbox View</string>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">100342</int>
@@ -1076,6 +1074,35 @@
 				<object class="IBPartialClassDescription">
 					<string key="className">EXTDocumentWindowController</string>
 					<string key="superclassName">NSWindowController</string>
+					<dictionary class="NSMutableDictionary" key="actions">
+						<string key="changeTool:">id</string>
+						<string key="exportArtBoard:">id</string>
+						<string key="resetGridToDefaults:">id</string>
+						<string key="startLeibnizPropagation:">id</string>
+						<string key="zoomIn:">id</string>
+					</dictionary>
+					<dictionary class="NSMutableDictionary" key="actionInfosByName">
+						<object class="IBActionInfo" key="changeTool:">
+							<string key="name">changeTool:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="exportArtBoard:">
+							<string key="name">exportArtBoard:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="resetGridToDefaults:">
+							<string key="name">resetGridToDefaults:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="startLeibnizPropagation:">
+							<string key="name">startLeibnizPropagation:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="zoomIn:">
+							<string key="name">zoomIn:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+					</dictionary>
 					<dictionary class="NSMutableDictionary" key="outlets">
 						<string key="chartScrollView">EXTScrollView</string>
 						<string key="chartView">EXTChartView</string>
@@ -1145,6 +1172,14 @@
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">./Classes/EXTScrollView.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">EXTToolboxView</string>
+					<string key="superclassName">NSView</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">./Classes/EXTToolboxView.h</string>
 					</object>
 				</object>
 			</array>

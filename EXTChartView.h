@@ -8,15 +8,7 @@
 
 
 #import <Cocoa/Cocoa.h>
-
-typedef enum : NSInteger {
-    _EXTGeneratorToolTag = 1,
-    _EXTDifferentialToolTag = 2,
-    _EXTMultiplicativeStructure = 3,
-    _EXTArtboardToolTag = 4,
-    _EXTMarqueeToolTag = 5,
-    _EXTToolTagCount
-} EXTToolboxTag;
+#import "EXTToolboxView.h"
 
 
 @class EXTChartView, EXTArtBoard, EXTGrid, EXTSpectralSequence;
