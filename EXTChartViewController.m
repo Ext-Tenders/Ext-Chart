@@ -197,6 +197,7 @@ static NSCache *_EXTLayerCache = nil;
         const EXTIntPoint endPoint = differential.end.location.gridPoint;
         const bool startPointInGridRect = EXTIntPointInRect(startPoint, gridRect);
         const bool endPointInGridRect = EXTIntPointInRect(endPoint, gridRect);
+        
         if (!startPointInGridRect && !endPointInGridRect)
             continue;
 
@@ -212,14 +213,14 @@ static NSCache *_EXTLayerCache = nil;
         *startPosition = [NSMutableArray arrayWithArray:@[@0, @0]],
         *endPosition = [NSMutableArray arrayWithArray:@[@0, @0]];
 
-        if (EXTIntPointInRect(startPoint, gridRect)) {
+        if (startPointInGridRect) {
             NSMutableArray *column = (NSMutableArray*)counts[startPoint.x - gridRect.origin.x];
             const NSInteger startPointYOffset = startPoint.y - gridRect.origin.y;
             NSAssert(startPointYOffset < gridRect.size.height, @"start point is not in grid rect; potential index out of bounds doom");
             startPosition = column[startPointYOffset];
         }
 
-        if (EXTIntPointInRect(endPoint, gridRect)) {
+        if (endPointInGridRect) {
             NSMutableArray *column = (NSMutableArray*)counts[endPoint.x - gridRect.origin.x];
             const NSInteger endPointYOffset = endPoint.y - gridRect.origin.y;
             NSAssert(endPointYOffset < gridRect.size.height, @"end point is not in grid rect; potential index out of bounds doom");
