@@ -27,7 +27,9 @@ NSString * const EXTChartViewHighlightColorPreferenceKey = @"EXTChartViewHighlig
 
 static void *_EXTChartViewSelectedPageIndexContext = &_EXTChartViewSelectedPageIndexContext;
 static void *_EXTChartViewArtBoardDrawingRectContext = &_EXTChartViewArtBoardDrawingRectContext;
+static void *_EXTChartViewArtBoardFrameContext = &_EXTChartViewArtBoardFrameContext;
 static void *_EXTChartViewGridAnyKeyContext = &_EXTChartViewGridAnyKeyContext;
+static void *_EXTChartViewGridSpacingContext = &_EXTChartViewGridSpacingContext;
 
 static CGFloat const _EXTHighlightLineWidth = 0.5;
 
@@ -35,6 +37,7 @@ static CGFloat const _EXTHighlightLineWidth = 0.5;
 @interface EXTChartView () {
 	NSTrackingArea *_trackingArea;
 	NSBezierPath *_highlightPath;
+    EXTIntRect _artBoardGridFrame; // the art board frame in grid coordinate space
 }
 
 @property(nonatomic, assign) bool highlighting;
@@ -67,22 +70,23 @@ static CGFloat const _EXTHighlightLineWidth = 0.5;
             _grid = [EXTGrid new];
             [_grid setBoundsRect:[self bounds]];
             [_grid addObserver:self forKeyPath:EXTGridAnyKey options:0 context:_EXTChartViewGridAnyKeyContext];
+            [_grid addObserver:self forKeyPath:@"gridSpacing" options:0 context:_EXTChartViewGridSpacingContext];
         }
 
         // Art board
         {
             _artBoard = [EXTArtBoard new];
 
+            _artBoardGridFrame.origin = (EXTIntPoint){0};
+            _artBoardGridFrame.size.width = 20;
+            _artBoardGridFrame.size.height = 15;
+
             // Since the frame extends past the bounds rectangle, we need observe the drawingRect in order to know what to refresh when the artBoard changes
             [_artBoard addObserver:self forKeyPath:@"drawingRect" options:NSKeyValueObservingOptionOld context:_EXTChartViewArtBoardDrawingRectContext];
+            [_artBoard addObserver:self forKeyPath:@"frame" options:0 context:_EXTChartViewArtBoardFrameContext];
 
             // Align the art board to the grid
-            NSRect artBoardFrame = [_artBoard frame];
-            artBoardFrame.origin = [_grid convertPointToView:[_grid nearestGridPoint:artBoardFrame.origin]];
-            const NSPoint originOppositePoint = [_grid convertPointToView:[_grid nearestGridPoint:(NSPoint){NSMaxX(artBoardFrame), NSMaxY(artBoardFrame)}]];
-            artBoardFrame.size.width = originOppositePoint.x - NSMinX(artBoardFrame);
-            artBoardFrame.size.height = originOppositePoint.y - NSMinY(artBoardFrame);
-            [_artBoard setFrame:artBoardFrame];
+            [self _extAlignArtBoardToGrid];
         }
 
         // Highlighting
@@ -97,7 +101,10 @@ static CGFloat const _EXTHighlightLineWidth = 0.5;
 
 - (void)dealloc {
     [_artBoard removeObserver:self forKeyPath:@"drawingRect" context:_EXTChartViewArtBoardDrawingRectContext];
+    [_artBoard removeObserver:self forKeyPath:@"frame" context:_EXTChartViewArtBoardFrameContext];
     [_grid removeObserver:self forKeyPath:EXTGridAnyKey context:_EXTChartViewGridAnyKeyContext];
+    [_grid removeObserver:self forKeyPath:@"gridSpacing" context:_EXTChartViewGridSpacingContext];
+    
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
@@ -286,9 +293,15 @@ static CGFloat const _EXTHighlightLineWidth = 0.5;
         if (_selectedToolTag == _EXTArtboardToolTag)
             [[self window] invalidateCursorRectsForView:self];
 	}
+    else if (context == _EXTChartViewArtBoardFrameContext) {
+        [self _extUpdateArtBoardGridFrame];
+    }
 	else if (context == _EXTChartViewGridAnyKeyContext) {
 		[self setNeedsDisplay:YES];
 	}
+    else if (context == _EXTChartViewGridSpacingContext) {
+        [self _extAlignArtBoardToGrid];
+    }
     else if (context == _EXTChartViewSelectedPageIndexContext) {
         NSNumber *selectedPageNumber = [object valueForKeyPath:keyPath];
 
@@ -393,6 +406,40 @@ static CGFloat const _EXTHighlightLineWidth = 0.5;
                                                 userInfo:nil];
     [self addTrackingArea:_trackingArea];
     [self _extResetHighlightPath];
+}
+
+#pragma mark - Art board
+
+// Given _artBoardGridFrame in grid coordinate space, set EXTArtBoard.frame to the
+// corresponding frame in view coordinate space
+- (void)_extAlignArtBoardToGrid {
+    // Make sure the art board grid frame has positive width and height
+    _artBoardGridFrame.size.width = MAX(1, _artBoardGridFrame.size.width);
+    _artBoardGridFrame.size.height = MAX(1, _artBoardGridFrame.size.height);
+
+    const EXTIntPoint upperRightInGrid = EXTIntUpperRightPointOfRect(_artBoardGridFrame);
+    const NSPoint lowerLeftInView = [_grid convertPointToView:_artBoardGridFrame.origin];
+    const NSPoint upperRightInView = [_grid convertPointToView:upperRightInGrid];
+    const NSRect artBoardFrame = {
+        .origin = lowerLeftInView,
+        .size.width = upperRightInView.x - lowerLeftInView.x,
+        .size.height = upperRightInView.y - lowerLeftInView.y
+    };
+
+    [_artBoard setFrame:artBoardFrame];
+}
+
+// Given EXTArtBoard.frame in view coordinate space, set _artBoardGridFrame to the
+// corresponding frame in grid coordinate space
+- (void)_extUpdateArtBoardGridFrame {
+    const NSRect artBoardFrame = [_artBoard frame];
+    _artBoardGridFrame.origin = [_grid convertPointFromView:artBoardFrame.origin];
+    const NSPoint upperRightInView = {NSMaxX(artBoardFrame), NSMaxY(artBoardFrame)};
+    const EXTIntPoint upperRightInGrid = [_grid convertPointFromView:upperRightInView];
+
+    // Make sure the art board grid frame has positive width and height
+    _artBoardGridFrame.size.width = MAX(1, upperRightInGrid.x - _artBoardGridFrame.origin.x);
+    _artBoardGridFrame.size.height = MAX(1, upperRightInGrid.y - _artBoardGridFrame.origin.y);
 }
 
 #pragma mark - Resizing

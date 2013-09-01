@@ -49,6 +49,10 @@ static inline bool EXTEqualIntPoints(EXTIntPoint point1, EXTIntPoint point2) {
     return point1.x == point2.x && point1.y == point2.y;
 }
 
+static inline bool EXTEqualIntSizes(EXTIntSize size1, EXTIntSize size2) {
+    return size1.width == size2.width && size1.height == size2.height;
+}
+
 static inline EXTIntPoint EXTIntPointFromNSPoint(NSPoint point) {
     return (EXTIntPoint){(NSInteger)point.x, (NSInteger)point.y};
 }
