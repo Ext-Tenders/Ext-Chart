@@ -35,6 +35,12 @@ typedef enum : NSUInteger {
      */
     @property(nonatomic, assign, readonly) NSRect drawingRect;
 
+    /*!
+     @property minimumSize
+     @abstract The minimum size of the art board in view coordinate space.
+     */
+    @property(nonatomic, assign) NSSize minimumSize;
+
     @property(nonatomic, assign) bool hasShadow;
 
     - (id)initWithFrame:(NSRect)frame;

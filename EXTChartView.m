@@ -85,8 +85,8 @@ static CGFloat const _EXTHighlightLineWidth = 0.5;
             [_artBoard addObserver:self forKeyPath:@"drawingRect" options:NSKeyValueObservingOptionOld context:_EXTChartViewArtBoardDrawingRectContext];
             [_artBoard addObserver:self forKeyPath:@"frame" options:0 context:_EXTChartViewArtBoardFrameContext];
 
-            // Align the art board to the grid
             [self _extAlignArtBoardToGrid];
+            [self _extUpdateArtBoardMinimumSize];
         }
 
         // Highlighting
@@ -301,6 +301,7 @@ static CGFloat const _EXTHighlightLineWidth = 0.5;
 	}
     else if (context == _EXTChartViewGridSpacingContext) {
         [self _extAlignArtBoardToGrid];
+        [self _extUpdateArtBoardMinimumSize];
     }
     else if (context == _EXTChartViewSelectedPageIndexContext) {
         NSNumber *selectedPageNumber = [object valueForKeyPath:keyPath];
@@ -440,6 +441,23 @@ static CGFloat const _EXTHighlightLineWidth = 0.5;
     // Make sure the art board grid frame has positive width and height
     _artBoardGridFrame.size.width = MAX(1, upperRightInGrid.x - _artBoardGridFrame.origin.x);
     _artBoardGridFrame.size.height = MAX(1, upperRightInGrid.y - _artBoardGridFrame.origin.y);
+}
+
+- (void)_extUpdateArtBoardMinimumSize {
+    // If grid spacing is big enough, the art board’s minimum size is a 1x1 grid square.
+    // Otherwise, we set an NxN grid square that can still be handled gracefully when
+    // resizing or moving the art board.
+    static const CGFloat _EXTMinimumLength = 5.0;
+    
+    const CGFloat gridSpacing = [_grid gridSpacing];
+    NSSize minimumSize = {gridSpacing, gridSpacing};
+
+    if (gridSpacing < _EXTMinimumLength) {
+        const CGFloat newMinimumLength = ceil(_EXTMinimumLength / gridSpacing) * gridSpacing;
+        minimumSize.width = minimumSize.height = newMinimumLength;
+    }
+
+    [_artBoard setMinimumSize:minimumSize];
 }
 
 #pragma mark - Resizing

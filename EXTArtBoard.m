@@ -12,8 +12,6 @@
 
 #pragma mark - Private variables
 
-static const NSSize _EXTArtBoardDefaultSize = {360, 216};
-static const NSSize _EXTArtBoardMinimumSize = {50, 50};
 static NSColor *_EXTArtBoardBackgroundColour = nil;
 static NSColor *_EXTArtBoardBorderColour = nil;
 static const CGFloat _EXTArtBoardBorderWidth = 1.0;
@@ -75,7 +73,7 @@ NS_INLINE void EXTArtBoardComputeHotSpotFrames(const NSRect frame,
 }
 
 - (id)init {
-    return [self initWithFrame:(NSRect){NSZeroPoint, _EXTArtBoardDefaultSize}];
+    return [self initWithFrame:NSZeroRect];
 }
 
 - (id)initWithFrame:(NSRect)frame {
@@ -162,13 +160,13 @@ NS_INLINE void EXTArtBoardComputeHotSpotFrames(const NSRect frame,
         if ((_dragOperation & EXTArtBoardMouseDragOperationResizeTop) == EXTArtBoardMouseDragOperationResizeTop) {
             const CGFloat targetHeight = _initialDragFrame.size.height + mouseOffset.height;
 
-            if (targetHeight >= _EXTArtBoardMinimumSize.height)
+            if (targetHeight >= _minimumSize.height)
                 targetFrame.size.height = targetHeight;
         }
         else if ((_dragOperation & EXTArtBoardMouseDragOperationResizeBottom) == EXTArtBoardMouseDragOperationResizeBottom) {
             const CGFloat targetHeight = _initialDragFrame.size.height - mouseOffset.height;
 
-            if (targetHeight >= _EXTArtBoardMinimumSize.height) {
+            if (targetHeight >= _minimumSize.height) {
                 targetFrame.size.height = targetHeight;
                 targetFrame.origin.y = _initialDragFrame.origin.y + mouseOffset.height;
             }
@@ -177,7 +175,7 @@ NS_INLINE void EXTArtBoardComputeHotSpotFrames(const NSRect frame,
         if ((_dragOperation & EXTArtBoardMouseDragOperationResizeLeft) == EXTArtBoardMouseDragOperationResizeLeft) {
             const CGFloat targetWidth = _initialDragFrame.size.width - mouseOffset.width;
 
-            if (targetWidth >= _EXTArtBoardMinimumSize.width) {
+            if (targetWidth >= _minimumSize.width) {
                 targetFrame.size.width = targetWidth;
                 targetFrame.origin.x = _initialDragFrame.origin.x + mouseOffset.width;
             }
@@ -185,7 +183,7 @@ NS_INLINE void EXTArtBoardComputeHotSpotFrames(const NSRect frame,
         else if ((_dragOperation & EXTArtBoardMouseDragOperationResizeRight) == EXTArtBoardMouseDragOperationResizeRight) {
             const CGFloat targetWidth = _initialDragFrame.size.width + mouseOffset.width;
 
-            if (targetWidth >= _EXTArtBoardMinimumSize.width)
+            if (targetWidth >= _minimumSize.width)
                 targetFrame.size.width = targetWidth;
         }
     }
