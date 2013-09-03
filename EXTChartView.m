@@ -7,13 +7,9 @@
 //
 
 #import "EXTChartView.h"
-#import "EXTDocument.h"
 #import "EXTScrollView.h"
 #import "EXTGrid.h"
 #import "EXTArtBoard.h"
-#import "EXTTerm.h"
-#import "EXTDifferential.h"
-#import "EXTSpectralSequence.h"
 #import "NSUserDefaults+EXTAdditions.h"
 
 
