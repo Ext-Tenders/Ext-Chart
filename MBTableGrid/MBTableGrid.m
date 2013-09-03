@@ -976,9 +976,7 @@ NSString *MBTableGridRowDataType = @"MBTableGridRowDataType";
 	return contentView;
 }
 
-@end
-
-@implementation MBTableGrid (OverriddenPropertyAccessors)
+#pragma mark - Overridden Property Accessors
 
 - (void)setSelectedColumnIndexes:(NSIndexSet *)anIndexSet
 {

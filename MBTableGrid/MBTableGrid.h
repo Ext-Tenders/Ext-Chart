@@ -214,7 +214,7 @@ typedef enum {
  * @see			selectedRowIndexes
  * @see			selectCellsInColumns:rows:
  */
-@property(strong) NSIndexSet *selectedColumnIndexes;
+@property(nonatomic, strong) NSIndexSet *selectedColumnIndexes;
 
 /**
  * @brief		Returns an index set containing the indexes of
@@ -226,7 +226,7 @@ typedef enum {
  * @see			selectedColumnIndexes
  * @see			selectCellsInColumns:rows:
  */
-@property(strong) NSIndexSet *selectedRowIndexes;
+@property(nonatomic, strong) NSIndexSet *selectedRowIndexes;
 
 /**
  * @}
@@ -323,7 +323,7 @@ typedef enum {
  *
  * @see			dataSource
  */
-@property(unsafe_unretained) id <MBTableGridDelegate> delegate;
+@property(nonatomic, unsafe_unretained) id <MBTableGridDelegate> delegate;
 
 /**
  * @}
