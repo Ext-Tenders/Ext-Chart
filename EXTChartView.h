@@ -38,6 +38,7 @@
 @property(nonatomic, strong) EXTArtBoard *artBoard;
 @property(nonatomic, readonly) EXTGrid *grid;
 @property(nonatomic, strong) NSColor *highlightColor;
+@property(nonatomic, assign) EXTIntRect artBoardGridFrame; // the art board frame in grid coordinate space
 
 @property(nonatomic, weak) id<EXTChartViewDelegate> delegate;
 @property(nonatomic, assign) NSUInteger selectedPageIndex;

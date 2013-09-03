@@ -13,6 +13,7 @@
 #import "EXTDocumentWindowController.h"
 #import "EXTDemos.h"
 #import "NSUserDefaults+EXTAdditions.h"
+#import "NSKeyedArchiver+EXTAdditions.h"
 
 
 #define PRESENT_FILE_VERSION 1
@@ -40,6 +41,7 @@
         _highlightColor = [defaults extColorForKey:EXTChartViewHighlightColorPreferenceKey];
         _gridSpacing = [defaults doubleForKey:EXTGridSpacingPreferenceKey];
         _gridEmphasisSpacing = [defaults integerForKey:EXTGridEmphasisSpacingPreferenceKey];
+        _artBoardGridFrame = (EXTIntRect){{0}, {20, 15}};
     }
     return self;
 }
@@ -70,6 +72,7 @@
     [arch encodeObject:_highlightColor forKey:@"highlightColor"];
     [arch encodeDouble:_gridSpacing forKey:@"gridSpacing"];
     [arch encodeInteger:_gridEmphasisSpacing forKey:@"gridEmphasisSpacing"];
+    [arch extEncodeIntRect:_artBoardGridFrame forKey:@"artBoardGridFrame"];
 
     [arch finishEncoding];
 
@@ -108,6 +111,10 @@
 
     if ([unarchiver containsValueForKey:@"gridEmphasisSpacing"])
         self.gridEmphasisSpacing = [unarchiver decodeIntegerForKey:@"gridEmphasisSpacing"];
+
+    EXTIntRect tentativeArtBoardGridFrame = [unarchiver extDecodeIntRectForKey:@"artBoardGridFrame"];
+    if (tentativeArtBoardGridFrame.size.width > 0 && tentativeArtBoardGridFrame.size.height > 0)
+        self.artBoardGridFrame = tentativeArtBoardGridFrame;
 
     return YES;
 }

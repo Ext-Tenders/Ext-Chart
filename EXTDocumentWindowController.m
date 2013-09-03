@@ -29,6 +29,8 @@
 
 static void *_EXTScrollViewMagnificationContext = &_EXTScrollViewMagnificationContext;
 static void *_EXTChartViewControllerSelectedObjectContext = &_EXTChartViewControllerSelectedObjectContext;
+static void *_EXTArtBoardFrameContext = &_EXTArtBoardFrameContext;
+
 static CGFloat const _EXTDefaultMagnificationSteps[] = {0.1, 0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 2.0, 4.0, 8.0, 16.0, 32.0};
 static size_t const _EXTDefaultMagnificationStepsCount = sizeof(_EXTDefaultMagnificationSteps) / sizeof(_EXTDefaultMagnificationSteps[0]);
 static CGFloat const _EXTMagnificationStepRoundingMultiplier = 100.0;
@@ -111,10 +113,12 @@ typedef enum : NSInteger {
     {
         _chartViewController = [[EXTChartViewController alloc] initWithDocument:self.extDocument];
         _chartViewController.view = _chartView;
-        
+
+        [_chartView.artBoard addObserver:self forKeyPath:@"frame" options:0 context:_EXTArtBoardFrameContext];
         [_chartViewController addObserver:self forKeyPath:@"selectedObject" options:NSKeyValueObservingOptionNew context:_EXTChartViewControllerSelectedObjectContext];
 
         [_chartView bind:@"highlightColor" toObject:self.extDocument withKeyPath:@"highlightColor" options:nil];
+        [_chartView bind:@"artBoardGridFrame" toObject:self.extDocument withKeyPath:@"artBoardGridFrame" options:nil];
         
         [_chartView.grid bind:@"gridColor" toObject:self.extDocument withKeyPath:@"gridColor" options:nil];
         [_chartView.grid bind:@"emphasisGridColor" toObject:self.extDocument withKeyPath:@"gridEmphasisColor" options:nil];
@@ -236,6 +240,7 @@ typedef enum : NSInteger {
 
 - (void)windowWillClose:(NSNotification *)notification {
     [_chartScrollView removeObserver:self forKeyPath:@"magnification"];
+    [_chartView.artBoard removeObserver:self forKeyPath:@"frame" context:_EXTArtBoardFrameContext];
     [_chartViewController removeObserver:_differentialPaneController forKeyPath:@"selectedObject"];
     [_chartViewController removeObserver:self forKeyPath:@"selectedObject"];
     
@@ -361,7 +366,11 @@ typedef enum : NSInteger {
             [_zoomPopUpButton selectItemAtIndex:stepIndex];
 
         [[self window] invalidateCursorRectsForView:[_chartScrollView documentView]];
-    } else if (context == _EXTChartViewControllerSelectedObjectContext) {
+    }
+    else if (context == _EXTArtBoardFrameContext) {
+        self.extDocument.artBoardGridFrame = [_chartView.grid convertRectFromView:_chartView.artBoard.frame];
+    }
+    else if (context == _EXTChartViewControllerSelectedObjectContext) {
         NSObject *newValue = change[NSKeyValueChangeNewKey];
         if ([newValue isKindOfClass:[EXTDifferential class]]) {
             EXTDifferential *diff = (EXTDifferential*)newValue;

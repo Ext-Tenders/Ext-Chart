@@ -181,6 +181,18 @@ static const CGFloat _EXTGridLineWidth = 0.25;
     };
 }
 
+- (EXTIntRect)convertRectFromView:(NSRect)viewRect {
+    const EXTIntPoint originInGrid = [self convertPointFromView:viewRect.origin];
+    const NSPoint upperRightInView = {NSMaxX(viewRect), NSMaxY(viewRect)};
+    const EXTIntPoint upperRightInGrid = [self convertPointFromView:upperRightInView];
+
+    return (EXTIntRect){
+        .origin = originInGrid,
+        .size.width = upperRightInGrid.x - originInGrid.x,
+        .size.height = upperRightInGrid.y - originInGrid.y
+    };
+}
+
 - (EXTIntPoint)nearestGridPoint:(NSPoint)viewPoint {
     return (EXTIntPoint){
         .x = (NSInteger)floor((viewPoint.x / _gridSpacing) + 0.5),

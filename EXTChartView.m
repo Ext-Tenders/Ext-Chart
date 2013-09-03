@@ -27,7 +27,6 @@ NSString * const EXTChartViewHighlightColorPreferenceKey = @"EXTChartViewHighlig
 
 static void *_EXTChartViewSelectedPageIndexContext = &_EXTChartViewSelectedPageIndexContext;
 static void *_EXTChartViewArtBoardDrawingRectContext = &_EXTChartViewArtBoardDrawingRectContext;
-static void *_EXTChartViewArtBoardFrameContext = &_EXTChartViewArtBoardFrameContext;
 static void *_EXTChartViewGridAnyKeyContext = &_EXTChartViewGridAnyKeyContext;
 static void *_EXTChartViewGridSpacingContext = &_EXTChartViewGridSpacingContext;
 
@@ -37,7 +36,6 @@ static CGFloat const _EXTHighlightLineWidth = 0.5;
 @interface EXTChartView () {
 	NSTrackingArea *_trackingArea;
 	NSBezierPath *_highlightPath;
-    EXTIntRect _artBoardGridFrame; // the art board frame in grid coordinate space
 }
 
 @property(nonatomic, assign) bool highlighting;
@@ -76,17 +74,11 @@ static CGFloat const _EXTHighlightLineWidth = 0.5;
         // Art board
         {
             _artBoard = [EXTArtBoard new];
-
-            _artBoardGridFrame.origin = (EXTIntPoint){0};
-            _artBoardGridFrame.size.width = 20;
-            _artBoardGridFrame.size.height = 15;
+            [self _extAlignArtBoardToGrid];
+            [self _extUpdateArtBoardMinimumSize];
 
             // Since the frame extends past the bounds rectangle, we need observe the drawingRect in order to know what to refresh when the artBoard changes
             [_artBoard addObserver:self forKeyPath:@"drawingRect" options:NSKeyValueObservingOptionOld context:_EXTChartViewArtBoardDrawingRectContext];
-            [_artBoard addObserver:self forKeyPath:@"frame" options:0 context:_EXTChartViewArtBoardFrameContext];
-
-            [self _extAlignArtBoardToGrid];
-            [self _extUpdateArtBoardMinimumSize];
         }
 
         // Highlighting
@@ -101,7 +93,6 @@ static CGFloat const _EXTHighlightLineWidth = 0.5;
 
 - (void)dealloc {
     [_artBoard removeObserver:self forKeyPath:@"drawingRect" context:_EXTChartViewArtBoardDrawingRectContext];
-    [_artBoard removeObserver:self forKeyPath:@"frame" context:_EXTChartViewArtBoardFrameContext];
     [_grid removeObserver:self forKeyPath:EXTGridAnyKey context:_EXTChartViewGridAnyKeyContext];
     [_grid removeObserver:self forKeyPath:@"gridSpacing" context:_EXTChartViewGridSpacingContext];
     
@@ -233,6 +224,11 @@ static CGFloat const _EXTHighlightLineWidth = 0.5;
     }
 }
 
+- (void)setArtBoardGridFrame:(EXTIntRect)artBoardGridFrame {
+    _artBoardGridFrame = artBoardGridFrame;
+    [self _extAlignArtBoardToGrid];
+}
+
 - (BOOL)isOpaque {
     return YES;
 }
@@ -293,9 +289,6 @@ static CGFloat const _EXTHighlightLineWidth = 0.5;
         if (_selectedToolTag == _EXTArtboardToolTag)
             [[self window] invalidateCursorRectsForView:self];
 	}
-    else if (context == _EXTChartViewArtBoardFrameContext) {
-        [self _extUpdateArtBoardGridFrame];
-    }
 	else if (context == _EXTChartViewGridAnyKeyContext) {
 		[self setNeedsDisplay:YES];
 	}
@@ -367,7 +360,6 @@ static CGFloat const _EXTHighlightLineWidth = 0.5;
     [_artBoard finishDragOperation];
 }
 
-
 - (void)mouseDown:(NSEvent *)event {
 	const NSPoint location = [self convertPoint:[event locationInWindow] fromView:nil];
 
@@ -428,19 +420,6 @@ static CGFloat const _EXTHighlightLineWidth = 0.5;
     };
 
     [_artBoard setFrame:artBoardFrame];
-}
-
-// Given EXTArtBoard.frame in view coordinate space, set _artBoardGridFrame to the
-// corresponding frame in grid coordinate space
-- (void)_extUpdateArtBoardGridFrame {
-    const NSRect artBoardFrame = [_artBoard frame];
-    _artBoardGridFrame.origin = [_grid convertPointFromView:artBoardFrame.origin];
-    const NSPoint upperRightInView = {NSMaxX(artBoardFrame), NSMaxY(artBoardFrame)};
-    const EXTIntPoint upperRightInGrid = [_grid convertPointFromView:upperRightInView];
-
-    // Make sure the art board grid frame has positive width and height
-    _artBoardGridFrame.size.width = MAX(1, upperRightInGrid.x - _artBoardGridFrame.origin.x);
-    _artBoardGridFrame.size.height = MAX(1, upperRightInGrid.y - _artBoardGridFrame.origin.y);
 }
 
 - (void)_extUpdateArtBoardMinimumSize {

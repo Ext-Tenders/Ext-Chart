@@ -27,6 +27,7 @@
 		14D78E5D17B5E44000B1BB52 /* EXTChartViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 14D78E5C17B5E44000B1BB52 /* EXTChartViewController.m */; };
 		14E757CD17BF128F008BED48 /* EXTGridInspectorViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 14E757CC17BF128F008BED48 /* EXTGridInspectorViewController.m */; };
 		14EF1A6B17584C080012DD3C /* EXTDocumentWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 14EF1A6A17584C080012DD3C /* EXTDocumentWindowController.m */; };
+		14F16A1617D34EE5002EACD3 /* NSKeyedArchiver+EXTAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 14F16A1517D34EE5002EACD3 /* NSKeyedArchiver+EXTAdditions.m */; };
 		14F930BB17BF39EC0000176A /* EXTGridInspectorView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 14F930BA17BF39EC0000176A /* EXTGridInspectorView.xib */; };
 		1DDD582C0DA1D0D100B32029 /* EXTDocument.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1DDD58280DA1D0D100B32029 /* EXTDocument.xib */; };
 		1DDD582D0DA1D0D100B32029 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1DDD582A0DA1D0D100B32029 /* MainMenu.xib */; };
@@ -107,6 +108,8 @@
 		14E757CC17BF128F008BED48 /* EXTGridInspectorViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTGridInspectorViewController.m; sourceTree = "<group>"; };
 		14EF1A6917584C080012DD3C /* EXTDocumentWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTDocumentWindowController.h; sourceTree = "<group>"; };
 		14EF1A6A17584C080012DD3C /* EXTDocumentWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTDocumentWindowController.m; sourceTree = "<group>"; };
+		14F16A1417D34EE5002EACD3 /* NSKeyedArchiver+EXTAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSKeyedArchiver+EXTAdditions.h"; sourceTree = "<group>"; };
+		14F16A1517D34EE5002EACD3 /* NSKeyedArchiver+EXTAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSKeyedArchiver+EXTAdditions.m"; sourceTree = "<group>"; };
 		14F930BA17BF39EC0000176A /* EXTGridInspectorView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = EXTGridInspectorView.xib; sourceTree = "<group>"; };
 		1DDD58290DA1D0D100B32029 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/EXTDocument.xib; sourceTree = "<group>"; };
 		1DDD582B0DA1D0D100B32029 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/MainMenu.xib; sourceTree = "<group>"; };
@@ -250,6 +253,8 @@
 				149A0EA6176C409C006F6142 /* NSCursor+EXTApplePrivate.h */,
 				14741D7017B7535A00AF73D9 /* NSUserDefaults+EXTAdditions.h */,
 				14741D7117B7535A00AF73D9 /* NSUserDefaults+EXTAdditions.m */,
+				14F16A1417D34EE5002EACD3 /* NSKeyedArchiver+EXTAdditions.h */,
+				14F16A1517D34EE5002EACD3 /* NSKeyedArchiver+EXTAdditions.m */,
 			);
 			name = "System Categories";
 			sourceTree = "<group>";
@@ -584,6 +589,7 @@
 				3804BF6E17C07D7300A74325 /* EXTMatrixEditor.m in Sources */,
 				38F707B817CDCD9D002273B1 /* EXTLeibnizWindowController.m in Sources */,
 				1462B38B17D19D4A00BFDF50 /* EXTToolboxView.m in Sources */,
+				14F16A1617D34EE5002EACD3 /* NSKeyedArchiver+EXTAdditions.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

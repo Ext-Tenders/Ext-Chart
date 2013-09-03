@@ -22,6 +22,7 @@
     @property(nonatomic, strong) NSColor *highlightColor;
     @property(nonatomic, assign) CGFloat gridSpacing;
     @property(nonatomic, assign) NSInteger gridEmphasisSpacing;
+    @property(nonatomic, assign) EXTIntRect artBoardGridFrame;
 @end
 
 // Notes: need something to specify the size (width, height) of the document, origin location, serre or adams convention?

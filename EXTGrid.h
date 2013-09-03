@@ -28,6 +28,9 @@
 /*! Given a view point, returns the grid point representing the origin of the grid square containing that view point */
 - (EXTIntPoint)convertPointFromView:(NSPoint)viewPoint;
 
+/*! Given a view rectangle, returns the corresponding rectangle in grid coordinate space */
+- (EXTIntRect)convertRectFromView:(NSRect)viewRect;
+
 /*! Given a view point, returns the grid point nearest to that view point */
 - (EXTIntPoint)nearestGridPoint:(NSPoint)viewPoint;
 
