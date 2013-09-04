@@ -239,25 +239,7 @@ static CGFloat const _EXTHighlightLineWidth = 0.5;
 
 #pragma mark - Paging
 
-// this get called when we move to the next page in the display. it's
-// responsible for checking whether the page is dirty and, if so, calling the
-// relevant updating algorithms.
 - (IBAction)nextPage:(id)sender {
-    //	EXTPage *nextPage;
-    //	EXTPage *currentPage = [pages objectAtIndex:pageInView];
-    //	if (pageInView == [pages count] - 1) {
-    //		nextPage = [currentPage computeHomology];
-    //		[currentPage setModified:NO];
-    //		[nextPage setWhichPage:pageInView + 1];
-    //		[pages addObject:nextPage];
-    //	} else {
-    //		if ([currentPage modified]) {
-    //			nextPage = [currentPage computeHomology];
-    //			[nextPage setModified:YES];
-    //			[currentPage setModified:NO];
-    //			[pages replaceObjectAtIndex:pageInView +1 withObject:nextPage];
-    //		}
-    //	};
     [self setSelectedPageIndex:_selectedPageIndex + 1];
 }
 
