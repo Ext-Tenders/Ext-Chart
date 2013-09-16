@@ -10,6 +10,10 @@
 #import "EXTGrid.h"
 #import "EXTTerm.h"
 
+#pragma mark - Private variables
+
+static void *_EXTPresentationParametersContext = &_EXTPresentationParametersContext;
+
 // redeclare part of the EXTDifferential interface so that we synthesize both
 // getters *and* setters for the publicly read-only properties.
 @interface EXTDifferential () {
@@ -23,12 +27,29 @@
 
 
 // actual class housing the differential information
-@implementation EXTDifferential
+@implementation EXTDifferential {
+    bool presentationNeedsAssembly;
+}
 
 @synthesize page;
 @synthesize start, end;
 @synthesize partialDefinitions;
 @synthesize wellDefined;
+
+- (id)init {
+    self = [super init];
+
+    if (self) {
+        presentationNeedsAssembly = true;
+        [self addObserver:self forKeyPath:@"presentationParameters" options:0 context:_EXTPresentationParametersContext];
+    }
+
+    return self;
+}
+
+- (void)dealloc {
+    [self removeObserver:self forKeyPath:@"presentationParameters" context:_EXTPresentationParametersContext];
+}
 
 +(id) newDifferential:(EXTTerm *)start end:(EXTTerm *)end page:(int)page {
     EXTDifferential *object = [EXTDifferential new];
@@ -53,8 +74,11 @@
 
 // quietly assemble the presentation when asked for it :)
 -(EXTMatrix*) presentation {
-    [self assemblePresentation];
-    
+    if (presentationNeedsAssembly) {
+        [self assemblePresentation];
+        presentationNeedsAssembly = false;
+    }
+
     return _presentation;
 }
 
@@ -124,6 +148,9 @@
 		end = [coder decodeObjectForKey:@"end"];
 		page = [coder decodeIntForKey:@"page"];
         partialDefinitions = [coder decodeObjectForKey:@"partialDefinitions"];
+
+        presentationNeedsAssembly = true;
+        [self addObserver:self forKeyPath:@"presentationParameters" options:0 context:_EXTPresentationParametersContext];
 	}
 	return self;
 }
@@ -133,6 +160,19 @@
 	[coder encodeObject:end.location forKey:@"end"];
 	[coder encodeInt:page forKey:@"page"];
     [coder encodeObject:partialDefinitions forKey:@"partialDefinitions"];
+}
+
+#pragma mark - Key-Value Observing
+
++ (NSSet *)keyPathsForValuesAffectingPresentationParameters {
+    return [NSSet setWithObjects:@"start", @"end", @"partialDefinitions", nil];
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
+    if (context == _EXTPresentationParametersContext)
+        presentationNeedsAssembly = true;
+    else
+        [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
 }
 
 @end
