@@ -95,13 +95,15 @@
 #pragma mark - NSToolTipOwner
 
 - (NSString *)view:(NSView *)view stringForToolTip:(NSToolTipTag)tag point:(NSPoint)point userData:(void *)data {
-    NSUInteger rowIndex = (NSUInteger)floor(point.y / 19.0 /* row height */);
+    NSUInteger rowIndex = (NSUInteger)data;
     return [self tableGrid:self headerStringForRow:rowIndex];
 }
 
 - (void)_extResetRowHeaderToolTips {
-    [[self rowHeaderView] removeAllToolTips];
-    [[self rowHeaderView] addToolTipRect:[[self rowHeaderView] bounds] owner:self userData:NULL];
+    [rowHeaderView removeAllToolTips];
+
+    for (NSUInteger rowIndex = 0; rowIndex < representedObject.height; rowIndex++)
+        [rowHeaderView addToolTipRect:[rowHeaderView headerRectOfRow:rowIndex] owner:self userData:(void *)rowIndex];
 }
 
 #pragma mark - Notifications
