@@ -8,10 +8,17 @@
 
 #import "EXTMatrixEditor.h"
 #import "MBTableGridHeaderView.h"
+#import "MBTableGridCell.h"
+
 
 @interface EXTMatrixEditor () <MBTableGridDataSource, MBTableGridDelegate>
-
 @end
+
+
+// We use a custom cell so that cell contents are selected whenever the cell is edited
+@interface EXTMatrixCell : MBTableGridCell
+@end
+
 
 @implementation EXTMatrixEditor
 
@@ -24,6 +31,12 @@
         representedObject = nil;
         self.dataSource = self;
         self.delegate = self;
+
+        EXTMatrixCell *defaultCell = [EXTMatrixCell new];
+        defaultCell.bordered = YES;
+        defaultCell.scrollable = YES;
+		defaultCell.lineBreakMode = NSLineBreakByTruncatingTail;
+        self.cell = defaultCell;
 
         [self _extResetRowHeaderToolTips];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(rowHeaderViewFrameDidChange:) name:NSViewFrameDidChangeNotification object:[self rowHeaderView]];
@@ -110,6 +123,16 @@
 
 - (void)rowHeaderViewFrameDidChange:(NSNotification *)notification {
     [self _extResetRowHeaderToolTips];
+}
+
+@end
+
+
+@implementation EXTMatrixCell
+
+- (void)editWithFrame:(NSRect)cellFrame inView:(NSView *)controlView editor:(NSText *)textObj delegate:(id)delegateObj event:(NSEvent *)event {
+    [super editWithFrame:cellFrame inView:controlView editor:textObj delegate:delegateObj event:event];
+    [textObj setSelectedRange:(NSRange){0, textObj.string.length}];
 }
 
 @end
