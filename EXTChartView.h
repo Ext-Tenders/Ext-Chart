@@ -11,7 +11,7 @@
 #import "EXTToolboxView.h"
 
 
-@class EXTChartView, EXTArtBoard, EXTGrid, EXTSpectralSequence;
+@class EXTChartView, EXTArtBoard, EXTGrid;
 
 @protocol EXTChartViewDelegate <NSObject>
     - (void)chartView:(EXTChartView *)chartView willDisplayPage:(NSUInteger)pageNumber;
