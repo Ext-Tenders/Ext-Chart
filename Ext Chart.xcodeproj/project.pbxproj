@@ -39,12 +39,12 @@
 		31D403BB13DA0476006A8C06 /* EXTTerm.m in Sources */ = {isa = PBXBuildFile; fileRef = 31D403BA13DA0476006A8C06 /* EXTTerm.m */; };
 		31D403C013DA04D8006A8C06 /* EXTDifferential.m in Sources */ = {isa = PBXBuildFile; fileRef = 31D403BF13DA04D8006A8C06 /* EXTDifferential.m */; };
 		31D5D2E513F6933B00F1B2F9 /* EXTArtBoard.m in Sources */ = {isa = PBXBuildFile; fileRef = 31D5D2E413F6933B00F1B2F9 /* EXTArtBoard.m */; };
-		3804BF6617C0775C00A74325 /* MBTableGrid.m in Sources */ = {isa = PBXBuildFile; fileRef = 3804BF5B17C0775C00A74325 /* MBTableGrid.m */; };
-		3804BF6717C0775C00A74325 /* MBTableGridCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 3804BF5D17C0775C00A74325 /* MBTableGridCell.m */; };
-		3804BF6817C0775C00A74325 /* MBTableGridContentView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3804BF5F17C0775C00A74325 /* MBTableGridContentView.m */; };
-		3804BF6917C0775C00A74325 /* MBTableGridController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3804BF6117C0775C00A74325 /* MBTableGridController.m */; };
-		3804BF6A17C0775C00A74325 /* MBTableGridHeaderCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 3804BF6317C0775C00A74325 /* MBTableGridHeaderCell.m */; };
-		3804BF6B17C0775C00A74325 /* MBTableGridHeaderView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3804BF6517C0775C00A74325 /* MBTableGridHeaderView.m */; };
+		3804BF6617C0775C00A74325 /* MBTableGrid.m in Sources */ = {isa = PBXBuildFile; fileRef = 3804BF5B17C0775C00A74325 /* MBTableGrid.m */; settings = {COMPILER_FLAGS = "-Wno-conversion"; }; };
+		3804BF6717C0775C00A74325 /* MBTableGridCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 3804BF5D17C0775C00A74325 /* MBTableGridCell.m */; settings = {COMPILER_FLAGS = "-Wno-conversion"; }; };
+		3804BF6817C0775C00A74325 /* MBTableGridContentView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3804BF5F17C0775C00A74325 /* MBTableGridContentView.m */; settings = {COMPILER_FLAGS = "-Wno-conversion"; }; };
+		3804BF6917C0775C00A74325 /* MBTableGridController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3804BF6117C0775C00A74325 /* MBTableGridController.m */; settings = {COMPILER_FLAGS = "-Wno-conversion"; }; };
+		3804BF6A17C0775C00A74325 /* MBTableGridHeaderCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 3804BF6317C0775C00A74325 /* MBTableGridHeaderCell.m */; settings = {COMPILER_FLAGS = "-Wno-conversion"; }; };
+		3804BF6B17C0775C00A74325 /* MBTableGridHeaderView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3804BF6517C0775C00A74325 /* MBTableGridHeaderView.m */; settings = {COMPILER_FLAGS = "-Wno-conversion"; }; };
 		3804BF6E17C07D7300A74325 /* EXTMatrixEditor.m in Sources */ = {isa = PBXBuildFile; fileRef = 3804BF6D17C07D7300A74325 /* EXTMatrixEditor.m */; };
 		3841EBD2177380C000ADA929 /* EXTZeroRange.m in Sources */ = {isa = PBXBuildFile; fileRef = 3841EBD1177380C000ADA929 /* EXTZeroRange.m */; };
 		385BF10D17AAD8C2008CA5B6 /* EXTGeneratorInspectorView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 385BF10B17AAD8C2008CA5B6 /* EXTGeneratorInspectorView.xib */; };
