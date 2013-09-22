@@ -59,11 +59,11 @@ typedef enum : NSInteger {
     @property(nonatomic, weak) IBOutlet NSTextField *highlightLabel;
 
     @property(nonatomic, assign) EXTToolboxTag selectedToolTag;
+    @property(nonatomic, strong) EXTChartViewController *chartViewController;
 @end
 
 
 @implementation EXTDocumentWindowController {
-    EXTChartViewController *_chartViewController;
     EXTGridInspectorViewController *_gridInspectorViewController;
     EXTGeneratorInspectorViewController *_generatorInspectorViewController;
     EXTDifferentialPaneController *_differentialPaneController;
@@ -111,7 +111,7 @@ typedef enum : NSInteger {
 
     // Chart view
     {
-        _chartViewController = [[EXTChartViewController alloc] initWithDocument:self.extDocument];
+        self.chartViewController = [[EXTChartViewController alloc] initWithDocument:self.extDocument];
         _chartViewController.view = _chartView;
 
         [_chartView.artBoard addObserver:self forKeyPath:@"frame" options:0 context:_EXTArtBoardFrameContext];
@@ -170,7 +170,6 @@ typedef enum : NSInteger {
         
         _differentialPaneController = [EXTDifferentialPaneController new];
         [_chartViewController addObserver:_differentialPaneController forKeyPath:@"selectedObject" options:NSKeyValueObservingOptionNew context:nil];
-        [_differentialPaneController bind:@"chartView" toObject:self withKeyPath:@"chartView" options:nil];
         [_inspectorView addSubview:_differentialPaneController.view withTitle:@"Differential" collapsed:true centered:true];
 
         _gridInspectorViewController = [EXTGridInspectorViewController new];
@@ -228,11 +227,8 @@ typedef enum : NSInteger {
     {
         // set up tool handlers
         _leibnizWindowController = [[EXTLeibnizWindowController alloc] initWithWindowNibName:@"EXTLeibnizWindow"];
-        [_chartViewController setLeibnizWindowController:_leibnizWindowController];
-        [_leibnizWindowController setChartView:_chartView];
-
-        _leibnizWindowController.sseq = self.extDocument.sseq;
-        [self.chartView addObserver:_leibnizWindowController forKeyPath:@"selectedPageIndex" options:NSKeyValueObservingOptionNew context:nil];
+        _chartViewController.leibnizWindowController = _leibnizWindowController;
+        _leibnizWindowController.documentWindowController = self;
     }
 
     [[self window] makeFirstResponder:_chartView];
@@ -243,8 +239,6 @@ typedef enum : NSInteger {
     [_chartView.artBoard removeObserver:self forKeyPath:@"frame" context:_EXTArtBoardFrameContext];
     [_chartViewController removeObserver:_differentialPaneController forKeyPath:@"selectedObject"];
     [_chartViewController removeObserver:self forKeyPath:@"selectedObject"];
-    
-    [self.chartView removeObserver:_leibnizWindowController forKeyPath:@"selectedPageIndex"];
 
     for (NSDictionary *viewDelegatePair in _inspectorViewDelegates) {
         id<EXTDocumentInspectorViewDelegate> delegate = viewDelegatePair[@"delegate"];
@@ -416,11 +410,20 @@ typedef enum : NSInteger {
     [[self window] makeFirstResponder:_chartView];
 }
 
+- (IBAction)nextPage:(id)sender {
+    self.chartViewController.currentPage++;
+}
+
+- (IBAction)previousPage:(id)sender {
+    if (self.chartViewController.currentPage > 0)
+        self.chartViewController.currentPage--;
+}
+
 - (IBAction)exportArtBoard:(id)sender {
     NSData *artBoardPDFData = [_chartView dataWithPDFInsideRect:[[_chartView artBoard] frame]];
 
     NSSavePanel *savePanel = [NSSavePanel savePanel];
-    [savePanel setNameFieldStringValue:[NSString stringWithFormat:@"page_%lu", [_chartView selectedPageIndex]]];
+    [savePanel setNameFieldStringValue:[NSString stringWithFormat:@"page_%d", [_chartViewController currentPage]]];
     [savePanel setAllowedFileTypes:@[@"pdf"]];
     [savePanel setAllowsOtherFileTypes:NO];
 

@@ -9,14 +9,13 @@
 #import "EXTLeibnizWindowController.h"
 #import "EXTLocation.h"
 #import "EXTTerm.h"
+#import "EXTChartViewController.h"
 
 @interface EXTLeibnizWindowController ()
 
 @property IBOutlet NSTableView *tableView;
 @property IBOutlet NSButton *deleteButton;
 @property IBOutlet NSButton *OKButton;
-
-@property (assign,nonatomic) NSUInteger selectedPageIndex;
 
 // list of EXTLocations
 @property (strong) NSMutableArray *list;
@@ -50,9 +49,9 @@
 }
 
 -(IBAction)OKPressed:(id)sender {
-    [self.sseq propagateLeibniz:self.list page:self.selectedPageIndex];
+    [self.documentWindowController.extDocument.sseq propagateLeibniz:self.list page:self.documentWindowController.chartViewController.currentPage];
+    [self.documentWindowController.chartViewController reloadCurrentPage];
 
-    [self.chartView displaySelectedPage];
     [self close];
     return;
 }
@@ -75,20 +74,8 @@
     return ((EXTLocation*)self.list[row]).description;
 }
 
-- (void)observeValueForKeyPath:(NSString *)keyPath
-                      ofObject:(id)object
-                        change:(NSDictionary *)change
-                       context:(void *)context {
-    if ([keyPath isEqualToString:@"selectedPageIndex"]) {
-        self.selectedPageIndex = [change[NSKeyValueChangeNewKey] intValue];
-    } else
-        [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
-    
-    return;
-}
-
 -(void)mouseDownAtGridLocation:(EXTIntPoint)gridLocation {
-    NSArray *termsUnderClick = [self.sseq findTermsUnderPoint:gridLocation];
+    NSArray *termsUnderClick = [self.documentWindowController.extDocument.sseq findTermsUnderPoint:gridLocation];
     
     for (int i = 0; i < termsUnderClick.count; i++) {
         EXTTerm *term = termsUnderClick[i];

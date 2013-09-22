@@ -46,7 +46,7 @@ static NSCache *_EXTLayerCache = nil;
     [super setView:view];
 
     self.chartView.delegate = self;
-    [self.chartView displaySelectedPage];
+    [self reloadCurrentPage];
 }
 
 + (id)new {
@@ -79,19 +79,26 @@ static NSCache *_EXTLayerCache = nil;
     return;
 }
 
+- (void)setCurrentPage:(int)currentPage {
+    if (currentPage == _currentPage || currentPage < 0)
+        return;
+
+    _currentPage = currentPage;
+
+    self.selectedObject = nil;
+    [self reloadCurrentPage];
+}
+
+#pragma mark -
+
+- (void)reloadCurrentPage {
+    [_document.sseq computeGroupsForPage:_currentPage];
+    [self.chartView setNeedsDisplay:YES];
+}
+
 #pragma mark - EXTChartViewDelegate
 
-// this message means the page number just changed.  this gets called *before*
-// a redisplay message is issued, letting us do things like drop highlights.
-- (void)pageChangedIn:(EXTChartView*)chartView {
-    self.selectedObject = nil;
-}
-
-- (void)chartView:(EXTChartView *)chartView willDisplayPage:(NSUInteger)pageNumber {
-    [_document.sseq computeGroupsForPage:pageNumber];
-}
-
-- (NSBezierPath *)chartView:(EXTChartView *)chartView highlightPathForTool:(EXTToolboxTag)toolTag page:(NSUInteger)page gridLocation:(EXTIntPoint)gridLocation {
+- (NSBezierPath *)chartView:(EXTChartView *)chartView highlightPathForTool:(EXTToolboxTag)toolTag gridLocation:(EXTIntPoint)gridLocation {
     NSBezierPath *highlightPath;
 
     switch (toolTag) {
@@ -103,7 +110,7 @@ static NSCache *_EXTLayerCache = nil;
 
         case _EXTDifferentialToolTag: {
             EXTGrid *grid = chartView.grid;
-            const EXTIntPoint targetGridPoint = [_document.sseq.indexClass followDifflAtGridLocation:gridLocation page:chartView.selectedPageIndex];
+            const EXTIntPoint targetGridPoint = [_document.sseq.indexClass followDifflAtGridLocation:gridLocation page:_currentPage];
             const NSRect sourceRect = [grid viewBoundingRectForGridPoint:gridLocation];
             const NSRect targetRect = [grid viewBoundingRectForGridPoint:targetGridPoint];
 
@@ -120,7 +127,7 @@ static NSCache *_EXTLayerCache = nil;
 }
 
 // this performs the culling and delegation calls for drawing a page of the SS
-- (void)chartView:(EXTChartView *)chartView drawPageNumber:(const NSUInteger)pageNumber inGridRect:(const EXTIntRect)gridRect {
+- (void)chartView:(EXTChartView *)chartView drawPageInGridRect:(const EXTIntRect)gridRect {
     // start by initializing the array of counts
     NSMutableArray *counts = [NSMutableArray arrayWithCapacity:gridRect.size.width];
     for (int i = 0; i < gridRect.size.width; i++) {
@@ -146,7 +153,7 @@ static NSCache *_EXTLayerCache = nil;
             NSMutableArray *column = (NSMutableArray*)counts[(int)(point.x-gridRect.origin.x)];
             NSMutableArray *tuple = column[(int)(point.y-gridRect.origin.y)];
             int offset = [tuple[0] intValue];
-            tuple[0] = @(offset + [term dimension:pageNumber]);
+            tuple[0] = @(offset + [term dimension:_currentPage]);
         }
     }
 
@@ -185,12 +192,12 @@ static NSCache *_EXTLayerCache = nil;
     }
 
     // iterate also through the available differentials
-    if (pageNumber >= _document.sseq.differentials.count)
+    if (_currentPage >= _document.sseq.differentials.count)
         return;
 
-    for (EXTDifferential *differential in ((NSDictionary*)_document.sseq.differentials[pageNumber]).allValues) {
+    for (EXTDifferential *differential in ((NSDictionary*)_document.sseq.differentials[_currentPage]).allValues) {
         // some sanity checks to make sure this differential is worth drawing
-        if ([differential page] != pageNumber)
+        if ([differential page] != _currentPage)
             continue;
 
         const EXTIntPoint startPoint = differential.start.location.gridPoint;
@@ -287,8 +294,7 @@ static NSCache *_EXTLayerCache = nil;
         case _EXTDifferentialToolTag: {
             NSArray *terms = [_document.sseq findTermsUnderPoint:gridLocation];
             NSUInteger oldIndex = NSNotFound;
-            NSUInteger page = self.chartView.selectedPageIndex;
-            
+
             // if there's nothing under this click, just quit now.
             if (terms.count == 0) {
                 self.selectedObject = nil;
@@ -298,7 +304,7 @@ static NSCache *_EXTLayerCache = nil;
             // if we used to have something selected, and it was a differential
             // on this page, then we should find its position in our list.
             if ([[self.selectedObject class] isSubclassOfClass:[EXTDifferential class]] &&
-                (((EXTDifferential*)self.selectedObject).page == page))
+                (((EXTDifferential*)self.selectedObject).page == _currentPage))
                 oldIndex = [terms indexOfObject:((EXTDifferential*)self.selectedObject).start];
             
             // the new index is one past the old index, unless we have to wrap.
@@ -315,7 +321,7 @@ static NSCache *_EXTLayerCache = nil;
                 else
                     newIndex = newIndex + 1;
                 source = terms[newIndex];
-                diff = [_document.sseq findDifflWithSource:source.location onPage:page];
+                diff = [_document.sseq findDifflWithSource:source.location onPage:_currentPage];
                 
                 // if we've found it, good!  quit!
                 if (diff) {
@@ -324,12 +330,12 @@ static NSCache *_EXTLayerCache = nil;
                 }
                 
                 // if there's no differential, then let's try to build it.
-                EXTLocation *endLoc = [[source.location class] followDiffl:source.location page:page];
+                EXTLocation *endLoc = [[source.location class] followDiffl:source.location page:_currentPage];
                 end = [_document.sseq findTerm:endLoc];
                 
                 if (end) {
                     // but if there is, let's build it and set it up.
-                    diff = [EXTDifferential newDifferential:source end:end page:page];
+                    diff = [EXTDifferential newDifferential:source end:end page:_currentPage];
                     [_document.sseq addDifferential:diff];
                     self.selectedObject = diff;
                     break;
@@ -498,6 +504,18 @@ static NSCache *_EXTLayerCache = nil;
 - (NSRect)_extBoundingRectForTerm:(EXTTerm *)term {
     EXTGrid *grid = self.chartView.grid;
     return [grid viewBoundingRectForGridPoint:term.location.gridPoint];
+}
+
+#pragma mark - Key-Value Coding
+
+- (void)setNilValueForKey:(NSString *)key {
+    if ([key isEqualToString:@"currentPage"]) {
+        [self willChangeValueForKey:@"currentPage"];
+        self.currentPage = 0;
+        [self didChangeValueForKey:@"currentPage"];
+    }
+    else
+        [super setNilValueForKey:key];
 }
 
 @end

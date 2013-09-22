@@ -9,8 +9,10 @@
 #import "EXTDifferentialPaneController.h"
 #import "EXTDifferential.h"
 #import "EXTMatrixEditor.h"
+#import "EXTDocumentWindowController.h"
+#import "EXTChartViewController.h"
 
-@interface EXTDifferentialPaneController ()
+@interface EXTDifferentialPaneController () <EXTDocumentInspectorViewDelegate, NSTableViewDataSource, NSTableViewDelegate>
 
 @property IBOutlet NSTableView *tableView;
 @property IBOutlet NSButton *addButton;
@@ -30,9 +32,8 @@
 @implementation EXTDifferentialPaneController
 {
     EXTPartialDefinition *_partial;
+    EXTDocumentWindowController *_documentWindowController;
 }
-
-@synthesize chartView;
 
 #pragma mark differential inspector pane
 
@@ -100,8 +101,8 @@
     
     [self.tableView deselectAll:sender];
     [self.tableView reloadData];
-    [self.chartView displaySelectedPage];
-    
+    [_documentWindowController.chartViewController reloadCurrentPage];
+
     return;
 }
 
@@ -164,8 +165,8 @@
     _partial.action = self.actionEditor.representedObject;
     
     [_tableView reloadData];
-    [self.chartView displaySelectedPage];
-    
+    [_documentWindowController.chartViewController reloadCurrentPage];
+
     return;
 }
 
@@ -201,6 +202,16 @@
     [self.actionEditor reloadData];
     
     return;
+}
+
+#pragma mark - EXTDocumentInspectorViewDelegate
+
+- (void)documentWindowController:(EXTDocumentWindowController *)windowController didAddInspectorView:(NSView *)inspectorView {
+    _documentWindowController = windowController;
+}
+
+- (void)documentWindowController:(EXTDocumentWindowController *)windowController willRemoveInspectorView:(NSView *)inspectorView {
+    _documentWindowController = nil;
 }
 
 @end

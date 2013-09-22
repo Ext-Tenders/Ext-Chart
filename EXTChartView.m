@@ -15,13 +15,11 @@
 
 #pragma mark - Exported variables
 
-NSString * const EXTChartViewSelectedPageIndexBindingName = @"selectedPageIndex";
 NSString * const EXTChartViewHighlightColorPreferenceKey = @"EXTChartViewHighlightColor";
 
 
 #pragma mark - Private variables
 
-static void *_EXTChartViewSelectedPageIndexContext = &_EXTChartViewSelectedPageIndexContext;
 static void *_EXTChartViewArtBoardDrawingRectContext = &_EXTChartViewArtBoardDrawingRectContext;
 static void *_EXTChartViewGridAnyKeyContext = &_EXTChartViewGridAnyKeyContext;
 static void *_EXTChartViewGridSpacingContext = &_EXTChartViewGridSpacingContext;
@@ -43,7 +41,6 @@ static CGFloat const _EXTHighlightLineWidth = 0.5;
 #pragma mark - Life cycle
 
 + (void)load {
-    [self exposeBinding:EXTChartViewSelectedPageIndexBindingName];
     [self exposeBinding:@"grid"];
     [self exposeBinding:@"highlightColor"];
 
@@ -146,9 +143,7 @@ static CGFloat const _EXTHighlightLineWidth = 0.5;
 
     // TODO: this may be drawing too narrow a window, resulting in blank Ext
     // charts if the scroll is dragged too slowly.
-    [_delegate chartView:self
-          drawPageNumber:_selectedPageIndex
-              inGridRect:gridDirtyRect];
+    [_delegate chartView:self drawPageInGridRect:gridDirtyRect];
 
     //  // restore the graphics context
     //	[theContext restoreGraphicsState];
@@ -162,7 +157,7 @@ static CGFloat const _EXTHighlightLineWidth = 0.5;
     const NSPoint currentMouseLocation = [self convertPoint:[[self window] mouseLocationOutsideOfEventStream] fromView:nil];
     if (NSPointInRect(currentMouseLocation, dataRect)) {
         const EXTIntPoint mouseLocationInGrid = [_grid convertPointFromView:currentMouseLocation];
-        _highlightPath = [_delegate chartView:self highlightPathForTool:_selectedToolTag page:_selectedPageIndex gridLocation:mouseLocationInGrid];
+        _highlightPath = [_delegate chartView:self highlightPathForTool:_selectedToolTag gridLocation:mouseLocationInGrid];
         [_highlightPath setLineWidth:_EXTHighlightLineWidth];
         [self setNeedsDisplayInRect:[self _extHighlightDrawingRect]];
     }
@@ -176,24 +171,7 @@ static CGFloat const _EXTHighlightLineWidth = 0.5;
     return NSInsetRect([_highlightPath bounds], -halfLineWidth, -halfLineWidth);
 }
 
-- (void)displaySelectedPage {
-    if (_highlighting)
-        [self _extResetHighlightPath];
-
-    [_delegate chartView:self willDisplayPage:_selectedPageIndex];
-    [self setNeedsDisplay:YES];
-}
-
 #pragma mark - Properties
-
-- (void)setSelectedPageIndex:(NSUInteger)selectedPageIndex {
-    // TODO: should check whether the argument lies in {min, max} page indices
-    if (selectedPageIndex != _selectedPageIndex) {
-        _selectedPageIndex = selectedPageIndex;
-        [self.delegate pageChangedIn:self];
-        [self displaySelectedPage];
-    }
-}
 
 - (void)setShowsGrid:(bool)showsGrid {
     if (showsGrid != _showsGrid) {
@@ -239,24 +217,16 @@ static CGFloat const _EXTHighlightLineWidth = 0.5;
 
 #pragma mark - Paging
 
-- (IBAction)nextPage:(id)sender {
-    [self setSelectedPageIndex:_selectedPageIndex + 1];
-}
-
-- (IBAction)previousPage:(id)sender {
-	if (_selectedPageIndex > 0)
-        [self setSelectedPageIndex:_selectedPageIndex - 1];
-}
-
 // This is odd: we do not receive -swipeWithEvent: until the user scrolls the
 // view using a two-finger scroll gesture. This same behaviour happens if the
 // scroll view implements -swipeWithEvent:.
 // See http://stackoverflow.com/questions/15854301
 - (void)swipeWithEvent:(NSEvent *)event {
 	CGFloat x = [event deltaX];
-	if (x != 0) {
-		(x < 0)  ? [self nextPage:self]: [self previousPage:self];
-	};
+    if (x > 0.0)
+        [NSApp sendAction:@selector(nextPage:) to:nil from:self];
+    else if (x < 0.0)
+        [NSApp sendAction:@selector(previousPage:) to:nil from:self];
 }
 
 #pragma mark - Key-value observing
@@ -273,12 +243,6 @@ static CGFloat const _EXTHighlightLineWidth = 0.5;
     else if (context == _EXTChartViewGridSpacingContext) {
         [self _extAlignArtBoardToGrid];
         [self _extUpdateArtBoardMinimumSize];
-    }
-    else if (context == _EXTChartViewSelectedPageIndexContext) {
-        NSNumber *selectedPageNumber = [object valueForKeyPath:keyPath];
-
-        if (selectedPageNumber != NSNotApplicableMarker)
-            [self setSelectedPageIndex:[selectedPageNumber unsignedIntegerValue]];
     }
 	else {
 		[super observeValueForKeyPath:keyPath ofObject:object change:change context:context];

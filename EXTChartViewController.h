@@ -17,6 +17,7 @@
     @property(nonatomic, readonly) EXTChartView *chartView;
     @property(nonatomic, weak) id selectedObject;
     @property(nonatomic, weak) EXTLeibnizWindowController *leibnizWindowController;
+    @property(nonatomic, assign) int currentPage;
 
 
     // Designated initialiser
@@ -26,4 +27,6 @@
     + (id)new __attribute__((deprecated("Use -initWithDocument: instead")));
     - (id)init __attribute__((deprecated("Use -initWithDocument: instead")));
     - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil __attribute__((deprecated("Use -initWithDocument: instead")));
+
+    - (void)reloadCurrentPage;
 @end

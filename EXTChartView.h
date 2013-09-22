@@ -14,20 +14,12 @@
 @class EXTChartView, EXTArtBoard, EXTGrid;
 
 @protocol EXTChartViewDelegate <NSObject>
-    - (void)chartView:(EXTChartView *)chartView willDisplayPage:(NSUInteger)pageNumber;
-
     - (NSBezierPath *)chartView:(EXTChartView *)chartView
            highlightPathForTool:(EXTToolboxTag)toolTag
-                           page:(NSUInteger)page
                    gridLocation:(EXTIntPoint)gridLocation;
 
-    - (void)chartView:(EXTChartView *)chartView
-       drawPageNumber:(NSUInteger)pageNumber
-           inGridRect:(EXTIntRect)gridRect;
-
+    - (void)chartView:(EXTChartView *)chartView drawPageInGridRect:(EXTIntRect)gridRect;
     - (void)chartView:(EXTChartView *)chartView mouseDownAtGridLocation:(EXTIntPoint)gridLocation;
-
-    - (void)pageChangedIn:(EXTChartView*)chartView;
 @end
 
 
@@ -40,18 +32,12 @@
 @property(nonatomic, assign) EXTIntRect artBoardGridFrame; // the art board frame in grid coordinate space
 
 @property(nonatomic, weak) id<EXTChartViewDelegate> delegate;
-@property(nonatomic, assign) NSUInteger selectedPageIndex;
 @property(nonatomic, assign) EXTToolboxTag selectedToolTag;
 
-- (void)displaySelectedPage;
-
 // Actions
-- (IBAction)nextPage:(id)sender;
-- (IBAction)previousPage:(id)sender;
 - (IBAction)zoomToFit:(id)sender;
 @end
 
 #pragma mark - Exported variables
 
-extern NSString * const EXTChartViewSelectedPageIndexBindingName;
 extern NSString * const EXTChartViewHighlightColorPreferenceKey;

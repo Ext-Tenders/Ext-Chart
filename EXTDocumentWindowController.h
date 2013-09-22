@@ -12,6 +12,7 @@
 
 @class EXTDocument;
 @class EXTDocumentWindowController;
+@class EXTChartViewController;
 
 
 @protocol EXTDocumentInspectorViewDelegate <NSObject>
@@ -24,4 +25,5 @@
 @interface EXTDocumentWindowController : NSWindowController
     @property(nonatomic, weak) IBOutlet EXTChartView *chartView;
     @property(nonatomic, readonly) EXTDocument *extDocument;
+    @property(nonatomic, readonly) EXTChartViewController *chartViewController;
 @end

@@ -8,6 +8,7 @@
 
 #import "EXTGeneratorInspectorViewController.h"
 #import "EXTDocumentWindowController.h"
+#import "EXTChartViewController.h"
 #import "EXTPolynomialSSeq.h"
 
 @interface EXTGeneratorInspectorViewController () <EXTDocumentInspectorViewDelegate, NSTableViewDelegate, NSTableViewDataSource>
@@ -15,7 +16,7 @@
 @property(nonatomic, strong) IBOutlet NSTextField *textField;
 @property(nonatomic, strong) EXTSpectralSequence *sseq;
 @property(nonatomic, strong) NSMutableArray *generators;
-@property(nonatomic, weak) EXTChartView *chartView;
+@property(nonatomic, weak) EXTDocumentWindowController *documentWindowController;
 @end
 
 @implementation EXTGeneratorInspectorViewController
@@ -46,17 +47,16 @@
 
 - (void)documentWindowController:(EXTDocumentWindowController *)windowController didAddInspectorView:(NSView *)inspectorView {
     [self bind:@"sseq" toObject:windowController.document withKeyPath:@"sseq" options:nil];
-    [self bind:@"chartView" toObject:windowController withKeyPath:@"chartView" options:nil];
+    self.documentWindowController = windowController;
 }
 
 - (void)documentWindowController:(EXTDocumentWindowController *)windowController willRemoveInspectorView:(NSView *)inspectorView {
     [self unbind:@"generators"];
     [self unbind:@"sseq"];
-    [self unbind:@"chartView"];
 
     self.generators = nil;
     self.sseq = nil;
-    self.chartView = nil;
+    self.documentWindowController = nil;
 }
 
 #pragma mark - NSTableViewDataSource
@@ -91,10 +91,10 @@
 }
 
 -(void) causeRefresh {
-    if (_chartView.selectedPageIndex > 0) {
-        _chartView.selectedPageIndex = 0;
+    if (_documentWindowController.chartViewController.currentPage > 0) {
+        _documentWindowController.chartViewController.currentPage = 0;
     } else {
-        [_chartView displaySelectedPage];
+        [_documentWindowController.chartViewController reloadCurrentPage];
     }
     
     return;

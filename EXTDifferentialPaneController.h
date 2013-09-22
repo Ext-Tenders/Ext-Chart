@@ -7,10 +7,6 @@
 //
 
 #import <Cocoa/Cocoa.h>
-#import "EXTChartView.h"
 
-@interface EXTDifferentialPaneController : NSViewController <NSTableViewDataSource, NSTableViewDelegate>
-
-@property (nonatomic,weak) EXTChartView *chartView;
-
+@interface EXTDifferentialPaneController : NSViewController
 @end
