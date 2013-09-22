@@ -12,7 +12,6 @@
 
 
 @class EXTChartView, EXTArtBoard, EXTGrid, EXTSpectralSequence;
-@protocol EXTLocation;
 
 @protocol EXTChartViewDelegate <NSObject>
     - (void)chartView:(EXTChartView *)chartView willDisplayPage:(NSUInteger)pageNumber;
