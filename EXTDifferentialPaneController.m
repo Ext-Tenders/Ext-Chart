@@ -14,16 +14,16 @@
 
 @interface EXTDifferentialPaneController () <EXTDocumentInspectorViewDelegate, NSTableViewDataSource, NSTableViewDelegate>
 
-@property IBOutlet NSTableView *tableView;
-@property IBOutlet NSButton *addButton;
-@property IBOutlet NSButton *deleteButton;
+@property (nonatomic, weak) IBOutlet NSTableView *tableView;
+@property (nonatomic, weak) IBOutlet NSButton *addButton;
+@property (nonatomic, weak) IBOutlet NSButton *deleteButton;
 
-@property IBOutlet NSPopover *popover;
-@property IBOutlet NSTextField *descriptionField;
-@property IBOutlet NSTextField *dimensionField;
-@property IBOutlet NSButton *automaticallyGeneratedCB;
-@property IBOutlet EXTMatrixEditor *inclusionEditor;
-@property IBOutlet EXTMatrixEditor *actionEditor;
+@property (nonatomic, weak) IBOutlet NSPopover *popover;
+@property (nonatomic, weak) IBOutlet NSTextField *descriptionField;
+@property (nonatomic, weak) IBOutlet NSTextField *dimensionField;
+@property (nonatomic, weak) IBOutlet NSButton *automaticallyGeneratedCB;
+@property (nonatomic, weak) IBOutlet EXTMatrixEditor *inclusionEditor;
+@property (nonatomic, weak) IBOutlet EXTMatrixEditor *actionEditor;
 
 @end
 
