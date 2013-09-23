@@ -32,7 +32,7 @@
 @implementation EXTDifferentialPaneController
 {
     EXTPartialDefinition *_partial;
-    EXTDocumentWindowController *_documentWindowController;
+    EXTDocumentWindowController * __weak _documentWindowController;
 }
 
 #pragma mark differential inspector pane
