@@ -13,9 +13,9 @@
 
 @interface EXTLeibnizWindowController ()
 
-@property IBOutlet NSTableView *tableView;
-@property IBOutlet NSButton *deleteButton;
-@property IBOutlet NSButton *OKButton;
+@property (nonatomic, weak) IBOutlet NSTableView *tableView;
+@property (nonatomic, weak) IBOutlet NSButton *deleteButton;
+@property (nonatomic, weak) IBOutlet NSButton *OKButton;
 
 // list of EXTLocations
 @property (strong) NSMutableArray *list;
