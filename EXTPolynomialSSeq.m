@@ -185,7 +185,7 @@
     for (EXTZeroRange *zeroRange in self.zeroRanges) {
         EXTZeroRange *newZeroRange = nil;
         
-        if ([[newZeroRange class] isSubclassOfClass:[EXTZeroRangeStrict class]])
+        if ([newZeroRange isKindOfClass:[EXTZeroRangeStrict class]])
             newZeroRange = [EXTZeroRangeStrict newWithSSeq:ret];
         else
             newZeroRange = [zeroRange copy];

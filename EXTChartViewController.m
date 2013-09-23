@@ -303,7 +303,7 @@ static NSCache *_EXTLayerCache = nil;
             
             // if we used to have something selected, and it was a differential
             // on this page, then we should find its position in our list.
-            if ([[self.selectedObject class] isSubclassOfClass:[EXTDifferential class]] &&
+            if ([self.selectedObject isKindOfClass:[EXTDifferential class]] &&
                 (((EXTDifferential*)self.selectedObject).page == _currentPage))
                 oldIndex = [terms indexOfObject:((EXTDifferential*)self.selectedObject).start];
             

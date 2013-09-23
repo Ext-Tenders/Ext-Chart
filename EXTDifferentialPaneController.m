@@ -56,7 +56,7 @@
 }
 
 -(NSInteger)numberOfRowsInTableView:(NSTableView *)tableView {
-    if (![[self.representedObject class] isSubclassOfClass:[EXTDifferential class]])
+    if (![self.representedObject isKindOfClass:[EXTDifferential class]])
         return 0;
     
     EXTDifferential *diff = self.representedObject;
@@ -65,7 +65,7 @@
 }
 
 - (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row {
-    if (![[self.representedObject class] isSubclassOfClass:[EXTDifferential class]])
+    if (![self.representedObject isKindOfClass:[EXTDifferential class]])
         return nil;
     
     EXTDifferential *diff = self.representedObject;
@@ -92,7 +92,7 @@
 -(IBAction)deleteButtonPressed:(id)sender {
     NSInteger row = [self.tableView selectedRow];
     
-    if (![[self.representedObject class] isSubclassOfClass:[EXTDifferential class]])
+    if (![self.representedObject isKindOfClass:[EXTDifferential class]])
         return;
     
     EXTDifferential *diffl = self.representedObject;
@@ -107,7 +107,7 @@
 }
 
 -(IBAction)addButtonPressed:(id)sender {
-    if (![[self.representedObject class] isSubclassOfClass:[EXTDifferential class]])
+    if (![self.representedObject isKindOfClass:[EXTDifferential class]])
         return;
     EXTDifferential *diff = self.representedObject;
     
@@ -125,7 +125,7 @@
 }
 
 - (void)doubleClick:(id)sender {
-    if (![[self.representedObject class] isSubclassOfClass:[EXTDifferential class]])
+    if (![self.representedObject isKindOfClass:[EXTDifferential class]])
         return;
     EXTDifferential *diff = self.representedObject;
     
