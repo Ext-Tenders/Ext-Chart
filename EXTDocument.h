@@ -14,6 +14,7 @@
 
 @interface EXTDocument : NSDocument
     @property(nonatomic, strong) EXTSpectralSequence *sseq;
+    @property(nonatomic, strong) NSMutableArray *marquees; // an array of EXTMarquee objects
 
     // User interface configuration
     @property(nonatomic, strong) NSColor *gridColor;

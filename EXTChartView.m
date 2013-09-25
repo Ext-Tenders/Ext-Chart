@@ -131,19 +131,7 @@ static CGFloat const _EXTHighlightLineWidth = 0.5;
 	//	[xform translateXBy:72.0 yBy:72.0];
 	//	[xform concat];
 
-
-    // Convert dirtyRect to the grid coordinate space
-    const EXTIntPoint lowerLeftPoint = [_grid convertPointFromView:dirtyRect.origin];
-    const EXTIntPoint upperRightPoint = [_grid convertPointFromView:(NSPoint){NSMaxX(dirtyRect), NSMaxY(dirtyRect)}];
-    const EXTIntRect gridDirtyRect = {
-        .origin = lowerLeftPoint,
-        .size.width = upperRightPoint.x - lowerLeftPoint.x + 1,
-        .size.height = upperRightPoint.y - lowerLeftPoint.y + 1
-    };
-
-    // TODO: this may be drawing too narrow a window, resulting in blank Ext
-    // charts if the scroll is dragged too slowly.
-    [_delegate chartView:self drawPageInGridRect:gridDirtyRect];
+    [_delegate chartView:self drawPageInGridRect:[_grid convertRectFromView:dirtyRect]];
 
     //  // restore the graphics context
     //	[theContext restoreGraphicsState];

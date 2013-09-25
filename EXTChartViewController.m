@@ -9,6 +9,7 @@
 #import "EXTChartViewController.h"
 #import "EXTChartView.h"
 #import "EXTGrid.h"
+#import "EXTMarquee.h"
 #import "EXTDocument.h"
 #import "EXTSpectralSequence.h"
 #import "EXTTerm.h"
@@ -280,6 +281,25 @@ static NSCache *_EXTLayerCache = nil;
     // TODO: draw certain multiplicative structures?
     
     // TODO: draw highlighted object.
+
+    // Draw marquees
+    const NSRect dirtyRect = [self.chartView.grid convertRectToView:gridRect];
+    for (EXTMarquee *marquee in _document.marquees) {
+        if (!NSIntersectsRect(dirtyRect, marquee.frame))
+            continue;
+
+        // Images take precedence over text
+        if (marquee.image)
+            [marquee.image drawInRect:marquee.frame fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0];
+        else
+            [marquee.string drawInRect:marquee.frame withAttributes:nil];
+    }
+
+    if ([self.selectedObject isKindOfClass:[EXTMarquee class]]) {
+        EXTMarquee *selectedMarquee = self.selectedObject;
+        [self.chartView.highlightColor setFill];
+        NSFrameRect(selectedMarquee.frame);
+    }
 }
 
 - (void)chartView:(EXTChartView *)chartView mouseDownAtGridLocation:(EXTIntPoint)gridLocation {
@@ -347,7 +367,38 @@ static NSCache *_EXTLayerCache = nil;
             
             break;
         }
-            
+
+        case _EXTMarqueeToolTag: {
+            const NSRect gridRectInView = [self.chartView.grid viewBoundingRectForGridPoint:gridLocation];
+            NSIndexSet *marqueesAtPoint = [_document.marquees indexesOfObjectsPassingTest:^BOOL(EXTMarquee *marquee, NSUInteger idx, BOOL *stop) {
+                return NSIntersectsRect(gridRectInView, marquee.frame);
+            }];
+
+            EXTMarquee *newSelectedMarquee = nil;
+
+            if (marqueesAtPoint.count == 0) {
+                newSelectedMarquee = [EXTMarquee new];
+                newSelectedMarquee.string = @"New marquee";
+                newSelectedMarquee.frame = (NSRect){gridRectInView.origin, {100.0, 15.0}};
+                [_document.marquees addObject:newSelectedMarquee];
+            }
+            else {
+                // Cycle through all marquees lying on that grid square
+                const NSInteger previousSelectedMarqueeIndex = ([self.selectedObject isKindOfClass:[EXTMarquee class]] ?
+                                                                [_document.marquees indexOfObject:self.selectedObject] :
+                                                                -1);
+                NSInteger newSelectedMarqueeIndex = [marqueesAtPoint indexGreaterThanIndex:previousSelectedMarqueeIndex];
+                if (newSelectedMarqueeIndex == NSNotFound)
+                    newSelectedMarqueeIndex = [marqueesAtPoint firstIndex];
+
+                newSelectedMarquee = _document.marquees[newSelectedMarqueeIndex];
+            }
+
+            self.selectedObject = newSelectedMarquee;
+
+            break;
+        }
+
         default:
             break;
     }
@@ -496,6 +547,10 @@ static NSCache *_EXTLayerCache = nil;
         EXTDifferential *differential = object;
         return NSUnionRect([self _extBoundingRectForTerm:[differential start]],
                            [self _extBoundingRectForTerm:[differential end]]);
+    }
+    else if ([object isKindOfClass:[EXTMarquee class]]) {
+        EXTMarquee *marquee = object;
+        return marquee.frame;
     }
 
     return NSZeroRect;
