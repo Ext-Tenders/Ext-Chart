@@ -131,9 +131,16 @@ typedef enum : NSInteger {
     {
         [_chartScrollView setHasHorizontalRuler:YES];
         [_chartScrollView setHasVerticalRuler:YES];
-        [[_chartScrollView horizontalRulerView] setOriginOffset:-[_chartView bounds].origin.x];
+        [[_chartScrollView horizontalRulerView] setOriginOffset:-([_chartView bounds].origin.x-4.0)];
+        [[_chartScrollView verticalRulerView] setOriginOffset:-([_chartView bounds].origin.y-4.0)];
         [[_chartScrollView horizontalRulerView] setReservedThicknessForMarkers:0.0];
-        [[_chartScrollView verticalRulerView] setOriginOffset:-[_chartView bounds].origin.y];
+        // TODO: Make this safe across window instances by hooking up custom
+        // rulers to EXTScrollView.
+        /*
+         [NSRulerView registerUnitWithName:@"units" abbreviation:NSLocalizedString(@"un", @"Units abbreviation string") unitToPointsConversionFactor:self.extDocument.gridSpacing stepUpCycle:@[@(self.extDocument.gridEmphasisSpacing)] stepDownCycle:@[@0.5]];
+        [[_chartScrollView horizontalRulerView] setMeasurementUnits:@"units"];
+        [[_chartScrollView verticalRulerView] setMeasurementUnits:@"units"];
+         */
         [_chartScrollView setUsesPredominantAxisScrolling:NO];
         [_chartScrollView setRulersVisible:YES];
         [_chartScrollView setAllowsMagnification:YES];
