@@ -75,7 +75,7 @@
    setObjectValue:(id)object
    forTableColumn:(NSTableColumn *)tableColumn
               row:(NSInteger)row {
-    if (![[_sseq class] isSubclassOfClass:[EXTPolynomialSSeq class]])
+    if (![_sseq isKindOfClass:[EXTPolynomialSSeq class]])
         return;
     EXTPolynomialSSeq *polySSeq = (EXTPolynomialSSeq*)_sseq;
     
@@ -101,7 +101,7 @@
 }
 
 -(IBAction)addButtonPressed:(id)sender {
-    if (![[_sseq class] isSubclassOfClass:[EXTPolynomialSSeq class]])
+    if (![_sseq isKindOfClass:[EXTPolynomialSSeq class]])
         return;
     
     EXTPolynomialSSeq *polySSeq = (EXTPolynomialSSeq*) _sseq;
@@ -120,7 +120,7 @@
 -(IBAction)deleteButtonPressed:(id)sender {
     NSInteger row = [_tableView selectedRow];
     
-    if (![[_sseq class] isSubclassOfClass:[EXTPolynomialSSeq class]])
+    if (![_sseq isKindOfClass:[EXTPolynomialSSeq class]])
         return;
     
     EXTPolynomialSSeq *polySSeq = (EXTPolynomialSSeq*)_sseq;

@@ -10,6 +10,7 @@
 #import "EXTChartView.h"
 #import "EXTGrid.h"
 #import "EXTArtBoard.h"
+#import "EXTMarquee.h"
 #import "EXTDocumentWindowController.h"
 #import "EXTDemos.h"
 #import "NSUserDefaults+EXTAdditions.h"
@@ -32,6 +33,7 @@
     self = [super init];
     if (self) {
         _sseq = [EXTSpectralSequence new];
+        _marquees = [NSMutableArray new];
 
         NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
 
@@ -65,6 +67,7 @@
     [arch encodeInteger:PRESENT_FILE_VERSION forKey:@"fileVersion"];
 
     [arch encodeObject:_sseq forKey:@"sseq"];
+    [arch encodeObject:_marquees forKey:@"marquees"];
 
     [arch encodeObject:_gridColor forKey:@"gridColor"];
     [arch encodeObject:_gridEmphasisColor forKey:@"gridEmphasisColor"];
@@ -93,6 +96,9 @@
     }
 
     self.sseq = [unarchiver decodeObjectForKey:@"sseq"];
+
+    if ([unarchiver containsValueForKey:@"marquees"])
+        self.marquees = [unarchiver decodeObjectForKey:@"marquees"];
 
     if ([unarchiver containsValueForKey:@"gridColor"])
         self.gridColor = [unarchiver decodeObjectForKey:@"gridColor"];

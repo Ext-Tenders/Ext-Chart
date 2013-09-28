@@ -85,3 +85,7 @@ static inline EXTIntPoint EXTIntUpperRightPointOfRect(EXTIntRect rect) {
         .y = rect.origin.y + rect.size.height
     };
 }
+
+static inline bool EXTIntersectsIntRects(EXTIntRect rect1, EXTIntRect rect2) {
+    return EXTIntPointInRect(rect1.origin, rect2) || EXTIntPointInRect(rect2.origin, rect1);
+}

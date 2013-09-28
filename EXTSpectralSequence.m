@@ -48,7 +48,7 @@
         
         zeroRanges = [aDecoder decodeObjectForKey:@"zeroRanges"];
         for (EXTZeroRange *zeroRange in zeroRanges) {
-            if ([[zeroRanges class] isSubclassOfClass:[EXTZeroRangeStrict class]])
+            if ([zeroRanges isKindOfClass:[EXTZeroRangeStrict class]])
                 [(EXTZeroRangeStrict*)zeroRanges setSSeq:self];
         }
     }

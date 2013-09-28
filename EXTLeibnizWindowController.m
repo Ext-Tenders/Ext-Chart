@@ -13,9 +13,9 @@
 
 @interface EXTLeibnizWindowController ()
 
-@property IBOutlet NSTableView *tableView;
-@property IBOutlet NSButton *deleteButton;
-@property IBOutlet NSButton *OKButton;
+@property (nonatomic, weak) IBOutlet NSTableView *tableView;
+@property (nonatomic, weak) IBOutlet NSButton *deleteButton;
+@property (nonatomic, weak) IBOutlet NSButton *OKButton;
 
 // list of EXTLocations
 @property (strong) NSMutableArray *list;
@@ -23,23 +23,6 @@
 @end
 
 @implementation EXTLeibnizWindowController
-
-- (id)initWithWindow:(NSWindow *)window
-{
-    self = [super initWithWindow:window];
-    if (self) {
-        // Initialization code here.
-    }
-    
-    return self;
-}
-
-- (void)windowDidLoad
-{
-    [super windowDidLoad];
-    
-    // Implement this method to handle any initialization after your window controller's window has been loaded from its nib file.
-}
 
 - (void)showWindow:(id)sender {
     [self.tableView deselectAll:nil];

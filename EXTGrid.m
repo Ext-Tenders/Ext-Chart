@@ -184,7 +184,13 @@ static const CGFloat _EXTGridLineWidth = 0.25;
 - (EXTIntRect)convertRectFromView:(NSRect)viewRect {
     const EXTIntPoint originInGrid = [self convertPointFromView:viewRect.origin];
     const NSPoint upperRightInView = {NSMaxX(viewRect), NSMaxY(viewRect)};
-    const EXTIntPoint upperRightInGrid = [self convertPointFromView:upperRightInView];
+
+    // We can’t simply use -convertPointFromView: with upperRightInView since that method
+    // returns the origin (i.e., lower left) of the grid square containing the point
+    EXTIntPoint upperRightInGrid = {
+        .x = (NSInteger)ceil(upperRightInView.x / _gridSpacing),
+        .y = (NSInteger)ceil(upperRightInView.y / _gridSpacing)
+    };
 
     return (EXTIntRect){
         .origin = originInGrid,
@@ -204,6 +210,21 @@ static const CGFloat _EXTGridLineWidth = 0.25;
     return (NSPoint){
         .x = gridPoint.x * _gridSpacing,
         .y = gridPoint.y * _gridSpacing
+    };
+}
+
+- (NSRect)convertRectToView:(EXTIntRect)gridRect {
+    const NSPoint lowerLeftInView = [self convertPointToView:gridRect.origin];
+    const EXTIntPoint upperRightInGrid = {
+        .x = gridRect.origin.x + gridRect.size.width,
+        .y = gridRect.origin.y + gridRect.size.height
+    };
+    const NSPoint upperRightInView = [self convertPointToView:upperRightInGrid];
+
+    return (NSRect){
+        .origin = lowerLeftInView,
+        .size.width = upperRightInView.x - lowerLeftInView.x,
+        .size.height = upperRightInView.y - lowerLeftInView.y
     };
 }
 

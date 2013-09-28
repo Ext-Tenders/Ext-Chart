@@ -37,8 +37,12 @@
 /*! Given a grid point, returns the corresponding point in view coordinate space */
 - (NSPoint)convertPointToView:(EXTIntPoint)gridPoint;
 
+/*! Given a grid rectangle, returns the corresponding rectangle in view coordinate space */
+- (NSRect)convertRectToView:(EXTIntRect)gridRect;
+
 /*! Given a grid point, returns a grid square rectangle in view coordinate space whose origin matches the grid point */
 - (NSRect)viewBoundingRectForGridPoint:(EXTIntPoint)gridSquareOrigin;
+
 @end
 
 #pragma mark - Public variables

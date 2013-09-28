@@ -14,16 +14,16 @@
 
 @interface EXTDifferentialPaneController () <EXTDocumentInspectorViewDelegate, NSTableViewDataSource, NSTableViewDelegate>
 
-@property IBOutlet NSTableView *tableView;
-@property IBOutlet NSButton *addButton;
-@property IBOutlet NSButton *deleteButton;
+@property (nonatomic, weak) IBOutlet NSTableView *tableView;
+@property (nonatomic, weak) IBOutlet NSButton *addButton;
+@property (nonatomic, weak) IBOutlet NSButton *deleteButton;
 
-@property IBOutlet NSPopover *popover;
-@property IBOutlet NSTextField *descriptionField;
-@property IBOutlet NSTextField *dimensionField;
-@property IBOutlet NSButton *automaticallyGeneratedCB;
-@property IBOutlet EXTMatrixEditor *inclusionEditor;
-@property IBOutlet EXTMatrixEditor *actionEditor;
+@property (nonatomic, weak) IBOutlet NSPopover *popover;
+@property (nonatomic, weak) IBOutlet NSTextField *descriptionField;
+@property (nonatomic, weak) IBOutlet NSTextField *dimensionField;
+@property (nonatomic, weak) IBOutlet NSButton *automaticallyGeneratedCB;
+@property (nonatomic, weak) IBOutlet EXTMatrixEditor *inclusionEditor;
+@property (nonatomic, weak) IBOutlet EXTMatrixEditor *actionEditor;
 
 @end
 
@@ -32,7 +32,7 @@
 @implementation EXTDifferentialPaneController
 {
     EXTPartialDefinition *_partial;
-    EXTDocumentWindowController *_documentWindowController;
+    EXTDocumentWindowController * __weak _documentWindowController;
 }
 
 #pragma mark differential inspector pane
@@ -56,7 +56,7 @@
 }
 
 -(NSInteger)numberOfRowsInTableView:(NSTableView *)tableView {
-    if (![[self.representedObject class] isSubclassOfClass:[EXTDifferential class]])
+    if (![self.representedObject isKindOfClass:[EXTDifferential class]])
         return 0;
     
     EXTDifferential *diff = self.representedObject;
@@ -65,7 +65,7 @@
 }
 
 - (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row {
-    if (![[self.representedObject class] isSubclassOfClass:[EXTDifferential class]])
+    if (![self.representedObject isKindOfClass:[EXTDifferential class]])
         return nil;
     
     EXTDifferential *diff = self.representedObject;
@@ -92,7 +92,7 @@
 -(IBAction)deleteButtonPressed:(id)sender {
     NSInteger row = [self.tableView selectedRow];
     
-    if (![[self.representedObject class] isSubclassOfClass:[EXTDifferential class]])
+    if (![self.representedObject isKindOfClass:[EXTDifferential class]])
         return;
     
     EXTDifferential *diffl = self.representedObject;
@@ -107,7 +107,7 @@
 }
 
 -(IBAction)addButtonPressed:(id)sender {
-    if (![[self.representedObject class] isSubclassOfClass:[EXTDifferential class]])
+    if (![self.representedObject isKindOfClass:[EXTDifferential class]])
         return;
     EXTDifferential *diff = self.representedObject;
     
@@ -125,7 +125,7 @@
 }
 
 - (void)doubleClick:(id)sender {
-    if (![[self.representedObject class] isSubclassOfClass:[EXTDifferential class]])
+    if (![self.representedObject isKindOfClass:[EXTDifferential class]])
         return;
     EXTDifferential *diff = self.representedObject;
     
