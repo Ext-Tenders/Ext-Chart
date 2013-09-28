@@ -27,6 +27,11 @@
     return [self initWithNibName:@"EXTGeneratorInspectorView" bundle:nil];
 }
 
+- (void)awakeFromNib {
+    [self.textField setTarget:self];
+    [self.textField setAction:@selector(addButtonPressed:)];
+}
+
 #pragma mark - Properties
 
 - (void)setSseq:(EXTSpectralSequence *)sseq {
