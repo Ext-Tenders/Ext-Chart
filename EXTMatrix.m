@@ -560,7 +560,7 @@
             // otherwise, extend by zero.
             NSMutableArray *workingColumn = [NSMutableArray array];
             
-            for (int j = 0; j < basisMatrix.height; j++)
+            for (int j = 0; j < targetDimension; j++)
                 [workingColumn setObject:@0 atIndexedSubscript:j];
             
             differentialInCoordinates.presentation[i] = workingColumn;
