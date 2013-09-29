@@ -14,10 +14,10 @@
 @synthesize leftEdge, rightEdge, topEdge, bottomEdge;
 
 -(BOOL) isInRange:(EXTPair*)loc {
-    return ((loc.a >= leftEdge) &&
-            (loc.a <= rightEdge) &&
-            (loc.b >= bottomEdge) &&
-            (loc.b <= topEdge));
+    return !((loc.a >= leftEdge) &&
+             (loc.a <= rightEdge) &&
+             (loc.b >= bottomEdge) &&
+             (loc.b <= topEdge));
 }
 
 - (id)initWithCoder:(NSCoder *)aDecoder {
@@ -66,12 +66,12 @@
 }
 
 -(BOOL) isInRange:(EXTTriple*)loc {
-    return ((loc.a >= leftEdge) &&
-            (loc.a <= rightEdge) &&
-            (loc.b >= bottomEdge) &&
-            (loc.b <= topEdge) &&
-            (loc.c >= backEdge) &&
-            (loc.c <= frontEdge));
+    return !((loc.a >= leftEdge) &&
+             (loc.a <= rightEdge) &&
+             (loc.b >= bottomEdge) &&
+             (loc.b <= topEdge) &&
+             (loc.c >= backEdge) &&
+             (loc.c <= frontEdge));
 }
 
 - (id)initWithCoder:(NSCoder *)aDecoder {
