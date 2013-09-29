@@ -85,6 +85,10 @@
 }
 
 // TODO: should this routine be memoized?
+//
+// XXX: I'm nervous that not all squares of all sums in a given location will
+// land in the same filtration degree.  Hence, it may not make sense to compute
+// the squaring operation en masse...  :(
 -(NSArray*) squaringMatrix:(int)order location:(EXTTriple*)location {
     // we know the following three facts about the squaring operations:
     // Sq^n(xy) = sum_{i=0}^n Sq^i x Sq^{n-i} y, (Cartan)
@@ -297,6 +301,10 @@
     EXTMaySpectralSequence *sseq = [EXTMaySpectralSequence new];
     
     [sseq.zeroRanges addObject:[EXTZeroRangeStrict newWithSSeq:sseq]];
+    EXTZeroRangeTriple *zrTriple = [EXTZeroRangeTriple new];
+    zrTriple.leftEdge = zrTriple.bottomEdge = zrTriple.backEdge = 0;
+    zrTriple.rightEdge = zrTriple.topEdge = zrTriple.frontEdge = width;
+    [sseq.zeroRanges addObject:zrTriple];
     
     // start by adding the polynomial terms h_{i,j}
     for (int i = 1; ; i++) {
@@ -327,6 +335,10 @@
 
 +(EXTMaySpectralSequence*) fillToWidth:(int)width {
     EXTMaySpectralSequence *sseq = [EXTMaySpectralSequence new];
+    EXTZeroRangeTriple *zrTriple = [EXTZeroRangeTriple new];
+    zrTriple.leftEdge = zrTriple.bottomEdge = zrTriple.backEdge = 0;
+    zrTriple.rightEdge = zrTriple.topEdge = zrTriple.frontEdge = width;
+    [sseq.zeroRanges addObject:zrTriple];
     
     [sseq.zeroRanges addObject:[EXTZeroRangeStrict newWithSSeq:sseq]];
     
