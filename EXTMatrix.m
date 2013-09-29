@@ -221,14 +221,18 @@
 -(EXTMatrix*) columnReduce {
     int pivotRow = 0, pivotColumn = 0;
     EXTMatrix *ret = [self copy];
+    NSMutableArray *usedColumns = [NSMutableArray array];
+    for (int i = 0; i < width; i++)
+        usedColumns[i] = @(false);
     
     for (pivotRow = 0; (pivotRow < height) && (pivotColumn < width); pivotRow++) {
         int j;
         
         // find the first nonzero entry in this row, right of where we're at
-        for (j = pivotColumn; j < width; j++) {
-            if (0 != [[[ret.presentation objectAtIndex:j]
-                       objectAtIndex:pivotRow] intValue])
+        for (j = 0; j < width; j++) {
+            if ([usedColumns[j] intValue])
+                continue;
+            if (0 != [(ret.presentation[j])[pivotRow] intValue])
                 break;
         }
         
@@ -236,36 +240,36 @@
         // if we didn't, then we should skip this row entirely.
         if (j == width)
             continue;
-        else
+        else {
             pivotColumn = j;
+            usedColumns[j] = @(true);
+        }
         
         // if we've made it here, then we have a new pivot location, and we're
         // tasked with clearing the rest of the row of nonzero entries.
         //
         // start by performing modular reduction on the column we care about.
-        NSMutableArray *column = [ret.presentation objectAtIndex:pivotColumn];
+        NSMutableArray *column = ret.presentation[pivotColumn];
         for (j = 0; j < height; j++)
-            [column setObject:@([[column objectAtIndex:j] intValue] % 2)
-                atIndexedSubscript:j];
+            column[j] = @([column[j] intValue] % 2);
         
         // then iterate through the other columns...
         for (j = 0; j < width; j++) {
             // skip the column we're working with, of course!
             if (j == pivotColumn)
                 continue;
-            if ([[column objectAtIndex:pivotRow] intValue] == 0)
+            if ([column[pivotRow] intValue] == 0)
                 continue;
             
-            NSMutableArray *workingColumn = [ret.presentation objectAtIndex:j];
-            int factor = [[workingColumn objectAtIndex:pivotRow] intValue] /
-                         [[column objectAtIndex:pivotRow] intValue];
+            NSMutableArray *workingColumn = ret.presentation[j];
+            int factor = [workingColumn[pivotRow] intValue] /
+                         [column[pivotRow] intValue];
             
             // ... and for each entry in this column, subtract.
             for (int i = 0; i < height; i++)
-                [workingColumn
-                    setObject:@(([[workingColumn objectAtIndex:i] intValue] -
-                               factor * [[column objectAtIndex:i] intValue])%2)
-                    atIndexedSubscript:i];
+                workingColumn[i] =
+                    @(([workingColumn[i] intValue] -
+                       factor * [column[i] intValue])%2);
         }
         
         // prevent us from considering the same column twice.
