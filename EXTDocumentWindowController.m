@@ -31,6 +31,8 @@
 static void *_EXTScrollViewMagnificationContext = &_EXTScrollViewMagnificationContext;
 static void *_EXTChartViewControllerSelectedObjectContext = &_EXTChartViewControllerSelectedObjectContext;
 static void *_EXTArtBoardFrameContext = &_EXTArtBoardFrameContext;
+static void *_EXTDocumentGridSpacingContext = &_EXTDocumentGridSpacingContext;
+static void *_EXTDocumentGridEmphasisSpacingContext = &_EXTDocumentGridEmphasisSpacingContext;
 
 static CGFloat const _EXTDefaultMagnificationSteps[] = {0.1, 0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 2.0, 4.0, 8.0, 16.0, 32.0};
 static size_t const _EXTDefaultMagnificationStepsCount = sizeof(_EXTDefaultMagnificationSteps) / sizeof(_EXTDefaultMagnificationSteps[0]);
@@ -133,16 +135,11 @@ typedef enum : NSInteger {
     {
         [_chartScrollView setHasHorizontalRuler:YES];
         [_chartScrollView setHasVerticalRuler:YES];
-        [[_chartScrollView horizontalRulerView] setOriginOffset:-([_chartView bounds].origin.x-4.0)];
-        [[_chartScrollView verticalRulerView] setOriginOffset:-([_chartView bounds].origin.y-4.0)];
         [[_chartScrollView horizontalRulerView] setReservedThicknessForMarkers:0.0];
-        // TODO: Make this safe across window instances by hooking up custom
-        // rulers to EXTScrollView.
-        /*
-         [NSRulerView registerUnitWithName:@"units" abbreviation:NSLocalizedString(@"un", @"Units abbreviation string") unitToPointsConversionFactor:self.extDocument.gridSpacing stepUpCycle:@[@(self.extDocument.gridEmphasisSpacing)] stepDownCycle:@[@0.5]];
-        [[_chartScrollView horizontalRulerView] setMeasurementUnits:@"units"];
-        [[_chartScrollView verticalRulerView] setMeasurementUnits:@"units"];
-         */
+        [self _extUpdateRulerViewUnits];
+        [self.extDocument addObserver:self forKeyPath:@"gridSpacing" options:0 context:_EXTDocumentGridSpacingContext];
+        [self.extDocument addObserver:self forKeyPath:@"gridEmphasisSpacing" options:0 context:_EXTDocumentGridEmphasisSpacingContext];
+
         [_chartScrollView setUsesPredominantAxisScrolling:NO];
         [_chartScrollView setRulersVisible:YES];
         [_chartScrollView setAllowsMagnification:YES];
@@ -252,6 +249,8 @@ typedef enum : NSInteger {
     [_chartView.artBoard removeObserver:self forKeyPath:@"frame" context:_EXTArtBoardFrameContext];
     [_chartViewController removeObserver:_differentialPaneController forKeyPath:@"selectedObject"];
     [_chartViewController removeObserver:self forKeyPath:@"selectedObject"];
+    [self.extDocument removeObserver:self forKeyPath:@"gridSpacing" context:_EXTDocumentGridSpacingContext];
+    [self.extDocument removeObserver:self forKeyPath:@"gridEmphasisSpacing" context:_EXTDocumentGridEmphasisSpacingContext];
 
     for (NSDictionary *viewDelegatePair in _inspectorViewDelegates) {
         id<EXTDocumentInspectorViewDelegate> delegate = viewDelegatePair[@"delegate"];
@@ -259,6 +258,24 @@ typedef enum : NSInteger {
             [delegate documentWindowController:self willRemoveInspectorView:viewDelegatePair[@"view"]];
     }
 }
+
+#pragma mark - Ruler views
+
+- (void)_extUpdateRulerViewUnits {
+    const CGFloat halfGridSpacing = self.extDocument.gridSpacing / 2;
+    [[_chartScrollView horizontalRulerView] setOriginOffset:-([_chartView bounds].origin.x - halfGridSpacing)];
+    [[_chartScrollView verticalRulerView] setOriginOffset:-([_chartView bounds].origin.y - halfGridSpacing)];
+
+    NSString *unitName = [NSString stringWithFormat:@"EXTRulerViewUnit(%.2f, %ld)", self.extDocument.gridSpacing, self.extDocument.gridEmphasisSpacing];
+    [NSRulerView registerUnitWithName:unitName
+                         abbreviation:NSLocalizedString(@"un", @"Units abbreviation string")
+         unitToPointsConversionFactor:self.extDocument.gridSpacing
+                          stepUpCycle:@[@(self.extDocument.gridEmphasisSpacing)]
+                        stepDownCycle:@[@0.5]];
+    [[_chartScrollView horizontalRulerView] setMeasurementUnits:unitName];
+    [[_chartScrollView verticalRulerView] setMeasurementUnits:unitName];
+}
+
 
 #pragma mark - Zoom
 
@@ -385,7 +402,11 @@ typedef enum : NSInteger {
         } else {
             self.highlightLabel.stringValue = @"No selection.";
         }
-    } else
+    }
+    else if (context == _EXTDocumentGridSpacingContext || context == _EXTDocumentGridEmphasisSpacingContext) {
+        [self _extUpdateRulerViewUnits];
+    }
+    else
         [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
 }
 
