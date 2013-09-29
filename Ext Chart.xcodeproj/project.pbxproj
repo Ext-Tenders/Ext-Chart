@@ -53,6 +53,8 @@
 		3869FCF817B4587100D0D740 /* EXTDifferentialPaneController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3869FCF617B4587100D0D740 /* EXTDifferentialPaneController.m */; };
 		3869FCF917B4587100D0D740 /* EXTDifferentialPane.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3869FCF717B4587100D0D740 /* EXTDifferentialPane.xib */; };
 		3896548D16F538D90008FB8D /* EXTMatrix.m in Sources */ = {isa = PBXBuildFile; fileRef = 3896548C16F538D90008FB8D /* EXTMatrix.m */; };
+		3897740517F78B5800C6AD2F /* EXTZeroRangesInspector.m in Sources */ = {isa = PBXBuildFile; fileRef = 3897740317F78B5800C6AD2F /* EXTZeroRangesInspector.m */; };
+		3897740617F78B5800C6AD2F /* EXTZeroRangesInspector.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3897740417F78B5800C6AD2F /* EXTZeroRangesInspector.xib */; };
 		389FB38D17498AF500D0FE75 /* EXTMultiplicationTables.m in Sources */ = {isa = PBXBuildFile; fileRef = 389FB38C17498AF500D0FE75 /* EXTMultiplicationTables.m */; };
 		38A1AB6E1727009C00F9F9D5 /* todo.md in Resources */ = {isa = PBXBuildFile; fileRef = 38A1AB6D1727009C00F9F9D5 /* todo.md */; };
 		38A35E75178A018600D2A019 /* EXTDemos.m in Sources */ = {isa = PBXBuildFile; fileRef = 38A35E74178A018600D2A019 /* EXTDemos.m */; };
@@ -161,6 +163,9 @@
 		3869FCF717B4587100D0D740 /* EXTDifferentialPane.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = EXTDifferentialPane.xib; sourceTree = "<group>"; };
 		3896548B16F538D90008FB8D /* EXTMatrix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTMatrix.h; sourceTree = "<group>"; };
 		3896548C16F538D90008FB8D /* EXTMatrix.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTMatrix.m; sourceTree = "<group>"; };
+		3897740217F78B5800C6AD2F /* EXTZeroRangesInspector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTZeroRangesInspector.h; sourceTree = "<group>"; };
+		3897740317F78B5800C6AD2F /* EXTZeroRangesInspector.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTZeroRangesInspector.m; sourceTree = "<group>"; };
+		3897740417F78B5800C6AD2F /* EXTZeroRangesInspector.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = EXTZeroRangesInspector.xib; sourceTree = "<group>"; };
 		389FB38B17498AF500D0FE75 /* EXTMultiplicationTables.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTMultiplicationTables.h; sourceTree = "<group>"; };
 		389FB38C17498AF500D0FE75 /* EXTMultiplicationTables.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTMultiplicationTables.m; sourceTree = "<group>"; };
 		38A1AB6D1727009C00F9F9D5 /* todo.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = todo.md; sourceTree = "<group>"; };
@@ -316,6 +321,8 @@
 				14D78E5C17B5E44000B1BB52 /* EXTChartViewController.m */,
 				3869FCF517B4587100D0D740 /* EXTDifferentialPaneController.h */,
 				3869FCF617B4587100D0D740 /* EXTDifferentialPaneController.m */,
+				3897740217F78B5800C6AD2F /* EXTZeroRangesInspector.h */,
+				3897740317F78B5800C6AD2F /* EXTZeroRangesInspector.m */,
 				14EF1A6917584C080012DD3C /* EXTDocumentWindowController.h */,
 				14EF1A6A17584C080012DD3C /* EXTDocumentWindowController.m */,
 				38F707B517CDCD9C002273B1 /* EXTLeibnizWindowController.h */,
@@ -364,6 +371,7 @@
 				14F930BA17BF39EC0000176A /* EXTGridInspectorView.xib */,
 				38F707B717CDCD9D002273B1 /* EXTLeibnizWindow.xib */,
 				1498319F17AE04F3000380A5 /* EXTNewDocument.xib */,
+				3897740417F78B5800C6AD2F /* EXTZeroRangesInspector.xib */,
 				1DDD582A0DA1D0D100B32029 /* MainMenu.xib */,
 				1460B40D17B7360700B575E3 /* EXTPreferences.xib */,
 			);
@@ -533,6 +541,7 @@
 				38F7830B17565F72009D207A /* LICENSE in Resources */,
 				14CCA38C1794F21D002EF861 /* ArtBoardTool.pdf in Resources */,
 				14CCA38E1794F21D002EF861 /* Ext Chart.iconset in Resources */,
+				3897740617F78B5800C6AD2F /* EXTZeroRangesInspector.xib in Resources */,
 				38A92122179DCED8000B827D /* DifferentialTool.pdf in Resources */,
 				38A92123179DCED8000B827D /* MultiplicativeStructureTool.pdf in Resources */,
 				38A92125179DDF06000B827D /* GeneratorTool.pdf in Resources */,
@@ -592,6 +601,7 @@
 				3804BF6917C0775C00A74325 /* MBTableGridController.m in Sources */,
 				3804BF6A17C0775C00A74325 /* MBTableGridHeaderCell.m in Sources */,
 				3804BF6B17C0775C00A74325 /* MBTableGridHeaderView.m in Sources */,
+				3897740517F78B5800C6AD2F /* EXTZeroRangesInspector.m in Sources */,
 				3804BF6E17C07D7300A74325 /* EXTMatrixEditor.m in Sources */,
 				38F707B817CDCD9D002273B1 /* EXTLeibnizWindowController.m in Sources */,
 				1462B38B17D19D4A00BFDF50 /* EXTToolboxView.m in Sources */,

@@ -22,6 +22,7 @@
 #import "EXTDifferentialPaneController.h"
 #import "EXTDifferential.h"
 #import "EXTLeibnizWindowController.h"
+#import "EXTZeroRangesInspector.h"
 #import "NSUserDefaults+EXTAdditions.h"
 
 
@@ -68,6 +69,7 @@ typedef enum : NSInteger {
     EXTGeneratorInspectorViewController *_generatorInspectorViewController;
     EXTDifferentialPaneController *_differentialPaneController;
     EXTLeibnizWindowController *_leibnizWindowController;
+    EXTZeroRangesInspector *_zeroRangesInspectorController;
     NSArray *_inspectorViewDelegates;
     EXTDocumentInspectorView *_inspectorView;
     bool _sidebarHidden;
@@ -178,6 +180,9 @@ typedef enum : NSInteger {
         _differentialPaneController = [EXTDifferentialPaneController new];
         [_chartViewController addObserver:_differentialPaneController forKeyPath:@"selectedObject" options:NSKeyValueObservingOptionNew context:nil];
         [_inspectorView addSubview:_differentialPaneController.view withTitle:@"Differential" collapsed:true centered:true];
+        
+        _zeroRangesInspectorController = [EXTZeroRangesInspector new];
+        [_inspectorView addSubview:_zeroRangesInspectorController.view withTitle:@"Zero Ranges" collapsed:true centered:true];
 
         _gridInspectorViewController = [EXTGridInspectorViewController new];
         [_inspectorView addSubview:_gridInspectorViewController.view withTitle:@"Grid" collapsed:true centered:false];
@@ -185,6 +190,7 @@ typedef enum : NSInteger {
         _inspectorViewDelegates = @[
                                     @{@"view" : _generatorInspectorViewController.view, @"delegate" : _generatorInspectorViewController},
                                     @{@"view" : _differentialPaneController.view, @"delegate" : _differentialPaneController},
+                                    @{@"view" : _zeroRangesInspectorController.view, @"delegate" : _zeroRangesInspectorController },
                                     @{@"view" : _gridInspectorViewController.view, @"delegate" : _gridInspectorViewController},
                                     ];
 
