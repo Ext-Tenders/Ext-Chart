@@ -667,6 +667,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				INFOPLIST_FILE = "Ext_Chart-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				PRODUCT_NAME = "Ext Chart";
 				RUN_CLANG_STATIC_ANALYZER = NO;
 				SDKROOT = macosx;
@@ -691,6 +692,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				INFOPLIST_FILE = "Ext_Chart-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				PRODUCT_NAME = "Ext Chart";
 				RUN_CLANG_STATIC_ANALYZER = NO;
 				SDKROOT = macosx;
