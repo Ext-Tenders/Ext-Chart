@@ -75,7 +75,6 @@ typedef enum : NSInteger {
     NSArray *_inspectorViewDelegates;
     EXTDocumentInspectorView *_inspectorView;
     bool _sidebarHidden;
-    bool _sidebarAnimating;
 }
 
 #pragma mark - Life cycle
@@ -413,9 +412,6 @@ typedef enum : NSInteger {
 #pragma mark - Actions
 
 - (IBAction)toggleInspector:(id)sender {
-    if (_sidebarAnimating)
-        return;
-
     const NSRect contentFrame = [[[self window] contentView] frame];
     NSRect sidebarFrame = [_sidebarView frame];
     NSSize mainSize = [_mainView frame].size;
@@ -429,17 +425,10 @@ typedef enum : NSInteger {
         mainSize.width += sidebarFrame.size.width;
     }
 
-    // TODO: check why the chart view sometimes flashes during the animation. It is apparently
-    // related to the overlay scrollers showing up, and sometimes they won’t even automatically
-    // disappear afterwards!
-    _sidebarAnimating = true;
-    [NSAnimationContext runAnimationGroup:^(NSAnimationContext *context) {
-        [[_sidebarView animator] setFrame:sidebarFrame];
-        [[_mainView animator] setFrameSize:mainSize];
-    } completionHandler:^{
-        _sidebarHidden = !_sidebarHidden;
-        _sidebarAnimating = false;
-    }];
+    [_sidebarView setFrame:sidebarFrame];
+    [_mainView setFrameSize:mainSize];
+
+    _sidebarHidden = !_sidebarHidden;
 
     [[self window] makeFirstResponder:_chartView];
 }
