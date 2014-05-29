@@ -6,7 +6,7 @@
 //  Copyright (c) 2013 Harvard University. All rights reserved.
 //
 
-#import "MBTableGrid.h"
+#import "MBTableGrid/MBTableGrid.h"
 #import "EXTMatrix.h"
 
 @interface EXTMatrixEditor : MBTableGrid

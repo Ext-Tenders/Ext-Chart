@@ -7,8 +7,8 @@
 //
 
 #import "EXTMatrixEditor.h"
-#import "MBTableGridHeaderView.h"
-#import "MBTableGridCell.h"
+#import "../MBTableGrid/MBTableGridHeaderView.h"
+#import "../MBTableGrid/MBTableGridCell.h"
 
 
 @interface EXTMatrixEditor () <MBTableGridDataSource, MBTableGridDelegate>

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>6FB85E84-A162-40D3-B2E4-2812902E69F7</string>
+	<key>IDESourceControlProjectName</key>
+	<string>Ext Chart</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>1FB30C83-8AC0-4D57-9B6C-F81804D913E3</key>
+		<string>https://github.com/ecpeterson/Ext-Chart.git</string>
+		<key>690C358A-11FA-4C4C-8CDD-785DBE5B08DD</key>
+		<string>https://github.com/mikecsh/mbtablegrid.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>Ext Chart.xcodeproj/project.xcworkspace</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>1FB30C83-8AC0-4D57-9B6C-F81804D913E3</key>
+		<string>../..</string>
+		<key>690C358A-11FA-4C4C-8CDD-785DBE5B08DD</key>
+		<string>../../MBTableGrid</string>
+	</dict>
+	<key>IDESourceControlProjectRequiredConfigurationsDictionary</key>
+	<dict>
+		<key>690C358A-11FA-4C4C-8CDD-785DBE5B08DD</key>
+		<true/>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>https://github.com/ecpeterson/Ext-Chart.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>110</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>1FB30C83-8AC0-4D57-9B6C-F81804D913E3</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>1FB30C83-8AC0-4D57-9B6C-F81804D913E3</string>
+			<key>IDESourceControlWCCName</key>
+			<string>Ext-Chart</string>
+		</dict>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>690C358A-11FA-4C4C-8CDD-785DBE5B08DD</string>
+			<key>IDESourceControlWCCName</key>
+			<string>MBTableGrid</string>
+		</dict>
+	</array>
+</dict>
+</plist>
