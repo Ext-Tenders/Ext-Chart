@@ -5,7 +5,7 @@
 	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
 	<false/>
 	<key>IDESourceControlProjectIdentifier</key>
-	<string>6FB85E84-A162-40D3-B2E4-2812902E69F7</string>
+	<string>326BEF67-355F-4C98-99FC-75D8A748A1F4</string>
 	<key>IDESourceControlProjectName</key>
 	<string>Ext Chart</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
@@ -16,18 +16,13 @@
 		<string>https://github.com/mikecsh/mbtablegrid.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
-	<string>Ext Chart.xcodeproj/project.xcworkspace</string>
+	<string>Ext Chart.xcworkspace</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
 		<key>1FB30C83-8AC0-4D57-9B6C-F81804D913E3</key>
-		<string>../..</string>
+		<string>..</string>
 		<key>690C358A-11FA-4C4C-8CDD-785DBE5B08DD</key>
 		<string>../../MBTableGrid</string>
-	</dict>
-	<key>IDESourceControlProjectRequiredConfigurationsDictionary</key>
-	<dict>
-		<key>690C358A-11FA-4C4C-8CDD-785DBE5B08DD</key>
-		<true/>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
 	<string>https://github.com/ecpeterson/Ext-Chart.git</string>
