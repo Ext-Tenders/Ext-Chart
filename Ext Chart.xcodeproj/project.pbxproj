@@ -37,7 +37,6 @@
 		317707C413D784B0003475A2 /* EXTGrid.m in Sources */ = {isa = PBXBuildFile; fileRef = 317707C313D784B0003475A2 /* EXTGrid.m */; };
 		317707E113D7893A003475A2 /* EXTChartView.m in Sources */ = {isa = PBXBuildFile; fileRef = 317707E013D7893A003475A2 /* EXTChartView.m */; };
 		3187BA2713DC6C6C00C26803 /* EXTScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3187BA2413DC6C6C00C26803 /* EXTScrollView.m */; };
-		318EC0691409385F005D21D4 /* to do list.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 318EC0681409385F005D21D4 /* to do list.rtf */; };
 		31C77BA813E63F6800E9DBFC /* EXTAppController.m in Sources */ = {isa = PBXBuildFile; fileRef = 31C77BA713E63F6800E9DBFC /* EXTAppController.m */; };
 		31D403BB13DA0476006A8C06 /* EXTTerm.m in Sources */ = {isa = PBXBuildFile; fileRef = 31D403BA13DA0476006A8C06 /* EXTTerm.m */; };
 		31D403C013DA04D8006A8C06 /* EXTDifferential.m in Sources */ = {isa = PBXBuildFile; fileRef = 31D403BF13DA04D8006A8C06 /* EXTDifferential.m */; };
@@ -52,7 +51,6 @@
 		3897740517F78B5800C6AD2F /* EXTZeroRangesInspector.m in Sources */ = {isa = PBXBuildFile; fileRef = 3897740317F78B5800C6AD2F /* EXTZeroRangesInspector.m */; };
 		3897740617F78B5800C6AD2F /* EXTZeroRangesInspector.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3897740417F78B5800C6AD2F /* EXTZeroRangesInspector.xib */; };
 		389FB38D17498AF500D0FE75 /* EXTMultiplicationTables.m in Sources */ = {isa = PBXBuildFile; fileRef = 389FB38C17498AF500D0FE75 /* EXTMultiplicationTables.m */; };
-		38A1AB6E1727009C00F9F9D5 /* todo.md in Resources */ = {isa = PBXBuildFile; fileRef = 38A1AB6D1727009C00F9F9D5 /* todo.md */; };
 		38A35E75178A018600D2A019 /* EXTDemos.m in Sources */ = {isa = PBXBuildFile; fileRef = 38A35E74178A018600D2A019 /* EXTDemos.m */; };
 		38A92122179DCED8000B827D /* DifferentialTool.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 38A9211F179DCED8000B827D /* DifferentialTool.pdf */; };
 		38A92123179DCED8000B827D /* MultiplicativeStructureTool.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 38A92120179DCED8000B827D /* MultiplicativeStructureTool.pdf */; };
@@ -517,9 +515,7 @@
 				8D15AC2F0486D014006FF6A4 /* InfoPlist.strings in Resources */,
 				1DDD582C0DA1D0D100B32029 /* EXTDocument.xib in Resources */,
 				1DDD582D0DA1D0D100B32029 /* MainMenu.xib in Resources */,
-				318EC0691409385F005D21D4 /* to do list.rtf in Resources */,
 				38DDAA7B16EDA8990001841D /* README.md in Resources */,
-				38A1AB6E1727009C00F9F9D5 /* todo.md in Resources */,
 				38F7830B17565F72009D207A /* LICENSE in Resources */,
 				14CCA38C1794F21D002EF861 /* ArtBoardTool.pdf in Resources */,
 				14CCA38E1794F21D002EF861 /* Ext Chart.iconset in Resources */,
