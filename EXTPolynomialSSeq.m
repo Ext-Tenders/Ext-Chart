@@ -38,7 +38,9 @@
         return @"1";
     
     for (NSString *key in tags.keyEnumerator) {
-        ret = [ret stringByAppendingFormat:@" (%@)^{%@}", key.description, [tags objectForKey:key]];
+        ret = [ret stringByAppendingFormat:@" (%@)^{%@}",
+                    key.description,
+                    [tags objectForKey:key]];
     }
     
     return ret;
@@ -53,7 +55,8 @@
         if (!leftValue)
             [ret.tags setObject:rightValue forKey:key];
         else
-            [ret.tags setObject:@([rightValue intValue] + [leftValue intValue]) forKey:key];
+            [ret.tags setObject:@([rightValue intValue] + [leftValue intValue])
+                         forKey:key];
     }
     
     return ret;
@@ -151,8 +154,9 @@
     if (self = [super initWithIndexingClass:locClass]) {
         generators = [NSMutableArray array];
         
-        EXTTerm *unit = [EXTTerm term:[locClass identityLocation]
-                             andNames:[NSMutableArray arrayWithObject:[EXTPolynomialTag new]]];
+        EXTTerm *unit =
+            [EXTTerm term:[locClass identityLocation] andNames:
+                       [NSMutableArray arrayWithObject:[EXTPolynomialTag new]]];
         [self.terms setObject:unit forKey:unit.location];
     }
     
@@ -161,7 +165,8 @@
 
 // return an almost-empty spectral sequence
 +(EXTPolynomialSSeq*) sSeqWithIndexingClass:(Class<EXTLocation>)locClass {
-    EXTPolynomialSSeq *ret = [[EXTPolynomialSSeq alloc] initWithIndexingClass:locClass];
+    EXTPolynomialSSeq *ret =
+                    [[EXTPolynomialSSeq alloc] initWithIndexingClass:locClass];
     
     return ret;
 }
@@ -171,8 +176,10 @@
 // return value independent of the parent polynomial spectral sequence.  so,
 // this should be considered a DESTRUCTIVE method.
 -(EXTSpectralSequence*) upcastToSSeq {
-    EXTSpectralSequence *ret = [EXTSpectralSequence sSeqWithIndexingClass:self.indexClass];
-    ret.multTables.unitTerm = [self findTerm:[self.indexClass identityLocation]];
+    EXTSpectralSequence *ret =
+                    [EXTSpectralSequence sSeqWithIndexingClass:self.indexClass];
+    ret.multTables.unitTerm =
+        [self findTerm:[self.indexClass identityLocation]];
     
     // for the most part, we're already tracking the structure of a general sseq
     ret.terms = self.terms;
@@ -201,7 +208,8 @@
         partial.action = [self productWithLeft:leftTerm.location
                                                right:rightTerm.location];
         partial.inclusion = [EXTMatrix identity:partial.action.width];
-        partial.description = [NSString stringWithFormat:@"Inferred from polynomial structure."];
+        partial.description =
+            [NSString stringWithFormat:@"Inferred from polynomial structure."];
         [self.multTables addPartialDefinition:partial
                                            to:leftTerm.location
                                          with:rightTerm.location];
@@ -210,7 +218,9 @@
     return ret;
 }
 
--(void) addPolyClass:(NSObject<NSCopying>*)name location:(EXTLocation*)loc upTo:(int)bound {
+-(void) addPolyClass:(NSObject<NSCopying>*)name
+            location:(EXTLocation*)loc
+                upTo:(int)bound {
     // update the navigation members
     NSMutableDictionary *entry = [NSMutableDictionary new];
     
@@ -256,14 +266,20 @@
     tag.tags = [NSMutableDictionary dictionaryWithCapacity:generators.count];
     for (NSMutableDictionary *generator in generators)
         [tag.tags setObject:@0 forKey:[generator objectForKey:@"name"]];
-    [tag.tags setObject:@([[entry objectForKey:@"upperBound"] intValue]+1) forKey:name];
+    [tag.tags setObject:@([[entry objectForKey:@"upperBound"] intValue]+1)
+                 forKey:name];
     
     BOOL totalRollover = FALSE;
     while (!totalRollover) {
         // search for a term in the location encoded by the counter
         EXTLocation *workingLoc = [[self indexClass] identityLocation];
         for (NSDictionary *generator in generators)
-            workingLoc = [[self indexClass] addLocation:workingLoc to:[[self indexClass] scale:[generator objectForKey:@"location"] by:[[tag.tags objectForKey:[generator objectForKey:@"name"]] intValue]]];
+            workingLoc =
+                [[self indexClass] addLocation:workingLoc
+                            to:[[self indexClass]
+                         scale:[generator objectForKey:@"location"]
+                            by:[[tag.tags objectForKey:
+                                  [generator objectForKey:@"name"]] intValue]]];
         EXTTerm *term = [self findTerm:workingLoc];
         
         // if it doesn't exist, create it
@@ -276,7 +292,8 @@
         [term.names addObject:[tag copy]];
         
         // also need to modify all incoming and outgoing differentials.
-        EXTMatrix *inclusion = [EXTMatrix matrixWidth:(term.size-1) height:term.size];
+        EXTMatrix *inclusion = [EXTMatrix matrixWidth:(term.size-1)
+                                               height:term.size];
         for (int i = 0; i < term.size-1; i++)
             [inclusion.presentation[i] setObject:@1 atIndex:i];
         for (int i = 1; i < self.differentials.count; i++) {
@@ -284,9 +301,11 @@
                 *outgoing = [self findDifflWithSource:workingLoc onPage:i],
                 *incoming = [self findDifflWithTarget:workingLoc onPage:i];
             for (EXTPartialDefinition *partial in outgoing.partialDefinitions)
-                partial.inclusion = [EXTMatrix newMultiply:inclusion by:partial.inclusion];
+                partial.inclusion = [EXTMatrix newMultiply:inclusion
+                                                        by:partial.inclusion];
             for (EXTPartialDefinition *partial in incoming.partialDefinitions)
-                partial.action = [EXTMatrix newMultiply:inclusion by:partial.action];
+                partial.action = [EXTMatrix newMultiply:inclusion
+                                                     by:partial.action];
         }
         
         // increment the counter
@@ -294,18 +313,23 @@
              i < generators.count ? TRUE : !(totalRollover = TRUE);
              i++) {
             NSDictionary *generator = generators[i];
-            int value = [[tag.tags objectForKey:[generator objectForKey:@"name"]] intValue] + 1;
+            int value =
+                [[tag.tags objectForKey:[generator objectForKey:@"name"]]
+                        intValue] + 1;
             
             // there are two kinds of roll-over
             if ((generator == entry) && (value > newBound)) {
-                [tag.tags setObject:@([[generator objectForKey:@"upperBound"] intValue] + 1) forKey:name];
+                [tag.tags setObject:@([[generator objectForKey:@"upperBound"]
+                                       intValue] + 1)
+                             forKey:name];
                 continue;
             } else if ((generator != entry) &&
-                       (value > [[generator objectForKey:@"upperBound"] intValue])) {
+                  (value > [[generator objectForKey:@"upperBound"] intValue])) {
                 [tag.tags setObject:@0 forKey:[generator objectForKey:@"name"]];
                 continue;
             } else {
-                [tag.tags setObject:@(value) forKey:[generator objectForKey:@"name"]];
+                [tag.tags setObject:@(value)
+                             forKey:[generator objectForKey:@"name"]];
                 break;
             }
         } // for: counter increment
@@ -318,15 +342,18 @@
 }
 
 // builds the multiplication matrix for a pair of EXTLocations
--(EXTMatrix*) productWithLeft:(EXTLocation*)leftLoc right:(EXTLocation*)rightLoc {
+-(EXTMatrix*) productWithLeft:(EXTLocation*)leftLoc
+                        right:(EXTLocation*)rightLoc {
     EXTTerm *left = [self findTerm:leftLoc], *right = [self findTerm:rightLoc],
     *target = [self findTerm:[[leftLoc class] addLocation:leftLoc to:rightLoc]];
     
-    EXTMatrix *ret = [EXTMatrix matrixWidth:(left.size*right.size) height:target.size];
+    EXTMatrix *ret = [EXTMatrix matrixWidth:(left.size*right.size)
+                                     height:target.size];
     
     for (int i = 0; i < left.size; i++)
     for (int j = 0; j < right.size; j++) {
-        EXTPolynomialTag *sumTag = [EXTPolynomialTag sum:left.names[i] with:right.names[j]];
+        EXTPolynomialTag *sumTag = [EXTPolynomialTag sum:left.names[i]
+                                                    with:right.names[j]];
         int index = [target.names indexOfObject:sumTag];
         if (index != -1) {
             NSMutableArray *retcol = ret.presentation[i*right.size+j];
@@ -351,7 +378,8 @@
     
     // if we don't have differentials to work with, then skip this entirely.
     // XXX: i'm not sure this condition is quite right.
-    BOOL d1Zero = [self isInZeroRanges:[[loc1 class] followDiffl:loc1 page:page]],
+    BOOL d1Zero = [self isInZeroRanges:[[loc1 class] followDiffl:loc1
+                                                            page:page]],
     d2Zero = [self isInZeroRanges:[[loc2 class] followDiffl:loc2 page:page]];
     if ((!d1 && !d1Zero) ||
         (!d2 && !d2Zero) ||
@@ -381,21 +409,29 @@
         allZero.inclusion = [EXTMatrix identity:sumterm.size];
         allZero.action = [EXTMatrix matrixWidth:sumterm.size
                                                height:targetterm.size];
-        allZero.description = [NSString stringWithFormat:@"Leibniz rule on %@ and %@",loc1,loc2];
+        allZero.description =
+            [NSString stringWithFormat:@"Leibniz rule on %@ and %@",loc1,loc2];
         [dsum.partialDefinitions addObject:allZero];
     } else if (d1Zero && !d2Zero) {
         for (EXTPartialDefinition *partial2 in d2.partialDefinitions) {
             // in this case, we only have the right-hand differential, so
             // d(xy) = 0 + x dy.  this means building the span
             // A|B <-1|j- A|J -1|partial-> A|Y --mu-> Z.
-            EXTMatrix *muAY = [self productWithLeft:loc1 right:[[loc2 class] followDiffl:loc2 page:page]],
+            EXTMatrix *muAY = [self productWithLeft:loc1 right:
+                                [[loc2 class] followDiffl:loc2 page:page]],
                       *muAB = [self productWithLeft:loc1 right:loc2];
             
             EXTPartialDefinition *partial = [EXTPartialDefinition new];
             partial.inclusion =
-                [EXTMatrix newMultiply:muAB by:[EXTMatrix hadamardProduct:[EXTMatrix identity:A.size] with:partial2.inclusion]];
-            partial.action = [EXTMatrix newMultiply:muAY by:[EXTMatrix hadamardProduct:[EXTMatrix identity:A.size] with:partial2.action]];
-            partial.description = [NSString stringWithFormat:@"Leibniz rule on %@ and %@",loc1,loc2];
+                [EXTMatrix newMultiply:muAB by:
+                    [EXTMatrix hadamardProduct:[EXTMatrix identity:A.size]
+                                          with:partial2.inclusion]];
+            partial.action = [EXTMatrix newMultiply:muAY by:
+                    [EXTMatrix hadamardProduct:[EXTMatrix identity:A.size]
+                                          with:partial2.action]];
+            partial.description =
+                [NSString stringWithFormat:@"Leibniz rule on %@ and %@",
+                                            loc1, loc2];
             
             [dsum.partialDefinitions addObject:partial];
         }
@@ -404,14 +440,23 @@
             // in this case, we only have the left-hand differential, so
             // d(xy) = dx y.  this means building the span
             // A|B <-i|1- I|B -partial|1-> X|B --mu-> Z.
-            EXTMatrix *muXB = [self productWithLeft:[[loc1 class] followDiffl:loc1 page:page] right:loc2],
-                      *muAB = [self productWithLeft:loc1 right:loc2];
+            EXTMatrix
+                *muXB = [self productWithLeft:
+                          [[loc1 class] followDiffl:loc1 page:page] right:loc2],
+                *muAB = [self productWithLeft:loc1 right:loc2];
             
             EXTPartialDefinition *partial = [EXTPartialDefinition new];
             partial.inclusion =
-                [EXTMatrix newMultiply:muAB by:[EXTMatrix hadamardProduct:partial1.inclusion with:[EXTMatrix identity:B.size]]];
-            partial.action = [EXTMatrix newMultiply:muXB by:[EXTMatrix hadamardProduct:partial1.action with:[EXTMatrix identity:B.size]]];
-            partial.description = [NSString stringWithFormat:@"Leibniz rule on %@ and %@",loc1,loc2];
+                [EXTMatrix newMultiply:muAB by:
+                    [EXTMatrix hadamardProduct:partial1.inclusion
+                                          with:[EXTMatrix identity:B.size]]];
+            partial.action =
+                [EXTMatrix newMultiply:muXB by:
+                    [EXTMatrix hadamardProduct:partial1.action
+                                          with:[EXTMatrix identity:B.size]]];
+            partial.description =
+                [NSString stringWithFormat:@"Leibniz rule on %@ and %@",
+                                            loc1, loc2];
             
             [dsum.partialDefinitions addObject:partial];
         }
@@ -421,23 +466,42 @@
             // in this case, we only both differentials, so d(xy) = dx y + x dy.
             // this means building both spans, then taking their intersection,
             // and summing their action on the intersection.
-            EXTMatrix *muAY = [self productWithLeft:loc1 right:[[loc2 class] followDiffl:loc2 page:page]],
-                      *muXB = [self productWithLeft:[[loc1 class] followDiffl:loc1 page:page] right:loc2],
-                      *muAB = [self productWithLeft:loc1 right:loc2];
+            EXTMatrix
+                *muAY = [self productWithLeft:loc1
+                               right:[[loc2 class] followDiffl:loc2 page:page]],
+                *muXB = [self productWithLeft:
+                          [[loc1 class] followDiffl:loc1 page:page] right:loc2],
+                *muAB = [self productWithLeft:loc1 right:loc2];
 
             
             EXTMatrix
-                *rightInclusion = [EXTMatrix hadamardProduct:[EXTMatrix identity:A.size] with:partial2.inclusion],
-                *leftInclusion = [EXTMatrix hadamardProduct:partial1.inclusion with:[EXTMatrix identity:B.size]],
-                *rightMultiply = [EXTMatrix newMultiply:muAY by:[EXTMatrix hadamardProduct:[EXTMatrix identity:A.size] with:partial2.action]],
-                *leftMultiply = [EXTMatrix newMultiply:muXB by:[EXTMatrix hadamardProduct:partial1.action with:[EXTMatrix identity:B.size]]];
+                *rightInclusion =
+                    [EXTMatrix hadamardProduct:[EXTMatrix identity:A.size]
+                                          with:partial2.inclusion],
+                *leftInclusion =
+                    [EXTMatrix hadamardProduct:partial1.inclusion
+                                          with:[EXTMatrix identity:B.size]],
+                *rightMultiply =
+                    [EXTMatrix newMultiply:muAY by:
+                        [EXTMatrix hadamardProduct:[EXTMatrix identity:A.size]
+                                              with:partial2.action]],
+                *leftMultiply =
+                    [EXTMatrix newMultiply:muXB by:
+                       [EXTMatrix hadamardProduct:partial1.action
+                                             with:[EXTMatrix identity:B.size]]];
             
-            NSArray *pair = [EXTMatrix formIntersection:leftInclusion with:rightInclusion];
+            NSArray *pair = [EXTMatrix formIntersection:leftInclusion
+                                                   with:rightInclusion];
             
             EXTPartialDefinition *partial = [EXTPartialDefinition new];
-            partial.inclusion = [EXTMatrix newMultiply:muAB by:[EXTMatrix newMultiply:leftInclusion by:pair[0]]];
-            partial.action = [EXTMatrix sum:[EXTMatrix newMultiply:leftMultiply by:pair[0]] with:[EXTMatrix newMultiply:rightMultiply by:pair[1]]];
-            partial.description = [NSString stringWithFormat:@"Leibniz rule on %@ and %@",loc1,loc2];
+            partial.inclusion = [EXTMatrix newMultiply:muAB by:
+                            [EXTMatrix newMultiply:leftInclusion by:pair[0]]];
+            partial.action =
+               [EXTMatrix sum:[EXTMatrix newMultiply:leftMultiply by:pair[0]]
+                         with:[EXTMatrix newMultiply:rightMultiply by:pair[1]]];
+            partial.description =
+                [NSString stringWithFormat:@"Leibniz rule on %@ and %@",
+                                           loc1, loc2];
             
             [dsum.partialDefinitions addObject:partial];
         }
@@ -491,23 +555,31 @@
             [saveList addObject:tag];
         }
         
-        EXTMatrix *inclusion = [EXTMatrix matrixWidth:indexList.count height:term.size];
+        EXTMatrix *inclusion = [EXTMatrix matrixWidth:indexList.count
+                                               height:term.size];
         for (int index = 0; index < indexList.count; index++)
-            [inclusion.presentation[index] setObject:@1 atIndex:[indexList[index] intValue]];
+            [inclusion.presentation[index] setObject:@1
+                                           atIndex:[indexList[index] intValue]];
         
         for (int page = 0; page < self.differentials.count; page++) {
-            EXTDifferential *outgoing = [self findDifflWithSource:term.location onPage:page],
-                            *incoming = [self findDifflWithTarget:term.location onPage:page];
+            EXTDifferential *outgoing = [self findDifflWithSource:term.location
+                                                           onPage:page],
+                            *incoming = [self findDifflWithTarget:term.location
+                                                           onPage:page];
             
             for (EXTPartialDefinition *partial in outgoing.partialDefinitions) {
-                NSArray *pair = [EXTMatrix formIntersection:inclusion with:partial.inclusion];
+                NSArray *pair = [EXTMatrix formIntersection:inclusion
+                                                       with:partial.inclusion];
                 partial.inclusion = pair[0];
-                partial.action = [EXTMatrix newMultiply:partial.action by:pair[1]];
+                partial.action = [EXTMatrix newMultiply:partial.action
+                                                     by:pair[1]];
             }
             
             for (EXTPartialDefinition *partial in incoming.partialDefinitions) {
-                NSArray *pair = [EXTMatrix formIntersection:partial.action with:inclusion];
-                partial.inclusion = [EXTMatrix newMultiply:partial.inclusion by:pair[0]];
+                NSArray *pair = [EXTMatrix formIntersection:partial.action
+                                                       with:inclusion];
+                partial.inclusion = [EXTMatrix newMultiply:partial.inclusion
+                                                        by:pair[0]];
                 partial.action = pair[1];
             }
         } // differential pages
