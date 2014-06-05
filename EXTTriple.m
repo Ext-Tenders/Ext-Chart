@@ -27,7 +27,6 @@
 	return triple;
 }
 
-// more generally, maybe this could be replaced with an arbitrary projection mtx
 -(EXTIntPoint) gridPoint {
     return (EXTIntPoint){[self b] - [self a], [self a]};
 }
@@ -71,22 +70,6 @@
     return (start.c - end.c + 1);
 }
 
-+(EXTTriple*) convertFromString:(NSString *)input {
-    NSInteger a = 0, b = 0, c = 0;
-    NSScanner *scanner = [NSScanner scannerWithString:input];
-    [scanner scanString:@"(" intoString:nil];
-    if (![scanner scanInteger:&a])
-        return nil;
-    [scanner scanString:@"," intoString:nil];
-    if (![scanner scanInteger:&b])
-        return nil;
-    [scanner scanString:@"," intoString:nil];
-    if (![scanner scanInteger:&c])
-        return nil;
-    
-    return [EXTTriple tripleWithA:a B:b C:c];
-}
-
 -(EXTTriple*) copyWithZone:(NSZone*)zone {
     return [[EXTTriple allocWithZone:zone] initWithA:self.a B:self.b C:self.c];
 }
@@ -127,6 +110,180 @@
     [aCoder encodeInt:a forKey:@"a"];
     [aCoder encodeInt:b forKey:@"b"];
     [aCoder encodeInt:c forKey:@"c"];
+}
+
+@end
+
+
+
+
+@implementation EXTTripleToPoint
+
+@synthesize internalToUser, userToScreen;
+
+-(id)init {
+    if (!(self = [super init]))
+        return nil;
+    
+    self.internalToUser = [EXTMatrix identity:3];
+    self.userToScreen = [EXTMatrix identity:3];
+    
+    return self;
+}
+
+-(EXTTriple*) convertFromInternalToUser:(EXTTriple*)loc {
+    EXTMatrix *matFromPair = [EXTMatrix matrixWidth:1 height:3];
+    matFromPair.presentation[0][0] = @(loc.a);
+    matFromPair.presentation[0][1] = @(loc.b);
+    matFromPair.presentation[0][2] = @(loc.c);
+    
+    EXTMatrix *converted = [EXTMatrix newMultiply:internalToUser by:matFromPair];
+    return [EXTTriple tripleWithA:[converted.presentation[0][0] intValue]
+                                B:[converted.presentation[0][1] intValue]
+                                C:[converted.presentation[0][2] intValue]];
+}
+
+-(EXTTriple*) convertFromUserToInternal:(EXTTriple*)loc {
+    // TODO: we'd like to just use the -invert method here, but at the moment it
+    // looks like it uses -columnReduce, which is fixed to mod 2 arithmetic.
+    
+    NSArray *m = internalToUser.presentation;
+    
+    NSInteger det = [m[0][0] intValue] *
+                    ([m[1][1] intValue] * [m[2][2] intValue] -
+                     [m[1][2] intValue] * [m[2][1] intValue]) -
+                    [m[1][0] intValue] *
+                    ([m[0][1] intValue] * [m[2][2] intValue] -
+                     [m[2][1] intValue] * [m[0][2] intValue]) +
+                    [m[2][0] intValue] *
+                    ([m[0][1] intValue] * [m[1][2] intValue] -
+                     [m[1][1] intValue] * [m[0][2] intValue]);
+    
+    // XXX: surely this can be handled more gracefully. in any case, det should
+    // be a multiplicative unit.
+    assert(det == 1 || det == -1);
+    
+    // TODO: this actually write out the formula for an inverse manually.
+    // this is terrible. :( it will be a wonder if i get it completely right.
+    EXTMatrix *userToInternal = [EXTMatrix matrixWidth:3 height:3];
+    userToInternal.presentation[0][0] =
+        @([m[1][1] intValue]*[m[2][2] intValue] -
+          [m[2][0] intValue]*[m[1][2] intValue]);
+    userToInternal.presentation[0][1] =
+        @([m[2][1] intValue]*[m[0][2] intValue] -
+          [m[0][1] intValue]*[m[2][2] intValue]);
+    userToInternal.presentation[0][2] =
+        @([m[0][1] intValue]*[m[1][2] intValue] -
+          [m[1][1] intValue]*[m[0][2] intValue]);
+    userToInternal.presentation[1][0] =
+        @([m[2][0] intValue]*[m[1][2] intValue] -
+          [m[1][0] intValue]*[m[2][2] intValue]);
+    userToInternal.presentation[1][1] =
+        @([m[0][0] intValue]*[m[2][2] intValue] -
+          [m[2][0] intValue]*[m[0][2] intValue]);
+    userToInternal.presentation[1][2] =
+        @([m[1][0] intValue]*[m[0][2] intValue] -
+          [m[0][0] intValue]*[m[1][2] intValue]);
+    userToInternal.presentation[2][0] =
+        @([m[1][0] intValue]*[m[2][1] intValue] -
+          [m[2][0] intValue]*[m[1][1] intValue]);
+    userToInternal.presentation[2][1] =
+        @([m[2][0] intValue]*[m[0][1] intValue] -
+          [m[0][0] intValue]*[m[2][1] intValue]);
+    userToInternal.presentation[2][2] =
+        @([m[0][0] intValue]*[m[1][1] intValue] -
+          [m[1][0] intValue]*[m[0][1] intValue]);
+    
+    userToInternal = [userToInternal scale:(1/det)];
+    
+    NSArray *result = [userToInternal actOn:@[@(loc.a), @(loc.b), @(loc.c)]];
+    
+    return [EXTTriple tripleWithA:[result[0] intValue]
+                                B:[result[1] intValue]
+                                C:[result[2] intValue]];
+}
+
+-(EXTIntPoint) gridPoint:(EXTTriple*)loc {
+    EXTTriple *userCoordsTriple = [self convertFromInternalToUser:loc];
+    
+    EXTMatrix *userCoords = [EXTMatrix matrixWidth:1 height:3];
+    userCoords.presentation[0][0] = @(userCoordsTriple.a);
+    userCoords.presentation[0][1] = @(userCoordsTriple.b);
+    userCoords.presentation[0][2] = @(userCoordsTriple.c);
+    
+    EXTMatrix *screenCoords = [EXTMatrix newMultiply:userToScreen by:userCoords];
+    
+    return (EXTIntPoint)
+    {[screenCoords.presentation[0][0] intValue],
+        [screenCoords.presentation[0][1] intValue]};
+}
+
+-(EXTIntPoint) followDifflAtGridLocation:(EXTIntPoint)gridLocation
+                                    page:(int)page {
+    EXTMatrix *composite = [EXTMatrix newMultiply:userToScreen
+                                               by:internalToUser];
+    
+    EXTMatrix *clickCoord = [EXTMatrix matrixWidth:1 height:2];
+    clickCoord.presentation[0][0] = @((int)gridLocation.x);
+    clickCoord.presentation[0][1] = @((int)gridLocation.y);
+    
+    NSArray *pair = [EXTMatrix formIntersection:composite with:clickCoord];
+    
+    NSArray *lift = ((EXTMatrix*)pair[0]).presentation[0];
+    
+    EXTTriple *liftedTriple =
+        [EXTTriple tripleWithA:[lift[0] intValue]
+                             B:[lift[1] intValue]
+                             C:[lift[2] intValue]];
+    
+    return [self gridPoint:[EXTTriple followDiffl:liftedTriple page:page]];
+}
+
+-(EXTTriple*) convertFromString:(NSString *)input {
+    NSInteger s = 0, t = 0, u = 0;
+    NSScanner *scanner = [NSScanner scannerWithString:input];
+    [scanner scanString:@"(" intoString:nil];
+    if (![scanner scanInteger:&s])
+        return nil;
+    [scanner scanString:@"," intoString:nil];
+    if (![scanner scanInteger:&t])
+        return nil;
+    [scanner scanString:@"," intoString:nil];
+    if (![scanner scanInteger:&u])
+        return nil;
+    
+    return [self convertFromUserToInternal:[EXTTriple tripleWithA:s B:t C:u]];
+}
+
+-(NSString*) convertToString:(EXTTriple*)loc {
+    EXTTriple *user = [self convertFromInternalToUser:loc];
+    
+    return [NSString stringWithFormat: @"(%d %d %d)", user.a, user.b, user.c];
+}
+
+-(id)initWithCoder:(NSCoder *)aDecoder {
+    if (self = [super init]) {
+        internalToUser = [aDecoder decodeObjectForKey:@"internalToUser"];
+        userToScreen = [aDecoder decodeObjectForKey:@"userToScreen"];
+    }
+    
+    return self;
+}
+
+-(void)encodeWithCoder:(NSCoder *)aCoder {
+    [aCoder encodeObject:internalToUser forKey:@"internalToUser"];
+    [aCoder encodeObject:userToScreen forKey:@"userToScreen"];
+    
+    return;
+}
+
+-(id)copyWithZone:(NSZone *)zone {
+    EXTTripleToPoint *newConvertor = [EXTTripleToPoint init];
+    
+    newConvertor.internalToUser = [self.internalToUser copy];
+    newConvertor.userToScreen = [self.internalToUser copy];
+    
+    return newConvertor;
 }
 
 @end

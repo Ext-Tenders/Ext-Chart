@@ -116,7 +116,11 @@
     return self;
 }
 
-// the standard coordinate system is
+// the standard Z^2 coordinate system is graded so that setting both projection
+// matrices to the identity produces the Adams grading on display. however, this
+// is not what topologists are used to thinking of as the 'internal' grading to
+// an Adams spectral sequence: they want the axes to be labeled (t-s, s) for
+// internal coordinates (s, t). these matrices set up this yoga.
 - (id)initAdamsGrading {
     self = [self init];
     
@@ -168,13 +172,9 @@
 }
 
 -(EXTPair*) convertFromInternalToUser:(EXTPair*)loc {
-    EXTMatrix *matFromPair = [EXTMatrix matrixWidth:1 height:2];
-    matFromPair.presentation[0][0] = @(loc.a);
-    matFromPair.presentation[0][1] = @(loc.b);
-    
-    EXTMatrix *converted = [EXTMatrix newMultiply:internalToUser by:matFromPair];
-    return [EXTPair pairWithA:[converted.presentation[0][0] intValue]
-                            B:[converted.presentation[0][1] intValue]];
+    NSArray *converted = [internalToUser actOn:@[@(loc.a), @(loc.b)]];
+    return [EXTPair pairWithA:[converted[0] intValue]
+                            B:[converted[1] intValue]];
 }
 
 -(EXTPair*) convertFromUserToInternal:(EXTPair*)loc {
@@ -214,9 +214,6 @@
 
 -(EXTIntPoint) followDifflAtGridLocation:(EXTIntPoint)gridLocation
                                     page:(int)page {
-    EXTMatrix *userToScreen = [EXTMatrix matrixWidth:2 height:2],
-              *internalToUser = [EXTMatrix matrixWidth:2 height:2];
-    
     EXTMatrix *composite = [EXTMatrix newMultiply:userToScreen
                                                by:internalToUser];
     

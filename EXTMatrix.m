@@ -378,10 +378,11 @@
 }
 
 // matrix acts on a vector from the left.
--(NSMutableArray*) actOn:(NSMutableArray *)vector {
+-(NSMutableArray*) actOn:(NSArray *)vector {
     EXTMatrix *tempMatrix = [EXTMatrix matrixWidth:1 height:vector.count];
     
-    [tempMatrix.presentation setObject:vector atIndexedSubscript:0];
+    [tempMatrix.presentation setObject:[NSMutableArray arrayWithArray:vector]
+                    atIndexedSubscript:0];
     
     EXTMatrix *product = [EXTMatrix newMultiply:self by:tempMatrix];
     

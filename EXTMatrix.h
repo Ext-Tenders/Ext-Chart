@@ -58,7 +58,7 @@
 -(void) modularReduction;
 -(NSMutableArray*) kernel;
 -(NSMutableArray*) image;
--(NSMutableArray*) actOn:(NSMutableArray*)vector;
+-(NSMutableArray*) actOn:(NSArray*)vector;
 -(int) rank;
 -(EXTMatrix*) scale:(int)scalar;
 +(EXTMatrix*) sum:(EXTMatrix*)a with:(EXTMatrix*)b;
