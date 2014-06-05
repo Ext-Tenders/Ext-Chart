@@ -38,15 +38,13 @@
 // this internal grading, i.e., they describe the mapping (a, b) |-> (s, t).
 //
 // this is required to be an integrally invertible linear mapping.
-@property (strong) EXTPair* firstInternalCoord;
-@property (strong) EXTPair* secondInternalCoord;
+@property (strong) EXTMatrix *internalToUser;
 
 // then, a second projection is performed to produce screen coordinates for
 // drawing. these describe the second map in (a, b) |-> (s, t) |-> (x, y).
 //
 // this map is *NOT* required to be invertible.
-@property (assign) EXTIntPoint firstScreenCoord;
-@property (assign) EXTIntPoint secondScreenCoord;
+@property (strong) EXTMatrix *userToScreen;
 
 -(id) initAdamsGrading;
 -(id) initHomologicalSerreGrading;

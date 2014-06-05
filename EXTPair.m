@@ -104,19 +104,14 @@
 
 @implementation EXTPairToPoint
 
-@synthesize firstInternalCoord,
-            secondInternalCoord,
-            firstScreenCoord,
-            secondScreenCoord;
+@synthesize internalToUser, userToScreen;
 
 -(id)init {
     if (!(self = [super init]))
         return nil;
     
-    self.firstInternalCoord = [EXTPair pairWithA:1 B:0];
-    self.secondInternalCoord = [EXTPair pairWithA:0 B:1];
-    self.firstScreenCoord = EXTIntPointFromNSPoint(NSMakePoint(1., 0.));
-    self.secondScreenCoord = EXTIntPointFromNSPoint(NSMakePoint(0., 1.));
+    self.internalToUser = [EXTMatrix identity:2];
+    self.userToScreen = [EXTMatrix identity:2];
     
     return self;
 }
@@ -126,12 +121,16 @@
     self = [self init];
     
     // (a, b) |-> (b, a+b)
-    self.firstInternalCoord = [EXTPair pairWithA:0 B:1];
-    self.secondInternalCoord = [EXTPair pairWithA:1 B:1];
+    internalToUser.presentation[0][0] = @0;
+    internalToUser.presentation[0][1] = @1;
+    internalToUser.presentation[1][0] = @1;
+    internalToUser.presentation[1][1] = @1;
     
     // (s, t) |-> (t-s, s)
-    self.firstScreenCoord = (EXTIntPoint){-1., 1.};
-    self.secondScreenCoord = (EXTIntPoint){1., 0.};
+    userToScreen.presentation[0][0] = @(-1);
+    userToScreen.presentation[0][1] = @1;
+    userToScreen.presentation[1][0] = @1;
+    userToScreen.presentation[1][1] = @0;
     
     return self;
 }
@@ -140,13 +139,14 @@
     self = [self init];
     
     // differentials should go d_r: E_r^{s, t} --> E_r^{s+r, t-r+1}.
-    self.firstInternalCoord = [EXTPair pairWithA:0 B:(-1)];
-    self.secondInternalCoord = [EXTPair pairWithA:1 B:(-1)];
+    internalToUser.presentation[0][0] = @0;
+    internalToUser.presentation[0][1] = @(-1);
+    internalToUser.presentation[1][0] = @1;
+    internalToUser.presentation[1][1] = @(-1);
     
     // internal coordinates = visible coordinates.
     // perform a NOP to project to screen.
-    self.firstScreenCoord = (EXTIntPoint){1., 0.};
-    self.secondScreenCoord = (EXTIntPoint){0., 1.};
+    userToScreen = [EXTMatrix identity:2];
     
     return self;
 }
@@ -155,58 +155,67 @@
     self = [self init];
     
     // differentials should go d_r: E_r^{s, t} --> E_r^{s-r, t+r-1}.
-    self.firstInternalCoord = [EXTPair pairWithA:0 B:1];
-    self.secondInternalCoord = [EXTPair pairWithA:(-1) B:1];
+    internalToUser.presentation[0][0] = @0;
+    internalToUser.presentation[0][1] = @1;
+    internalToUser.presentation[1][0] = @(-1);
+    internalToUser.presentation[1][1] = @1;
     
     // internal coordinates = visible coordinates.
     // perform a NOP to project to screen.
-    self.firstScreenCoord = (EXTIntPoint){1., 0.};
-    self.secondScreenCoord = (EXTIntPoint){0., 1.};
+    userToScreen = [EXTMatrix identity:2];
     
     return self;
 }
 
 -(EXTPair*) convertFromInternalToUser:(EXTPair*)loc {
-    return [EXTPair
-      pairWithA:(loc.a * firstInternalCoord.a + loc.b * secondInternalCoord.a)
-              B:(loc.a * firstInternalCoord.b + loc.b * secondInternalCoord.b)];
+    EXTMatrix *matFromPair = [EXTMatrix matrixWidth:1 height:2];
+    matFromPair.presentation[0][0] = @(loc.a);
+    matFromPair.presentation[0][1] = @(loc.b);
+    
+    EXTMatrix *converted = [EXTMatrix newMultiply:internalToUser by:matFromPair];
+    return [EXTPair pairWithA:[converted.presentation[0][0] intValue]
+                            B:[converted.presentation[0][1] intValue]];
 }
 
 -(EXTPair*) convertFromUserToInternal:(EXTPair*)loc {
-    NSInteger det = firstInternalCoord.a * secondInternalCoord.b -
-                    firstInternalCoord.b * secondInternalCoord.a;
+    // TODO: we'd like to just use the -invert method here, but at the moment it
+    // looks like it uses -columnReduce, which is fixed to mod 2 arithmetic.
+    
+    NSInteger det = ([internalToUser.presentation[0][0] intValue] *
+                     [internalToUser.presentation[1][1] intValue]) -
+                    ([internalToUser.presentation[0][1] intValue] *
+                     [internalToUser.presentation[1][0] intValue]);
     
     // XXX: surely this can be handled more gracefully. in any case, det should
     // be a multiplicative unit.
     assert(det == 1 || det == -1);
     
-    int a = (loc.a*secondInternalCoord.b - loc.b*secondInternalCoord.a)/det,
-        b = (loc.a*(-firstInternalCoord.b) + loc.b*firstInternalCoord.a)/det;
+    int a = (loc.a*[internalToUser.presentation[1][1] intValue] -
+             loc.b*[internalToUser.presentation[1][0] intValue])/det,
+        b = (loc.a*[internalToUser.presentation[0][1] intValue]*(-1) +
+             loc.b*[internalToUser.presentation[0][0] intValue])/det;
     
     return [EXTPair pairWithA:a B:b];
 }
 
 -(EXTIntPoint) gridPoint:(EXTPair*)loc {
-    EXTPair *userCoords = [self convertFromInternalToUser:loc];
+    EXTPair *userCoordsPair = [self convertFromInternalToUser:loc];
+    
+    EXTMatrix *userCoords = [EXTMatrix matrixWidth:1 height:2];
+    userCoords.presentation[0][0] = @(userCoordsPair.a);
+    userCoords.presentation[0][1] = @(userCoordsPair.b);
+    
+    EXTMatrix *screenCoords = [EXTMatrix newMultiply:userToScreen by:userCoords];
+    
     return (EXTIntPoint)
-       {userCoords.a * firstScreenCoord.x + userCoords.b * secondScreenCoord.x,
-        userCoords.a * firstScreenCoord.y + userCoords.b * secondScreenCoord.y};
+       {[screenCoords.presentation[0][0] intValue],
+        [screenCoords.presentation[0][1] intValue]};
 }
 
 -(EXTIntPoint) followDifflAtGridLocation:(EXTIntPoint)gridLocation
                                     page:(int)page {
     EXTMatrix *userToScreen = [EXTMatrix matrixWidth:2 height:2],
               *internalToUser = [EXTMatrix matrixWidth:2 height:2];
-    
-    userToScreen.presentation[0][0] = @(firstScreenCoord.x);
-    userToScreen.presentation[0][1] = @(firstScreenCoord.y);
-    userToScreen.presentation[1][0] = @(secondScreenCoord.x);
-    userToScreen.presentation[1][1] = @(secondScreenCoord.y);
-    
-    internalToUser.presentation[0][0] = @(firstInternalCoord.a);
-    internalToUser.presentation[0][1] = @(firstInternalCoord.b);
-    internalToUser.presentation[1][0] = @(secondInternalCoord.a);
-    internalToUser.presentation[1][1] = @(secondInternalCoord.b);
     
     EXTMatrix *composite = [EXTMatrix newMultiply:userToScreen
                                                by:internalToUser];
@@ -245,26 +254,16 @@
 
 -(id)initWithCoder:(NSCoder *)aDecoder {
     if (self = [super init]) {
-        firstInternalCoord =
-            [aDecoder decodeObjectForKey:@"firstInternalCoord"];
-        secondInternalCoord =
-            [aDecoder decodeObjectForKey:@"secondInternalCoord"];
-        firstScreenCoord = EXTIntPointFromNSPoint(
-            [aDecoder decodePointForKey:@"firstScreenCoord"]);
-        secondScreenCoord = EXTIntPointFromNSPoint(
-            [aDecoder decodePointForKey:@"secondScreenCoord"]);
+        internalToUser = [aDecoder decodeObjectForKey:@"internalToUser"];
+        userToScreen = [aDecoder decodeObjectForKey:@"userToScreen"];
     }
     
     return self;
 }
 
 -(void)encodeWithCoder:(NSCoder *)aCoder {
-    [aCoder encodeObject:firstInternalCoord forKey:@"firstInternalCoord"];
-    [aCoder encodeObject:secondInternalCoord forKey:@"secondInternalCoord"];
-    [aCoder encodePoint:NSPointFromEXTIntPoint(firstScreenCoord)
-                 forKey:@"firstScreenCoord"];
-    [aCoder encodePoint:NSPointFromEXTIntPoint(secondScreenCoord)
-                 forKey:@"secondScreenCoord"];
+    [aCoder encodeObject:internalToUser forKey:@"internalToUser"];
+    [aCoder encodeObject:userToScreen forKey:@"userToScreen"];
     
     return;
 }
@@ -272,10 +271,8 @@
 -(id)copyWithZone:(NSZone *)zone {
     EXTPairToPoint *newConvertor = [EXTPairToPoint init];
     
-    newConvertor.firstInternalCoord = self.firstInternalCoord;
-    newConvertor.secondInternalCoord = self.secondInternalCoord;
-    newConvertor.firstScreenCoord = self.firstScreenCoord;
-    newConvertor.secondScreenCoord = self.secondScreenCoord;
+    newConvertor.internalToUser = [self.internalToUser copy];
+    newConvertor.userToScreen = [self.internalToUser copy];
     
     return newConvertor;
 }
