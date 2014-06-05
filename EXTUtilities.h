@@ -57,6 +57,10 @@ static inline EXTIntPoint EXTIntPointFromNSPoint(NSPoint point) {
     return (EXTIntPoint){(NSInteger)point.x, (NSInteger)point.y};
 }
 
+static inline NSPoint NSPointFromEXTIntPoint(EXTIntPoint point) {
+    return NSMakePoint(point.x, point.y);
+}
+
 static inline NSString *EXTStringFromIntPoint(EXTIntPoint point) {
     return [NSString stringWithFormat:@"(%ld, %ld)", point.x, point.y];
 }

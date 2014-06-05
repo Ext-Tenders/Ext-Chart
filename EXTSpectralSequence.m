@@ -16,7 +16,8 @@
 
 @implementation EXTSpectralSequence
 
-@synthesize terms, differentials, multTables, indexClass, zeroRanges;
+@synthesize terms, differentials, multTables, indexClass, zeroRanges,
+            locConvertor;
 
 - (id)initWithCoder:(NSCoder *)aDecoder {
     if (self = [super init]) {
@@ -46,6 +47,8 @@
                 break;
         }
         
+        locConvertor = [aDecoder decodeObjectForKey:@"locConvertor"];
+        
         zeroRanges = [aDecoder decodeObjectForKey:@"zeroRanges"];
         for (EXTZeroRange *zeroRange in zeroRanges) {
             if ([zeroRange isKindOfClass:[EXTZeroRangeStrict class]])
@@ -62,14 +65,16 @@
     [aCoder encodeObject:multTables forKey:@"multTables"];
     [aCoder encodeObject:zeroRanges forKey:@"zeroRanges"];
     
-    if ([[EXTPair class] isEqual:indexClass])
+    if ([[EXTPair class] isEqual:indexClass]) {
         [aCoder encodeInteger:EXTPair_KIND forKey:@"indexClass"];
-    else if ([[EXTTriple class] isEqual:indexClass])
+    } else if ([[EXTTriple class] isEqual:indexClass]) {
         [aCoder encodeInteger:EXTTriple_KIND forKey:@"indexClass"];
-    else {
+    } else {
         NSLog(@"unrecognized indexClass on write");
         [aCoder encodeInteger:EXTPair_KIND forKey:@"indexClass"];
     }
+    
+    [aCoder encodeObject:locConvertor forKey:@"locConvertor"];
 }
 
 -(EXTSpectralSequence*) initWithIndexingClass:(Class<EXTLocation>)locClass {
@@ -78,9 +83,18 @@
         differentials = [NSMutableArray array];
         differentials[0] = [NSMutableDictionary dictionary];
         multTables = [EXTMultiplicationTables multiplicationTables:self];
-        indexClass = locClass;
         zeroRanges = [NSMutableArray array];
         [zeroRanges addObject:[EXTZeroRangeStrict newWithSSeq:self]];
+        indexClass = locClass;
+        
+        if ([[EXTPair class] isEqual:locClass]) {
+            self.locConvertor = [EXTPairToPoint new];
+        } else if ([[EXTTriple class] isEqual:locClass]) {
+            assert(false);
+//            self.locConvertor = [EXTTripleToPoint new];
+        } else {
+            DLog(@"-initWithIndexingClass doesn't recognize EXTLocationToPoint.");
+        }
     }
     
     return self;
@@ -95,6 +109,7 @@
     differentials[0] = [NSMutableDictionary dictionary];
     multTables = [EXTMultiplicationTables multiplicationTables:self];
     indexClass = [EXTPair class];
+    locConvertor = [[EXTPairToPoint alloc] initAdamsGrading];
     zeroRanges = [NSMutableArray array];
     [zeroRanges addObject:[EXTZeroRangeStrict newWithSSeq:self]];
     
@@ -530,7 +545,7 @@
     NSMutableDictionary *difflsOnPage = self.differentials[page];
     
     for (EXTLocation *loc in difflsOnPage) {
-        EXTIntPoint difflPoint = [loc gridPoint];
+        EXTIntPoint difflPoint = [self.locConvertor gridPoint:loc];
         if (EXTEqualIntPoints(difflPoint, point))
             [ret addObject:[difflsOnPage objectForKey:loc]];
     }
@@ -542,7 +557,7 @@
     NSMutableArray *ret = [NSMutableArray array];
     
     for (EXTLocation *loc in terms) {
-        EXTIntPoint termPoint = [loc gridPoint];
+        EXTIntPoint termPoint = [self.locConvertor gridPoint:loc];
         if (EXTEqualIntPoints(termPoint, point))
             [ret addObject:[terms objectForKey:loc]];
     }

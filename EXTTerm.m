@@ -48,7 +48,8 @@
     return self;
 }
 
-+(EXTTerm*) term:(EXTLocation*)whichLocation andNames:(NSMutableArray*)whichNames {
++(EXTTerm*) term:(EXTLocation*)whichLocation
+        andNames:(NSMutableArray*)whichNames {
     EXTTerm *term = [EXTTerm new];
     [term setTerm:whichLocation andNames:whichNames];
     return term;

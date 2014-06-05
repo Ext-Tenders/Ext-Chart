@@ -111,7 +111,7 @@ static NSCache *_EXTLayerCache = nil;
 
         case _EXTDifferentialToolTag: {
             EXTGrid *grid = chartView.grid;
-            const EXTIntPoint targetGridPoint = [_document.sseq.indexClass followDifflAtGridLocation:gridLocation page:_currentPage];
+            const EXTIntPoint targetGridPoint = [_document.sseq.locConvertor followDifflAtGridLocation:gridLocation page:_currentPage];
             const NSRect sourceRect = [grid viewBoundingRectForGridPoint:gridLocation];
             const NSRect targetRect = [grid viewBoundingRectForGridPoint:targetGridPoint];
 
@@ -129,6 +129,8 @@ static NSCache *_EXTLayerCache = nil;
 
 // this performs the culling and delegation calls for drawing a page of the SS
 - (void)chartView:(EXTChartView *)chartView drawPageInGridRect:(const EXTIntRect)gridRect {
+    EXTSpectralSequence *sseq = _document.sseq;
+    
     // start by initializing the array of counts
     NSMutableArray *counts = [NSMutableArray arrayWithCapacity:gridRect.size.width];
     for (int i = 0; i < gridRect.size.width; i++) {
@@ -147,8 +149,8 @@ static NSCache *_EXTLayerCache = nil;
     // they get drawn.  this will probably need to be changed when we move to
     // Z-mods, since those have lots of interesting quotients which need to
     // represented visually.
-    for (EXTTerm *term in _document.sseq.terms.allValues) {
-        EXTIntPoint point = [[term location] gridPoint];
+    for (EXTTerm *term in sseq.terms.allValues) {
+        EXTIntPoint point = [sseq.locConvertor gridPoint:term.location];
 
         if (EXTIntPointInRect(point, gridRect)) {
             NSMutableArray *column = (NSMutableArray*)counts[(int)(point.x-gridRect.origin.x)];
@@ -193,16 +195,18 @@ static NSCache *_EXTLayerCache = nil;
     }
 
     // iterate also through the available differentials
-    if (_currentPage >= _document.sseq.differentials.count)
+    if (_currentPage >= sseq.differentials.count)
         return;
 
-    for (EXTDifferential *differential in ((NSDictionary*)_document.sseq.differentials[_currentPage]).allValues) {
+    for (EXTDifferential *differential in ((NSDictionary*)sseq.differentials[_currentPage]).allValues) {
         // some sanity checks to make sure this differential is worth drawing
         if ([differential page] != _currentPage)
             continue;
 
-        const EXTIntPoint startPoint = differential.start.location.gridPoint;
-        const EXTIntPoint endPoint = differential.end.location.gridPoint;
+        const EXTIntPoint startPoint =
+                [sseq.locConvertor gridPoint:differential.start.location];
+        const EXTIntPoint endPoint =
+                [sseq.locConvertor gridPoint:differential.end.location];
         const bool startPointInGridRect = EXTIntPointInRect(startPoint, gridRect);
         const bool endPointInGridRect = EXTIntPointInRect(endPoint, gridRect);
         
@@ -530,10 +534,16 @@ static NSCache *_EXTLayerCache = nil;
 - (void)_extDrawGridSelectionBackgroundForTerm:(EXTTerm *)term inGridRect:(EXTIntRect)gridRect {
     const CGFloat selectionInset = 0.25;
 
-    if (EXTIntPointInRect(term.location.gridPoint, gridRect)) {
-        NSColor *bgcolor = [[[self chartView] highlightColor] blendedColorWithFraction:0.8 ofColor:[NSColor whiteColor]];
+    if (EXTIntPointInRect([_document.sseq.locConvertor gridPoint:term.location],
+                          gridRect)) {
+        NSColor *bgcolor =
+            [[[self chartView] highlightColor]
+                    blendedColorWithFraction:0.8 ofColor:[NSColor whiteColor]];
         [bgcolor setFill];
-        const NSRect squareSelection = NSInsetRect([self _extBoundingRectForTerm:term], selectionInset, selectionInset);
+        const NSRect squareSelection =
+            NSInsetRect([self _extBoundingRectForTerm:term],
+                        selectionInset,
+                        selectionInset);
         NSRectFill(squareSelection);
     }
 }
@@ -558,7 +568,7 @@ static NSCache *_EXTLayerCache = nil;
 
 - (NSRect)_extBoundingRectForTerm:(EXTTerm *)term {
     EXTGrid *grid = self.chartView.grid;
-    return [grid viewBoundingRectForGridPoint:term.location.gridPoint];
+    return [grid viewBoundingRectForGridPoint:[_document.sseq.locConvertor gridPoint:term.location]];
 }
 
 #pragma mark - Key-Value Coding

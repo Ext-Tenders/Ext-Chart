@@ -22,6 +22,7 @@
 @property(nonatomic, strong) NSMutableArray *differentials;
 @property(nonatomic, strong) EXTMultiplicationTables *multTables;
 @property(nonatomic, assign, readonly) Class<EXTLocation> indexClass;
+@property(nonatomic, strong) EXTLocationToPoint *locConvertor;
 @property(nonatomic, strong) NSMutableArray *zeroRanges;
 
 -(EXTSpectralSequence*) initWithIndexingClass:(Class<EXTLocation>)locClass;

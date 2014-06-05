@@ -72,6 +72,9 @@
 
 - (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row {
     NSAssert(row >= 0 && row < self.generators.count, @"Table view row index is out of bounds");
+    
+    if ([[tableColumn identifier] isEqualToString:@"location"])
+        return [_sseq.locConvertor convertToString:[[self.generators objectAtIndex:row] objectForKey:[tableColumn identifier]]];
 
     return [[[self.generators objectAtIndex:row] objectForKey:[tableColumn identifier]] description];
 }
@@ -110,7 +113,8 @@
         return;
     
     EXTPolynomialSSeq *polySSeq = (EXTPolynomialSSeq*) _sseq;
-    EXTLocation *loc = [[polySSeq indexClass] convertFromString:[self.textField stringValue]];
+    EXTLocation *loc =
+        [polySSeq.locConvertor convertFromString:[self.textField stringValue]];
     
     if (!loc)
         return;
