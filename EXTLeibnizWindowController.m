@@ -54,7 +54,7 @@
 }
 
 - (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row {
-    return ((EXTLocation*)self.list[row]).description;
+    return [self.documentWindowController.extDocument.sseq.locConvertor convertToString:(EXTLocation*)self.list[row]];
 }
 
 -(void)mouseDownAtGridLocation:(EXTIntPoint)gridLocation {

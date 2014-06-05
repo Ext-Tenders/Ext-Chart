@@ -397,7 +397,7 @@ typedef enum : NSInteger {
         NSObject *newValue = change[NSKeyValueChangeNewKey];
         if ([newValue isKindOfClass:[EXTDifferential class]]) {
             EXTDifferential *diff = (EXTDifferential*)newValue;
-            self.highlightLabel.stringValue = [NSString stringWithFormat:@"Differential: %@ → %@",diff.start.location,diff.end.location];
+            self.highlightLabel.stringValue = [NSString stringWithFormat:@"Differential: %@ → %@", [self.extDocument.sseq.locConvertor convertToString:diff.start.location], [self.extDocument.sseq.locConvertor convertToString:diff.end.location]];
         } else {
             self.highlightLabel.stringValue = @"No selection.";
         }
