@@ -219,9 +219,6 @@
 // runs gaussian column reduction on a matrix over Z.  useful for finding a
 // presentation of the image of the matrix.
 -(EXTMatrix*) columnReduce {
-    if ([self.presentation[2][0] intValue] == -1)
-        DLog(@"ugh.");
-    
     EXTMatrix *ret = [self copy];
     NSMutableArray *usedColumns = [NSMutableArray array];
     for (int i = 0; i < width; i++)
@@ -231,19 +228,41 @@
          pivotRow < height;
          pivotRow++) {
         
-        int j;
-        NSMutableArray *row = [NSMutableArray arrayWithCapacity:width];
+        int j, firstNonzeroEntry = -1;
+        NSMutableArray *row = [NSMutableArray arrayWithCapacity:width],
+                       *rowToBezout = [NSMutableArray arrayWithCapacity:width];
         
         // save this row for analysis.
-        for (int k = 0; k < width; k++)
+        for (int k = 0; k < width; k++) {
             row[k] = ret.presentation[k][pivotRow];
+            
+            if ([usedColumns[k] intValue])
+                rowToBezout[k] = @0;
+            else
+                rowToBezout[k] = ret.presentation[k][pivotRow];
+            
+            if (firstNonzeroEntry == -1 && [row[k] intValue] != 0)
+                firstNonzeroEntry = k;
+        }
         
         // compute the bezout vector for this row.
-        NSMutableArray *bezout = [NSMutableArray arrayWithCapacity:row.count];
-        NSInteger gcd = [row[0] intValue];
-        bezout[0] = row[0];
+        NSMutableArray *bezout =
+                        [NSMutableArray arrayWithCapacity:rowToBezout.count];
+        NSInteger gcd = [rowToBezout[firstNonzeroEntry] intValue];
+        for (int k = 0; k < firstNonzeroEntry; k++)
+            bezout[k] = @0;
+        bezout[firstNonzeroEntry] = row[firstNonzeroEntry];
             
-        for (NSInteger index = 1; index < row.count; index++) {
+        for (NSInteger index = firstNonzeroEntry + 1;
+             index < row.count;
+             index++) {
+            
+            // don't look at this column if it's already been used.
+            if ([usedColumns[index] intValue]) {
+                bezout[index] = @0;
+                continue;
+            }
+            
             int rOld = gcd, rNew = [row[index] intValue];
             int sOld = 1, sNew = 0;
             int tOld = 0, tNew = 1;
@@ -268,14 +287,6 @@
                 temp = tNew;
                 tNew = tOld - tNew * quotient;
                 tOld = temp;
-            }
-            
-            // if we're not going to change the gcd and this most recent row
-            // has already been used in a reduction, then we should avoid
-            // involving it with the bezout combination at all.
-            if (gcd == rOld && [usedColumns[index] intValue]) {
-                bezout[index] = @0;
-                continue;
             }
             
             gcd = rOld;
@@ -307,30 +318,31 @@
         // start by forming the extended gcd for this row and replacing this
         // column with the Bezout-weighted sum of the columns.
         NSArray *newColumn = [ret actOn:bezout];
-        for (int k = 0; k < height; k++)
-            ret.presentation[pivotColumn][k] = newColumn[k];
+        ret.presentation[pivotColumn] =
+                [NSMutableArray arrayWithArray:newColumn];
         
         // then iterate through the other columns...
-        NSMutableArray *column = ret.presentation[pivotColumn];
         for (j = 0; j < width; j++) {
             NSMutableArray *workingColumn = ret.presentation[j];
-            
-            // skip the column we're working with, of course!
-            if (j == pivotColumn)
-                continue;
+        
+            // skip the column if this row is already zeroed out.
             if ([workingColumn[pivotRow] intValue] == 0)
+                continue;
+            // also skip the column if it's already been used & so is stuck.
+            // this includes the present pivotColumn.
+            if ([usedColumns[j] intValue])
                 continue;
             
             // NOTE: this is *always* an integer, because the pivotRow entry of
             // our pivotColumn now contains the gcd of all the pivotRow values.
             int factor = [workingColumn[pivotRow] intValue] /
-                         [column[pivotRow] intValue];
+                         [newColumn[pivotRow] intValue];
             
             // ... and for each entry in this column, subtract.
             for (int i = 0; i < height; i++)
                 workingColumn[i] =
                     @([workingColumn[i] intValue] -
-                       factor * [column[i] intValue]);
+                       factor * [newColumn[i] intValue]);
         }
     }
 
