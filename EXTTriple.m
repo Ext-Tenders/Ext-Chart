@@ -126,7 +126,11 @@
         return nil;
     
     self.internalToUser = [EXTMatrix identity:3];
-    self.userToScreen = [EXTMatrix identity:3];
+    self.userToScreen = [EXTMatrix matrixWidth:3 height:2];
+    
+    self.userToScreen.presentation[0][0] = @(-1);
+    self.userToScreen.presentation[0][1] = @1;
+    self.userToScreen.presentation[1][0] = @1;
     
     return self;
 }
@@ -235,6 +239,10 @@
         [EXTTriple tripleWithA:[lift[0] intValue]
                              B:[lift[1] intValue]
                              C:[lift[2] intValue]];
+    
+    if ([((EXTMatrix*)pair[1]).presentation[0][0] intValue] == -1) {
+        liftedTriple   = [EXTTriple scale:liftedTriple by:-1];
+    }
     
     return [self gridPoint:[EXTTriple followDiffl:liftedTriple page:page]];
 }

@@ -223,12 +223,13 @@
     
     NSArray *pair = [EXTMatrix formIntersection:composite with:clickCoord];
     
-    if (((EXTMatrix*)pair[0]).presentation.count == 0)
-        return (EXTIntPoint){0., 0.};
-    
     NSArray *lift = ((EXTMatrix*)pair[0]).presentation[0];
     
     EXTPair *liftedPair = [EXTPair pairWithA:[lift[0] intValue] B:[lift[1] intValue]];
+    
+    if ([((EXTMatrix*)pair[1]).presentation[0][0] intValue] == -1) {
+        liftedPair = [EXTPair scale:liftedPair by:-1];
+    }
     
     return [self gridPoint:[EXTPair followDiffl:liftedPair page:page]];
 }

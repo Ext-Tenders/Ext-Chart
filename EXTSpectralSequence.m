@@ -90,8 +90,7 @@
         if ([[EXTPair class] isEqual:locClass]) {
             self.locConvertor = [EXTPairToPoint new];
         } else if ([[EXTTriple class] isEqual:locClass]) {
-            assert(false);
-//            self.locConvertor = [EXTTripleToPoint new];
+            self.locConvertor = [EXTTripleToPoint new];
         } else {
             DLog(@"-initWithIndexingClass doesn't recognize EXTLocationToPoint.");
         }
@@ -109,7 +108,7 @@
     differentials[0] = [NSMutableDictionary dictionary];
     multTables = [EXTMultiplicationTables multiplicationTables:self];
     indexClass = [EXTPair class];
-    locConvertor = [[EXTPairToPoint alloc] initAdamsGrading];
+    locConvertor = [EXTPairToPoint new];
     zeroRanges = [NSMutableArray array];
     [zeroRanges addObject:[EXTZeroRangeStrict newWithSSeq:self]];
     
