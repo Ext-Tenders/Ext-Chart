@@ -223,6 +223,9 @@
     
     NSArray *pair = [EXTMatrix formIntersection:composite with:clickCoord];
     
+    if (((EXTMatrix*)pair[0]).presentation.count == 0)
+        return (EXTIntPoint){0., 0.};
+    
     NSArray *lift = ((EXTMatrix*)pair[0]).presentation[0];
     
     EXTPair *liftedPair = [EXTPair pairWithA:[lift[0] intValue] B:[lift[1] intValue]];

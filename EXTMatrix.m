@@ -216,59 +216,19 @@
     return copy;
 }
 
-+(NSArray*) computeBezout:(NSArray*)numbers {
-    NSMutableArray *ret = [NSMutableArray arrayWithCapacity:(numbers.count+1)];
-    NSInteger gcd = [numbers[0] intValue];
-    ret[0] = numbers[0];
-    
-    for (NSInteger index = 1; index < numbers.count; index++) {
-        int rOld = gcd, rNew = [numbers[index] intValue];
-        int sOld = 1, sNew = 0;
-        int tOld = 0, tNew = 1;
-        int temp, quotient;
-        
-        if (rNew == 0) {
-            ret[index] = @0;
-            continue;
-        }
-        
-        while (rNew != 0) {
-            quotient = rOld / rNew;
-            
-            temp = rNew;
-            rNew = rOld - quotient * rNew;
-            rOld = temp;
-            
-            temp = sNew;
-            sNew = sOld - sNew * quotient;
-            sOld = temp;
-            
-            temp = tNew;
-            tNew = tOld - tNew * quotient;
-            tOld = temp;
-        }
-        
-        gcd = rOld;
-        ret[index] = @(tOld);
-        for (NSInteger j = 0; j < index; j++)
-            ret[j] = @([ret[j] intValue] * sOld);
-    }
-    
-    ret[numbers.count] = @(gcd);
-    
-    return ret;
-}
-
 // runs gaussian column reduction on a matrix over Z.  useful for finding a
 // presentation of the image of the matrix.
 -(EXTMatrix*) columnReduce {
+    if ([self.presentation[2][0] intValue] == -1)
+        DLog(@"ugh.");
+    
     EXTMatrix *ret = [self copy];
     NSMutableArray *usedColumns = [NSMutableArray array];
     for (int i = 0; i < width; i++)
         usedColumns[i] = @(false);
     
     for (int pivotRow = 0, pivotColumn = 0;
-         (pivotRow < height) && (pivotColumn < width);
+         pivotRow < height;
          pivotRow++) {
         
         int j;
@@ -278,7 +238,51 @@
         for (int k = 0; k < width; k++)
             row[k] = ret.presentation[k][pivotRow];
         
-        NSArray *bezout = [EXTMatrix computeBezout:row];
+        // compute the bezout vector for this row.
+        NSMutableArray *bezout = [NSMutableArray arrayWithCapacity:row.count];
+        NSInteger gcd = [row[0] intValue];
+        bezout[0] = row[0];
+            
+        for (NSInteger index = 1; index < row.count; index++) {
+            int rOld = gcd, rNew = [row[index] intValue];
+            int sOld = 1, sNew = 0;
+            int tOld = 0, tNew = 1;
+            int temp, quotient;
+                
+            if (rNew == 0) {
+                bezout[index] = @0;
+                continue;
+            }
+                
+            while (rNew != 0) {
+                quotient = rOld / rNew;
+                    
+                temp = rNew;
+                rNew = rOld - quotient * rNew;
+                rOld = temp;
+                    
+                temp = sNew;
+                sNew = sOld - sNew * quotient;
+                sOld = temp;
+                    
+                temp = tNew;
+                tNew = tOld - tNew * quotient;
+                tOld = temp;
+            }
+            
+            // if we're not going to change the gcd and this most recent row
+            // has already been used in a reduction, then we should avoid
+            // involving it with the bezout combination at all.
+            if (gcd == rOld && [usedColumns[index] intValue]) {
+                bezout[index] = @0;
+                continue;
+            }
+            
+            gcd = rOld;
+            bezout[index] = @(tOld);
+            for (NSInteger j = 0; j < index; j++)
+                bezout[j] = @([bezout[j] intValue] * sOld);
+        }
         
         // find the first nonzero entry in this row, right of where we're at
         for (j = 0; j < width; j++) {
@@ -302,21 +306,21 @@
         //
         // start by forming the extended gcd for this row and replacing this
         // column with the Bezout-weighted sum of the columns.
-        NSArray *newColumn =
-                  [ret actOn:[bezout subarrayWithRange:NSMakeRange(0, width)]];
+        NSArray *newColumn = [ret actOn:bezout];
         for (int k = 0; k < height; k++)
             ret.presentation[pivotColumn][k] = newColumn[k];
         
         // then iterate through the other columns...
         NSMutableArray *column = ret.presentation[pivotColumn];
         for (j = 0; j < width; j++) {
+            NSMutableArray *workingColumn = ret.presentation[j];
+            
             // skip the column we're working with, of course!
             if (j == pivotColumn)
                 continue;
-            if ([column[pivotRow] intValue] == 0)
+            if ([workingColumn[pivotRow] intValue] == 0)
                 continue;
             
-            NSMutableArray *workingColumn = ret.presentation[j];
             // NOTE: this is *always* an integer, because the pivotRow entry of
             // our pivotColumn now contains the gcd of all the pivotRow values.
             int factor = [workingColumn[pivotRow] intValue] /
@@ -328,9 +332,6 @@
                     @([workingColumn[i] intValue] -
                        factor * [column[i] intValue]);
         }
-        
-        // prevent us from considering the same column twice.
-        pivotColumn++;
     }
 
     return ret;
@@ -359,8 +360,7 @@
     NSMutableArray *ret = [NSMutableArray array];
     
     for (int i = 0; i < reducedMatrix.width; i++) {
-        NSMutableArray *augmentedColumn =
-            [reducedMatrix.presentation objectAtIndex:i];
+        NSMutableArray *augmentedColumn = reducedMatrix.presentation[i];
         
         // test to see if the original column is full of zeroes
         bool skipme = false;
