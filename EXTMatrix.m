@@ -259,8 +259,8 @@
     return ret;
 }
 
-// runs gaussian column reduction on a matrix.  useful of course for finding
-// a presentation of the image of a matrix.
+// runs gaussian column reduction on a matrix over Z.  useful for finding a
+// presentation of the image of the matrix.
 -(EXTMatrix*) columnReduce {
     EXTMatrix *ret = [self copy];
     NSMutableArray *usedColumns = [NSMutableArray array];
@@ -274,11 +274,17 @@
         int j;
         NSMutableArray *row = [NSMutableArray arrayWithCapacity:width];
         
+        // save this row for analysis.
+        for (int k = 0; k < width; k++)
+            row[k] = ret.presentation[k][pivotRow];
+        
+        NSArray *bezout = [EXTMatrix computeBezout:row];
+        
         // find the first nonzero entry in this row, right of where we're at
         for (j = 0; j < width; j++) {
             if ([usedColumns[j] intValue])
                 continue;
-            if (0 != [(ret.presentation[j])[pivotRow] intValue])
+            if (0 != [bezout[j] intValue])
                 break;
         }
         
@@ -289,10 +295,6 @@
         else {
             pivotColumn = j;
             usedColumns[j] = @(true);
-            
-            // save this row for analysis.
-            for (int k = 0; k < width; k++)
-                row[k] = ret.presentation[j][pivotRow];
         }
         
         // if we've made it here, then we have a new pivot location, and we're
@@ -300,8 +302,7 @@
         //
         // start by forming the extended gcd for this row and replacing this
         // column with the Bezout-weighted sum of the columns.
-        NSArray *bezout = [EXTMatrix computeBezout:row],
-                *newColumn =
+        NSArray *newColumn =
                   [ret actOn:[bezout subarrayWithRange:NSMakeRange(0, width)]];
         for (int k = 0; k < height; k++)
             ret.presentation[pivotColumn][k] = newColumn[k];
@@ -324,8 +325,8 @@
             // ... and for each entry in this column, subtract.
             for (int i = 0; i < height; i++)
                 workingColumn[i] =
-                    @(([workingColumn[i] intValue] -
-                       factor * [column[i] intValue])%2);
+                    @([workingColumn[i] intValue] -
+                       factor * [column[i] intValue]);
         }
         
         // prevent us from considering the same column twice.
