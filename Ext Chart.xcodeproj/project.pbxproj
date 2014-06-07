@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		093AEADD13E10759003E9F58 /* EXTPair.m in Sources */ = {isa = PBXBuildFile; fileRef = 093AEADC13E10759003E9F58 /* EXTPair.m */; };
 		143F3DFE176D615100FB92B3 /* EXTUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 143F3DFD176D615100FB92B3 /* EXTUtilities.m */; };
+		145440371939A96D00385343 /* MBTableGrid.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 145440361939A96D00385343 /* MBTableGrid.framework */; };
+		145440381939A99000385343 /* MBTableGrid.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 145440361939A96D00385343 /* MBTableGrid.framework */; };
 		1460B40C17B735BD00B575E3 /* EXTPreferencesWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1460B40B17B735BD00B575E3 /* EXTPreferencesWindowController.m */; };
 		1460B40E17B7360700B575E3 /* EXTPreferences.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1460B40D17B7360700B575E3 /* EXTPreferences.xib */; };
 		1462B38B17D19D4A00BFDF50 /* EXTToolboxView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1462B38A17D19D4A00BFDF50 /* EXTToolboxView.m */; };
@@ -16,7 +18,6 @@
 		1467B272178D13A80084A2F6 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1467B271178D13A80084A2F6 /* QuartzCore.framework */; };
 		14741D7217B7535A00AF73D9 /* NSUserDefaults+EXTAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 14741D7117B7535A00AF73D9 /* NSUserDefaults+EXTAdditions.m */; };
 		149314581783B6EB0080EF28 /* EXTDocumentControlsView.m in Sources */ = {isa = PBXBuildFile; fileRef = 149314571783B6EA0080EF28 /* EXTDocumentControlsView.m */; };
-		149376EA19379DD3003D89CE /* MBTableGrid.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 149376E919379DD3003D89CE /* MBTableGrid.framework */; };
 		149831A017AE04F3000380A5 /* EXTNewDocumentWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1498319E17AE04F3000380A5 /* EXTNewDocumentWindowController.m */; };
 		149831A117AE04F3000380A5 /* EXTNewDocument.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1498319F17AE04F3000380A5 /* EXTNewDocument.xib */; };
 		149831A617AE65EA000380A5 /* A1MSS Example.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 149831A217AE65EA000380A5 /* A1MSS Example.pdf */; };
@@ -36,7 +37,6 @@
 		317707C413D784B0003475A2 /* EXTGrid.m in Sources */ = {isa = PBXBuildFile; fileRef = 317707C313D784B0003475A2 /* EXTGrid.m */; };
 		317707E113D7893A003475A2 /* EXTChartView.m in Sources */ = {isa = PBXBuildFile; fileRef = 317707E013D7893A003475A2 /* EXTChartView.m */; };
 		3187BA2713DC6C6C00C26803 /* EXTScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3187BA2413DC6C6C00C26803 /* EXTScrollView.m */; };
-		318EC0691409385F005D21D4 /* to do list.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 318EC0681409385F005D21D4 /* to do list.rtf */; };
 		31C77BA813E63F6800E9DBFC /* EXTAppController.m in Sources */ = {isa = PBXBuildFile; fileRef = 31C77BA713E63F6800E9DBFC /* EXTAppController.m */; };
 		31D403BB13DA0476006A8C06 /* EXTTerm.m in Sources */ = {isa = PBXBuildFile; fileRef = 31D403BA13DA0476006A8C06 /* EXTTerm.m */; };
 		31D403C013DA04D8006A8C06 /* EXTDifferential.m in Sources */ = {isa = PBXBuildFile; fileRef = 31D403BF13DA04D8006A8C06 /* EXTDifferential.m */; };
@@ -51,7 +51,6 @@
 		3897740517F78B5800C6AD2F /* EXTZeroRangesInspector.m in Sources */ = {isa = PBXBuildFile; fileRef = 3897740317F78B5800C6AD2F /* EXTZeroRangesInspector.m */; };
 		3897740617F78B5800C6AD2F /* EXTZeroRangesInspector.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3897740417F78B5800C6AD2F /* EXTZeroRangesInspector.xib */; };
 		389FB38D17498AF500D0FE75 /* EXTMultiplicationTables.m in Sources */ = {isa = PBXBuildFile; fileRef = 389FB38C17498AF500D0FE75 /* EXTMultiplicationTables.m */; };
-		38A1AB6E1727009C00F9F9D5 /* todo.md in Resources */ = {isa = PBXBuildFile; fileRef = 38A1AB6D1727009C00F9F9D5 /* todo.md */; };
 		38A35E75178A018600D2A019 /* EXTDemos.m in Sources */ = {isa = PBXBuildFile; fileRef = 38A35E74178A018600D2A019 /* EXTDemos.m */; };
 		38A92122179DCED8000B827D /* DifferentialTool.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 38A9211F179DCED8000B827D /* DifferentialTool.pdf */; };
 		38A92123179DCED8000B827D /* MultiplicativeStructureTool.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 38A92120179DCED8000B827D /* MultiplicativeStructureTool.pdf */; };
@@ -70,6 +69,20 @@
 		8D15AC340486D014006FF6A4 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A7FEA54F5311CA2CBB /* Cocoa.framework */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		145440351939A6CA00385343 /* Copy Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				145440381939A99000385343 /* MBTableGrid.framework in Copy Frameworks */,
+			);
+			name = "Copy Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		089C1660FE840EACC02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		093AEADB13E10759003E9F58 /* EXTPair.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTPair.h; sourceTree = "<group>"; };
@@ -78,6 +91,7 @@
 		13E42FBA07B3F13500E4EEF1 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
 		143F3DFC176D615100FB92B3 /* EXTUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTUtilities.h; sourceTree = "<group>"; };
 		143F3DFD176D615100FB92B3 /* EXTUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTUtilities.m; sourceTree = "<group>"; };
+		145440361939A96D00385343 /* MBTableGrid.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MBTableGrid.framework; path = "../../../Library/Developer/Xcode/DerivedData/Ext_Chart-dmpbsbfoqcwypiehvfauukftcnlu/Build/Products/Debug/MBTableGrid.framework"; sourceTree = "<group>"; };
 		1460B40A17B735BD00B575E3 /* EXTPreferencesWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTPreferencesWindowController.h; sourceTree = "<group>"; };
 		1460B40B17B735BD00B575E3 /* EXTPreferencesWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTPreferencesWindowController.m; sourceTree = "<group>"; };
 		1460B40D17B7360700B575E3 /* EXTPreferences.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = EXTPreferences.xib; sourceTree = "<group>"; };
@@ -90,7 +104,6 @@
 		14741D7117B7535A00AF73D9 /* NSUserDefaults+EXTAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSUserDefaults+EXTAdditions.m"; sourceTree = "<group>"; };
 		149314561783B6EA0080EF28 /* EXTDocumentControlsView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTDocumentControlsView.h; sourceTree = "<group>"; };
 		149314571783B6EA0080EF28 /* EXTDocumentControlsView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTDocumentControlsView.m; sourceTree = "<group>"; };
-		149376E919379DD3003D89CE /* MBTableGrid.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MBTableGrid.framework; path = "../../../Library/Developer/Xcode/DerivedData/Ext_Chart-fnjcoeqnbdphmrhibzdufpggyonu/Build/Products/Debug/MBTableGrid.framework"; sourceTree = "<group>"; };
 		1498319D17AE04F3000380A5 /* EXTNewDocumentWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTNewDocumentWindowController.h; sourceTree = "<group>"; };
 		1498319E17AE04F3000380A5 /* EXTNewDocumentWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTNewDocumentWindowController.m; sourceTree = "<group>"; };
 		1498319F17AE04F3000380A5 /* EXTNewDocument.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = EXTNewDocument.xib; sourceTree = "<group>"; };
@@ -135,18 +148,6 @@
 		31D403BF13DA04D8006A8C06 /* EXTDifferential.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTDifferential.m; sourceTree = "<group>"; };
 		31D5D2E313F6933B00F1B2F9 /* EXTArtBoard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTArtBoard.h; sourceTree = "<group>"; };
 		31D5D2E413F6933B00F1B2F9 /* EXTArtBoard.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTArtBoard.m; sourceTree = "<group>"; };
-		3804BF5A17C0775C00A74325 /* MBTableGrid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MBTableGrid.h; path = MBTableGrid/MBTableGrid.h; sourceTree = "<group>"; };
-		3804BF5B17C0775C00A74325 /* MBTableGrid.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MBTableGrid.m; path = MBTableGrid/MBTableGrid.m; sourceTree = "<group>"; };
-		3804BF5C17C0775C00A74325 /* MBTableGridCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MBTableGridCell.h; path = MBTableGrid/MBTableGridCell.h; sourceTree = "<group>"; };
-		3804BF5D17C0775C00A74325 /* MBTableGridCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MBTableGridCell.m; path = MBTableGrid/MBTableGridCell.m; sourceTree = "<group>"; };
-		3804BF5E17C0775C00A74325 /* MBTableGridContentView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MBTableGridContentView.h; path = MBTableGrid/MBTableGridContentView.h; sourceTree = "<group>"; };
-		3804BF5F17C0775C00A74325 /* MBTableGridContentView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MBTableGridContentView.m; path = MBTableGrid/MBTableGridContentView.m; sourceTree = "<group>"; };
-		3804BF6017C0775C00A74325 /* MBTableGridController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MBTableGridController.h; path = MBTableGrid/MBTableGridController.h; sourceTree = "<group>"; };
-		3804BF6117C0775C00A74325 /* MBTableGridController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MBTableGridController.m; path = MBTableGrid/MBTableGridController.m; sourceTree = "<group>"; };
-		3804BF6217C0775C00A74325 /* MBTableGridHeaderCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MBTableGridHeaderCell.h; path = MBTableGrid/MBTableGridHeaderCell.h; sourceTree = "<group>"; };
-		3804BF6317C0775C00A74325 /* MBTableGridHeaderCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MBTableGridHeaderCell.m; path = MBTableGrid/MBTableGridHeaderCell.m; sourceTree = "<group>"; };
-		3804BF6417C0775C00A74325 /* MBTableGridHeaderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MBTableGridHeaderView.h; path = MBTableGrid/MBTableGridHeaderView.h; sourceTree = "<group>"; };
-		3804BF6517C0775C00A74325 /* MBTableGridHeaderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MBTableGridHeaderView.m; path = MBTableGrid/MBTableGridHeaderView.m; sourceTree = "<group>"; };
 		3804BF6C17C07D7300A74325 /* EXTMatrixEditor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTMatrixEditor.h; sourceTree = "<group>"; };
 		3804BF6D17C07D7300A74325 /* EXTMatrixEditor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTMatrixEditor.m; sourceTree = "<group>"; };
 		3841EBD0177380C000ADA929 /* EXTZeroRange.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTZeroRange.h; sourceTree = "<group>"; };
@@ -193,7 +194,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				149376EA19379DD3003D89CE /* MBTableGrid.framework in Frameworks */,
+				145440371939A96D00385343 /* MBTableGrid.framework in Frameworks */,
 				1467B272178D13A80084A2F6 /* QuartzCore.framework in Frameworks */,
 				8D15AC340486D014006FF6A4 /* Cocoa.framework in Frameworks */,
 			);
@@ -417,7 +418,6 @@
 			children = (
 				3804BF6C17C07D7300A74325 /* EXTMatrixEditor.h */,
 				3804BF6D17C07D7300A74325 /* EXTMatrixEditor.m */,
-				3804BF5917C0772800A74325 /* MBTableGrid */,
 				2564AD2C0F5327BB00F57823 /* Ext_Chart_Prefix.pch */,
 				2A37F4B0FDCFA73011CA2CEA /* main.m */,
 			);
@@ -438,30 +438,11 @@
 		2A37F4C3FDCFA73011CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				149376E919379DD3003D89CE /* MBTableGrid.framework */,
+				145440361939A96D00385343 /* MBTableGrid.framework */,
 				1058C7A6FEA54F5311CA2CBB /* Linked Frameworks */,
 				1058C7A8FEA54F5311CA2CBB /* Other Frameworks */,
 			);
 			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		3804BF5917C0772800A74325 /* MBTableGrid */ = {
-			isa = PBXGroup;
-			children = (
-				3804BF5A17C0775C00A74325 /* MBTableGrid.h */,
-				3804BF5B17C0775C00A74325 /* MBTableGrid.m */,
-				3804BF5C17C0775C00A74325 /* MBTableGridCell.h */,
-				3804BF5D17C0775C00A74325 /* MBTableGridCell.m */,
-				3804BF5E17C0775C00A74325 /* MBTableGridContentView.h */,
-				3804BF5F17C0775C00A74325 /* MBTableGridContentView.m */,
-				3804BF6017C0775C00A74325 /* MBTableGridController.h */,
-				3804BF6117C0775C00A74325 /* MBTableGridController.m */,
-				3804BF6217C0775C00A74325 /* MBTableGridHeaderCell.h */,
-				3804BF6317C0775C00A74325 /* MBTableGridHeaderCell.m */,
-				3804BF6417C0775C00A74325 /* MBTableGridHeaderView.h */,
-				3804BF6517C0775C00A74325 /* MBTableGridHeaderView.m */,
-			);
-			name = MBTableGrid;
 			sourceTree = "<group>";
 		};
 		3869FCF417B442AE00D0D740 /* Locations */ = {
@@ -484,6 +465,7 @@
 			buildConfigurationList = C05733C708A9546B00998B17 /* Build configuration list for PBXNativeTarget "Ext Chart" */;
 			buildPhases = (
 				8D15AC2B0486D014006FF6A4 /* Resources */,
+				145440351939A6CA00385343 /* Copy Frameworks */,
 				8D15AC300486D014006FF6A4 /* Sources */,
 				8D15AC330486D014006FF6A4 /* Frameworks */,
 			);
@@ -533,9 +515,7 @@
 				8D15AC2F0486D014006FF6A4 /* InfoPlist.strings in Resources */,
 				1DDD582C0DA1D0D100B32029 /* EXTDocument.xib in Resources */,
 				1DDD582D0DA1D0D100B32029 /* MainMenu.xib in Resources */,
-				318EC0691409385F005D21D4 /* to do list.rtf in Resources */,
 				38DDAA7B16EDA8990001841D /* README.md in Resources */,
-				38A1AB6E1727009C00F9F9D5 /* todo.md in Resources */,
 				38F7830B17565F72009D207A /* LICENSE in Resources */,
 				14CCA38C1794F21D002EF861 /* ArtBoardTool.pdf in Resources */,
 				14CCA38E1794F21D002EF861 /* Ext Chart.iconset in Resources */,
@@ -652,6 +632,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/Ext_Chart-fnjcoeqnbdphmrhibzdufpggyonu/Build/Products/Debug",
+					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/Ext_Chart-dmpbsbfoqcwypiehvfauukftcnlu/Build/Products/Debug",
 				);
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_MODEL_TUNING = G5;
@@ -683,6 +664,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/Ext_Chart-fnjcoeqnbdphmrhibzdufpggyonu/Build/Products/Debug",
+					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/Ext_Chart-dmpbsbfoqcwypiehvfauukftcnlu/Build/Products/Debug",
 				);
 				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
