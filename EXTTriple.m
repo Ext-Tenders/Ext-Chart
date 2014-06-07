@@ -233,15 +233,25 @@
     
     NSArray *pair = [EXTMatrix formIntersection:composite with:clickCoord];
     
-    NSArray *lift = ((EXTMatrix*)pair[0]).presentation[0];
+    EXTTriple *liftedTriple;
+    NSArray *lift;
     
-    EXTTriple *liftedTriple =
-        [EXTTriple tripleWithA:[lift[0] intValue]
-                             B:[lift[1] intValue]
-                             C:[lift[2] intValue]];
-    
-    if ([((EXTMatrix*)pair[1]).presentation[0][0] intValue] == -1) {
-        liftedTriple   = [EXTTriple scale:liftedTriple by:-1];
+    if ([((EXTMatrix*)pair[1]).presentation[0][0] intValue] != 0) {
+        lift = ((EXTMatrix*)pair[0]).presentation[0];
+        
+        liftedTriple = [EXTTriple tripleWithA:[lift[0] intValue]
+                                            B:[lift[1] intValue]
+                                            C:[lift[2] intValue]];
+        if ([((EXTMatrix*)pair[1]).presentation[0][0] intValue] == -1)
+            liftedTriple = [EXTTriple scale:liftedTriple by:-1];
+    } else {
+        lift = ((EXTMatrix*)pair[0]).presentation[1];
+        
+        liftedTriple = [EXTTriple tripleWithA:[lift[0] intValue]
+                                            B:[lift[1] intValue]
+                                            C:[lift[2] intValue]];
+        if ([((EXTMatrix*)pair[1]).presentation[1][0] intValue] == -1)
+            liftedTriple = [EXTTriple scale:liftedTriple by:-1];
     }
     
     return [self gridPoint:[EXTTriple followDiffl:liftedTriple page:page]];
