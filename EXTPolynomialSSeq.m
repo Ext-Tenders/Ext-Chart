@@ -38,6 +38,9 @@
         return @"1";
     
     for (NSString *key in tags.keyEnumerator) {
+        if ([[tags objectForKey:key] intValue] == 0)
+            continue;
+        
         ret = [ret stringByAppendingFormat:@" (%@)^{%@}",
                     key.description,
                     [tags objectForKey:key]];
