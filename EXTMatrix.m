@@ -245,6 +245,9 @@
                 firstNonzeroEntry = k;
         }
         
+        if (firstNonzeroEntry == -1)
+            continue;
+        
         // compute the bezout vector for this row.
         NSMutableArray *bezout =
                         [NSMutableArray arrayWithCapacity:rowToBezout.count];
