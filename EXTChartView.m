@@ -137,7 +137,7 @@ static CGFloat const _EXTHighlightLineWidth = 0.5;
     //	[theContext restoreGraphicsState];
 }
 
-- (void)_extResetHighlightPath {
+- (void)resetHighlightPath {
     if (_highlightPath)
         [self setNeedsDisplayInRect:[self _extHighlightDrawingRect]];
 
@@ -175,7 +175,7 @@ static CGFloat const _EXTHighlightLineWidth = 0.5;
 
         _selectedToolTag = selectedToolTag;
 
-        [self _extResetHighlightPath];
+        [self resetHighlightPath];
     }
 }
 
@@ -306,15 +306,15 @@ static CGFloat const _EXTHighlightLineWidth = 0.5;
 }
 
 - (void)mouseMoved:(NSEvent *)event {
-    [self _extResetHighlightPath];
+    [self resetHighlightPath];
 }
 
 - (void)mouseEntered:(NSEvent *)event {
-    [self _extResetHighlightPath];
+    [self resetHighlightPath];
 }
 
 - (void)mouseExited:(NSEvent *)event {
-    [self _extResetHighlightPath];
+    [self resetHighlightPath];
 }
 
 - (void)updateTrackingAreas {
@@ -328,7 +328,7 @@ static CGFloat const _EXTHighlightLineWidth = 0.5;
                                                    owner:self
                                                 userInfo:nil];
     [self addTrackingArea:_trackingArea];
-    [self _extResetHighlightPath];
+    [self resetHighlightPath];
 }
 
 #pragma mark - Art board

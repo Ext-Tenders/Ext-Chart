@@ -94,6 +94,7 @@ static NSCache *_EXTLayerCache = nil;
 
 - (void)reloadCurrentPage {
     [_document.sseq computeGroupsForPage:_currentPage];
+    [self.chartView resetHighlightPath];
     [self.chartView setNeedsDisplay:YES];
 }
 

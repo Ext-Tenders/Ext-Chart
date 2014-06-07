@@ -34,6 +34,10 @@
 @property(nonatomic, weak) id<EXTChartViewDelegate> delegate;
 @property(nonatomic, assign) EXTToolboxTag selectedToolTag;
 
+// TODO: I feel like maybe this doesn't belong here.  Shouldn't this be handled
+// by the controller somehow?  Hmph.
+- (void)resetHighlightPath;
+
 // Actions
 - (IBAction)zoomToFit:(id)sender;
 @end
