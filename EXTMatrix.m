@@ -41,7 +41,8 @@
     
     EXTPartialDefinition *target = (EXTPartialDefinition*)object;
     
-    return ([self.action isEqual:target.action] && [self.inclusion isEqual:target.inclusion]);
+    return ([self.action isEqual:target.action] &&
+            [self.inclusion isEqual:target.inclusion]);
 }
 
 -(void) encodeWithCoder:(NSCoder *)aCoder {
@@ -55,7 +56,8 @@
     if (self = [super init]) {
         inclusion = [aDecoder decodeObjectForKey:@"inclusion"];
         action = [aDecoder decodeObjectForKey:@"action"];
-        automaticallyGenerated = [aDecoder decodeBoolForKey:@"automaticallyGenerated"];
+        automaticallyGenerated =
+                        [aDecoder decodeBoolForKey:@"automaticallyGenerated"];
         description = [aDecoder decodeObjectForKey:@"description"];
     }
     
@@ -182,7 +184,7 @@
         
         for (int j = 0; j < [input width]; j++) {
             // read off the subscripts in the inverse order
-            [newColumn setObject:[[input.presentation objectAtIndex:j] objectAtIndex:i] atIndexedSubscript:j];
+            newColumn[j] = input.presentation[j][i];
         }
         
         [ret.presentation setObject:newColumn atIndexedSubscript:i];
@@ -391,7 +393,9 @@
             continue; // ... skip this column.
         
         // otherwise, strip to the augmented portion
-        NSArray *strippedColumn = [augmentedColumn subarrayWithRange:NSMakeRange(self.height, self.width)];
+        NSArray *strippedColumn =
+            [augmentedColumn subarrayWithRange:NSMakeRange(self.height,
+                                                           self.width)];
         [ret addObject:[NSMutableArray arrayWithArray:strippedColumn]];
     }
     
@@ -436,7 +440,7 @@
     
     for (int k = 0; k < [right width]; k++) {
         NSMutableArray *rightColumn = [[right presentation] objectAtIndex:k],
-                       *column = [NSMutableArray arrayWithCapacity:[left height]];
+                       *column = [NSMutableArray arrayWithCapacity:left.height];
         for (int i = 0; i < [left height]; i++) {
             int total = 0;
             
@@ -514,7 +518,10 @@
 +(EXTMatrix*) assemblePresentation:(NSMutableArray*)partialDefinitions
                    sourceDimension:(int)sourceDimension
                    targetDimension:(int)targetDimension {
-    NSArray *pair = [EXTMatrix assemblePresentationAndOptimize:partialDefinitions sourceDimension:sourceDimension targetDimension:targetDimension];
+    NSArray *pair =
+            [EXTMatrix assemblePresentationAndOptimize:partialDefinitions
+                                       sourceDimension:sourceDimension
+                                       targetDimension:targetDimension];
     
     return pair[0];
 }
@@ -527,7 +534,8 @@
                             targetDimension:(int)targetDimension {
     // first, make sure we're not going to bomb.
     if (partialDefinitions.count == 0)
-        return @[[EXTMatrix matrixWidth:sourceDimension height:targetDimension],[NSMutableArray array]];
+        return @[[EXTMatrix matrixWidth:sourceDimension height:targetDimension],
+                 [NSMutableArray array]];
     
     // we first need to assemble all the inclusion image vectors into one
     // massive array.
