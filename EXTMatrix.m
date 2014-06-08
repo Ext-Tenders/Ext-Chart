@@ -292,6 +292,11 @@
                 tOld = temp;
             }
             
+            if (gcd == rOld) {
+                bezout[index] = @0;
+                continue;
+            }
+            
             gcd = rOld;
             bezout[index] = @(tOld);
             for (NSInteger j = 0; j < index; j++)
