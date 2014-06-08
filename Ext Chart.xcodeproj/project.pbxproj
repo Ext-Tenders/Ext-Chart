@@ -9,8 +9,6 @@
 /* Begin PBXBuildFile section */
 		093AEADD13E10759003E9F58 /* EXTPair.m in Sources */ = {isa = PBXBuildFile; fileRef = 093AEADC13E10759003E9F58 /* EXTPair.m */; };
 		143F3DFE176D615100FB92B3 /* EXTUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 143F3DFD176D615100FB92B3 /* EXTUtilities.m */; };
-		145440371939A96D00385343 /* MBTableGrid.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 145440361939A96D00385343 /* MBTableGrid.framework */; };
-		145440381939A99000385343 /* MBTableGrid.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 145440361939A96D00385343 /* MBTableGrid.framework */; };
 		1460B40C17B735BD00B575E3 /* EXTPreferencesWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1460B40B17B735BD00B575E3 /* EXTPreferencesWindowController.m */; };
 		1460B40E17B7360700B575E3 /* EXTPreferences.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1460B40D17B7360700B575E3 /* EXTPreferences.xib */; };
 		1462B38B17D19D4A00BFDF50 /* EXTToolboxView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1462B38A17D19D4A00BFDF50 /* EXTToolboxView.m */; };
@@ -42,6 +40,8 @@
 		31D403C013DA04D8006A8C06 /* EXTDifferential.m in Sources */ = {isa = PBXBuildFile; fileRef = 31D403BF13DA04D8006A8C06 /* EXTDifferential.m */; };
 		31D5D2E513F6933B00F1B2F9 /* EXTArtBoard.m in Sources */ = {isa = PBXBuildFile; fileRef = 31D5D2E413F6933B00F1B2F9 /* EXTArtBoard.m */; };
 		3804BF6E17C07D7300A74325 /* EXTMatrixEditor.m in Sources */ = {isa = PBXBuildFile; fileRef = 3804BF6D17C07D7300A74325 /* EXTMatrixEditor.m */; };
+		382BAD201942B25900E1DDED /* MBTableGrid.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 382BAD1E1942B23E00E1DDED /* MBTableGrid.framework */; };
+		382BAD221943E26B00E1DDED /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 382BAD211943E26B00E1DDED /* Credits.rtf */; };
 		3841EBD2177380C000ADA929 /* EXTZeroRange.m in Sources */ = {isa = PBXBuildFile; fileRef = 3841EBD1177380C000ADA929 /* EXTZeroRange.m */; };
 		385BF10D17AAD8C2008CA5B6 /* EXTGeneratorInspectorView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 385BF10B17AAD8C2008CA5B6 /* EXTGeneratorInspectorView.xib */; };
 		385BF11017AAD8D5008CA5B6 /* EXTGeneratorInspectorViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 385BF10F17AAD8D5008CA5B6 /* EXTGeneratorInspectorViewController.m */; };
@@ -76,7 +76,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				145440381939A99000385343 /* MBTableGrid.framework in Copy Frameworks */,
 			);
 			name = "Copy Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -91,7 +90,6 @@
 		13E42FBA07B3F13500E4EEF1 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
 		143F3DFC176D615100FB92B3 /* EXTUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTUtilities.h; sourceTree = "<group>"; };
 		143F3DFD176D615100FB92B3 /* EXTUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTUtilities.m; sourceTree = "<group>"; };
-		145440361939A96D00385343 /* MBTableGrid.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MBTableGrid.framework; path = "../../../Library/Developer/Xcode/DerivedData/Ext_Chart-dmpbsbfoqcwypiehvfauukftcnlu/Build/Products/Debug/MBTableGrid.framework"; sourceTree = "<group>"; };
 		1460B40A17B735BD00B575E3 /* EXTPreferencesWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTPreferencesWindowController.h; sourceTree = "<group>"; };
 		1460B40B17B735BD00B575E3 /* EXTPreferencesWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTPreferencesWindowController.m; sourceTree = "<group>"; };
 		1460B40D17B7360700B575E3 /* EXTPreferences.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = EXTPreferences.xib; sourceTree = "<group>"; };
@@ -150,6 +148,8 @@
 		31D5D2E413F6933B00F1B2F9 /* EXTArtBoard.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTArtBoard.m; sourceTree = "<group>"; };
 		3804BF6C17C07D7300A74325 /* EXTMatrixEditor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTMatrixEditor.h; sourceTree = "<group>"; };
 		3804BF6D17C07D7300A74325 /* EXTMatrixEditor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTMatrixEditor.m; sourceTree = "<group>"; };
+		382BAD1E1942B23E00E1DDED /* MBTableGrid.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MBTableGrid.framework; path = "../../../../Library/Developer/Xcode/DerivedData/Ext-Chart-Workspace/Products/Debug/MBTableGrid.framework"; sourceTree = "<group>"; };
+		382BAD211943E26B00E1DDED /* Credits.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; path = Credits.rtf; sourceTree = "<group>"; };
 		3841EBD0177380C000ADA929 /* EXTZeroRange.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTZeroRange.h; sourceTree = "<group>"; };
 		3841EBD1177380C000ADA929 /* EXTZeroRange.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTZeroRange.m; sourceTree = "<group>"; };
 		385BF10C17AAD8C2008CA5B6 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/EXTGeneratorInspectorView.xib; sourceTree = "<group>"; };
@@ -194,7 +194,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				145440371939A96D00385343 /* MBTableGrid.framework in Frameworks */,
+				382BAD201942B25900E1DDED /* MBTableGrid.framework in Frameworks */,
 				1467B272178D13A80084A2F6 /* QuartzCore.framework in Frameworks */,
 				8D15AC340486D014006FF6A4 /* Cocoa.framework in Frameworks */,
 			);
@@ -206,6 +206,7 @@
 		1058C7A6FEA54F5311CA2CBB /* Linked Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				382BAD1E1942B23E00E1DDED /* MBTableGrid.framework */,
 				1467B271178D13A80084A2F6 /* QuartzCore.framework */,
 				1058C7A7FEA54F5311CA2CBB /* Cocoa.framework */,
 			);
@@ -431,6 +432,7 @@
 				14EF1A611756ED430012DD3C /* Images */,
 				8D15AC360486D014006FF6A4 /* Ext_Chart-Info.plist */,
 				089C165FFE840EACC02AAC07 /* InfoPlist.strings */,
+				382BAD211943E26B00E1DDED /* Credits.rtf */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -438,7 +440,6 @@
 		2A37F4C3FDCFA73011CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				145440361939A96D00385343 /* MBTableGrid.framework */,
 				1058C7A6FEA54F5311CA2CBB /* Linked Frameworks */,
 				1058C7A8FEA54F5311CA2CBB /* Other Frameworks */,
 			);
@@ -531,6 +532,7 @@
 				149831A917AE65EA000380A5 /* S5 Example.pdf in Resources */,
 				3869FCF917B4587100D0D740 /* EXTDifferentialPane.xib in Resources */,
 				1460B40E17B7360700B575E3 /* EXTPreferences.xib in Resources */,
+				382BAD221943E26B00E1DDED /* Credits.rtf in Resources */,
 				14F930BB17BF39EC0000176A /* EXTGridInspectorView.xib in Resources */,
 				38F707B917CDCD9D002273B1 /* EXTLeibnizWindow.xib in Resources */,
 			);
@@ -631,8 +633,7 @@
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/Ext_Chart-fnjcoeqnbdphmrhibzdufpggyonu/Build/Products/Debug",
-					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/Ext_Chart-dmpbsbfoqcwypiehvfauukftcnlu/Build/Products/Debug",
+					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/Ext-Chart-Workspace/Products/Debug",
 				);
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_MODEL_TUNING = G5;
@@ -663,8 +664,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/Ext_Chart-fnjcoeqnbdphmrhibzdufpggyonu/Build/Products/Debug",
-					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/Ext_Chart-dmpbsbfoqcwypiehvfauukftcnlu/Build/Products/Debug",
+					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/Ext-Chart-Workspace/Products/Debug",
 				);
 				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
