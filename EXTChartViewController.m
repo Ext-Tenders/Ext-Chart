@@ -51,10 +51,14 @@ static void *_selectedToolTagContext = &_selectedToolTagContext;
 
 - (void)mainDocumentWindowWillClose:(NSNotification *)notification
 {
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:NSWindowWillCloseNotification object:_document.mainWindowController.window];
     [_document.mainWindowController removeObserver:self forKeyPath:@"selectedToolTag"];
 
     [_chartViewModel unbind:@"selectedObject"];
     [_chartViewModel unbind:@"selectedToolTag"];
+
+    self.chartViewModel = nil;
+    _document = nil;
 }
 
 - (void)setView:(NSView *)view {
@@ -113,7 +117,6 @@ static void *_selectedToolTagContext = &_selectedToolTagContext;
 #pragma mark -
 
 - (void)reloadCurrentPage {
-    [_document.sseq computeGroupsForPage:_currentPage];
     [self.chartViewModel reloadCurrentPage];
     [self.chartView resetHighlightPath];
     [self.chartView setNeedsDisplay:YES];

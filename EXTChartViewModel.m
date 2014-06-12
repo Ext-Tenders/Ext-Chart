@@ -12,10 +12,6 @@
 #import "EXTTerm.h"
 #import "EXTDifferential.h"
 
-// From https://www.mikeash.com/pyblog/friday-qa-2010-06-18-implementing-equality-and-hashing.html
-#define NSUINT_BIT (CHAR_BIT * sizeof(NSUInteger))
-#define NSUINTROTATE(val, howmuch) ((((NSUInteger)val) << howmuch) | (((NSUInteger)val) >> (NSUINT_BIT - howmuch)))
-
 
 @interface EXTChartViewModel ()
 @property (nonatomic, strong) NSMutableDictionary *termCounts; // indexed by @(page). Each element is a dictionary mapping an EXTViewModelPoint to a term count
@@ -127,6 +123,8 @@ static dispatch_queue_t _dotLayersQueue;
 
 - (void)reloadCurrentPage
 {
+    [self.sequence computeGroupsForPage:self.currentPage];
+
     // --- Term Counts
     // start by initializing the array of counts
     NSMutableDictionary *counts = [NSMutableDictionary new];

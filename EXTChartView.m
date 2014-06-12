@@ -447,8 +447,61 @@ static CGFloat const _EXTHighlightLineWidth = 0.5;
 
 
 @implementation EXTChartViewTermCountData
++ (instancetype)chartViewTermCountDataWithCount:(NSInteger)count atGridPoint:(EXTIntPoint)gridPoint
+{
+    EXTChartViewTermCountData *result = [self new];
+    result.count = count;
+    result.point = gridPoint;
+    return result;
+}
+
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"Term count %ld at (%ld, %ld)", self.count, self.point.x, self.point.y];
+}
+
+- (BOOL)isEqual:(id)object
+{
+    EXTChartViewTermCountData *other = object;
+    return ([other isKindOfClass:[EXTChartViewTermCountData class]] &&
+            other.count == _count &&
+            other.point.x == _point.x &&
+            other.point.y == _point.y);
+
+}
+
+- (NSUInteger)hash
+{
+    return NSUINTROTATE(((NSUInteger)_point.x), NSUINT_BIT / 2) ^ _point.y ^ _count;
+}
 @end
 
 
 @implementation EXTChartViewDifferentialData
++ (instancetype)chartViewDifferentialDataWithStart:(NSPoint)start end:(NSPoint)end
+{
+    EXTChartViewDifferentialData *result = [self new];
+    result.start = start;
+    result.end = end;
+    return result;
+}
+
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"Differential from %@ to %@", NSStringFromPoint(self.start), NSStringFromPoint(self.end)];
+}
+
+- (BOOL)isEqual:(id)object
+{
+    EXTChartViewDifferentialData *other = object;
+    return ([other isKindOfClass:[EXTChartViewDifferentialData class]] &&
+            NSEqualPoints(other.start, _start) &&
+            NSEqualPoints(other.end, _end));
+}
+
+- (NSUInteger)hash
+{
+    return (NSUINTROTATE(((NSUInteger)_start.x), NSUINT_BIT / 2) ^ (NSUInteger)_start.y ^
+            NSUINTROTATE(((NSUInteger)_end.y), NSUINT_BIT / 2) ^ (NSUInteger)_end.x);
+}
 @end

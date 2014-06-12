@@ -10,6 +10,9 @@
 		093AEADD13E10759003E9F58 /* EXTPair.m in Sources */ = {isa = PBXBuildFile; fileRef = 093AEADC13E10759003E9F58 /* EXTPair.m */; };
 		143F3DFE176D615100FB92B3 /* EXTUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 143F3DFD176D615100FB92B3 /* EXTUtilities.m */; };
 		144709A51946CDF8009C6958 /* EXTChartViewModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 144709A41946CDF8009C6958 /* EXTChartViewModel.m */; };
+		145CD94F194A0AE5006621A6 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 145CD94E194A0AE5006621A6 /* XCTest.framework */; };
+		145CD955194A0AE5006621A6 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 145CD953194A0AE5006621A6 /* InfoPlist.strings */; };
+		145CD95F194A11BF006621A6 /* EXTTestCaseS5Demo.m in Sources */ = {isa = PBXBuildFile; fileRef = 145CD95E194A11BF006621A6 /* EXTTestCaseS5Demo.m */; };
 		1460B40C17B735BD00B575E3 /* EXTPreferencesWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1460B40B17B735BD00B575E3 /* EXTPreferencesWindowController.m */; };
 		1460B40E17B7360700B575E3 /* EXTPreferences.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1460B40D17B7360700B575E3 /* EXTPreferences.xib */; };
 		1462B38B17D19D4A00BFDF50 /* EXTToolboxView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1462B38A17D19D4A00BFDF50 /* EXTToolboxView.m */; };
@@ -70,6 +73,16 @@
 		8D15AC340486D014006FF6A4 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A7FEA54F5311CA2CBB /* Cocoa.framework */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		145CD959194A0AE5006621A6 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 2A37F4A9FDCFA73011CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8D15AC270486D014006FF6A4;
+			remoteInfo = "Ext Chart";
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXCopyFilesBuildPhase section */
 		145440351939A6CA00385343 /* Copy Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
@@ -93,6 +106,12 @@
 		143F3DFD176D615100FB92B3 /* EXTUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTUtilities.m; sourceTree = "<group>"; };
 		144709A31946CDF8009C6958 /* EXTChartViewModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTChartViewModel.h; sourceTree = "<group>"; };
 		144709A41946CDF8009C6958 /* EXTChartViewModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTChartViewModel.m; sourceTree = "<group>"; };
+		145CD94D194A0AE5006621A6 /* Ext Chart Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Ext Chart Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		145CD94E194A0AE5006621A6 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
+		145CD952194A0AE5006621A6 /* Ext Chart Tests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Ext Chart Tests-Info.plist"; sourceTree = "<group>"; };
+		145CD954194A0AE5006621A6 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		145CD958194A0AE5006621A6 /* Ext Chart Tests-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Ext Chart Tests-Prefix.pch"; sourceTree = "<group>"; };
+		145CD95E194A11BF006621A6 /* EXTTestCaseS5Demo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTTestCaseS5Demo.m; sourceTree = "<group>"; };
 		1460B40A17B735BD00B575E3 /* EXTPreferencesWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTPreferencesWindowController.h; sourceTree = "<group>"; };
 		1460B40B17B735BD00B575E3 /* EXTPreferencesWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTPreferencesWindowController.m; sourceTree = "<group>"; };
 		1460B40D17B7360700B575E3 /* EXTPreferences.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = EXTPreferences.xib; sourceTree = "<group>"; };
@@ -193,6 +212,14 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		145CD94A194A0AE5006621A6 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				145CD94F194A0AE5006621A6 /* XCTest.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		8D15AC330486D014006FF6A4 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -233,6 +260,25 @@
 				143F3DFD176D615100FB92B3 /* EXTUtilities.m */,
 			);
 			name = Support;
+			sourceTree = "<group>";
+		};
+		145CD950194A0AE5006621A6 /* Ext Chart Tests */ = {
+			isa = PBXGroup;
+			children = (
+				145CD95E194A11BF006621A6 /* EXTTestCaseS5Demo.m */,
+				145CD951194A0AE5006621A6 /* Supporting Files */,
+			);
+			path = "Ext Chart Tests";
+			sourceTree = "<group>";
+		};
+		145CD951194A0AE5006621A6 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				145CD952194A0AE5006621A6 /* Ext Chart Tests-Info.plist */,
+				145CD953194A0AE5006621A6 /* InfoPlist.strings */,
+				145CD958194A0AE5006621A6 /* Ext Chart Tests-Prefix.pch */,
+			);
+			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
 		149831AA17AE6A0E000380A5 /* Toolbox */ = {
@@ -386,6 +432,7 @@
 			isa = PBXGroup;
 			children = (
 				8D15AC370486D014006FF6A4 /* Ext Chart.app */,
+				145CD94D194A0AE5006621A6 /* Ext Chart Tests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -396,6 +443,7 @@
 				2A37F4ABFDCFA73011CA2CEA /* Classes */,
 				2A37F4AFFDCFA73011CA2CEA /* Other Sources */,
 				2A37F4B8FDCFA73011CA2CEA /* Resources */,
+				145CD950194A0AE5006621A6 /* Ext Chart Tests */,
 				2A37F4C3FDCFA73011CA2CEA /* Frameworks */,
 				19C28FB0FE9D524F11CA2CBB /* Products */,
 			);
@@ -446,6 +494,7 @@
 			isa = PBXGroup;
 			children = (
 				1058C7A6FEA54F5311CA2CBB /* Linked Frameworks */,
+				145CD94E194A0AE5006621A6 /* XCTest.framework */,
 				1058C7A8FEA54F5311CA2CBB /* Other Frameworks */,
 			);
 			name = Frameworks;
@@ -466,6 +515,24 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		145CD94C194A0AE5006621A6 /* Ext Chart Tests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 145CD95B194A0AE5006621A6 /* Build configuration list for PBXNativeTarget "Ext Chart Tests" */;
+			buildPhases = (
+				145CD949194A0AE5006621A6 /* Sources */,
+				145CD94A194A0AE5006621A6 /* Frameworks */,
+				145CD94B194A0AE5006621A6 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				145CD95A194A0AE5006621A6 /* PBXTargetDependency */,
+			);
+			name = "Ext Chart Tests";
+			productName = "Ext Chart Tests";
+			productReference = 145CD94D194A0AE5006621A6 /* Ext Chart Tests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		8D15AC270486D014006FF6A4 /* Ext Chart */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = C05733C708A9546B00998B17 /* Build configuration list for PBXNativeTarget "Ext Chart" */;
@@ -493,6 +560,11 @@
 			attributes = {
 				LastUpgradeCheck = 0500;
 				ORGANIZATIONNAME = "Harvard University";
+				TargetAttributes = {
+					145CD94C194A0AE5006621A6 = {
+						TestTargetID = 8D15AC270486D014006FF6A4;
+					};
+				};
 			};
 			buildConfigurationList = C05733CB08A9546B00998B17 /* Build configuration list for PBXProject "Ext Chart" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -503,17 +575,27 @@
 				Japanese,
 				French,
 				German,
+				en,
 			);
 			mainGroup = 2A37F4AAFDCFA73011CA2CEA /* Ext Chart */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
 				8D15AC270486D014006FF6A4 /* Ext Chart */,
+				145CD94C194A0AE5006621A6 /* Ext Chart Tests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		145CD94B194A0AE5006621A6 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				145CD955194A0AE5006621A6 /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		8D15AC2B0486D014006FF6A4 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -546,6 +628,14 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		145CD949194A0AE5006621A6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				145CD95F194A11BF006621A6 /* EXTTestCaseS5Demo.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		8D15AC300486D014006FF6A4 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -591,11 +681,27 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		145CD95A194A0AE5006621A6 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8D15AC270486D014006FF6A4 /* Ext Chart */;
+			targetProxy = 145CD959194A0AE5006621A6 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin PBXVariantGroup section */
 		089C165FFE840EACC02AAC07 /* InfoPlist.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
 				089C1660FE840EACC02AAC07 /* English */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		145CD953194A0AE5006621A6 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				145CD954194A0AE5006621A6 /* en */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -627,6 +733,92 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		145CD95C194A0AE5006621A6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/Ext Chart.app/Contents/MacOS/Ext Chart";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+					"$(inherited)",
+				);
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "Ext Chart Tests/Ext Chart Tests-Prefix.pch";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				INFOPLIST_FILE = "Ext Chart Tests/Ext Chart Tests-Info.plist";
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				TEST_HOST = "$(BUNDLE_LOADER)";
+				WRAPPER_EXTENSION = xctest;
+			};
+			name = Debug;
+		};
+		145CD95D194A0AE5006621A6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/Ext Chart.app/Contents/MacOS/Ext Chart";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+					"$(inherited)",
+				);
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "Ext Chart Tests/Ext Chart Tests-Prefix.pch";
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				INFOPLIST_FILE = "Ext Chart Tests/Ext Chart Tests-Info.plist";
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				TEST_HOST = "$(BUNDLE_LOADER)";
+				WRAPPER_EXTENSION = xctest;
+			};
+			name = Release;
+		};
 		C05733C808A9546B00998B17 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -642,6 +834,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = Ext_Chart_Prefix.pch;
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				GCC_TREAT_INCOMPATIBLE_POINTER_TYPE_WARNINGS_AS_ERRORS = NO;
 				GCC_WARN_PEDANTIC = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
@@ -667,6 +860,7 @@
 				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = Ext_Chart_Prefix.pch;
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				GCC_TREAT_INCOMPATIBLE_POINTER_TYPE_WARNINGS_AS_ERRORS = NO;
 				GCC_WARN_PEDANTIC = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
@@ -709,6 +903,14 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		145CD95B194A0AE5006621A6 /* Build configuration list for PBXNativeTarget "Ext Chart Tests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				145CD95C194A0AE5006621A6 /* Debug */,
+				145CD95D194A0AE5006621A6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
 		C05733C708A9546B00998B17 /* Build configuration list for PBXNativeTarget "Ext Chart" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
