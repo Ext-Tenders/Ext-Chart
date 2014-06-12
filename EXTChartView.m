@@ -447,8 +447,16 @@ static CGFloat const _EXTHighlightLineWidth = 0.5;
 
 
 @implementation EXTChartViewTermCountData
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"Term count %ld at (%ld, %ld)", self.count, self.point.x, self.point.y];
+}
 @end
 
 
 @implementation EXTChartViewDifferentialData
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"Differential from %@ to %@", NSStringFromPoint(self.start), NSStringFromPoint(self.end)];
+}
 @end
