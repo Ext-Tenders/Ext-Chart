@@ -13,7 +13,7 @@
 
 static void *_EXTCollapsedContext = &_EXTCollapsedContext;
 static const CGFloat _EXTHorizontalMargin = 10.0; // margin = empty space outside of the group view
-static const CGFloat _EXTVerticalMargin = 5.0; // Set to half the horizontal margin, because it gets doubled as views are stacked vertically.
+static const CGFloat _EXTVerticalMargin = 10.0;
 static const CGFloat _EXTHorizontalPadding = 5.0; // padding = empty space inside of the group view
 static const CGFloat _EXTHeaderHeight = 30.0;
 static const CGFloat _EXTContentTopPadding = 1.0; // space between the header and the content view
@@ -45,15 +45,26 @@ NS_INLINE NSSize _EXTGroupSizeForContentSize(NSSize contentSize) {
 
 @implementation EXTDocumentInspectorView
 
+- (id)initWithFrame:(NSRect)frameRect {
+    if (self = [super initWithFrame:frameRect]) {
+        // add some vertical padding, which will sit at the top of the inspector
+        NSSize frameSize = self.frame.size;
+        frameSize.height += _EXTVerticalMargin;
+        [self setFrameSize:frameSize];
+    }
+    
+    return self;
+}
+
 - (void)addSubview:(NSView *)subview withTitle:(NSString *)title collapsed:(bool)collapsed centered:(bool)centered {
     NSSize frameSize = [self frame].size;
     NSRect groupViewFrame = {
         .origin.x = _EXTHorizontalMargin,
-        .origin.y = frameSize.height + _EXTVerticalMargin,
+        .origin.y = frameSize.height,
         .size = _EXTGroupSizeForContentSize([subview frame].size)
     };
 
-    frameSize.height += groupViewFrame.size.height + _EXTVerticalMargin * 2;
+    frameSize.height += groupViewFrame.size.height + _EXTVerticalMargin;
     frameSize.width = MAX(frameSize.width, groupViewFrame.size.width + _EXTHorizontalMargin * 2);
     groupViewFrame.size.width = frameSize.width - _EXTHorizontalMargin * 2;
     [self setFrameSize:frameSize];
