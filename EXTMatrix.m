@@ -256,7 +256,7 @@
         NSInteger gcd = [rowToBezout[firstNonzeroEntry] intValue];
         for (int k = 0; k < firstNonzeroEntry; k++)
             bezout[k] = @0;
-        bezout[firstNonzeroEntry] = row[firstNonzeroEntry];
+        bezout[firstNonzeroEntry] = @1;
             
         for (NSInteger index = firstNonzeroEntry + 1;
              index < row.count;
@@ -280,7 +280,7 @@
                 
             while (rNew != 0) {
                 quotient = rOld / rNew;
-                    
+                
                 temp = rNew;
                 rNew = rOld - quotient * rNew;
                 rOld = temp;
