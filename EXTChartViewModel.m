@@ -123,6 +123,8 @@ static dispatch_queue_t _dotLayersQueue;
 
 - (void)reloadCurrentPage
 {
+    [self.sequence computeGroupsForPage:self.currentPage];
+
     // --- Term Counts
     // start by initializing the array of counts
     NSMutableDictionary *counts = [NSMutableDictionary new];

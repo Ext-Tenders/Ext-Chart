@@ -117,7 +117,6 @@ static void *_selectedToolTagContext = &_selectedToolTagContext;
 #pragma mark -
 
 - (void)reloadCurrentPage {
-    [_document.sseq computeGroupsForPage:_currentPage];
     [self.chartViewModel reloadCurrentPage];
     [self.chartView resetHighlightPath];
     [self.chartView setNeedsDisplay:YES];
