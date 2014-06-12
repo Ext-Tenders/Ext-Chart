@@ -482,9 +482,6 @@ typedef enum : NSInteger {
         return;
 
     self.selectedToolTag = tag;
-
-//    [_chartViewController setSelectedObject:nil];
-//    [_chartView setSelectedToolTag:tag];
 }
 
 #pragma mark - NSUserInterfaceValidations
