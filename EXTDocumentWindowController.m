@@ -159,7 +159,6 @@ typedef enum : NSInteger {
     // Toolbox view
     {
         [self setSelectedToolTag:_EXTGeneratorToolTag];
-        [_chartView bind:@"selectedToolTag" toObject:self withKeyPath:@"selectedToolTag" options:nil];
     }
 
 
@@ -482,8 +481,10 @@ typedef enum : NSInteger {
     if (tag <= 0 || tag >= _EXTToolTagCount)
         return;
 
-    [_chartViewController setSelectedObject:nil];
-    [_chartView setSelectedToolTag:tag];
+    self.selectedToolTag = tag;
+
+//    [_chartViewController setSelectedObject:nil];
+//    [_chartView setSelectedToolTag:tag];
 }
 
 #pragma mark - NSUserInterfaceValidations
@@ -497,7 +498,7 @@ typedef enum : NSInteger {
     }
     else if ([item action] == @selector(changeTool:)) {
         if ([(id)item respondsToSelector:@selector(setState:)]) {
-            [(id)item setState:([item tag] == [_chartView selectedToolTag] ? NSOnState : NSOffState)];
+            [(id)item setState:([item tag] == self.selectedToolTag ? NSOnState : NSOffState)];
         }
     }
 

@@ -9,6 +9,7 @@
 
 #import <Cocoa/Cocoa.h>
 
+@class EXTDocumentWindowController;
 @class EXTSpectralSequence;
 
 
@@ -24,6 +25,7 @@
     @property(nonatomic, assign) CGFloat gridSpacing;
     @property(nonatomic, assign) NSInteger gridEmphasisSpacing;
     @property(nonatomic, assign) EXTIntRect artBoardGridFrame;
+    @property(nonatomic, readonly) EXTDocumentWindowController *mainWindowController;
 @end
 
 // Notes: need something to specify the size (width, height) of the document, origin location, serre or adams convention?

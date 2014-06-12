@@ -26,4 +26,5 @@
     @property(nonatomic, weak) IBOutlet EXTChartView *chartView;
     @property(nonatomic, readonly) EXTDocument *extDocument;
     @property(nonatomic, readonly) EXTChartViewController *chartViewController;
+    @property (nonatomic, assign, readonly) EXTToolboxTag selectedToolTag;
 @end

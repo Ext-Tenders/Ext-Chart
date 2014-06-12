@@ -10,29 +10,20 @@
 #import <Cocoa/Cocoa.h>
 #import "EXTToolboxView.h"
 
-
 @class EXTChartView, EXTArtBoard, EXTGrid;
-
-@protocol EXTChartViewDelegate <NSObject>
-    - (NSBezierPath *)chartView:(EXTChartView *)chartView
-           highlightPathForTool:(EXTToolboxTag)toolTag
-                   gridLocation:(EXTIntPoint)gridLocation;
-
-    - (void)chartView:(EXTChartView *)chartView drawPageInGridRect:(EXTIntRect)gridRect;
-    - (void)chartView:(EXTChartView *)chartView mouseDownAtGridLocation:(EXTIntPoint)gridLocation;
-@end
-
+@protocol EXTChartViewDataSource, EXTChartViewDelegate;
 
 @interface EXTChartView : NSView <NSUserInterfaceValidations>
-
 @property(nonatomic, assign) bool showsGrid;
 @property(nonatomic, strong) EXTArtBoard *artBoard;
 @property(nonatomic, readonly) EXTGrid *grid;
 @property(nonatomic, strong) NSColor *highlightColor;
 @property(nonatomic, assign) EXTIntRect artBoardGridFrame; // the art board frame in grid coordinate space
+@property(nonatomic, assign) bool highlightsGridPositionUnderCursor;
+@property(nonatomic, assign) bool editingArtBoard;
 
+@property (nonatomic, weak) id<EXTChartViewDataSource> dataSource;
 @property(nonatomic, weak) id<EXTChartViewDelegate> delegate;
-@property(nonatomic, assign) EXTToolboxTag selectedToolTag;
 
 // TODO: I feel like maybe this doesn't belong here.  Shouldn't this be handled
 // by the controller somehow?  Hmph.
@@ -40,6 +31,32 @@
 
 // Actions
 - (IBAction)zoomToFit:(id)sender;
+@end
+
+
+@protocol EXTChartViewDelegate <NSObject>
+- (void)chartView:(EXTChartView *)chartView mouseDownAtGridLocation:(EXTIntPoint)gridLocation;
+@end
+
+
+@protocol EXTChartViewDataSource <NSObject>
+- (CGLayerRef)chartView:(EXTChartView *)chartView layerForTermCount:(NSInteger)count;
+- (NSArray *)chartView:(EXTChartView *)chartView termCountsInGridRect:(EXTIntRect)gridRect; // an array of EXTChartViewTermCountData
+- (NSArray *)chartView:(EXTChartView *)chartView differentialsInRect:(NSRect)gridRect; // an array of EXTChartViewDifferentialData
+- (NSArray *)chartViewBackgroundRectsForSelectedObject:(EXTChartView *)chartView; // an array of NSRects
+- (NSBezierPath *)chartView:(EXTChartView *)chartView highlightPathForToolAtGridLocation:(EXTIntPoint)gridLocation;
+@end
+
+
+@interface EXTChartViewTermCountData : NSObject
+@property (nonatomic, assign) EXTIntPoint point;
+@property (nonatomic, assign) NSInteger count;
+@end
+
+
+@interface EXTChartViewDifferentialData : NSObject
+@property (nonatomic, assign) NSPoint start;
+@property (nonatomic, assign) NSPoint end;
 @end
 
 #pragma mark - Exported variables

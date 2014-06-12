@@ -13,20 +13,20 @@
 @class EXTChartView;
 @class EXTDocument;
 
+
 @interface EXTChartViewController : NSViewController
-    @property(nonatomic, readonly) EXTChartView *chartView;
-    @property(nonatomic, weak) id selectedObject;
-    @property(nonatomic, weak) EXTLeibnizWindowController *leibnizWindowController;
-    @property(nonatomic, assign) int currentPage;
+@property(nonatomic, readonly) EXTChartView *chartView;
+@property(nonatomic, weak) id selectedObject;
+@property(nonatomic, weak) EXTLeibnizWindowController *leibnizWindowController;
+@property(nonatomic, assign) int currentPage;
 
+// Designated initialiser
+- (id)initWithDocument:(EXTDocument *)document;
 
-    // Designated initialiser
-    - (id)initWithDocument:(EXTDocument *)document;
+// Deprecate other initialisers
++ (id)new UNAVAILABLE_ATTRIBUTE;
+- (id)init UNAVAILABLE_ATTRIBUTE;
+- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil UNAVAILABLE_ATTRIBUTE;
 
-    // Deprecate other initialisers
-    + (id)new __attribute__((deprecated("Use -initWithDocument: instead")));
-    - (id)init __attribute__((deprecated("Use -initWithDocument: instead")));
-    - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil __attribute__((deprecated("Use -initWithDocument: instead")));
-
-    - (void)reloadCurrentPage;
+- (void)reloadCurrentPage;
 @end

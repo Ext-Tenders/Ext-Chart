@@ -21,10 +21,6 @@
 #define MINIMUM_FILE_VERSION_ALLOWED 2
 
 
-@interface EXTDocument ()
-    @property(nonatomic, readonly) EXTDocumentWindowController *windowController;
-@end
-
 @implementation EXTDocument
 
 #pragma mark - Lifecycle
@@ -54,7 +50,7 @@
     [self addWindowController:[EXTDocumentWindowController new]];
 }
 
-- (EXTDocumentWindowController *)windowController {
+- (EXTDocumentWindowController *)mainWindowController {
     return (self.windowControllers.count == 1 ? self.windowControllers[0] : nil);
 }
 
