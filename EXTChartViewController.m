@@ -8,6 +8,8 @@
 
 #import "EXTChartViewController.h"
 #import "EXTChartView.h"
+#import "EXTChartViewModel.h"
+#import "EXTDocumentWindowController.h"
 #import "EXTGrid.h"
 #import "EXTMarquee.h"
 #import "EXTDocument.h"
@@ -15,10 +17,9 @@
 #import "EXTTerm.h"
 #import "EXTDifferential.h"
 
-static NSCache *_EXTLayerCache = nil;
-
 
 @interface EXTChartViewController () <EXTChartViewDelegate>
+@property (nonatomic, strong) EXTChartViewModel *chartViewModel;
 @end
 
 
@@ -26,18 +27,34 @@ static NSCache *_EXTLayerCache = nil;
     EXTDocument *_document;
 }
 
-#pragma mark - Life cycle
+static void *_selectedToolTagContext = &_selectedToolTagContext;
 
-+ (void)initialize {
-    if (self == [EXTChartViewController class])
-        _EXTLayerCache = [NSCache new];
-}
+#pragma mark - Life cycle
 
 - (id)initWithDocument:(EXTDocument *)document {
     self = [super init];
-    if (self)
+    if (self) {
+        NSAssert(document, @"We need a document");
+        NSAssert(document.mainWindowController, @"The document should have a main window controller at this point");
+
         _document = document;
+        [document.mainWindowController addObserver:self forKeyPath:@"selectedToolTag" options:NSKeyValueObservingOptionNew context:_selectedToolTagContext];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(mainDocumentWindowWillClose:) name:NSWindowWillCloseNotification object:document.mainWindowController.window];
+
+        _chartViewModel = [EXTChartViewModel new];
+        _chartViewModel.sequence = document.sseq;
+        [_chartViewModel bind:@"selectedObject" toObject:self withKeyPath:@"selectedObject" options:nil];
+        [_chartViewModel bind:@"selectedToolTag" toObject:document.mainWindowController withKeyPath:@"selectedToolTag" options:nil];
+    }
     return self;
+}
+
+- (void)mainDocumentWindowWillClose:(NSNotification *)notification
+{
+    [_document.mainWindowController removeObserver:self forKeyPath:@"selectedToolTag"];
+
+    [_chartViewModel unbind:@"selectedObject"];
+    [_chartViewModel unbind:@"selectedToolTag"];
 }
 
 - (void)setView:(NSView *)view {
@@ -47,6 +64,9 @@ static NSCache *_EXTLayerCache = nil;
     [super setView:view];
 
     self.chartView.delegate = self;
+    self.chartView.dataSource = self.chartViewModel;
+    self.chartViewModel.grid = self.chartView.grid;
+
     [self reloadCurrentPage];
 }
 
@@ -72,10 +92,9 @@ static NSCache *_EXTLayerCache = nil;
     if (selectedObject == _selectedObject)
         return;
 
-    EXTChartView *chartView = [self chartView];
-    [chartView setNeedsDisplayInRect:[self _extBoundingRectForObject:_selectedObject]]; // clear the previous selection
+    [self.chartView setNeedsDisplayInRect:[self _extBoundingRectForObject:_selectedObject]]; // clear the previous selection
     _selectedObject = selectedObject;
-    [chartView setNeedsDisplayInRect:[self _extBoundingRectForObject:selectedObject]]; // draw the new selection
+    [self.chartView setNeedsDisplayInRect:[self _extBoundingRectForObject:selectedObject]]; // draw the new selection
     
     return;
 }
@@ -87,225 +106,20 @@ static NSCache *_EXTLayerCache = nil;
     _currentPage = currentPage;
 
     self.selectedObject = nil;
-    [self reloadCurrentPage];
+    self.chartViewModel.currentPage = currentPage;
+    [self reloadCurrentPage]; // FIXME: We should only reload if the model has been changed. Otherwise, we should just redisplay the page.
 }
 
 #pragma mark -
 
 - (void)reloadCurrentPage {
     [_document.sseq computeGroupsForPage:_currentPage];
+    [self.chartViewModel reloadCurrentPage];
     [self.chartView resetHighlightPath];
     [self.chartView setNeedsDisplay:YES];
 }
 
 #pragma mark - EXTChartViewDelegate
-
-- (NSBezierPath *)chartView:(EXTChartView *)chartView highlightPathForTool:(EXTToolboxTag)toolTag gridLocation:(EXTIntPoint)gridLocation {
-    NSBezierPath *highlightPath;
-
-    switch (toolTag) {
-        case _EXTGeneratorToolTag: {
-            const NSRect gridSquareInView = [[chartView grid] viewBoundingRectForGridPoint:gridLocation];
-            highlightPath = [NSBezierPath bezierPathWithRect:gridSquareInView];
-            break;
-        }
-
-        case _EXTDifferentialToolTag: {
-            EXTGrid *grid = chartView.grid;
-            const EXTIntPoint targetGridPoint = [_document.sseq.locConvertor followDifflAtGridLocation:gridLocation page:_currentPage];
-            const NSRect sourceRect = [grid viewBoundingRectForGridPoint:gridLocation];
-            const NSRect targetRect = [grid viewBoundingRectForGridPoint:targetGridPoint];
-
-            highlightPath = [NSBezierPath bezierPathWithRect:sourceRect];
-            [highlightPath appendBezierPathWithRect:targetRect];
-            break;
-        }
-
-        default:
-            highlightPath = nil;
-    }
-
-    return highlightPath;
-}
-
-// this performs the culling and delegation calls for drawing a page of the SS
-- (void)chartView:(EXTChartView *)chartView drawPageInGridRect:(const EXTIntRect)gridRect {
-    EXTSpectralSequence *sseq = _document.sseq;
-    
-    // start by initializing the array of counts
-    NSMutableArray *counts = [NSMutableArray arrayWithCapacity:gridRect.size.width];
-    for (int i = 0; i < gridRect.size.width; i++) {
-        NSMutableArray *row = [NSMutableArray arrayWithCapacity:gridRect.size.height];
-        for (int j = 0; j < gridRect.size.height; j++)
-            [row setObject:[NSMutableArray arrayWithArray:@[@0, @0]] atIndexedSubscript:j];
-        [counts setObject:row atIndexedSubscript:i];
-    }
-
-    // iterate through the available EXTTerms and count up how many project onto
-    // a given grid location.  (this is a necessary step for, e.g., EXTTriple-
-    // graded spectral sequences, where many EXTLocations might end up in the
-    // same place.)
-    //
-    // TODO: the way this is set up does not allow EXTTerms to determine how
-    // they get drawn.  this will probably need to be changed when we move to
-    // Z-mods, since those have lots of interesting quotients which need to
-    // represented visually.
-    for (EXTTerm *term in sseq.terms.allValues) {
-        EXTIntPoint point = [sseq.locConvertor gridPoint:term.location];
-
-        if (EXTIntPointInRect(point, gridRect)) {
-            NSMutableArray *column = (NSMutableArray*)counts[(int)(point.x-gridRect.origin.x)];
-            NSMutableArray *tuple = column[(int)(point.y-gridRect.origin.y)];
-            int offset = [tuple[0] intValue];
-            tuple[0] = @(offset + [term dimension:_currentPage]);
-        }
-    }
-
-    // Draw grid square selection background if needed
-    if (_selectedObject) {
-        if ([_selectedObject isKindOfClass:[EXTTerm class]]) {
-            [self _extDrawGridSelectionBackgroundForTerm:_selectedObject inGridRect:gridRect];
-        }
-        else if ([_selectedObject isKindOfClass:[EXTDifferential class]]) {
-            EXTDifferential *selectedDifferential = _selectedObject;
-            [self _extDrawGridSelectionBackgroundForTerm:[selectedDifferential start] inGridRect:gridRect];
-            [self _extDrawGridSelectionBackgroundForTerm:[selectedDifferential end] inGridRect:gridRect];
-        }
-    }
-
-    // actually loop through the available positions and perform the draw.
-    const CGFloat gridSpacing = [[[self chartView] grid] gridSpacing];
-    const EXTIntPoint upperRight = EXTIntUpperRightPointOfRect(gridRect);
-    CGContextRef currentCGContext = [[NSGraphicsContext currentContext] graphicsPort];
-    CGRect layerFrame = {.size = {gridSpacing, gridSpacing}};
-    
-    for (NSInteger i = gridRect.origin.x; i < upperRight.x; i++) {
-        NSArray *column = (NSArray *)counts[i - gridRect.origin.x];
-        for (NSInteger j = gridRect.origin.y; j < upperRight.y; j++) {
-            NSArray *tuple = column[j - gridRect.origin.y];
-            int count = [tuple[0] intValue];
-
-            if (count == 0)
-                continue;
-
-            CGLayerRef dotLayer = [self newDotLayerForCount:count];
-            layerFrame.origin = (CGPoint){i * gridSpacing, j * gridSpacing};
-            CGContextDrawLayerInRect(currentCGContext, layerFrame, dotLayer);
-            CGLayerRelease(dotLayer);
-        }
-    }
-
-    // iterate also through the available differentials
-    if (_currentPage >= sseq.differentials.count)
-        return;
-
-    for (EXTDifferential *differential in ((NSDictionary*)sseq.differentials[_currentPage]).allValues) {
-        // some sanity checks to make sure this differential is worth drawing
-        if ([differential page] != _currentPage)
-            continue;
-
-        const EXTIntPoint startPoint =
-                [sseq.locConvertor gridPoint:differential.start.location];
-        const EXTIntPoint endPoint =
-                [sseq.locConvertor gridPoint:differential.end.location];
-        const bool startPointInGridRect = EXTIntPointInRect(startPoint, gridRect);
-        const bool endPointInGridRect = EXTIntPointInRect(endPoint, gridRect);
-        
-        if (!startPointInGridRect && !endPointInGridRect)
-            continue;
-
-        int imageSize = [differential.presentation image].count;
-        if ((imageSize == 0) ||
-            ([differential.start dimension:differential.page] == 0) ||
-            ([differential.end dimension:differential.page] == 0))
-            continue;
-
-        // figure out the various parameters needed to build the draw commands:
-        // where the dots are, how many there are, and so on.
-        NSMutableArray
-        *startPosition = [NSMutableArray arrayWithArray:@[@0, @0]],
-        *endPosition = [NSMutableArray arrayWithArray:@[@0, @0]];
-
-        if (startPointInGridRect) {
-            NSMutableArray *column = (NSMutableArray*)counts[startPoint.x - gridRect.origin.x];
-            const NSInteger startPointYOffset = startPoint.y - gridRect.origin.y;
-            NSAssert(startPointYOffset < gridRect.size.height, @"start point is not in grid rect; potential index out of bounds doom");
-            startPosition = column[startPointYOffset];
-        }
-
-        if (endPointInGridRect) {
-            NSMutableArray *column = (NSMutableArray*)counts[endPoint.x - gridRect.origin.x];
-            const NSInteger endPointYOffset = endPoint.y - gridRect.origin.y;
-            NSAssert(endPointYOffset < gridRect.size.height, @"end point is not in grid rect; potential index out of bounds doom");
-            endPosition = column[endPointYOffset];
-        }
-
-        NSArray *startRects = [self dotPositionsForCount:[startPosition[0] intValue] atGridPoint:startPoint];
-        NSArray *endRects = [self dotPositionsForCount:[endPosition[0] intValue] atGridPoint:endPoint];
-
-        const bool differentialSelected = (differential == _selectedObject);
-        
-        if (differentialSelected)
-            [[[self chartView] highlightColor] set];
-        else
-            [[NSColor blackColor] set];
-
-        NSBezierPath *line = [NSBezierPath bezierPath];
-        [line setLineWidth:(differentialSelected ? 1.0 : 0.25)];
-        [line setLineCapStyle:NSRoundLineCapStyle];
-
-        for (int i = 0; i < imageSize; i++) {
-            // get and update the offsets
-            int startOffset = [startPosition[1] intValue],
-            endOffset = [endPosition[1] intValue];
-            startPosition[1] = @(startOffset+1);
-            endPosition[1] = @(endOffset+1);
-
-            // if they're out of bounds, which will happen in the >= 4 case,
-            // just use the bottom one.
-            if (startOffset >= startRects.count)
-                startOffset = 0;
-            if (endOffset >= endRects.count)
-                endOffset = 0;
-
-            NSRect startRect = [startRects[startOffset] rectValue],
-            endRect = [endRects[endOffset] rectValue];
-
-            [line moveToPoint:
-             NSMakePoint(startRect.origin.x,
-                         startRect.origin.y + startRect.size.height/2)];
-            // TODO: this next line draws OK, but it's not morally upright.
-            [line lineToPoint:
-             NSMakePoint(endRect.origin.x + endRect.size.width - 0.1*gridSpacing,
-                         endRect.origin.y + endRect.size.height/2)];
-        }
-
-        [line stroke];
-    }
-    
-    // TODO: draw certain multiplicative structures?
-    
-    // TODO: draw highlighted object.
-
-    // Draw marquees
-    const NSRect dirtyRect = [self.chartView.grid convertRectToView:gridRect];
-    for (EXTMarquee *marquee in _document.marquees) {
-        if (!NSIntersectsRect(dirtyRect, marquee.frame))
-            continue;
-
-        // Images take precedence over text
-        if (marquee.image)
-            [marquee.image drawInRect:marquee.frame fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0];
-        else
-            [marquee.string drawInRect:marquee.frame withAttributes:nil];
-    }
-
-    if ([self.selectedObject isKindOfClass:[EXTMarquee class]]) {
-        EXTMarquee *selectedMarquee = self.selectedObject;
-        [self.chartView.highlightColor setFill];
-        NSFrameRect(selectedMarquee.frame);
-    }
-}
 
 - (void)chartView:(EXTChartView *)chartView mouseDownAtGridLocation:(EXTIntPoint)gridLocation {
     // first, see if a modal tool is open.
@@ -315,7 +129,7 @@ static NSCache *_EXTLayerCache = nil;
     }
     
     // TODO: lots!
-    switch (chartView.selectedToolTag) {
+    switch (self.chartViewModel.selectedToolTag) {
         case _EXTDifferentialToolTag: {
             NSArray *terms = [_document.sseq findTermsUnderPoint:gridLocation];
             NSUInteger oldIndex = NSNotFound;
@@ -411,144 +225,6 @@ static NSCache *_EXTLayerCache = nil;
 
 #pragma mark - Drawing support
 
-/* Returns an array of NSValue-boxed rectangles. The number of elements in the array
- represents the number of dots should be drawn for a given (term) count at the grid
- square with origin at `point`. Each rectangle describes the position and size of the
- dot in user coordinate space. */
-- (NSArray *)dotPositionsForCount:(int)count atGridPoint:(EXTIntPoint)point {
-    const CGFloat gridSpacing = [[[self chartView] grid] gridSpacing];
-    
-    switch (count) {
-        case 1:
-            return @[[NSValue valueWithRect:
-                      NSMakeRect(point.x*gridSpacing + 2.0/6.0*gridSpacing,
-                                 point.y*gridSpacing + 2.0/6.0*gridSpacing,
-                                 2.0*gridSpacing/6.0,
-                                 2.0*gridSpacing/6.0)]];
-
-        case 2:
-            return @[[NSValue valueWithRect:
-                      NSMakeRect(point.x*gridSpacing + 1.0/6.0*gridSpacing,
-                                 point.y*gridSpacing + 1.0/6.0*gridSpacing,
-                                 2.0*gridSpacing/6.0,
-                                 2.0*gridSpacing/6.0)],
-                     [NSValue valueWithRect:
-                      NSMakeRect(point.x*gridSpacing + 3.0/6.0*gridSpacing,
-                                 point.y*gridSpacing + 3.0/6.0*gridSpacing,
-                                 2.0*gridSpacing/6.0,
-                                 2.0*gridSpacing/6.0)]];
-
-        case 3:
-            return @[[NSValue valueWithRect:
-                      NSMakeRect(point.x*gridSpacing + 0.66/6.0*gridSpacing,
-                                 point.y*gridSpacing + 1.0/6.0*gridSpacing,
-                                 2.0*gridSpacing/6.0,
-                                 2.0*gridSpacing/6.0)],
-                     [NSValue valueWithRect:
-                      NSMakeRect(point.x*gridSpacing + 2.0/6.0*gridSpacing,
-                                 point.y*gridSpacing + 3.0/6.0*gridSpacing,
-                                 2.0*gridSpacing/6.0,
-                                 2.0*gridSpacing/6.0)],
-                     [NSValue valueWithRect:
-                      NSMakeRect(point.x*gridSpacing + 3.33/6.0*gridSpacing,
-                                 point.y*gridSpacing + 1.0/6.0*gridSpacing,
-                                 2.0*gridSpacing/6.0,
-                                 2.0*gridSpacing/6.0)]];
-
-        default:
-            return @[[NSValue valueWithRect:
-                      NSMakeRect(point.x*gridSpacing+0.15*gridSpacing,
-                                 point.y*gridSpacing+0.15*gridSpacing,
-                                 0.7*gridSpacing,
-                                 0.7*gridSpacing)]];
-    }
-}
-
-- (CGLayerRef)newDotLayerForCount:(int)count {
-    CGLayerRef layer = (__bridge CGLayerRef)[_EXTLayerCache objectForKey:@(count)];
-    if (layer)
-        return CGLayerRetain(layer);
-
-    // Since dot layers contain vectors only, we can draw them with fixed size and let Quartz
-    // scale layers when needed
-    const CGFloat spacing = 9.0;
-    const CGSize size = {spacing, spacing};
-    const CGRect frame = {.size = size};
-
-    NSMutableData *PDFData = [NSMutableData data];
-    CGDataConsumerRef dataConsumer = CGDataConsumerCreateWithCFData((__bridge CFMutableDataRef)PDFData);
-    CGContextRef PDFContext = CGPDFContextCreate(dataConsumer, &frame, NULL);
-
-    layer = CGLayerCreateWithContext(PDFContext, size, NULL);
-    CGContextRef layerContext = CGLayerGetContext(layer);
-
-    NSGraphicsContext *drawingContext = [NSGraphicsContext graphicsContextWithGraphicsPort:layerContext flipped:NO];
-    [NSGraphicsContext saveGraphicsState];
-    [NSGraphicsContext setCurrentContext:drawingContext];
-    CGContextBeginPage(PDFContext, &frame);
-    {
-        NSArray *dotPositions = [self dotPositionsForCount:count atGridPoint:(EXTIntPoint){0}];
-
-        if (count <= 3) {
-            NSBezierPath *path = [NSBezierPath bezierPath];
-            for (NSValue *rectObject in dotPositions)
-                [path appendBezierPathWithOvalInRect:[rectObject rectValue]];
-            [path fill];
-        }
-        else {
-            static dispatch_once_t labelAttributesOnceToken;
-            static NSDictionary *singleDigitAttributes, *multiDigitAttributes;
-            dispatch_once(&labelAttributesOnceToken, ^{
-                NSMutableParagraphStyle *paragraphStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
-                [paragraphStyle setAlignment:NSCenterTextAlignment];
-
-                NSFont *singleDigitFont = [NSFont fontWithName:@"Palatino-Roman" size:5.0];
-                NSFont *multiDigitFont = [NSFont fontWithName:@"Palatino-Roman" size:4.5];
-
-                singleDigitAttributes = @{NSFontAttributeName : singleDigitFont,
-                                          NSParagraphStyleAttributeName : paragraphStyle};
-                multiDigitAttributes = @{NSFontAttributeName : multiDigitFont,
-                                         NSParagraphStyleAttributeName : paragraphStyle};
-            });
-
-            const NSRect drawingFrame = [dotPositions[0] rectValue];
-            [[NSBezierPath bezierPathWithOvalInRect:drawingFrame] stroke];
-
-            NSRect textFrame = drawingFrame;
-            textFrame.origin.y += 0.05 * spacing;
-            NSString *label = [NSString stringWithFormat:@"%d", count];
-            [label drawInRect:textFrame withAttributes:(label.length == 1 ? singleDigitAttributes : multiDigitAttributes)];
-
-        }
-    }
-    CGContextEndPage(PDFContext);
-    CGPDFContextClose(PDFContext);
-    CGContextRelease(PDFContext);
-    CGDataConsumerRelease(dataConsumer);
-    [NSGraphicsContext restoreGraphicsState];
-
-    [_EXTLayerCache setObject:(__bridge id)layer forKey:@(count)];
-
-    return layer;
-}
-
-- (void)_extDrawGridSelectionBackgroundForTerm:(EXTTerm *)term inGridRect:(EXTIntRect)gridRect {
-    const CGFloat selectionInset = 0.25;
-
-    if (EXTIntPointInRect([_document.sseq.locConvertor gridPoint:term.location],
-                          gridRect)) {
-        NSColor *bgcolor =
-            [[[self chartView] highlightColor]
-                    blendedColorWithFraction:0.8 ofColor:[NSColor whiteColor]];
-        [bgcolor setFill];
-        const NSRect squareSelection =
-            NSInsetRect([self _extBoundingRectForTerm:term],
-                        selectionInset,
-                        selectionInset);
-        NSRectFill(squareSelection);
-    }
-}
-
 /* Returns the bounding rect of a given object in user coordinate space */
 - (NSRect)_extBoundingRectForObject:(id)object {
     if ([object isKindOfClass:[EXTTerm class]]) {
@@ -572,13 +248,26 @@ static NSCache *_EXTLayerCache = nil;
     return [grid viewBoundingRectForGridPoint:[_document.sseq.locConvertor gridPoint:term.location]];
 }
 
+#pragma mark - NSKeyValueObserving
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
+{
+    if (context == _selectedToolTagContext) {
+        EXTToolboxTag newTag = [change[NSKeyValueChangeNewKey] integerValue];
+        self.selectedObject = nil;
+        [self.chartView.window invalidateCursorRectsForView:self.chartView];
+        self.chartView.highlightsGridPositionUnderCursor = (newTag != _EXTArtboardToolTag);
+        self.chartView.editingArtBoard = (newTag == _EXTArtboardToolTag);
+        [self.chartView resetHighlightPath];
+    }
+    else [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
+}
+
 #pragma mark - Key-Value Coding
 
 - (void)setNilValueForKey:(NSString *)key {
     if ([key isEqualToString:@"currentPage"]) {
-        [self willChangeValueForKey:@"currentPage"];
         self.currentPage = 0;
-        [self didChangeValueForKey:@"currentPage"];
     }
     else
         [super setNilValueForKey:key];
