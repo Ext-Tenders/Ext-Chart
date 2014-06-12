@@ -51,12 +51,14 @@
 @interface EXTChartViewTermCountData : NSObject
 @property (nonatomic, assign) EXTIntPoint point;
 @property (nonatomic, assign) NSInteger count;
++ (instancetype)chartViewTermCountDataWithCount:(NSInteger)count atGridPoint:(EXTIntPoint)gridPoint;
 @end
 
 
 @interface EXTChartViewDifferentialData : NSObject
 @property (nonatomic, assign) NSPoint start;
 @property (nonatomic, assign) NSPoint end;
++ (instancetype)chartViewDifferentialDataWithStart:(NSPoint)start end:(NSPoint)end;
 @end
 
 #pragma mark - Exported variables

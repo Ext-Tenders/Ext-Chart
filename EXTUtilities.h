@@ -29,6 +29,12 @@ static bool __attribute__((__overloadable__, __always_inline__)) EXTEpsilonEqual
 static NSString * __attribute__((__always_inline__)) EXTBoolToString(bool x) { return x ? @"true" : @"false"; }
 static const char * __attribute__((__always_inline__)) EXTBoolToCString(bool x) { return x ? "true" : "false"; }
 
+
+// From https://www.mikeash.com/pyblog/friday-qa-2010-06-18-implementing-equality-and-hashing.html
+#define NSUINT_BIT (CHAR_BIT * sizeof(NSUInteger))
+#define NSUINTROTATE(val, howmuch) ((((NSUInteger)val) << howmuch) | (((NSUInteger)val) >> (NSUINT_BIT - howmuch)))
+
+
 /*! Integer coordinate space */
 typedef struct {
     NSInteger x;
