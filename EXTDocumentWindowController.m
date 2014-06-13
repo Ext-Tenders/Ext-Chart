@@ -273,7 +273,7 @@ typedef enum : NSInteger {
                          abbreviation:NSLocalizedString(@"un", @"Units abbreviation string")
          unitToPointsConversionFactor:self.extDocument.gridSpacing
                           stepUpCycle:@[@(self.extDocument.gridEmphasisSpacing)]
-                        stepDownCycle:@[@0.5]];
+                        stepDownCycle:@[@FLT_MIN]]; // With FLT_MIN, we get integral hash marks as requested in issue #34
     [[_chartScrollView horizontalRulerView] setMeasurementUnits:unitName];
     [[_chartScrollView verticalRulerView] setMeasurementUnits:unitName];
 }
