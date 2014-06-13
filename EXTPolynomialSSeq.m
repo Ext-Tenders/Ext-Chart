@@ -96,13 +96,13 @@
     return TRUE;
 }
 
--(id) copyWithZone:(NSZone *)zone {
+-(instancetype) copyWithZone:(NSZone *)zone {
     EXTPolynomialTag *ret = [EXTPolynomialTag new];
     ret.tags = [NSMutableDictionary dictionaryWithDictionary:tags];
     return ret;
 }
 
-- (id)initWithCoder:(NSCoder *)aDecoder {
+- (instancetype)initWithCoder:(NSCoder *)aDecoder {
     if (self = [super init]) {
         tags = [aDecoder decodeObjectForKey:@"tags"];
     }
@@ -125,7 +125,7 @@
 
 @synthesize generators;
 
-- (id)initWithCoder:(NSCoder *)aDecoder {
+- (instancetype)initWithCoder:(NSCoder *)aDecoder {
     if (self = [super initWithCoder:aDecoder]) {
         generators = [aDecoder decodeObjectForKey:@"generators"];
     }

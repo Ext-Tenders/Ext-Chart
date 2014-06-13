@@ -25,7 +25,7 @@
 
 #pragma mark - Lifecycle
 
-- (id)init {
+- (instancetype)init {
     self = [super init];
     if (self) {
         _sseq = [EXTSpectralSequence new];

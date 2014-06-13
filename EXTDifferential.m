@@ -36,7 +36,7 @@ static void *_EXTPresentationParametersContext = &_EXTPresentationParametersCont
 @synthesize partialDefinitions;
 @synthesize wellDefined;
 
-- (id)init {
+- (instancetype)init {
     self = [super init];
 
     if (self) {
@@ -51,7 +51,9 @@ static void *_EXTPresentationParametersContext = &_EXTPresentationParametersCont
     [self removeObserver:self forKeyPath:@"presentationParameters" context:_EXTPresentationParametersContext];
 }
 
-+(id) newDifferential:(EXTTerm *)start end:(EXTTerm *)end page:(int)page {
++(instancetype) newDifferential:(EXTTerm *)start
+                            end:(EXTTerm *)end
+                           page:(int)page {
     EXTDifferential *object = [EXTDifferential new];
     
     object.start = start;
@@ -65,7 +67,9 @@ static void *_EXTPresentationParametersContext = &_EXTPresentationParametersCont
     return object;
 }
 
-+(id) differential:(EXTTerm *)start end:(EXTTerm *)end page:(int)page {
++(instancetype) differential:(EXTTerm *)start
+                         end:(EXTTerm *)end
+                        page:(int)page {
     EXTDifferential *differential =
         [EXTDifferential newDifferential:start end:end page:page];
     
@@ -141,7 +145,7 @@ static void *_EXTPresentationParametersContext = &_EXTPresentationParametersCont
 // IMPORTANT NOTE: this DOESN'T actually return a properly initialized object.
 // instead, the start and end pointers are set to the EXTLocation of the term
 // they refer to.  this must be dereferenced before storing the differential.
-- (id) initWithCoder: (NSCoder*) coder {
+- (instancetype) initWithCoder: (NSCoder*) coder {
 	if (self = [super init])
 	{
         start = [coder decodeObjectForKey:@"start"];

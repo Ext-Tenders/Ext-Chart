@@ -20,7 +20,7 @@
              (loc.b <= topEdge));
 }
 
-- (id)initWithCoder:(NSCoder *)aDecoder {
+- (instancetype)initWithCoder:(NSCoder *)aDecoder {
     if (self = [super init]) {
         leftEdge = [aDecoder decodeIntForKey:@"leftEdge"];
         rightEdge = [aDecoder decodeIntForKey:@"rightEdge"];
@@ -38,7 +38,7 @@
     [aCoder encodeInteger:bottomEdge forKey:@"bottomEdge"];
 }
 
-- (id)copyWithZone:(NSZone *)zone {
+- (instancetype)copyWithZone:(NSZone *)zone {
     EXTZeroRangePair *ret = [[EXTZeroRangePair allocWithZone:zone] init];
     ret.leftEdge = leftEdge;
     ret.rightEdge = rightEdge;
@@ -74,7 +74,7 @@
              (loc.c <= frontEdge));
 }
 
-- (id)initWithCoder:(NSCoder *)aDecoder {
+- (instancetype)initWithCoder:(NSCoder *)aDecoder {
     if (self = [super init]) {
         leftEdge = [aDecoder decodeIntForKey:@"leftEdge"];
         rightEdge = [aDecoder decodeIntForKey:@"rightEdge"];
@@ -96,7 +96,7 @@
     [aCoder encodeInteger:backEdge forKey:@"backEdge"];
 }
 
-- (id)copyWithZone:(NSZone *)zone {
+- (instancetype)copyWithZone:(NSZone *)zone {
     EXTZeroRangeTriple *ret = [[EXTZeroRangeTriple allocWithZone:zone] init];
     ret.leftEdge = leftEdge;
     ret.rightEdge = rightEdge;
@@ -135,13 +135,13 @@
     return;
 }
 
-- (id)initWithCoder:(NSCoder *)aDecoder {
+- (instancetype)initWithCoder:(NSCoder *)aDecoder {
     self = [super init];
     sSeq = nil;
     return self;
 }
 
-- (id)copyWithZone:(NSZone *)zone {
+- (instancetype)copyWithZone:(NSZone *)zone {
     EXTZeroRangeStrict *ret = [[EXTZeroRangeStrict allocWithZone:zone] init];
     ret.sSeq = sSeq;
     return ret;

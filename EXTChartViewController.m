@@ -31,28 +31,47 @@ static void *_selectedToolTagContext = &_selectedToolTagContext;
 
 #pragma mark - Life cycle
 
-- (id)initWithDocument:(EXTDocument *)document {
+- (instancetype)initWithDocument:(EXTDocument *)document {
     self = [super init];
     if (self) {
         NSAssert(document, @"We need a document");
-        NSAssert(document.mainWindowController, @"The document should have a main window controller at this point");
+        NSAssert(document.mainWindowController,
+            @"The document should have a main window controller at this point");
 
         _document = document;
-        [document.mainWindowController addObserver:self forKeyPath:@"selectedToolTag" options:NSKeyValueObservingOptionNew context:_selectedToolTagContext];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(mainDocumentWindowWillClose:) name:NSWindowWillCloseNotification object:document.mainWindowController.window];
+        [document.mainWindowController addObserver:self
+                                        forKeyPath:@"selectedToolTag"
+                                           options:NSKeyValueObservingOptionNew
+                                           context:_selectedToolTagContext];
+        
+        [[NSNotificationCenter defaultCenter]
+                             addObserver:self
+                                selector:@selector(mainDocumentWindowWillClose:)
+                                    name:NSWindowWillCloseNotification
+                                  object:document.mainWindowController.window];
 
         _chartViewModel = [EXTChartViewModel new];
         _chartViewModel.sequence = document.sseq;
-        [_chartViewModel bind:@"selectedObject" toObject:self withKeyPath:@"selectedObject" options:nil];
-        [_chartViewModel bind:@"selectedToolTag" toObject:document.mainWindowController withKeyPath:@"selectedToolTag" options:nil];
+        [_chartViewModel bind:@"selectedObject"
+                     toObject:self withKeyPath:@"selectedObject"
+                      options:nil];
+        [_chartViewModel bind:@"selectedToolTag"
+                     toObject:document.mainWindowController
+                  withKeyPath:@"selectedToolTag"
+                      options:nil];
     }
     return self;
 }
 
 - (void)mainDocumentWindowWillClose:(NSNotification *)notification
 {
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:NSWindowWillCloseNotification object:_document.mainWindowController.window];
-    [_document.mainWindowController removeObserver:self forKeyPath:@"selectedToolTag"];
+    [[NSNotificationCenter defaultCenter]
+                        removeObserver:self
+                                  name:NSWindowWillCloseNotification
+                                object:_document.mainWindowController.window];
+    
+    [_document.mainWindowController removeObserver:self
+                                        forKeyPath:@"selectedToolTag"];
 
     [_chartViewModel unbind:@"selectedObject"];
     [_chartViewModel unbind:@"selectedToolTag"];
@@ -62,7 +81,8 @@ static void *_selectedToolTagContext = &_selectedToolTagContext;
 }
 
 - (void)setView:(NSView *)view {
-    NSAssert([view isKindOfClass:[EXTChartView class]], @"EXTChartViewController controls EXTChartViews only");
+    NSAssert([view isKindOfClass:[EXTChartView class]],
+             @"EXTChartViewController controls EXTChartViews only");
     NSAssert(_document, @"EXTChartViewController needs a document");
 
     [super setView:view];
@@ -74,15 +94,16 @@ static void *_selectedToolTagContext = &_selectedToolTagContext;
     [self reloadCurrentPage];
 }
 
-+ (id)new {
++ (instancetype)new {
     return [super new];
 }
 
-- (id)init {
+- (instancetype)init {
     return [super init];
 }
 
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
+- (instancetype)initWithNibName:(NSString *)nibNameOrNil
+                         bundle:(NSBundle *)nibBundleOrNil {
     return [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
 }
 

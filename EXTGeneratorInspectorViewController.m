@@ -23,7 +23,7 @@
 
 #pragma mark - Life cycle
 
-- (id)init {
+- (instancetype)init {
     return [self initWithNibName:@"EXTGeneratorInspectorView" bundle:nil];
 }
 

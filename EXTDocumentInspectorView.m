@@ -39,13 +39,15 @@ NS_INLINE NSSize _EXTGroupSizeForContentSize(NSSize contentSize) {
     @property(nonatomic, readonly) NSString *title;
     @property(nonatomic, assign, getter=isCollapsed) bool collapsed;
     @property(nonatomic, assign, getter=isContentCentered) bool contentCentered;
-    - (id)initWithFrame:(NSRect)frame contentView:(NSView *)contentView title:(NSString *)title;
+    - (instancetype)initWithFrame:(NSRect)frame
+                      contentView:(NSView *)contentView
+                            title:(NSString *)title;
 @end
 
 
 @implementation EXTDocumentInspectorView
 
-- (id)initWithFrame:(NSRect)frameRect {
+- (instancetype)initWithFrame:(NSRect)frameRect {
     if (self = [super initWithFrame:frameRect]) {
         // add some vertical padding, which will sit at the top of the inspector
         NSSize frameSize = self.frame.size;
@@ -154,7 +156,9 @@ NS_INLINE NSSize _EXTGroupSizeForContentSize(NSSize contentSize) {
     }
 }
 
-- (id)initWithFrame:(NSRect)frame contentView:(NSView *)contentView title:(NSString *)title {
+- (instancetype)initWithFrame:(NSRect)frame
+                  contentView:(NSView *)contentView
+                        title:(NSString *)title {
     self = [super initWithFrame:frame];
     if (self) {
         _contentView = contentView;

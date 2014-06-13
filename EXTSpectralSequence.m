@@ -19,7 +19,7 @@
 @synthesize terms, differentials, multTables, indexClass, zeroRanges,
             locConvertor;
 
-- (id)initWithCoder:(NSCoder *)aDecoder {
+- (instancetype)initWithCoder:(NSCoder *)aDecoder {
     if (self = [super init]) {
         terms = [aDecoder decodeObjectForKey:@"terms"];
         

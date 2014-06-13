@@ -15,27 +15,32 @@
 
 // this class models a differential in the spectral sequence.
 @interface EXTDifferential : NSObject <NSCoding>
-    {
-        EXTTerm *start, *end;
-        int page;
+{
+    EXTTerm *start, *end;
+    int page;
         
-        NSMutableArray *partialDefinitions; // array of EXTPartialDifferential's
-        bool wellDefined;                   // false if definitions don't span
-    }
+    NSMutableArray *partialDefinitions; // array of EXTPartialDifferential's
+    bool wellDefined;                   // false if definitions don't span
+}
 
-    @property(retain) EXTTerm *start, *end;
-    @property(assign) int page;
-    @property(strong,readonly) NSMutableArray *partialDefinitions;
-    @property(strong,readonly) EXTMatrix *presentation;
-    @property(assign) bool wellDefined;
+@property(retain) EXTTerm *start, *end;
+@property(assign) int page;
+@property(strong,readonly) NSMutableArray *partialDefinitions;
+@property(strong,readonly) EXTMatrix *presentation;
+@property(assign) bool wellDefined;
 
-    // constructors
-    +(id) newDifferential:(EXTTerm *)start end:(EXTTerm *)end page:(int)page;
-    +(id) differential:(EXTTerm *)start end:(EXTTerm *)end page:(int)page;
+// constructors
++(instancetype) newDifferential:(EXTTerm *)start
+                            end:(EXTTerm *)end
+                           page:(int)page;
++(instancetype) differential:(EXTTerm *)start
+                         end:(EXTTerm *)end
+                        page:(int)page;
 
-    // deal with its
-    -(void) assemblePresentation;
-    -(void) stripDuplicates;
+// deal with its
+-(void) assemblePresentation;
+-(void) stripDuplicates;
 
-    -(BOOL) checkForSanity;
+-(BOOL) checkForSanity;
+
 @end

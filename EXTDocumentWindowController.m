@@ -81,7 +81,7 @@ typedef enum : NSInteger {
 
 #pragma mark - Life cycle
 
-- (id)init {
+- (instancetype)init {
     return [super initWithWindowNibName:@"EXTDocument"];
 }
 

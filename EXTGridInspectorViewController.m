@@ -24,7 +24,7 @@
 
 @implementation EXTGridInspectorViewController
 
-- (id)init {
+- (instancetype)init {
     return [self initWithNibName:@"EXTGridInspectorView" bundle:nil];
 }
 

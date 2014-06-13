@@ -26,7 +26,8 @@
 #pragma mark *** initialization ***
 
 // setTerm re/initializes an EXTTerm with the desired values.
--(id) setTerm:(EXTLocation*)whichLocation andNames:(NSMutableArray*)whichNames {
+-(instancetype) setTerm:(EXTLocation*)whichLocation
+               andNames:(NSMutableArray*)whichNames {
     // first try to initialize the memory for the object which we don't control
 
     // if it succeeds, then initialize the members
@@ -60,7 +61,7 @@
 // TODO: update these to pull in the element names.  they should not bother
 // writing the cycles and boundaries to disk; these are computable from scratch.
 
-- (id) initWithCoder: (NSCoder*) coder {
+- (instancetype) initWithCoder: (NSCoder*) coder {
 	if (self = [super init])
 	{
         names = [coder decodeObjectForKey:@"names"];
@@ -100,7 +101,7 @@
 // TODO: this requires sophisticated logic now that terms understand where they
 // live in the spectral sequence.  summation is more appropriate an operation on
 // modules, rather than on EXTTerms...
-+ (id) sumOfTerms:(EXTTerm *)termOne and:(EXTTerm *)termTwo {
++ (instancetype) sumOfTerms:(EXTTerm *)termOne and:(EXTTerm *)termTwo {
     NSLog(@"+sumOfTerms is not yet implemented.");
 	return nil; // allowed?
 }

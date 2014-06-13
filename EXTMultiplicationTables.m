@@ -58,7 +58,7 @@
 	return (int) key;
 }
 
-- (id)initWithCoder:(NSCoder *)aDecoder {
+- (instancetype)initWithCoder:(NSCoder *)aDecoder {
     if (self = [super init]) {
         left = [aDecoder decodeObjectForKey:@"left"];
         right = [aDecoder decodeObjectForKey:@"right"];
@@ -89,11 +89,7 @@
     return self;
 }
 
-+(id) entry {
-    return [EXTMultiplicationEntry new];
-}
-
-- (id)initWithCoder:(NSCoder *)aDecoder {
+- (instancetype)initWithCoder:(NSCoder *)aDecoder {
     if (self = [super init]) {
         partialDefinitions = [aDecoder decodeObjectForKey:@"partialDefinitions"];
     }
@@ -122,7 +118,7 @@
 // XXX: general oversight: i don't check for when the target term exists.  this
 // surely must get in the way sometimes...
 
--(id) init {
+-(instancetype) init {
     if (!(self = [super init])) return nil;
     
     [self setTables:[NSMutableDictionary dictionary]];
@@ -136,7 +132,7 @@
     return self;
 }
 
-+(id) multiplicationTables:(EXTSpectralSequence *)sseq {
++(instancetype) multiplicationTables:(EXTSpectralSequence *)sseq {
     EXTMultiplicationTables *ret = [EXTMultiplicationTables new];
     
     [ret setSSeq:sseq];
@@ -150,7 +146,7 @@
 // *ALSO* true of the sSeq pointer.
 //
 // TODO: should the aforementioned behavior be written into an NSCoder subclass?
-- (id)initWithCoder:(NSCoder *)aDecoder {
+- (instancetype)initWithCoder:(NSCoder *)aDecoder {
     if (self = [super init]) {
         tables = [aDecoder decodeObjectForKey:@"tables"];
         unitTerm = [aDecoder decodeObjectForKey:@"unitTerm"];
@@ -187,7 +183,7 @@
            *targetterm = [self.sSeq findTerm:[locClass addLocation:loc1 to:loc2]];
         
         // instantiate the matrix
-        ret = [EXTMultiplicationEntry entry];
+        ret = [EXTMultiplicationEntry new];
         ret.presentation =
             [EXTMatrix matrixWidth:([term1 names].count * [term2 names].count)
                             height:[targetterm names].count];

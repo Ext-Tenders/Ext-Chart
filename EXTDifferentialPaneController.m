@@ -37,11 +37,12 @@
 
 #pragma mark differential inspector pane
 
-- (id)init {
+- (instancetype)init {
     return [self initWithNibName:@"EXTDifferentialPane" bundle:nil];
 }
 
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
+- (instancetype)initWithNibName:(NSString *)nibNameOrNil
+                         bundle:(NSBundle *)nibBundleOrNil
 {
     return [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
 }

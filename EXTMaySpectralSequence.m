@@ -59,7 +59,7 @@
 	return (int) key;
 }
 
-- (id)initWithCoder:(NSCoder *)aDecoder {
+- (instancetype)initWithCoder:(NSCoder *)aDecoder {
     if (self = [super init]) {
         i = [aDecoder decodeIntForKey:@"i"];
         j = [aDecoder decodeIntForKey:@"j"];
@@ -80,7 +80,7 @@
 
 @implementation EXTMaySpectralSequence
 
--(id) init {    
+-(instancetype) init {
     return self = [super initWithIndexingClass:[EXTTriple class]];
 }
 

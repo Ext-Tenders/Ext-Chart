@@ -18,7 +18,7 @@
 -(NSString*) description;
 +(EXTPolynomialTag*) sum:(EXTPolynomialTag*)left with:(EXTPolynomialTag*)right;
 -(BOOL) isEqual:(id)object;
--(id) copyWithZone:(NSZone *)zone;
+-(instancetype) copyWithZone:(NSZone *)zone;
 
 @end
 

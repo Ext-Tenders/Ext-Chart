@@ -43,7 +43,7 @@ typedef enum : NSUInteger {
 
     @property(nonatomic, assign) bool hasShadow;
 
-    - (id)initWithFrame:(NSRect)frame;
+    - (instancetype)initWithFrame:(NSRect)frame;
 
     - (void)fillRect;
     - (void)strokeRect;

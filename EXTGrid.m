@@ -42,7 +42,7 @@ static const CGFloat _EXTGridLineWidth = 0.25;
     [[NSUserDefaults standardUserDefaults] registerDefaults:defaults];
 }
 
-- (id)init {
+- (instancetype)init {
     self = [super init];
     if (!self)
         return nil;

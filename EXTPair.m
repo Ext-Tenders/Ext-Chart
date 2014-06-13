@@ -13,7 +13,7 @@
 @synthesize a;
 @synthesize b;
 
-- (id) initWithA:(int)aa B:(int)bb {
+- (instancetype) initWithA:(int)aa B:(int)bb {
 	if (self = [super init]) {
 		a = aa;
         b = bb;
@@ -21,7 +21,7 @@
 	return self;
 }
 
-+ (id) pairWithA:(int)aa B:(int)bb {
++ (instancetype) pairWithA:(int)aa B:(int)bb {
 	EXTPair* pair = [[EXTPair alloc] initWithA:aa B:bb];
 	return pair;
 }
@@ -81,7 +81,7 @@
 	return (([other a] == [self a]) && ([other b] == [self b]));
 }
 
-- (id) initWithCoder: (NSCoder*) coder {
+- (instancetype) initWithCoder: (NSCoder*) coder {
 	if (self = [super init])
 	{
 		a = [coder decodeIntForKey:@"a"];
@@ -106,7 +106,7 @@
 
 @synthesize internalToUser, userToScreen;
 
--(id)init {
+-(instancetype)init {
     if (!(self = [super init]))
         return nil;
     
@@ -121,7 +121,7 @@
 // is not what topologists are used to thinking of as the 'internal' grading to
 // an Adams spectral sequence: they want the axes to be labeled (t-s, s) for
 // internal coordinates (s, t). these matrices set up this yoga.
-- (id)initAdamsGrading {
+- (instancetype)initAdamsGrading {
     self = [self init];
     
     // (a, b) |-> (b, a+b)
@@ -139,7 +139,7 @@
     return self;
 }
 
-- (id)initCohomologicalSerreGrading {
+- (instancetype)initCohomologicalSerreGrading {
     self = [self init];
     
     // differentials should go d_r: E_r^{s, t} --> E_r^{s+r, t-r+1}.
@@ -155,7 +155,7 @@
     return self;
 }
 
-- (id)initHomologicalSerreGrading {
+- (instancetype)initHomologicalSerreGrading {
     self = [self init];
     
     // differentials should go d_r: E_r^{s, t} --> E_r^{s-r, t+r-1}.
@@ -253,7 +253,7 @@
     return [NSString stringWithFormat: @"(%d %d)", user.a, user.b];
 }
 
--(id)initWithCoder:(NSCoder *)aDecoder {
+-(instancetype)initWithCoder:(NSCoder *)aDecoder {
     if (self = [super init]) {
         internalToUser = [aDecoder decodeObjectForKey:@"internalToUser"];
         userToScreen = [aDecoder decodeObjectForKey:@"userToScreen"];
@@ -269,7 +269,7 @@
     return;
 }
 
--(id)copyWithZone:(NSZone *)zone {
+-(instancetype)copyWithZone:(NSZone *)zone {
     EXTPairToPoint *newConvertor = [EXTPairToPoint init];
     
     newConvertor.internalToUser = [self.internalToUser copy];

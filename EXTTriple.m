@@ -15,14 +15,14 @@
 
 @synthesize a, b, c;
 
-- (id) initWithA:(int)aa B:(int)bb C:(int)cc {
+- (instancetype) initWithA:(int)aa B:(int)bb C:(int)cc {
 	if (self = [super init]) {
 		a = aa; b = bb; c = cc;
 	}
 	return self;
 }
 
-+ (id) tripleWithA:(int)aa B:(int)bb C:(int)cc {
++ (instancetype) tripleWithA:(int)aa B:(int)bb C:(int)cc {
 	EXTTriple* triple = [[EXTTriple alloc] initWithA:aa B:bb C:cc];
 	return triple;
 }
@@ -96,7 +96,7 @@
             (c == ((EXTTriple*)other)->c));
 }
 
--(id) initWithCoder:(NSCoder *)aDecoder {
+-(instancetype) initWithCoder:(NSCoder *)aDecoder {
     if (self = [super init]) {
         a = [aDecoder decodeIntForKey:@"a"];
         b = [aDecoder decodeIntForKey:@"b"];
@@ -121,7 +121,7 @@
 
 @synthesize internalToUser, userToScreen;
 
--(id)init {
+-(instancetype)init {
     if (!(self = [super init]))
         return nil;
     
@@ -279,7 +279,7 @@
     return [NSString stringWithFormat: @"(%d %d %d)", user.a, user.b, user.c];
 }
 
--(id)initWithCoder:(NSCoder *)aDecoder {
+-(instancetype)initWithCoder:(NSCoder *)aDecoder {
     if (self = [super init]) {
         internalToUser = [aDecoder decodeObjectForKey:@"internalToUser"];
         userToScreen = [aDecoder decodeObjectForKey:@"userToScreen"];
@@ -295,7 +295,7 @@
     return;
 }
 
--(id)copyWithZone:(NSZone *)zone {
+-(instancetype)copyWithZone:(NSZone *)zone {
     EXTTripleToPoint *newConvertor = [EXTTripleToPoint init];
     
     newConvertor.internalToUser = [self.internalToUser copy];

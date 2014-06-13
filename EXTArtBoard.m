@@ -72,11 +72,11 @@ NS_INLINE void EXTArtBoardComputeHotSpotFrames(const NSRect frame,
     }
 }
 
-- (id)init {
+- (instancetype)init {
     return [self initWithFrame:NSZeroRect];
 }
 
-- (id)initWithFrame:(NSRect)frame {
+- (instancetype)initWithFrame:(NSRect)frame {
     self = [super init];
     if (self) {
         _frame = frame;

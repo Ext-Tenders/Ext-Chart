@@ -49,7 +49,7 @@
     NSInteger _firstExampleIndex;
 }
 
-- (id)init {
+- (instancetype)init {
     return [self initWithWindowNibName:@"EXTNewDocument"];
 }
 

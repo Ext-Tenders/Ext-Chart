@@ -15,11 +15,9 @@
     EXTMatrix *presentation;
     NSMutableArray *partialDefinitions;
 }
+
 @property(strong) EXTMatrix *presentation;
 @property(strong) NSMutableArray *partialDefinitions;
-
--(EXTMultiplicationEntry*) init;
-+(EXTMultiplicationEntry*) entry;
 
 @end
 
@@ -36,8 +34,8 @@
 @property(strong) EXTTerm *unitTerm;
 @property(strong) NSMutableArray *unitClass;
 
--(id) init;
-+(id) multiplicationTables:(EXTSpectralSequence*)sseq;
+-(instancetype) init;
++(instancetype) multiplicationTables:(EXTSpectralSequence*)sseq;
 
 -(EXTMatrix*) getMatrixFor:(EXTLocation*)loc1 with:(EXTLocation*)loc2;
 

@@ -16,7 +16,7 @@
 
 @implementation EXTPreferencesWindowController
 
-- (id)init {
+- (instancetype)init {
     return [self initWithWindowNibName:@"EXTPreferences"];
 }
 

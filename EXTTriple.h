@@ -16,8 +16,8 @@
 @property(readonly, assign) int b;
 @property(readonly, assign) int c;
 
--(id) initWithA:(int)aa B:(int)bb C:(int)cc;
-+(id) tripleWithA:(int)aa B:(int)bb C:(int)cc;
+-(instancetype) initWithA:(int)aa B:(int)bb C:(int)cc;
++(instancetype) tripleWithA:(int)aa B:(int)bb C:(int)cc;
 
 -(EXTIntPoint) gridPoint;
 -(NSString *) description;

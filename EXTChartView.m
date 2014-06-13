@@ -47,7 +47,7 @@ static CGFloat const _EXTHighlightLineWidth = 0.5;
     [[NSUserDefaults standardUserDefaults] registerDefaults:defaults];
 }
 
-- (id)initWithFrame:(NSRect)frame {
+- (instancetype)initWithFrame:(NSRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
 		[self translateOriginToPoint:NSMakePoint(NSMidX(frame), NSMidY(frame))];

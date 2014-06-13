@@ -21,12 +21,12 @@
 @property(nonatomic, assign) int currentPage;
 
 // Designated initialiser
-- (id)initWithDocument:(EXTDocument *)document;
+- (instancetype)initWithDocument:(EXTDocument *)document;
 
 // Deprecate other initialisers
-+ (id)new UNAVAILABLE_ATTRIBUTE;
-- (id)init UNAVAILABLE_ATTRIBUTE;
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil UNAVAILABLE_ATTRIBUTE;
++ (instancetype)new UNAVAILABLE_ATTRIBUTE;
+- (instancetype)init UNAVAILABLE_ATTRIBUTE;
+- (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil UNAVAILABLE_ATTRIBUTE;
 
 - (void)reloadCurrentPage;
 @end

@@ -296,7 +296,7 @@ static dispatch_queue_t _dotLayersQueue;
     return newPoint;
 }
 
-- (id)copyWithZone:(NSZone *)zone
+- (instancetype)copyWithZone:(NSZone *)zone
 {
     return [[self class] newViewModelPointWithX:_x y:_y];
 }

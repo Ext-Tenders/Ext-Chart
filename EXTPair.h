@@ -15,8 +15,8 @@
 }
 @property(readonly, assign) int a;
 @property(readonly, assign) int b;
--(id) initWithA:(int)aa B:(int)bb;
-+(id) pairWithA:(int)aa B:(int)bb;
+-(instancetype) initWithA:(int)aa B:(int)bb;
++(instancetype) pairWithA:(int)aa B:(int)bb;
 
 +(EXTPair*) addLocation:(EXTPair*)a to:(EXTPair*)b;
 +(EXTPair*) identityLocation;
@@ -46,9 +46,9 @@
 // this map is *NOT* required to be invertible.
 @property (strong) EXTMatrix *userToScreen;
 
--(id) initAdamsGrading;
--(id) initHomologicalSerreGrading;
--(id) initCohomologicalSerreGrading;
+-(instancetype) initAdamsGrading;
+-(instancetype) initHomologicalSerreGrading;
+-(instancetype) initCohomologicalSerreGrading;
 
 -(EXTIntPoint) gridPoint:(EXTPair*)loc;
 // this routine only makes sense when differentials are projected orthogonally

@@ -32,9 +32,11 @@
     @property(retain) NSMutableArray* displayNames; // labels for display
 
     // a constructor
-    +(id) term:(EXTLocation*)whichLocation andNames:(NSMutableArray*)whichNames;
+    +(instancetype) term:(EXTLocation*)whichLocation
+                andNames:(NSMutableArray*)whichNames;
     // and an in-place initializer
-    -(id) setTerm:(EXTLocation*)whichLocation andNames:(NSMutableArray*)whichNames;
+    -(instancetype) setTerm:(EXTLocation*)whichLocation
+                   andNames:(NSMutableArray*)whichNames;
     // TODO: a direct sum constructor might be nice?
 
     -(int) size;

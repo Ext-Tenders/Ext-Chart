@@ -52,7 +52,7 @@
     [aCoder encodeObject:description forKey:@"description"];
 }
 
--(id) initWithCoder:(NSCoder *)aDecoder {
+-(instancetype) initWithCoder:(NSCoder *)aDecoder {
     if (self = [super init]) {
         inclusion = [aDecoder decodeObjectForKey:@"inclusion"];
         action = [aDecoder decodeObjectForKey:@"action"];
@@ -81,7 +81,7 @@
 @synthesize height, width;
 @synthesize presentation;
 
-- (id)initWithCoder:(NSCoder *)aDecoder {
+- (instancetype)initWithCoder:(NSCoder *)aDecoder {
     if (self = [super init]) {
         height = [aDecoder decodeIntForKey:@"height"];
         width = [aDecoder decodeIntForKey:@"width"];

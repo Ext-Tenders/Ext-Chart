@@ -20,7 +20,7 @@
     // TODO: encode image representations. Will we accept arbitrary images or PDF only?
 }
 
-- (id)initWithCoder:(NSCoder *)decoder {
+- (instancetype)initWithCoder:(NSCoder *)decoder {
     self = [super init];
     if (!self)
         return nil;
