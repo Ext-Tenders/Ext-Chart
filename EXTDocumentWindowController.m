@@ -24,6 +24,7 @@
 #import "EXTLeibnizWindowController.h"
 #import "EXTZeroRangesInspector.h"
 #import "NSUserDefaults+EXTAdditions.h"
+#import "EXTToolboxTag.h"
 
 
 #pragma mark - Private variables
@@ -53,11 +54,11 @@ typedef enum : NSInteger {
 @interface EXTDocumentWindowController () <NSWindowDelegate, NSUserInterfaceValidations>
     @property(nonatomic, weak) IBOutlet NSView *mainView;
     @property(nonatomic, weak) IBOutlet EXTScrollView *chartScrollView;
-    @property(nonatomic, weak) IBOutlet NSView *controlsView;
     @property(nonatomic, weak) IBOutlet NSPopUpButton *zoomPopUpButton;
+    @property(nonatomic, strong) IBOutlet NSView *pageControlsView;
+    @property(nonatomic, weak) IBOutlet NSToolbarItem *pageControlsToolbarItem;
 
     @property(nonatomic, strong) IBOutlet NSView *sidebarView;
-    @property(nonatomic, weak) IBOutlet NSView *toolboxView;
 
     @property(nonatomic, weak) IBOutlet NSTextField *highlightLabel;
 
@@ -75,16 +76,13 @@ typedef enum : NSInteger {
     NSArray *_inspectorViewDelegates;
     EXTDocumentInspectorView *_inspectorView;
     bool _sidebarHidden;
+    bool _sidebarAnimating;
 }
 
 #pragma mark - Life cycle
 
 - (id)init {
-    if (self = [super initWithWindowNibName:@"EXTDocument"]) {
-        // initialization goes here
-    }
-    
-    return self;
+    return [super initWithWindowNibName:@"EXTDocument"];
 }
 
 - (void)windowDidLoad {
@@ -153,12 +151,20 @@ typedef enum : NSInteger {
         // IMO, this looks nicer than -[EXTChartView zoomToFit:]
         const NSRect visibleRect = NSInsetRect([[_chartView artBoard] frame], -20.0, -20.0);
         [_chartScrollView magnifyToFitRect:visibleRect];
-        [_chartView scrollRectToVisible:visibleRect];
+        [_chartView scrollPoint:visibleRect.origin];
+
+        // FIXME: It looks like some magnification factors make the scroll/chart view a bit blurry when it's layer-backed,
+        // and rounding the magnification factor (in this case, up to two decimal numbers) solves this. If this is indeed
+        // the case, the scroll view should always constrain its magnification factor, not only here. Maybe this is
+        // related to the document view bounds being fractional?
+        // FIXME
+        _chartScrollView.magnification = lround(_chartScrollView.magnification * _EXTMagnificationStepRoundingMultiplier) / _EXTMagnificationStepRoundingMultiplier;
     }
 
-    // Toolbox view
+    // Toolbox
     {
-        [self setSelectedToolTag:_EXTGeneratorToolTag];
+        [self setSelectedToolTag:EXTToolTagGenerator];
+        self.pageControlsToolbarItem.view = self.pageControlsView;
     }
 
 
@@ -167,8 +173,6 @@ typedef enum : NSInteger {
         _inspectorView = [[EXTDocumentInspectorView alloc] initWithFrame:NSZeroRect];
 
         // set up the subviews
-        [_inspectorView addSubview:_toolboxView withTitle:@"Toolbox" collapsed:false centered:true];
-
         _generatorInspectorViewController = [EXTGeneratorInspectorViewController new];
         [_inspectorView addSubview:_generatorInspectorViewController.view withTitle:@"Generators" collapsed:true centered:true];
         
@@ -353,6 +357,22 @@ typedef enum : NSInteger {
     return [self document];
 }
 
+- (void)setSelectedToolTag:(EXTToolboxTag)selectedToolTag
+{
+    _selectedToolTag = selectedToolTag;
+
+    NSDictionary *tagToId = @{@(EXTToolTagGenerator): @"GeneratorTool",
+                              @(EXTToolTagDifferential): @"DifferentialTool",
+                              @(EXTToolTagMultiplicativeStructure): @"MultiplicativeStructureTool",
+                              @(EXTToolTagArtboard): @"ArtBoardTool",
+                              @(EXTToolTagMarquee): @"MarqueeTool",
+                              };
+    NSString *identifier = tagToId[@(selectedToolTag)];
+    NSAssert(identifier, @"Toolbar item tag should always match a toolbar item identifier");
+
+    [self.window.toolbar setSelectedItemIdentifier:identifier];
+}
+
 #pragma mark - Key-value observing
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
@@ -411,6 +431,9 @@ typedef enum : NSInteger {
 #pragma mark - Actions
 
 - (IBAction)toggleInspector:(id)sender {
+    if (_sidebarAnimating)
+        return;
+
     const NSRect contentFrame = [[[self window] contentView] frame];
     NSRect sidebarFrame = [_sidebarView frame];
     NSSize mainSize = [_mainView frame].size;
@@ -424,12 +447,17 @@ typedef enum : NSInteger {
         mainSize.width += sidebarFrame.size.width;
     }
 
-    [_sidebarView setFrame:sidebarFrame];
-    [_mainView setFrameSize:mainSize];
+    _sidebarAnimating = true;
+    [NSAnimationContext runAnimationGroup:^(NSAnimationContext *context) {
+        [_sidebarView.animator setFrame:sidebarFrame];
+        [_mainView.animator setFrameSize:mainSize];
+    } completionHandler:^{
+        _sidebarHidden = !_sidebarHidden;
+        _sidebarAnimating = false;
 
-    _sidebarHidden = !_sidebarHidden;
-
-    [[self window] makeFirstResponder:_chartView];
+        [[self window] makeFirstResponder:_chartView];
+        [[self window] invalidateCursorRectsForView:_sidebarView];
+    }];
 }
 
 - (IBAction)nextPage:(id)sender {
@@ -478,7 +506,7 @@ typedef enum : NSInteger {
     NSAssert([sender respondsToSelector:@selector(tag)], @"This action requires senders that respond to -tag");
 
     EXTToolboxTag tag = [sender tag];
-    if (tag <= 0 || tag >= _EXTToolTagCount)
+    if (tag <= 0 || tag >= EXTToolTagLastSentinel)
         return;
 
     self.selectedToolTag = tag;
@@ -500,6 +528,13 @@ typedef enum : NSInteger {
     }
 
     return [self respondsToSelector:[item action]];
+}
+
+#pragma mark - NSToolbarItemValidation
+
+- (BOOL)validateToolbarItem:(NSToolbarItem *)item
+{
+    return ![item.itemIdentifier isEqualToString:@"MarqueeTool"];
 }
 
 @end

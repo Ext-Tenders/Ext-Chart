@@ -260,13 +260,13 @@ static dispatch_queue_t _dotLayersQueue;
     NSBezierPath *highlightPath;
 
     switch (self.selectedToolTag) {
-        case _EXTGeneratorToolTag: {
+        case EXTToolTagGenerator: {
             const NSRect gridSquareInView = [[chartView grid] viewBoundingRectForGridPoint:gridLocation];
             highlightPath = [NSBezierPath bezierPathWithRect:gridSquareInView];
             break;
         }
 
-        case _EXTDifferentialToolTag: {
+        case EXTToolTagDifferential: {
             EXTGrid *grid = chartView.grid;
             const EXTIntPoint targetGridPoint = [self.sequence.locConvertor followDifflAtGridLocation:gridLocation page:self.currentPage];
             const NSRect sourceRect = [grid viewBoundingRectForGridPoint:gridLocation];

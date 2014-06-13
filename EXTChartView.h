@@ -8,7 +8,7 @@
 
 
 #import <Cocoa/Cocoa.h>
-#import "EXTToolboxView.h"
+#import "EXTToolboxTag.h"
 
 @class EXTChartView, EXTArtBoard, EXTGrid;
 @protocol EXTChartViewDataSource, EXTChartViewDelegate;

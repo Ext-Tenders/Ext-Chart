@@ -133,7 +133,7 @@ static void *_selectedToolTagContext = &_selectedToolTagContext;
     
     // TODO: lots!
     switch (self.chartViewModel.selectedToolTag) {
-        case _EXTDifferentialToolTag: {
+        case EXTToolTagDifferential: {
             NSArray *terms = [_document.sseq findTermsUnderPoint:gridLocation];
             NSUInteger oldIndex = NSNotFound;
 
@@ -190,7 +190,7 @@ static void *_selectedToolTagContext = &_selectedToolTagContext;
             break;
         }
 
-        case _EXTMarqueeToolTag: {
+        case EXTToolTagMarquee: {
             const NSRect gridRectInView = [self.chartView.grid viewBoundingRectForGridPoint:gridLocation];
             NSIndexSet *marqueesAtPoint = [_document.marquees indexesOfObjectsPassingTest:^BOOL(EXTMarquee *marquee, NSUInteger idx, BOOL *stop) {
                 return NSIntersectsRect(gridRectInView, marquee.frame);
@@ -259,8 +259,8 @@ static void *_selectedToolTagContext = &_selectedToolTagContext;
         EXTToolboxTag newTag = [change[NSKeyValueChangeNewKey] integerValue];
         self.selectedObject = nil;
         [self.chartView.window invalidateCursorRectsForView:self.chartView];
-        self.chartView.highlightsGridPositionUnderCursor = (newTag != _EXTArtboardToolTag);
-        self.chartView.editingArtBoard = (newTag == _EXTArtboardToolTag);
+        self.chartView.highlightsGridPositionUnderCursor = (newTag != EXTToolTagArtboard);
+        self.chartView.editingArtBoard = (newTag == EXTToolTagArtboard);
         [self.chartView resetHighlightPath];
     }
     else [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
