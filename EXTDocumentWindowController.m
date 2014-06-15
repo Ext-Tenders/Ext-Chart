@@ -417,6 +417,9 @@ typedef enum : NSInteger {
         if ([newValue isKindOfClass:[EXTDifferential class]]) {
             EXTDifferential *diff = (EXTDifferential*)newValue;
             self.highlightLabel.stringValue = [NSString stringWithFormat:@"Differential: %@ → %@", [self.extDocument.sseq.locConvertor convertToString:diff.start.location], [self.extDocument.sseq.locConvertor convertToString:diff.end.location]];
+        } else if ([newValue isKindOfClass:[EXTTerm class]]) {
+            EXTTerm *term = (EXTTerm*)newValue;
+            self.highlightLabel.stringValue = [NSString stringWithFormat:@"Term: %@", [self.extDocument.sseq.locConvertor convertToString:term.location]];
         } else {
             self.highlightLabel.stringValue = @"No selection.";
         }
