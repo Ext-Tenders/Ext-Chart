@@ -154,6 +154,45 @@ static void *_selectedToolTagContext = &_selectedToolTagContext;
     
     // TODO: lots!
     switch (self.chartViewModel.selectedToolTag) {
+        case EXTToolTagGenerator: {
+            NSArray *terms = [_document.sseq findTermsUnderPoint:gridLocation];
+            NSUInteger oldIndex = NSNotFound;
+            
+            // if there's nothing under this click, just quit now.
+            if (terms.count == 0) {
+                self.selectedObject = nil;
+                return;
+            }
+            
+            // if we used to have something selected, and it was a term at this
+            // location, then we should find its position in our list.
+            if ([self.selectedObject isKindOfClass:[EXTTerm class]])
+                oldIndex = [terms indexOfObject:(EXTTerm*)self.selectedObject];
+            
+            // the new index is one past the old index, unless we have to wrap.
+            int newIndex = oldIndex;
+            EXTTerm *term = nil;
+            if (oldIndex == NSNotFound) {
+                oldIndex = 0;
+                newIndex = 0;
+            }
+            do {
+                if (newIndex == (terms.count - 1))
+                    newIndex = 0;
+                else
+                    newIndex = newIndex + 1;
+                term = terms[newIndex];
+                
+                // if we've found it, good!  quit!
+                if (term) {
+                    self.selectedObject = term;
+                    break;
+                }
+            } while (newIndex != oldIndex);
+            
+            break;
+        }
+            
         case EXTToolTagDifferential: {
             NSArray *terms = [_document.sseq findTermsUnderPoint:gridLocation];
             NSUInteger oldIndex = NSNotFound;
