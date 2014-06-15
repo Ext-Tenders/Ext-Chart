@@ -22,7 +22,7 @@
 
 @implementation EXTMatrixEditor
 
-@synthesize representedObject;
+@synthesize representedObject, readonly;
 
 - (instancetype)initWithFrame:(NSRect)frame
 {
@@ -31,6 +31,7 @@
         representedObject = nil;
         self.dataSource = self;
         self.delegate = self;
+        self.readonly = false;
 
         EXTMatrixCell *defaultCell = [EXTMatrixCell new];
         defaultCell.bordered = YES;
@@ -72,7 +73,7 @@
 }
 
 - (void)tableGrid:(MBTableGrid *)aTableGrid setObjectValue:(id)anObject forColumn:(NSUInteger)columnIndex row:(NSUInteger)rowIndex {
-    if (!representedObject)
+    if (!representedObject || readonly)
         return;
     
     NSMutableArray *presentation = representedObject.presentation;

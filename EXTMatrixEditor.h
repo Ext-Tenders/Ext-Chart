@@ -13,5 +13,6 @@
 
 @property (strong) EXTMatrix *representedObject;
 @property (strong) NSArray *columnNames, *rowNames;
+@property (assign) bool readonly;
 
 @end
