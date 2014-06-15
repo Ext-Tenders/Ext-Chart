@@ -25,6 +25,7 @@
 #import "EXTZeroRangesInspector.h"
 #import "NSUserDefaults+EXTAdditions.h"
 #import "EXTToolboxTag.h"
+#import "EXTTermInspectorViewController.h"
 
 
 #pragma mark - Private variables
@@ -69,6 +70,7 @@ typedef enum : NSInteger {
 
 @implementation EXTDocumentWindowController {
     EXTGridInspectorViewController *_gridInspectorViewController;
+    EXTTermInspectorViewController *_termInspectorViewController;
     EXTGeneratorInspectorViewController *_generatorInspectorViewController;
     EXTDifferentialPaneController *_differentialPaneController;
     EXTLeibnizWindowController *_leibnizWindowController;
@@ -175,6 +177,9 @@ typedef enum : NSInteger {
         // set up the subviews
         _generatorInspectorViewController = [EXTGeneratorInspectorViewController new];
         [_inspectorView addSubview:_generatorInspectorViewController.view withTitle:@"Generators" collapsed:true centered:true];
+        
+        _termInspectorViewController = [EXTTermInspectorViewController new];
+        [_inspectorView addSubview:_termInspectorViewController.view withTitle:@"Term" collapsed:true centered:true];
         
         _differentialPaneController = [EXTDifferentialPaneController new];
         [_chartViewController addObserver:_differentialPaneController forKeyPath:@"selectedObject" options:NSKeyValueObservingOptionNew context:nil];
