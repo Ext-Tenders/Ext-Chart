@@ -825,6 +825,11 @@
                     DLog(@"I got triggered twice...");
                 order = [column[j] intValue];
             }
+        
+        // skip this vector if it is perfectly quotiented out.
+        if (order == 1 || order == -1)
+            continue;
+        
         [ret setObject:@(order) forKey:columns.presentation[i]];
     }
     
