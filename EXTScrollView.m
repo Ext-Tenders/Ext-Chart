@@ -12,6 +12,16 @@
 
 @implementation EXTScrollView
 
+static Class _rulerViewClass;
+
++ (void)setRulerViewClass:(Class)rulerViewClass {
+    _rulerViewClass = rulerViewClass;
+}
+
++ (Class)rulerViewClass {
+    return _rulerViewClass;
+}
+
 #pragma mark - Trackpad events
 
 // TODO: the default implementation of -magnifyWithEvent: and -setMagnification:centeredAtPoint:

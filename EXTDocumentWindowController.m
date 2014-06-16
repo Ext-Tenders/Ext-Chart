@@ -26,6 +26,7 @@
 #import "NSUserDefaults+EXTAdditions.h"
 #import "EXTToolboxTag.h"
 #import "EXTTermInspectorViewController.h"
+#import "EXTChartRulerView.h"
 
 
 #pragma mark - Private variables
@@ -82,6 +83,12 @@ typedef enum : NSInteger {
 }
 
 #pragma mark - Life cycle
+
++ (void)initialize {
+    if (self == [EXTDocumentWindowController class]) {
+        [EXTScrollView setRulerViewClass:[EXTChartRulerView class]];
+    }
+}
 
 - (instancetype)init {
     return [super initWithWindowNibName:@"EXTDocument"];
@@ -273,18 +280,14 @@ typedef enum : NSInteger {
 #pragma mark - Ruler views
 
 - (void)_extUpdateRulerViewUnits {
-    const CGFloat halfGridSpacing = self.extDocument.gridSpacing / 2;
-    [[_chartScrollView horizontalRulerView] setOriginOffset:-([_chartView bounds].origin.x - halfGridSpacing)];
-    [[_chartScrollView verticalRulerView] setOriginOffset:-([_chartView bounds].origin.y - halfGridSpacing)];
+    [[_chartScrollView horizontalRulerView] setOriginOffset:-([_chartView bounds].origin.x)];
+    [[_chartScrollView verticalRulerView] setOriginOffset:-([_chartView bounds].origin.y)];
 
-    NSString *unitName = [NSString stringWithFormat:@"EXTRulerViewUnit(%.2f, %ld)", self.extDocument.gridSpacing, self.extDocument.gridEmphasisSpacing];
-    [NSRulerView registerUnitWithName:unitName
-                         abbreviation:NSLocalizedString(@"un", @"Units abbreviation string")
-         unitToPointsConversionFactor:self.extDocument.gridSpacing
-                          stepUpCycle:@[@(self.extDocument.gridEmphasisSpacing)]
-                        stepDownCycle:@[@FLT_MIN]]; // With FLT_MIN, we get integral hash marks as requested in issue #34
-    [[_chartScrollView horizontalRulerView] setMeasurementUnits:unitName];
-    [[_chartScrollView verticalRulerView] setMeasurementUnits:unitName];
+    // FIXME: use bindings instead
+    EXTChartRulerView *horizontalRulerView = (EXTChartRulerView *)_chartScrollView.horizontalRulerView;
+    EXTChartRulerView *verticalRulerView = (EXTChartRulerView *)_chartScrollView.verticalRulerView;
+    horizontalRulerView.unitToPointsConversionFactor = verticalRulerView.unitToPointsConversionFactor = self.extDocument.gridSpacing;
+    horizontalRulerView.emphasisSpacing = verticalRulerView.emphasisSpacing = self.extDocument.gridEmphasisSpacing;
 }
 
 
