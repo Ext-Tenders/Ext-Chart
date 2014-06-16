@@ -88,7 +88,7 @@
   headerStringForColumn:(NSUInteger)columnIndex {
     if ((!_columnNames) ||
         (columnIndex >= _columnNames.count))
-        return [NSString stringWithFormat:@"%ld",(unsigned long)columnIndex];
+        return [NSString stringWithFormat:@"%ld",(unsigned long)columnIndex+1];
     
     return _columnNames[columnIndex];
 }
@@ -97,7 +97,7 @@
      headerStringForRow:(NSUInteger)rowIndex {
     if ((!_rowNames) ||
         (rowIndex >= _rowNames.count))
-        return [NSString stringWithFormat:@"%ld",(unsigned long)rowIndex];
+        return [NSString stringWithFormat:@"%ld",(unsigned long)rowIndex+1];
     
     return _rowNames[rowIndex];
 }
