@@ -179,6 +179,7 @@ typedef enum : NSInteger {
         [_inspectorView addSubview:_generatorInspectorViewController.view withTitle:@"Generators" collapsed:true centered:true];
         
         _termInspectorViewController = [EXTTermInspectorViewController new];
+        [_chartViewController addObserver:_termInspectorViewController forKeyPath:@"selectedObject" options:NSKeyValueObservingOptionNew context:nil];
         [_inspectorView addSubview:_termInspectorViewController.view withTitle:@"Term" collapsed:true centered:true];
         
         _differentialPaneController = [EXTDifferentialPaneController new];
@@ -193,6 +194,7 @@ typedef enum : NSInteger {
 
         _inspectorViewDelegates = @[
                                     @{@"view" : _generatorInspectorViewController.view, @"delegate" : _generatorInspectorViewController},
+                                    @{@"view" : _termInspectorViewController.view, @"delegate" : _termInspectorViewController},
                                     @{@"view" : _differentialPaneController.view, @"delegate" : _differentialPaneController},
                                     @{@"view" : _zeroRangesInspectorController.view, @"delegate" : _zeroRangesInspectorController },
                                     @{@"view" : _gridInspectorViewController.view, @"delegate" : _gridInspectorViewController},
@@ -252,8 +254,10 @@ typedef enum : NSInteger {
 }
 
 - (void)windowWillClose:(NSNotification *)notification {
+    // TODO: should these observer adds and removes be put into the EXTDIVD calls?
     [_chartScrollView removeObserver:self forKeyPath:@"magnification"];
     [_chartView.artBoard removeObserver:self forKeyPath:@"frame" context:_EXTArtBoardFrameContext];
+    [_chartViewController removeObserver:_termInspectorViewController forKeyPath:@"selectedObject"];
     [_chartViewController removeObserver:_differentialPaneController forKeyPath:@"selectedObject"];
     [_chartViewController removeObserver:self forKeyPath:@"selectedObject"];
     [self.extDocument removeObserver:self forKeyPath:@"gridSpacing" context:_EXTDocumentGridSpacingContext];

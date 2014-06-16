@@ -52,10 +52,6 @@
     [self.tableView setDoubleAction:@selector(doubleClick:)];
 }
 
-- (void)setRepresentedObject:(id)representedObject {
-    [super setRepresentedObject:representedObject];
-}
-
 -(NSInteger)numberOfRowsInTableView:(NSTableView *)tableView {
     if (![self.representedObject isKindOfClass:[EXTDifferential class]])
         return 0;
