@@ -218,10 +218,9 @@
     return copy;
 }
 
-// runs gaussian column reduction on a matrix over Z.  useful for finding a
-// presentation of the image of the matrix.
--(EXTMatrix*) columnReduce {
-    EXTMatrix *ret = [self copy];
+-(NSArray*) columnReduceWithRightFactor {
+    EXTMatrix *ret = [self copy],
+              *rightFactor = [EXTMatrix identity:self.width];
     NSMutableArray *usedColumns = [NSMutableArray array];
     for (int i = 0; i < width; i++)
         usedColumns[i] = @(false);
@@ -232,7 +231,7 @@
         
         int j, firstNonzeroEntry = -1;
         NSMutableArray *row = [NSMutableArray arrayWithCapacity:width],
-                       *rowToBezout = [NSMutableArray arrayWithCapacity:width];
+        *rowToBezout = [NSMutableArray arrayWithCapacity:width];
         
         // save this row for analysis.
         for (int k = 0; k < width; k++) {
@@ -252,12 +251,12 @@
         
         // compute the bezout vector for this row.
         NSMutableArray *bezout =
-                        [NSMutableArray arrayWithCapacity:rowToBezout.count];
+        [NSMutableArray arrayWithCapacity:rowToBezout.count];
         NSInteger gcd = [rowToBezout[firstNonzeroEntry] intValue];
         for (int k = 0; k < firstNonzeroEntry; k++)
             bezout[k] = @0;
         bezout[firstNonzeroEntry] = @1;
-            
+        
         for (NSInteger index = firstNonzeroEntry + 1;
              index < row.count;
              index++) {
@@ -272,23 +271,23 @@
             int sOld = 1, sNew = 0;
             int tOld = 0, tNew = 1;
             int temp, quotient;
-                
+            
             if (rNew == 0) {
                 bezout[index] = @0;
                 continue;
             }
-                
+            
             while (rNew != 0) {
                 quotient = rOld / rNew;
                 
                 temp = rNew;
                 rNew = rOld - quotient * rNew;
                 rOld = temp;
-                    
+                
                 temp = sNew;
                 sNew = sOld - sNew * quotient;
                 sOld = temp;
-                    
+                
                 temp = tNew;
                 tNew = tOld - tNew * quotient;
                 tOld = temp;
@@ -325,38 +324,61 @@
         // if we've made it here, then we have a new pivot location, and we're
         // tasked with clearing the rest of the row of nonzero entries.
         //
-        // start by forming the extended gcd for this row and replacing this
-        // column with the Bezout-weighted sum of the columns.
+        // start by replacing this column with the Bezout-weighted sum of the
+        // old columns.
         NSArray *newColumn = [ret actOn:bezout];
         ret.presentation[pivotColumn] =
-                [NSMutableArray arrayWithArray:newColumn];
+                                    [NSMutableArray arrayWithArray:newColumn];
+        EXTMatrix *rightmostFactor = [EXTMatrix identity:self.width];
+        rightmostFactor.presentation[pivotColumn] = bezout;
         
         // then iterate through the other columns...
         for (j = 0; j < width; j++) {
-            NSMutableArray *workingColumn = ret.presentation[j];
-        
+            NSMutableArray *workingColumn = ret.presentation[j],
+                           *factorColumn = rightmostFactor.presentation[j];
+            
             // skip the column if this row is already zeroed out.
             if ([workingColumn[pivotRow] intValue] == 0)
                 continue;
+            
+            // XXX: I think that this is lethal behavior; we can't use this to
+            // run -invert if we don't do this part of the factorization too.
+            //
             // also skip the column if it's already been used & so is stuck.
-            // this includes the present pivotColumn.
-            if ([usedColumns[j] intValue])
+            //if ([usedColumns[j] intValue])
+            //    continue;
+            
+            // skip the present pivot column too.
+            if (pivotColumn == j)
                 continue;
             
             // NOTE: this is *always* an integer, because the pivotRow entry of
             // our pivotColumn now contains the gcd of all the pivotRow values.
             int factor = [workingColumn[pivotRow] intValue] /
-                         [newColumn[pivotRow] intValue];
+            [newColumn[pivotRow] intValue];
             
             // ... and for each entry in this column, subtract.
-            for (int i = 0; i < height; i++)
-                workingColumn[i] =
-                    @([workingColumn[i] intValue] -
-                       factor * [newColumn[i] intValue]);
+            for (int i = 0; i < height; i++) {
+                workingColumn[i] = @([workingColumn[i] intValue] -
+                                     factor * [newColumn[i] intValue]);
+            }
+            
+            for (int i = 0; i < width; i++) {
+                factorColumn[i] = @([factorColumn[i] intValue] -
+                                     factor * [bezout[i] intValue]);
+            }
         }
+        
+        rightFactor = [EXTMatrix newMultiply:rightFactor by:rightmostFactor];
     }
+    
+    return @[ret, rightFactor];
+}
 
-    return ret;
+// runs gaussian column reduction on a matrix over Z.  useful for finding a
+// presentation of the image of the matrix.
+-(EXTMatrix*) columnReduce {
+    return (EXTMatrix*)self.columnReduceWithRightFactor[0];
 }
 
 // returns a basis for the kernel of a matrix
@@ -500,9 +522,7 @@
     // XXX: some kind of error checking would be nice
     EXTMatrix *ret = [EXTMatrix matrixWidth:self.width height:self.width];
     for (int i = 0; i < self.width; i++) {
-        [ret.presentation setObject:
-            [unflip.presentation objectAtIndex:(self.width+i)]
-                            atIndexedSubscript:i];
+        ret.presentation[i] = unflip.presentation[self.width+i];
     }
     
     
@@ -751,6 +771,35 @@
         // haha, cool symbol garbage, (@"%@"
         NSLog(@"%@", output);
     }
+}
+
+// here we have a pair of inclusions B --> C <-- Z, with the implicit assumption
+// that B --> C factors through B --> Z --> C.  we find a presentation of the
+// quotient Z/B in the sequence B --> Z --> Z/B.
++(EXTMatrix*) findComplementOf:(EXTMatrix*)B in:(EXTMatrix*)Z {
+    // start by forming the pullback square.
+    NSArray *pair = [EXTMatrix formIntersection:Z with:B];
+    
+    // since im Z >= im B and both are full rank, the map P --> B is invertible
+    // and B --> P --> Z expresses B as a subspace of Z.
+    
+    EXTMatrix *inclusion = [EXTMatrix newMultiply:(EXTMatrix*)pair[0] by:[(EXTMatrix*)pair[1] invert]];
+    
+    // pad this out to a map B (+) R --(old map (+) 0)-> Z so that the
+    // dimensions line up. write this new map as
+    //                 invertible1 . diagonal . invertible2
+    // with the outer matrices of determinant 1.  this can be done by column
+    // and row reduction.
+    
+    // the diagonal entries give the orders of the abelian group decomposition.
+    // (the order '0' means that this factor is torsionfree.)
+    
+    // the matrix invertible1^-1 . invertible2^-1 gives a column-matrix of
+    // vectors generating these factors.
+    
+    NSAssert(false, @"-findComplementOf not yet implemented.");
+    
+    return nil;
 }
 
 @end

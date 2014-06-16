@@ -73,6 +73,8 @@
                             sourceDimension:(int)sourceDimension
                             targetDimension:(int)targetDimension;
 
++(EXTMatrix*) findComplementOf:(EXTMatrix*)A in:(EXTMatrix*)B;
+
 // debug operations
 -(void) log;
 

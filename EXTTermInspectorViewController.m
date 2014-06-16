@@ -23,6 +23,7 @@
 @implementation EXTTermInspectorViewController
 {
     EXTDocumentWindowController * __weak _documentWindowController;
+    EXTMatrix *homologyReps;
 }
 
 #pragma mark initialization routines
@@ -36,6 +37,8 @@
     self.zMatrixEditor.readonly = true;
     self.bMatrixEditor.representedObject = nil;
     self.zMatrixEditor.representedObject = nil;
+    
+    homologyReps = nil;
     
     return;
 }
