@@ -19,8 +19,23 @@ static const CGFloat _hashMarkHalfWidth = _hashMarkWidth / 2;
 
 static NSDictionary *_labelAttrs;
 
+static NSString *const _needsRedrawKey = @"needsRedraw";
+static void *_needsRedrawContext = &_needsRedrawContext;
+
 
 @implementation EXTChartRulerView
+
+- (instancetype)initWithScrollView:(NSScrollView *)scrollView orientation:(NSRulerOrientation)orientation {
+    self = [super initWithScrollView:scrollView orientation:orientation];
+    if (self) {
+        [self addObserver:self forKeyPath:_needsRedrawKey options:0 context:_needsRedrawContext];
+    }
+    return self;
+}
+
+- (void)dealloc {
+    [self removeObserver:self forKeyPath:_needsRedrawKey context:_needsRedrawContext];
+}
 
 - (void)drawHashMarksAndLabelsInRect:(NSRect)rect {
     const bool horizontal = self.orientation == NSHorizontalRuler;
@@ -115,6 +130,19 @@ static NSDictionary *_labelAttrs;
 
     [path stroke];
     [NSGraphicsContext restoreGraphicsState];
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
+    if (context == _needsRedrawContext) {
+        [self setNeedsDisplay:YES];
+    }
+    else {
+        [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
+    }
+}
+
++ (NSSet *)keyPathsForValuesAffectingNeedsRedraw {
+    return [NSSet setWithObjects:@"unitToPointsConversionFactor", @"emphasisSpacing", nil];
 }
 
 @end

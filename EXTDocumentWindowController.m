@@ -34,8 +34,6 @@
 static void *_EXTScrollViewMagnificationContext = &_EXTScrollViewMagnificationContext;
 static void *_EXTChartViewControllerSelectedObjectContext = &_EXTChartViewControllerSelectedObjectContext;
 static void *_EXTArtBoardFrameContext = &_EXTArtBoardFrameContext;
-static void *_EXTDocumentGridSpacingContext = &_EXTDocumentGridSpacingContext;
-static void *_EXTDocumentGridEmphasisSpacingContext = &_EXTDocumentGridEmphasisSpacingContext;
 
 static CGFloat const _EXTDefaultMagnificationSteps[] = {0.1, 0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 2.0, 4.0, 8.0, 16.0, 32.0};
 static size_t const _EXTDefaultMagnificationStepsCount = sizeof(_EXTDefaultMagnificationSteps) / sizeof(_EXTDefaultMagnificationSteps[0]);
@@ -141,10 +139,18 @@ typedef enum : NSInteger {
     {
         [_chartScrollView setHasHorizontalRuler:YES];
         [_chartScrollView setHasVerticalRuler:YES];
-        [[_chartScrollView horizontalRulerView] setReservedThicknessForMarkers:0.0];
-        [self _extUpdateRulerViewUnits];
-        [self.extDocument addObserver:self forKeyPath:@"gridSpacing" options:0 context:_EXTDocumentGridSpacingContext];
-        [self.extDocument addObserver:self forKeyPath:@"gridEmphasisSpacing" options:0 context:_EXTDocumentGridEmphasisSpacingContext];
+
+        EXTChartRulerView *horizontalRulerView = (EXTChartRulerView *)_chartScrollView.horizontalRulerView;
+        EXTChartRulerView *verticalRulerView = (EXTChartRulerView *)_chartScrollView.verticalRulerView;
+
+        [horizontalRulerView setReservedThicknessForMarkers:0.0];
+        [horizontalRulerView setOriginOffset:-([_chartView bounds].origin.x)];
+        [verticalRulerView setOriginOffset:-([_chartView bounds].origin.y)];
+
+        [horizontalRulerView bind:@"unitToPointsConversionFactor" toObject:self.extDocument withKeyPath:@"gridSpacing" options:nil];
+        [horizontalRulerView bind:@"emphasisSpacing" toObject:self.extDocument withKeyPath:@"gridEmphasisSpacing" options:nil];
+        [verticalRulerView bind:@"unitToPointsConversionFactor" toObject:self.extDocument withKeyPath:@"gridSpacing" options:nil];
+        [verticalRulerView bind:@"emphasisSpacing" toObject:self.extDocument withKeyPath:@"gridEmphasisSpacing" options:nil];
 
         [_chartScrollView setUsesPredominantAxisScrolling:NO];
         [_chartScrollView setRulersVisible:YES];
@@ -267,8 +273,20 @@ typedef enum : NSInteger {
     [_chartViewController removeObserver:_termInspectorViewController forKeyPath:@"selectedObject"];
     [_chartViewController removeObserver:_differentialPaneController forKeyPath:@"selectedObject"];
     [_chartViewController removeObserver:self forKeyPath:@"selectedObject"];
-    [self.extDocument removeObserver:self forKeyPath:@"gridSpacing" context:_EXTDocumentGridSpacingContext];
-    [self.extDocument removeObserver:self forKeyPath:@"gridEmphasisSpacing" context:_EXTDocumentGridEmphasisSpacingContext];
+
+    [_chartView unbind:@"highlightColor"];
+    [_chartView unbind:@"artBoardGridFrame"];
+
+    [_chartView.grid unbind:@"gridColor"];
+    [_chartView.grid unbind:@"emphasisGridColor"];
+    [_chartView.grid unbind:@"axisColor"];
+    [_chartView.grid unbind:@"gridSpacing"];
+    [_chartView.grid unbind:@"emphasisSpacing"];
+
+    [_chartScrollView.horizontalRulerView unbind:@"unitToPointsConversionFactor"];
+    [_chartScrollView.horizontalRulerView unbind:@"emphasisSpacing"];
+    [_chartScrollView.verticalRulerView unbind:@"unitToPointsConversionFactor"];
+    [_chartScrollView.verticalRulerView unbind:@"emphasisSpacing"];
 
     for (NSDictionary *viewDelegatePair in _inspectorViewDelegates) {
         id<EXTDocumentInspectorViewDelegate> delegate = viewDelegatePair[@"delegate"];
@@ -276,20 +294,6 @@ typedef enum : NSInteger {
             [delegate documentWindowController:self willRemoveInspectorView:viewDelegatePair[@"view"]];
     }
 }
-
-#pragma mark - Ruler views
-
-- (void)_extUpdateRulerViewUnits {
-    [[_chartScrollView horizontalRulerView] setOriginOffset:-([_chartView bounds].origin.x)];
-    [[_chartScrollView verticalRulerView] setOriginOffset:-([_chartView bounds].origin.y)];
-
-    // FIXME: use bindings instead
-    EXTChartRulerView *horizontalRulerView = (EXTChartRulerView *)_chartScrollView.horizontalRulerView;
-    EXTChartRulerView *verticalRulerView = (EXTChartRulerView *)_chartScrollView.verticalRulerView;
-    horizontalRulerView.unitToPointsConversionFactor = verticalRulerView.unitToPointsConversionFactor = self.extDocument.gridSpacing;
-    horizontalRulerView.emphasisSpacing = verticalRulerView.emphasisSpacing = self.extDocument.gridEmphasisSpacing;
-}
-
 
 #pragma mark - Zoom
 
@@ -435,9 +439,6 @@ typedef enum : NSInteger {
         } else {
             self.highlightLabel.stringValue = @"No selection.";
         }
-    }
-    else if (context == _EXTDocumentGridSpacingContext || context == _EXTDocumentGridEmphasisSpacingContext) {
-        [self _extUpdateRulerViewUnits];
     }
     else
         [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
