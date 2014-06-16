@@ -61,11 +61,17 @@
     return diff.partialDefinitions.count;
 }
 
-- (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row {
+- (id)tableView:(NSTableView *)tableView
+        objectValueForTableColumn:(NSTableColumn *)tableColumn
+            row:(NSInteger)row {
     if (![self.representedObject isKindOfClass:[EXTDifferential class]])
         return nil;
     
     EXTDifferential *diff = self.representedObject;
+    
+    if (row < 0 || row >= diff.partialDefinitions.count)
+        return nil;
+    
     EXTPartialDefinition *partial = diff.partialDefinitions[row];
     
     if ([tableColumn.identifier isEqualToString:@"dimension"]) {
@@ -77,7 +83,10 @@
     return nil;
 }
 
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
+- (void)observeValueForKeyPath:(NSString *)keyPath
+                      ofObject:(id)object
+                        change:(NSDictionary *)change
+                       context:(void *)context {
     if ([keyPath isEqualToString:@"selectedObject"]) {
         self.representedObject = change[NSKeyValueChangeNewKey];
         [self.tableView reloadData];
@@ -93,6 +102,11 @@
         return;
     
     EXTDifferential *diffl = self.representedObject;
+    
+    if (row < 0 || row >= diffl.partialDefinitions.count) {
+        [_documentWindowController.chartViewController reloadCurrentPage];
+        return;
+    }
     
     [diffl.partialDefinitions removeObjectAtIndex:row];
     
@@ -126,23 +140,29 @@
         return;
     EXTDifferential *diff = self.representedObject;
     
-    if ((self.tableView.selectedRow < 0) || (self.tableView.selectedRow >= diff.partialDefinitions.count))
+    if ((self.tableView.selectedRow < 0) ||
+        (self.tableView.selectedRow >= diff.partialDefinitions.count))
         return;
     _partial = diff.partialDefinitions[self.tableView.selectedRow];
     
     // initialize the pieces of the sheet.
     if (_partial.description)
         self.descriptionField.stringValue = [_partial.description copy];
-    self.dimensionField.stringValue = [NSString stringWithFormat:@"%ld", _partial.inclusion.width];
+    self.dimensionField.stringValue = [NSString stringWithFormat:@"%ld",
+                                       _partial.inclusion.width];
     self.inclusionEditor.representedObject = [_partial.inclusion copy];
-    self.inclusionEditor.rowNames = [diff.start.names valueForKey:@"description"];
+    self.inclusionEditor.rowNames =
+                                [diff.start.names valueForKey:@"description"];
     self.actionEditor.representedObject = [_partial.action copy];
     self.actionEditor.rowNames = [diff.end.names valueForKey:@"description"];
     self.automaticallyGeneratedCB.state = _partial.automaticallyGenerated;
     // XXX: make this update when we edit the EXTMatrix's data.
     
     // and display
-    [self.popover showRelativeToRect:[self.tableView rectOfRow:self.tableView.selectedRow] ofView:self.tableView preferredEdge:NSMinXEdge];
+    [self.popover
+        showRelativeToRect:[_tableView rectOfRow:_tableView.selectedRow]
+                    ofView:_tableView
+             preferredEdge:NSMinXEdge];
     [self.inclusionEditor reloadData];
     [self.actionEditor reloadData];
     
