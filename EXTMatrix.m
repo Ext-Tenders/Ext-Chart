@@ -768,7 +768,6 @@
                       [[presentation objectAtIndex:i] objectAtIndex:j]];
         }
         
-        // haha, cool symbol garbage, (@"%@"
         NSLog(@"%@", output);
     }
 }
@@ -776,30 +775,60 @@
 // here we have a pair of inclusions B --> C <-- Z, with the implicit assumption
 // that B --> C factors through B --> Z --> C.  we find a presentation of the
 // quotient Z/B in the sequence B --> Z --> Z/B.
-+(EXTMatrix*) findComplementOf:(EXTMatrix*)B in:(EXTMatrix*)Z {
++(NSDictionary*) findOrdersOf:(EXTMatrix*)B in:(EXTMatrix*)Z {
     // start by forming the pullback square.
     NSArray *pair = [EXTMatrix formIntersection:Z with:B];
     
     // since im Z >= im B and both are full rank, the map P --> B is invertible
     // and B --> P --> Z expresses B as a subspace of Z.
-    
     EXTMatrix *inclusion = [EXTMatrix newMultiply:(EXTMatrix*)pair[0] by:[(EXTMatrix*)pair[1] invert]];
     
     // pad this out to a map B (+) R --(old map (+) 0)-> Z so that the
-    // dimensions line up. write this new map as
-    //                 invertible1 . diagonal . invertible2
-    // with the outer matrices of determinant 1.  this can be done by column
-    // and row reduction.
+    // dimensions line up.
+    for (int i = inclusion.width; i < inclusion.height; i++) {
+        NSMutableArray *column =
+                            [NSMutableArray arrayWithCapacity:inclusion.height];
+        for (int j = 0; j < inclusion.height; j++)
+            column[j] = @0;
+        inclusion.presentation[i] = column;
+    }
+    inclusion.width = inclusion.height;
+    
+    // write this new map as (invertible1 . diagonal . invertible2) with the
+    // outer matrices of determinant 1.  this can be done by column and row
+    // reduction.
+    NSArray *columnReduction = [inclusion columnReduceWithRightFactor],
+            *rowReduction = [[EXTMatrix copyTranspose:columnReduction[0]]
+                                                columnReduceWithRightFactor],
+            *factorization = @[[[EXTMatrix copyTranspose:rowReduction[1]] invert],
+                               [EXTMatrix copyTranspose:rowReduction[0]],
+                               [(EXTMatrix*)columnReduction[1] invert]];
     
     // the diagonal entries give the orders of the abelian group decomposition.
-    // (the order '0' means that this factor is torsionfree.)
+    // (the order '0' means that this factor is torsionfree.) the matrix
+    // invertible1^-1 . invertible2^-1 gives a column-matrix of vectors
+    // generating these factors.
+    //
+    // store these in a dictionary.
+    EXTMatrix *columns =
+            [EXTMatrix newMultiply:Z
+                                by:[EXTMatrix newMultiply:factorization[0]
+                                                       by:factorization[2]]];
+    NSMutableDictionary *ret = [NSMutableDictionary new];
     
-    // the matrix invertible1^-1 . invertible2^-1 gives a column-matrix of
-    // vectors generating these factors.
+    for (int i = 0; i < columns.width; i++) {
+        NSArray *column = ((EXTMatrix*)factorization[1]).presentation[i];
+        int order = 0;
+        for (int j = 0; j < column.count; j++)
+            if ([column[j] intValue] != 0) {
+                if (order != 0)
+                    DLog(@"I got triggered twice...");
+                order = [column[j] intValue];
+            }
+        [ret setObject:@(order) forKey:columns.presentation[i]];
+    }
     
-    NSAssert(false, @"-findComplementOf not yet implemented.");
-    
-    return nil;
+    return ret;
 }
 
 @end

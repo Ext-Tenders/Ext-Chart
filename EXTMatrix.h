@@ -73,7 +73,7 @@
                             sourceDimension:(int)sourceDimension
                             targetDimension:(int)targetDimension;
 
-+(EXTMatrix*) findComplementOf:(EXTMatrix*)A in:(EXTMatrix*)B;
++(NSDictionary*) findOrdersOf:(EXTMatrix*)B in:(EXTMatrix*)Z;
 
 // debug operations
 -(void) log;
