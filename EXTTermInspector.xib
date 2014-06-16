@@ -43,7 +43,7 @@
                                                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                     <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                                     <tableColumns>
-                                                        <tableColumn editable="NO" width="132.2109375" minWidth="40" maxWidth="1000" id="yXj-L4-Tby">
+                                                        <tableColumn identifier="vector" editable="NO" width="132.2109375" minWidth="40" maxWidth="1000" id="yXj-L4-Tby">
                                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Name">
                                                                 <font key="font" metaFont="smallSystem"/>
                                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
@@ -56,7 +56,7 @@
                                                             </textFieldCell>
                                                             <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                         </tableColumn>
-                                                        <tableColumn editable="NO" width="40" minWidth="40" maxWidth="1000" id="5zr-I5-8P7">
+                                                        <tableColumn identifier="order" editable="NO" width="40" minWidth="40" maxWidth="1000" id="5zr-I5-8P7">
                                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Order">
                                                                 <font key="font" metaFont="smallSystem"/>
                                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
@@ -70,6 +70,10 @@
                                                             <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                         </tableColumn>
                                                     </tableColumns>
+                                                    <connections>
+                                                        <outlet property="dataSource" destination="-2" id="P3Y-NP-HaN"/>
+                                                        <outlet property="delegate" destination="-2" id="LvJ-4x-kBK"/>
+                                                    </connections>
                                                 </tableView>
                                             </subviews>
                                             <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>

@@ -23,7 +23,7 @@
 @implementation EXTTermInspectorViewController
 {
     EXTDocumentWindowController * __weak _documentWindowController;
-    EXTMatrix *homologyReps;
+    NSDictionary *homologyReps;
 }
 
 #pragma mark initialization routines
@@ -98,9 +98,12 @@
         
         self.bMatrixEditor.rowNames = [term.names valueForKey:@"description"];
         self.zMatrixEditor.rowNames = [term.names valueForKey:@"description"];
+        
+        homologyReps = [EXTMatrix findOrdersOf:boundaries in:cycles];
     } else {
         self.bMatrixEditor.representedObject = nil;
         self.zMatrixEditor.representedObject = nil;
+        homologyReps = nil;
     }
     
     [self reloadAll];
@@ -111,13 +114,55 @@
 #pragma mark NSTableView controller and data source routines
 
 -(NSInteger)numberOfRowsInTableView:(NSTableView *)tableView {
-    return 0;
+    if (!homologyReps)
+        return 0;
+    
+    return homologyReps.allKeys.count;
 }
 
 -(id)tableView:(NSTableView *)tableView
         objectValueForTableColumn:(NSTableColumn *)tableColumn
            row:(NSInteger)row {
+    if (!self.representedObject ||
+        ![self.representedObject isKindOfClass:[EXTTerm class]] ||
+        !homologyReps)
+        return nil;
     
+    EXTTerm *term = (EXTTerm*)self.representedObject;
+    NSArray *allKeys = homologyReps.allKeys;
+    
+    if (row < 0 || row >= allKeys.count)
+        return nil;
+    
+    NSArray *vector = allKeys[row];
+    
+    if ([tableColumn.identifier isEqualToString:@"order"]) {
+        int order = [homologyReps[vector] intValue];
+        
+        // XXX: over torsion ground rings, that "∞" should be the actual order
+        // of the element in the ring.
+        if (order)
+            return [NSString stringWithFormat:@"%d", order];
+        else
+            return @"∞";
+    } else if ([tableColumn.identifier isEqualToString:@"vector"]) {
+        NSString *ret = [NSString stringWithFormat:@"%@ %@",
+                         vector[0], term.names[0]];
+        for (int i = 1; i < vector.count; i++)
+            if ([vector[i] intValue] > 1)
+                ret = [NSString stringWithFormat:@"%@ + %@ %@",
+                       ret, vector[i], term.names[i]];
+            else if ([vector[i] intValue] == 1)
+                ret = [NSString stringWithFormat:@"%@ + %@",
+                       ret, term.names[i]];
+            else if ([vector[i] intValue] < 0)
+                ret = [NSString stringWithFormat:@"%@ - %@ %@",
+                       ret, @(-[vector[i] intValue]), term.names[i]];
+        
+        return ret;
+    }
+    
+    // else
     return nil;
 }
 
