@@ -37,6 +37,9 @@
     self.zMatrixEditor.readonly = true;
     self.bMatrixEditor.representedObject = nil;
     self.zMatrixEditor.representedObject = nil;
+
+    [self.bMatrixEditor reloadData];
+    [self.zMatrixEditor reloadData];
     
     homologyReps = nil;
     
