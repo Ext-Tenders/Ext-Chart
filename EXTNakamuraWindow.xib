@@ -29,6 +29,9 @@
                         <rect key="frame" x="143" y="203" width="19" height="27"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <stepperCell key="cell" continuous="YES" alignment="left" maxValue="100" id="jGd-VN-e6a"/>
+                        <connections>
+                            <action selector="changeDegreeValue:" target="-2" id="Sd8-Xk-b0C"/>
+                        </connections>
                     </stepper>
                     <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="O80-Ov-G1v">
                         <rect key="frame" x="105" y="206" width="33" height="22"/>
@@ -38,6 +41,10 @@
                             <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
+                        <connections>
+                            <action selector="changeDegreeValue:" target="-2" id="SEK-7c-33f"/>
+                            <outlet property="delegate" destination="-2" id="KBG-J2-PKX"/>
+                        </connections>
                     </textField>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Vze-Z1-VtP">
                         <rect key="frame" x="39" y="209" width="60" height="17"/>
