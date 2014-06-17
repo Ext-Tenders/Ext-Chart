@@ -150,9 +150,6 @@ static void *_selectedToolTagContext = &_selectedToolTagContext;
     if ([self.leibnizWindowController.window isVisible]) {
         [self.leibnizWindowController mouseDownAtGridLocation:gridLocation];
         return;
-    } else if ([_nakamuraWindowController.window isVisible]) {
-        [_nakamuraWindowController mouseDownAtGridLocation:gridLocation];
-        return;
     }
     
     // TODO: lots!

@@ -445,12 +445,6 @@ CA
                                     <action selector="startLeibnizPropagation:" target="-1" id="631"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Apply Nakamura's Lemma..." tag="17" id="NdQ-pd-GPa">
-                                <modifierMask key="keyEquivalentModifierMask"/>
-                                <connections>
-                                    <action selector="startNakamuraApplication:" target="-1" id="9Bz-Vx-vSr"/>
-                                </connections>
-                            </menuItem>
                         </items>
                     </menu>
                 </menuItem>

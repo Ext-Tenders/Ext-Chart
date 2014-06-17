@@ -11,12 +11,14 @@
 #import "EXTMatrixEditor.h"
 #import "EXTDocumentWindowController.h"
 #import "EXTChartViewController.h"
+#import "EXTMaySpectralSequence.h"
 
-@interface EXTDifferentialPaneController () <EXTDocumentInspectorViewDelegate, NSTableViewDataSource, NSTableViewDelegate>
+@interface EXTDifferentialPaneController () <EXTDocumentInspectorViewDelegate, NSTableViewDataSource, NSTableViewDelegate, NSTextFieldDelegate>
 
 @property (nonatomic, weak) IBOutlet NSTableView *tableView;
 @property (nonatomic, weak) IBOutlet NSButton *addButton;
 @property (nonatomic, weak) IBOutlet NSButton *deleteButton;
+@property (nonatomic, weak) IBOutlet NSButton *nakamuraButton;
 
 @property (nonatomic, weak) IBOutlet NSPopover *popover;
 @property (nonatomic, weak) IBOutlet NSTextField *descriptionField;
@@ -24,6 +26,13 @@
 @property (nonatomic, weak) IBOutlet NSButton *automaticallyGeneratedCB;
 @property (nonatomic, weak) IBOutlet EXTMatrixEditor *inclusionEditor;
 @property (nonatomic, weak) IBOutlet EXTMatrixEditor *actionEditor;
+
+@property (nonatomic, weak) IBOutlet NSPopover *nakamuraPopover;
+@property IBOutlet EXTMatrixEditor *editor;
+@property IBOutlet NSTextField *field;
+@property IBOutlet NSStepper *stepper;
+@property IBOutlet NSButton *OKbutton;
+@property (assign) int degree;
 
 @end
 
@@ -35,10 +44,14 @@
     EXTDocumentWindowController * __weak _documentWindowController;
 }
 
-#pragma mark differential inspector pane
+#pragma mark differential inspector pane, initialization
 
 - (instancetype)init {
-    return [self initWithNibName:@"EXTDifferentialPane" bundle:nil];
+    if (self = [self initWithNibName:@"EXTDifferentialPane" bundle:nil]) {
+        self.degree = 0;
+    }
+    
+    return self;
 }
 
 - (instancetype)initWithNibName:(NSString *)nibNameOrNil
@@ -50,7 +63,28 @@
 - (void)awakeFromNib {
     [self.tableView setTarget:self];
     [self.tableView setDoubleAction:@selector(doubleClick:)];
+    
+    return;
 }
+
+- (void)observeValueForKeyPath:(NSString *)keyPath
+                      ofObject:(id)object
+                        change:(NSDictionary *)change
+                       context:(void *)context {
+    if ([keyPath isEqualToString:@"selectedObject"]) {
+        self.representedObject = change[NSKeyValueChangeNewKey];
+        [self.tableView reloadData];
+        
+        if ([((EXTDocument*)_documentWindowController.document).sseq isKindOfClass:[EXTMaySpectralSequence class]])
+            [self.nakamuraButton setEnabled:YES];
+        else
+            [self.nakamuraButton setEnabled:NO];
+    }
+    
+    return;
+}
+
+#pragma mark differential inspector pane, tableview delegate messages
 
 -(NSInteger)numberOfRowsInTableView:(NSTableView *)tableView {
     if (![self.representedObject isKindOfClass:[EXTDifferential class]])
@@ -83,17 +117,7 @@
     return nil;
 }
 
-- (void)observeValueForKeyPath:(NSString *)keyPath
-                      ofObject:(id)object
-                        change:(NSDictionary *)change
-                       context:(void *)context {
-    if ([keyPath isEqualToString:@"selectedObject"]) {
-        self.representedObject = change[NSKeyValueChangeNewKey];
-        [self.tableView reloadData];
-    }
-    
-    return;
-}
+#pragma mark differential inspector pane, button press messages
 
 -(IBAction)deleteButtonPressed:(id)sender {
     NSInteger row = [self.tableView selectedRow];
@@ -169,20 +193,38 @@
     return;
 }
 
+-(IBAction)nakamuraButtonPressed:(id)sender {
+    if (![self.representedObject isKindOfClass:[EXTDifferential class]])
+        return;
+    
+    self.degree = 0;
+    self.editor.representedObject = nil;
+    [self.editor reloadData];
+    
+    [self.nakamuraPopover showRelativeToRect:self.nakamuraButton.frame ofView:self.nakamuraButton preferredEdge:NSMinXEdge];
+    
+    return;
+}
+
 #pragma mark differential editor popover
 
 - (void)popoverWillClose:(NSNotification *)notification {
-    if (![_partial.description isEqualToString:self.descriptionField.stringValue] ||
-        ![self.inclusionEditor.representedObject isEqual:_partial.inclusion] ||
-        ![self.actionEditor.representedObject isEqual:_partial.action])
-        [_partial manuallyGenerated];
+    if (self.popover.shown) {
+        if (![_partial.description isEqualToString:self.descriptionField.stringValue] ||
+            ![self.inclusionEditor.representedObject isEqual:_partial.inclusion] ||
+            ![self.actionEditor.representedObject isEqual:_partial.action])
+            [_partial manuallyGenerated];
     
-    _partial.description = self.descriptionField.stringValue;
-    _partial.inclusion = self.inclusionEditor.representedObject;
-    _partial.action = self.actionEditor.representedObject;
+        _partial.description = self.descriptionField.stringValue;
+        _partial.inclusion = self.inclusionEditor.representedObject;
+        _partial.action = self.actionEditor.representedObject;
     
-    [_tableView reloadData];
-    [_documentWindowController.chartViewController reloadCurrentPage];
+        [_tableView reloadData];
+        [_documentWindowController.chartViewController reloadCurrentPage];
+    } else if (self.nakamuraPopover.shown) {
+        // nakamura popover is closing.
+        // probably this is not important for cleanup.
+    }
 
     return;
 }
@@ -230,5 +272,32 @@
 - (void)documentWindowController:(EXTDocumentWindowController *)windowController willRemoveInspectorView:(NSView *)inspectorView {
     _documentWindowController = nil;
 }
+
+#pragma mark - Nakamura's lemma routines
+
+-(IBAction)OKPressed:(id)sender {
+    // actually do the nakamura calculation.
+    
+    [_documentWindowController.chartViewController reloadCurrentPage];
+    [self.nakamuraPopover close];
+    return;
+}
+
+-(IBAction)changeDegreeValue:(id)sender {
+    self.degree = [sender intValue];
+    [self.field setIntegerValue:self.degree];
+    [self.stepper setIntegerValue:self.degree];
+    
+    EXTDifferential *diff = (EXTDifferential*)self.representedObject;
+    EXTTerm *term = diff.start;
+    EXTMaySpectralSequence *sseq = ((EXTDocument*)_documentWindowController.document).sseq;
+}
+
+-(void)controlTextDidChange:(NSNotification *)obj {
+    int value = [((NSTextView*)obj.userInfo[@"NSFieldEditor"]).textStorage.string integerValue];
+    
+    [self changeDegreeValue:@(value)];
+}
+
 
 @end
