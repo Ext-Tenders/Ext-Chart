@@ -99,8 +99,8 @@
     // the squaring structure everywhere, by iteratively splitting apart a
     // square until we get down to just Sq^0s and Sq^1s.
     //
-    // an important thing to realize is that applying this naively yields
-    // differentials like d2 b30 = h12^2 h21 + h13 h20^2 + h21^2 h11 + h22 h10^2.
+    // an important thing to realize is that applying this naively yields the
+    // differential d2 b30 = h12^2 h21 + h13 h20^2 + h21^2 h11 + h22 h10^2.
     // however, the outer two terms are of lower May filtration than the middle
     // two, and so we project to the higher nonzero May filtration degree to get
     // just d2 b30 = h13 h20^2 + h21^2 h11.

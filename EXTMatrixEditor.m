@@ -40,7 +40,11 @@
         self.cell = defaultCell;
 
         [self _extResetRowHeaderToolTips];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(rowHeaderViewFrameDidChange:) name:NSViewFrameDidChangeNotification object:[self rowHeaderView]];
+        [[NSNotificationCenter defaultCenter]
+                addObserver:self
+                   selector:@selector(rowHeaderViewFrameDidChange:)
+                       name:NSViewFrameDidChangeNotification
+                     object:[self rowHeaderView]];
     }
     
     return self;

@@ -28,7 +28,8 @@
 @property (nonatomic, weak) IBOutlet EXTMatrixEditor *actionEditor;
 
 @property (nonatomic, weak) IBOutlet NSPopover *nakamuraPopover;
-@property IBOutlet EXTMatrixEditor *editor;
+@property IBOutlet EXTMatrixEditor *sourceEditor;
+@property IBOutlet EXTMatrixEditor *targetEditor;
 @property IBOutlet NSTextField *field;
 @property IBOutlet NSStepper *stepper;
 @property IBOutlet NSButton *OKbutton;
@@ -197,9 +198,14 @@
     if (![self.representedObject isKindOfClass:[EXTDifferential class]])
         return;
     
+    EXTDifferential *diff = (EXTDifferential*)self.representedObject;
+    
     self.degree = 0;
-    self.editor.representedObject = nil;
-    [self.editor reloadData];
+    self.sourceEditor.representedObject = [EXTMatrix matrixWidth:1 height:diff.start.names.count];
+    self.sourceEditor.rowNames = [diff.start.names valueForKey:@"description"];
+    [self.sourceEditor reloadData];
+    self.targetEditor.representedObject = nil;
+    [self.targetEditor reloadData];
     
     [self.nakamuraPopover showRelativeToRect:self.nakamuraButton.frame ofView:self.nakamuraButton preferredEdge:NSMinXEdge];
     
@@ -288,9 +294,17 @@
     [self.field setIntegerValue:self.degree];
     [self.stepper setIntegerValue:self.degree];
     
+    [self recomputeRHS];
+    
+    return;
+}
+
+-(void)recomputeRHS {
     EXTDifferential *diff = (EXTDifferential*)self.representedObject;
     EXTTerm *term = diff.start;
-    EXTMaySpectralSequence *sseq = ((EXTDocument*)_documentWindowController.document).sseq;
+    EXTMaySpectralSequence *sseq = ((EXTMaySpectralSequence*)((EXTDocument*)_documentWindowController.document).sseq);
+    
+    return;
 }
 
 -(void)controlTextDidChange:(NSNotification *)obj {
