@@ -40,10 +40,12 @@
     for (NSString *key in tags.keyEnumerator) {
         if ([[tags objectForKey:key] intValue] == 0)
             continue;
-        
-        ret = [ret stringByAppendingFormat:@" (%@)^{%@}",
-                    key.description,
-                    [tags objectForKey:key]];
+        else if ([[tags objectForKey:key] intValue] == 1)
+            ret = [ret stringByAppendingFormat:@" %@", key.description];
+        else
+            ret = [ret stringByAppendingFormat:@" (%@)^{%@}",
+                        key.description,
+                        [tags objectForKey:key]];
     }
     
     return ret;
