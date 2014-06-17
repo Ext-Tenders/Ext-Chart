@@ -46,6 +46,8 @@
 		3804BF6E17C07D7300A74325 /* EXTMatrixEditor.m in Sources */ = {isa = PBXBuildFile; fileRef = 3804BF6D17C07D7300A74325 /* EXTMatrixEditor.m */; };
 		381A4800194E12BA005054BD /* EXTTermInspectorViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 381A47FE194E12BA005054BD /* EXTTermInspectorViewController.m */; };
 		381A4801194E12BA005054BD /* EXTTermInspector.xib in Resources */ = {isa = PBXBuildFile; fileRef = 381A47FF194E12BA005054BD /* EXTTermInspector.xib */; };
+		381A480F194F68AB005054BD /* EXTNakamuraWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 381A480D194F68AB005054BD /* EXTNakamuraWindowController.m */; };
+		381A4810194F68AB005054BD /* EXTNakamuraWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 381A480E194F68AB005054BD /* EXTNakamuraWindow.xib */; };
 		382BAD201942B25900E1DDED /* MBTableGrid.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 382BAD1E1942B23E00E1DDED /* MBTableGrid.framework */; };
 		382BAD221943E26B00E1DDED /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 382BAD211943E26B00E1DDED /* Credits.rtf */; };
 		3841EBD2177380C000ADA929 /* EXTZeroRange.m in Sources */ = {isa = PBXBuildFile; fileRef = 3841EBD1177380C000ADA929 /* EXTZeroRange.m */; };
@@ -176,6 +178,9 @@
 		381A47FD194E12BA005054BD /* EXTTermInspectorViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTTermInspectorViewController.h; sourceTree = "<group>"; };
 		381A47FE194E12BA005054BD /* EXTTermInspectorViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTTermInspectorViewController.m; sourceTree = "<group>"; };
 		381A47FF194E12BA005054BD /* EXTTermInspector.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = EXTTermInspector.xib; sourceTree = "<group>"; };
+		381A480C194F68AB005054BD /* EXTNakamuraWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTNakamuraWindowController.h; sourceTree = "<group>"; };
+		381A480D194F68AB005054BD /* EXTNakamuraWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTNakamuraWindowController.m; sourceTree = "<group>"; };
+		381A480E194F68AB005054BD /* EXTNakamuraWindow.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = EXTNakamuraWindow.xib; sourceTree = "<group>"; };
 		382BAD1E1942B23E00E1DDED /* MBTableGrid.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MBTableGrid.framework; path = "../../../../Library/Developer/Xcode/DerivedData/Ext-Chart-Workspace/Products/Debug/MBTableGrid.framework"; sourceTree = "<group>"; };
 		382BAD211943E26B00E1DDED /* Credits.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; path = Credits.rtf; sourceTree = "<group>"; };
 		3841EBD0177380C000ADA929 /* EXTZeroRange.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTZeroRange.h; sourceTree = "<group>"; };
@@ -386,6 +391,8 @@
 				14E757CC17BF128F008BED48 /* EXTGridInspectorViewController.m */,
 				38F707B517CDCD9C002273B1 /* EXTLeibnizWindowController.h */,
 				38F707B617CDCD9C002273B1 /* EXTLeibnizWindowController.m */,
+				381A480C194F68AB005054BD /* EXTNakamuraWindowController.h */,
+				381A480D194F68AB005054BD /* EXTNakamuraWindowController.m */,
 				1498319D17AE04F3000380A5 /* EXTNewDocumentWindowController.h */,
 				1498319E17AE04F3000380A5 /* EXTNewDocumentWindowController.m */,
 				1460B40A17B735BD00B575E3 /* EXTPreferencesWindowController.h */,
@@ -429,6 +436,7 @@
 				385BF10B17AAD8C2008CA5B6 /* EXTGeneratorInspectorView.xib */,
 				14F930BA17BF39EC0000176A /* EXTGridInspectorView.xib */,
 				38F707B717CDCD9D002273B1 /* EXTLeibnizWindow.xib */,
+				381A480E194F68AB005054BD /* EXTNakamuraWindow.xib */,
 				1498319F17AE04F3000380A5 /* EXTNewDocument.xib */,
 				381A47FF194E12BA005054BD /* EXTTermInspector.xib */,
 				3897740417F78B5800C6AD2F /* EXTZeroRangesInspector.xib */,
@@ -631,6 +639,7 @@
 				3869FCF917B4587100D0D740 /* EXTDifferentialPane.xib in Resources */,
 				1460B40E17B7360700B575E3 /* EXTPreferences.xib in Resources */,
 				382BAD221943E26B00E1DDED /* Credits.rtf in Resources */,
+				381A4810194F68AB005054BD /* EXTNakamuraWindow.xib in Resources */,
 				14F930BB17BF39EC0000176A /* EXTGridInspectorView.xib in Resources */,
 				38F707B917CDCD9D002273B1 /* EXTLeibnizWindow.xib in Resources */,
 			);
@@ -656,6 +665,7 @@
 				317707C413D784B0003475A2 /* EXTGrid.m in Sources */,
 				317707E113D7893A003475A2 /* EXTChartView.m in Sources */,
 				31D403BB13DA0476006A8C06 /* EXTTerm.m in Sources */,
+				381A480F194F68AB005054BD /* EXTNakamuraWindowController.m in Sources */,
 				31D403C013DA04D8006A8C06 /* EXTDifferential.m in Sources */,
 				3187BA2713DC6C6C00C26803 /* EXTScrollView.m in Sources */,
 				093AEADD13E10759003E9F58 /* EXTPair.m in Sources */,

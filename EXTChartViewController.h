@@ -8,6 +8,7 @@
 
 #import <Cocoa/Cocoa.h>
 #import "EXTLeibnizWindowController.h"
+#import "EXTNakamuraWindowController.h"
 
 
 @class EXTChartView;
@@ -18,6 +19,7 @@
 @property(nonatomic, readonly) EXTChartView *chartView;
 @property(nonatomic, weak) id selectedObject;
 @property(nonatomic, weak) EXTLeibnizWindowController *leibnizWindowController;
+@property(nonatomic, weak) EXTNakamuraWindowController *nakamuraWindowController;
 @property(nonatomic, assign) int currentPage;
 
 // Designated initialiser

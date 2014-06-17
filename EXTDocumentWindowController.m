@@ -27,6 +27,7 @@
 #import "EXTToolboxTag.h"
 #import "EXTTermInspectorViewController.h"
 #import "EXTChartRulerView.h"
+#import "EXTNakamuraWindowController.h"
 
 
 #pragma mark - Private variables
@@ -73,6 +74,7 @@ typedef enum : NSInteger {
     EXTGeneratorInspectorViewController *_generatorInspectorViewController;
     EXTDifferentialPaneController *_differentialPaneController;
     EXTLeibnizWindowController *_leibnizWindowController;
+    EXTNakamuraWindowController *_nakamuraWindowController;
     EXTZeroRangesInspector *_zeroRangesInspectorController;
     NSArray *_inspectorViewDelegates;
     EXTDocumentInspectorView *_inspectorView;
@@ -261,6 +263,10 @@ typedef enum : NSInteger {
         _leibnizWindowController = [[EXTLeibnizWindowController alloc] initWithWindowNibName:@"EXTLeibnizWindow"];
         _chartViewController.leibnizWindowController = _leibnizWindowController;
         _leibnizWindowController.documentWindowController = self;
+        
+        _nakamuraWindowController = [[EXTNakamuraWindowController alloc] initWithWindowNibName:@"EXTNakamuraWindow"];
+        _chartViewController.nakamuraWindowController = _nakamuraWindowController;
+        _nakamuraWindowController.documentWindowController = self;
     }
 
     [[self window] makeFirstResponder:_chartView];
@@ -514,6 +520,11 @@ typedef enum : NSInteger {
 
 - (IBAction)startLeibnizPropagation:(id)sender {
     [_leibnizWindowController showWindow:sender];
+    return;
+}
+
+- (IBAction)startNakamuraApplication:(id)sender {
+    [_nakamuraWindowController showWindow:sender];
     return;
 }
 
