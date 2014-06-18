@@ -154,7 +154,7 @@
     if (selectedRow >= 0) {
         EXTNewDocumentOption *option = [_options objectAtIndex:selectedRow];
         [_nameField setStringValue:[option name]];
-        [_descriptionField setStringValue:[option description]];
+        [_descriptionField setStringValue:[option optionDescription]];
 
         if (![option isGroup]) {
             createButtonEnabled = true;
