@@ -32,7 +32,7 @@
 @interface EXTNewDocumentOption : NSObject
     @property(nonatomic, copy) NSString *name;
     @property(nonatomic, assign, getter = isGroup) bool group;
-    @property(nonatomic, copy) NSString *description;
+    @property(nonatomic, copy) NSString *optionDescription;
     @property(nonatomic, weak) NSView *detailsView;
     @property(nonatomic, copy) EXTSpectralSequence *(^spectralSequenceFactory)(void);
     - (instancetype)initGroupWithName:(NSString *)name;
@@ -241,7 +241,7 @@
     self = [super init];
     if (self) {
         _name = [name copy];
-        _description = @"";
+        _optionDescription = @"";
         _group = true;
     }
     return self;
@@ -255,7 +255,7 @@
     if (self) {
         _name = [name copy];
         _group = false;
-        _description = [description copy];
+        _optionDescription = [description copy];
         _detailsView = detailsView;
         _spectralSequenceFactory = [spectralSequenceFactory copy];
     }
