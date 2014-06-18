@@ -84,12 +84,18 @@
     return self = [super initWithIndexingClass:[EXTTriple class]];
 }
 
-// TODO: should this routine be memoized?
+// returns a pair {NSArray *vector, EXTTerm *term}
 //
-// XXX: I'm nervous that not all squares of all sums in a given location will
-// land in the same filtration degree.  Hence, it may not make sense to compute
-// the squaring operation en masse...  :(
--(NSArray*) squaringMatrix:(int)order location:(EXTTriple*)location {
+// NOTE: i'm concerned that this may ignore important filtration effects. what
+// if naive squaring operations tell us what the square 'should' be, but
+// this vector is somehow a cycle by the time it matters...? |||| i think maybe
+// this isn't something to be worried about.  the squares are already defined on
+// the E_1-page, and so there's no helping whether their values later turn out
+// to be given by cycles.  on the other hand, maybe this matters for applying
+// nakamura's lemma later on.  i have no idea.
+-(NSArray*) applySquare:(int)order
+               toVector:(NSArray*)vector
+             atLocation:(EXTTriple*)location {
     // we know the following three facts about the squaring operations:
     // Sq^n(xy) = sum_{i=0}^n Sq^i x Sq^{n-i} y, (Cartan)
     // Sq^0(h_ij) = h_i(j+1),                    (Nakamura on Sq^0)
@@ -107,10 +113,17 @@
     
     EXTTerm *startTerm = [self findTerm:location],
             *endTerm = nil;
-    EXTMatrix *ret = nil;
-    int activeMayDegree = -1;
+    NSMutableDictionary *allOutputTerms = [NSMutableDictionary new];
     
     for (int termIndex = 0; termIndex < startTerm.size; termIndex++) {
+        // on this pass of the loop, we're going to deal with the term
+        // contributed by the [termIndex] component of the vector we were fed
+        // in. if our source vector doesn't have a component for this to
+        // contribute anything, we should just skip it immediately.
+        if (!([vector[termIndex] intValue] & 0x1))
+            continue;
+        
+        // otherwise, pull up all the factors associated to this term.
         EXTPolynomialTag *tag = startTerm.names[termIndex];
         NSArray *tags = tag.tags.allKeys;
         NSMutableArray *counters = [NSMutableArray arrayWithCapacity:tags.count];
@@ -124,11 +137,19 @@
         // we completely roll over on the carries.
         do {
             // start by initializing the leftmost buckets
-            for (int i = 0; leftover > 0; i++) {
-                int bucketSize = [[tag.tags objectForKey:tags[i]] intValue];
+            int i;
+            for (i = 0; i < tags.count && leftover > 0; i++) {
+                int bucketSize = [tag.tags[tags[i]] intValue];
                 counters[i] = @(leftover < bucketSize ? leftover : bucketSize);
                 leftover -= bucketSize;
             }
+            
+            // if there are too few factors to apply this high of a square, then
+            // just quit.  NOTE that this is NEVER an issue with just one term,
+            // because the grading on the May SS is such that the third degree
+            // keeps track of EXACTLY how many factors any monomial enjoys.
+            if (i == tags.count && leftover > 0)
+                return nil;
             
             // at each term, perform the assigned number of Sq^1s, and apply
             // Sq^0 to the remainder.
@@ -139,34 +160,27 @@
             bool zeroMod2 = false;
             for (int i = 0; i < counters.count; i++) {
                 int r = [counters[i] intValue],
-                    n = [[tag.tags objectForKey:tags[i]] intValue];
+                    n = [tag.tags[tags[i]] intValue];
                 zeroMod2 |= r & (n - r);
             }
             
-            // if we're not 0 mod 2, then we're 1 mod 2.  this means one of
-            // three things can happen next:
-            //   1) this term is of lower filtration degree than the active term
-            //      and so we skip it and contribute nothing.
-            //   2) this term is of filtration degree equal to the active term,
-            //      so we add it as expected.
-            //   3) this term is of higher filtration degree than the active
-            //      term, so we clear the matrix, reinitialize it to point to
-            //      the new target, and poke the new value in.
+            // if we're not 0 mod 2, then we're 1 mod 2.  this means this term
+            // has the opportunity to contribute to the broader result, and we
+            // update our dictionary allOutputTerms to reflect it.
             if (!zeroMod2) {
                 EXTPolynomialTag *targetTag = [EXTPolynomialTag new];
                 
                 // start by building the tag we're going to be looking up
-                int mayDegree = 0;
                 for (int i = 0; i < counters.count; i++) {
                     EXTMayTag *hij = tags[i],
                               *hinext = [EXTMayTag tagWithI:hij.i J:(hij.j+1)];
-                    int n = [[tag.tags objectForKey:tags[i]] intValue],
+                    int n = [tag.tags[tags[i]] intValue],
                         r = [counters[i] intValue];
-                    NSNumber *oldSq0Exp = [targetTag.tags objectForKey:hinext],
-                             *oldSq1Exp = [targetTag.tags objectForKey:hij];
+                    NSNumber *oldSq0Exp = targetTag.tags[hinext],
+                             *oldSq1Exp = targetTag.tags[hij];
                     
                     if (oldSq0Exp)
-                        oldSq0Exp = @([oldSq0Exp intValue] + n-r);
+                        oldSq0Exp = @([oldSq0Exp integerValue] + n-r);
                     else
                         oldSq0Exp = @(n-r);
                     
@@ -175,43 +189,28 @@
                     else
                         oldSq1Exp = @(2*r);
                     
-                    [targetTag.tags setObject:oldSq0Exp forKey:hinext];
-                    [targetTag.tags setObject:oldSq1Exp forKey:hij];
-                    
-                    mayDegree += hij.i*(n+r);
+                    targetTag.tags[hinext] = oldSq0Exp;
+                    targetTag.tags[hij] = oldSq1Exp;
                 }
                 
-                // now we have to make a comparison based on filtration degree.
-                if (mayDegree > activeMayDegree) {                    
-                    // convert the target tag to an EXTLocation
-                    EXTTriple *targetLoc = [EXTTriple identityLocation];
-                    for (EXTMayTag *workingTag in targetTag.tags) {
-                        EXTTriple *hij = [EXTTriple tripleWithA:1 B:((1<<workingTag.j)*((1<<workingTag.i)-1)) C:workingTag.i];
-                        targetLoc = [EXTTriple addLocation:targetLoc to:[EXTTriple scale:hij by:[[targetTag.tags objectForKey:workingTag] intValue]]];
-                    }
-                    
-                    // set up a new target matrix and target term
-                    EXTTerm *tempTarget = [self findTerm:targetLoc];
-                    if (tempTarget) {
-                        endTerm = tempTarget;
-                        activeMayDegree = mayDegree;
-                        ret = [EXTMatrix matrixWidth:startTerm.size height:endTerm.size];
-                    }
-                }
-                
-                if (mayDegree == activeMayDegree) {
-                    // find this tag in the target term and poke the value
-                    NSMutableArray *col = ret.presentation[termIndex];
-                    int pokeIndex = [endTerm.names indexOfObject:targetTag];
-                    if (pokeIndex != -1)
-                        col[pokeIndex] = @([col[pokeIndex] intValue] + 1);
+                // if this tag exists in the dictionary, we must discard it,
+                // since 1 + 1 = 0 mod 2.
+                if (allOutputTerms[targetTag] != nil) {
+                    allOutputTerms[targetTag] = nil;
+                } else {
+                    // but if it doesn't exist, then poke a 1 in.
+                    allOutputTerms[targetTag] = @1;
                 }
             }
-                        
+            
             // now we move to the next bucket.  start by finding the leftmost
             // nonzero bucket.
             int leftmost = 0;
-            for (; [counters[leftmost] intValue] == 0; leftmost++);
+            for (; leftmost < counters.count && [counters[leftmost] intValue] == 0; leftmost++);
+            if (leftmost == counters.count) {
+                leftover = order; // force the cartan loop to quit.
+                continue;
+            }
             
             // this value of this bucket is going to be split into (value-1)+1.
             // the right-hand part of this is used for a carry, and the left-
@@ -235,13 +234,52 @@
         } while (leftover != order); // cartan loop
     } // term summand loop
     
-    if (!ret || !endTerm)
+    // now we need to strip out the highest weight summands from the dictionary
+    int activeMayFiltration = -1;
+    NSMutableDictionary *strippedOutputTerms = [NSMutableDictionary new];
+    for (EXTPolynomialTag *factor in allOutputTerms.allKeys) {
+        int mayFiltration = 0;
+        
+        // i got this convention from 3.2.3 in the green book. might not be
+        // consistent but i don't think that will get in the way. this is a
+        // highly localized calculation.
+        for (EXTMayTag *subfactor in factor.tags)
+            mayFiltration += 2*subfactor.i - 1;
+        
+        if (mayFiltration > activeMayFiltration) {
+            strippedOutputTerms = [NSMutableDictionary new];
+            activeMayFiltration = mayFiltration;
+        }
+        
+        if (mayFiltration == activeMayFiltration) {
+            strippedOutputTerms[factor] = @1;
+        }
+    }
+    
+    // if we haven't managed to accrue any summands, then the squaring operation
+    // is null, and there's nothing to do about that.
+    if (strippedOutputTerms.count == 0)
         return nil;
+    
+    // otherwise, we do have summands. we should find what term they live in and
+    // build a vector out of them.
+    endTerm = self.terms[[self computeLocationForTag:strippedOutputTerms.allKeys[0]]];
+    
+    NSMutableArray *ret = [NSMutableArray new];
+    for (int i = 0; i < endTerm.names.count; i++) {
+        EXTPolynomialTag *tag = endTerm.names[i];
+        NSNumber *value = strippedOutputTerms[tag];
+        if (value)
+            ret[i] = @1;
+        else
+            ret[i] = @0;
+    }
     
     return @[ret,endTerm];
 }
 
 // applies Sq^(order) to the terms at location to get a differential on page page
+/*
 -(void) calculateNakamura:(int)order location:(EXTTriple*)location page:(int)page {
     // we need to look up:
     // * the differential on E_new off the target location of Sq^order
@@ -290,12 +328,7 @@
 
     return;
 }
-
--(void) propagateNakamura:(int)page generators:(NSMutableArray*)generators {
-    // then propagate with nakamura's lemma / the cartan formula until exhausted
-    
-    return;
-}
+*/
 
 +(EXTMaySpectralSequence*) fillForAn:(int)n width:(int)width {
     EXTMaySpectralSequence *sseq = [EXTMaySpectralSequence new];
@@ -411,7 +444,9 @@
     [self propagateLeibniz:locations page:1];
     
     // TODO: use nakamura's lemma to get the higher differentials.
-    // XXX: right now i'm going to hard-code something that works for A(1)...
+    //
+    // the present decision to to put the user in charge of this task.
+    /*
     EXTTriple *h20 = [EXTTriple tripleWithA:1 B:3 C:2];
     if ([self findTerm:h20])
         [self calculateNakamura:1 location:h20 page:1];
@@ -419,6 +454,7 @@
     EXTTriple *h20squared = [EXTTriple tripleWithA:2 B:6 C:4];
     if ([self findTerm:h20squared])
         [self propagateLeibniz:@[h20squared, [EXTTriple tripleWithA:1 B:1 C:1], [EXTTriple tripleWithA:1 B:2 C:1]] page:2];
+    */
     
     return;
 }

@@ -304,6 +304,24 @@
     EXTTerm *term = diff.start;
     EXTMaySpectralSequence *sseq = ((EXTMaySpectralSequence*)((EXTDocument*)_documentWindowController.document).sseq);
     
+    NSArray *output = [sseq applySquare:self.degree toVector:self.sourceEditor.representedObject.presentation[0] atLocation:(EXTTriple*)term.location];
+    
+    // it's possible for nakamura to fail, whereupon we should empty the table
+    if (!output) {
+        self.targetEditor.representedObject = nil;
+        [self.targetEditor reloadData];
+        
+        return;
+    }
+    
+    EXTTerm *endTerm = output[1];
+    EXTMatrix *resultMatrix = [EXTMatrix matrixWidth:1 height:endTerm.names.count];
+    resultMatrix.presentation[0] = output[0];
+    
+    self.targetEditor.representedObject = resultMatrix;
+    self.targetEditor.rowNames = [endTerm.names valueForKey:@"description"];
+    [self.targetEditor reloadData];
+    
     return;
 }
 

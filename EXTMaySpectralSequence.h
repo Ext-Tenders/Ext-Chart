@@ -13,4 +13,8 @@
 +(EXTMaySpectralSequence*) fillToWidth:(int)width;
 +(EXTMaySpectralSequence*) fillForAn:(int)n width:(int)width;
 
+-(NSArray*) applySquare:(int)order
+               toVector:(NSArray*)vector
+             atLocation:(EXTTriple*)location;
+
 @end

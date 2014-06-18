@@ -30,7 +30,7 @@
     return self;
 }
 
-// sends the tag dictionary [[x, 1], [y, 2]] to the string "x^1 y^2"
+// sends the tag dictionary [x:1, y:2] to the string "x y^2"
 -(NSString*) description {
     NSString *ret = [NSMutableString string];
     
@@ -114,6 +114,10 @@
 
 - (void)encodeWithCoder:(NSCoder *)aCoder {
     [aCoder encodeObject:tags forKey:@"tags"];
+}
+
+- (NSUInteger)hash {
+    return 0;
 }
 
 @end
@@ -599,6 +603,19 @@
         }
     
     [generators removeObjectAtIndex:row];
+}
+
+-(NSObject<EXTLocation> *)computeLocationForTag:(EXTPolynomialTag *)tag {
+    EXTLocation *loc = [self.indexClass identityLocation];
+    
+    for (int i = 0; i < generators.count; i++) {
+        NSMutableDictionary *entry = generators[i];
+        NSNumber *amount = tag.tags[entry[@"name"]];
+        if (amount)
+            loc = [self.indexClass addLocation:loc to:[self.indexClass scale:entry[@"location"] by:[amount intValue]]];
+    }
+    
+    return loc;
 }
 
 @end

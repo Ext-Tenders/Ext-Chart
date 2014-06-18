@@ -48,5 +48,6 @@
 
 -(void) changeName:(NSObject<NSCopying>*)name to:(NSObject<NSCopying>*)newName;
 -(void) deleteClass:(NSObject<NSCopying>*)name;
+-(EXTLocation*) computeLocationForTag:(EXTPolynomialTag*)tag;
 
 @end
