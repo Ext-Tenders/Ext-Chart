@@ -9,9 +9,13 @@
 #import "EXTMatrixEditor.h"
 #import "../MBTableGrid/MBTableGridHeaderView.h"
 #import "../MBTableGrid/MBTableGridCell.h"
+#import <objc/runtime.h>
 
 
 @interface EXTMatrixEditor () <MBTableGridDataSource, MBTableGridDelegate>
+
+@property (nonatomic, weak) id<EXTMatrixEditorDelegate> externalDelegate;
+
 @end
 
 
@@ -30,7 +34,7 @@
     if (self) {
         representedObject = nil;
         self.dataSource = self;
-        self.delegate = self;
+        [super setDelegate:self];
         self.readonly = false;
 
         EXTMatrixCell *defaultCell = [EXTMatrixCell new];
@@ -48,6 +52,12 @@
     }
     
     return self;
+}
+
+- (void)setDelegate:(id<EXTMatrixEditorDelegate>)externalDelegate {
+    _externalDelegate = externalDelegate;
+    
+    return;
 }
 
 - (void)dealloc {
@@ -84,6 +94,9 @@
     NSMutableArray *column = presentation[columnIndex];
     NSInteger value = [anObject intValue];
     column[rowIndex] = @(value);
+    
+    if ([self.externalDelegate respondsToSelector:@selector(matrixEditorDidUpdate)])
+        [self.externalDelegate matrixEditorDidUpdate];
     
     return;
 }
@@ -128,6 +141,36 @@
 
 - (void)rowHeaderViewFrameDidChange:(NSNotification *)notification {
     [self _extResetRowHeaderToolTips];
+}
+
+#pragma mark - delegate forwarding routines
+
+// see https://gist.github.com/tangphillip/818bdd6d916b62f607b7
++ (BOOL)isInstanceMethodSelector:(SEL)selector inProtocol:(Protocol *)protocol {
+    struct objc_method_description requiredMethod = protocol_getMethodDescription(protocol, selector, YES, YES);
+    struct objc_method_description optionalMethod = protocol_getMethodDescription(protocol, selector,  NO, YES);
+    
+    return (requiredMethod.name != NULL || optionalMethod.name != NULL);
+}
+
+- (id)forwardingTargetForSelector:(SEL)selector {
+    BOOL isDelegateSelector = [[self class] isInstanceMethodSelector:selector
+                                                          inProtocol:@protocol(EXTMatrixEditorDelegate)];
+    if (isDelegateSelector && [self.externalDelegate respondsToSelector:selector]) {
+        return self.externalDelegate;
+    }
+    
+    return [super forwardingTargetForSelector:selector];
+}
+
+- (BOOL)respondsToSelector:(SEL)selector {
+    BOOL isDelegateSelector = [[self class] isInstanceMethodSelector:selector
+                                                          inProtocol:@protocol(EXTMatrixEditorDelegate)];
+    if (isDelegateSelector && [self.externalDelegate respondsToSelector:selector]) {
+        return YES;
+    }
+    
+    return [super respondsToSelector:selector];
 }
 
 @end

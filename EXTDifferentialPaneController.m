@@ -13,7 +13,7 @@
 #import "EXTChartViewController.h"
 #import "EXTMaySpectralSequence.h"
 
-@interface EXTDifferentialPaneController () <EXTDocumentInspectorViewDelegate, NSTableViewDataSource, NSTableViewDelegate, NSTextFieldDelegate>
+@interface EXTDifferentialPaneController () <EXTDocumentInspectorViewDelegate, NSTableViewDataSource, NSTableViewDelegate, NSTextFieldDelegate, EXTMatrixEditorDelegate>
 
 @property (nonatomic, weak) IBOutlet NSTableView *tableView;
 @property (nonatomic, weak) IBOutlet NSButton *addButton;
@@ -65,6 +65,7 @@
     [self.tableView setTarget:self];
     [self.tableView setDoubleAction:@selector(doubleClick:)];
     self.targetEditor.readonly = true;
+    self.sourceEditor.delegate = self;
     
     return;
 }
@@ -281,6 +282,10 @@
 }
 
 #pragma mark - Nakamura's lemma routines
+
+-(void)matrixEditorDidUpdate {
+    [self recomputeRHS];
+}
 
 -(IBAction)OKPressed:(id)sender {
     // actually do the nakamura calculation.

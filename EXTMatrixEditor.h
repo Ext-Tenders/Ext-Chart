@@ -9,7 +9,15 @@
 #import "MBTableGrid/MBTableGrid.h"
 #import "EXTMatrix.h"
 
+@protocol EXTMatrixEditorDelegate <NSObject, MBTableGridDelegate>
+
+-(void)matrixEditorDidUpdate;
+
+@end
+
 @interface EXTMatrixEditor : MBTableGrid
+
+@property (weak,nonatomic) NSObject<EXTMatrixEditorDelegate>* delegate;
 
 @property (strong) EXTMatrix *representedObject;
 @property (strong) NSArray *columnNames, *rowNames;
