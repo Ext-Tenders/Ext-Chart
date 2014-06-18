@@ -11,7 +11,7 @@
 @interface EXTMaySpectralSequence : EXTPolynomialSSeq
 
 +(EXTMaySpectralSequence*) fillToWidth:(int)width;
-+(EXTMaySpectralSequence*) fillForAn:(int)n width:(int)width;
++(EXTMaySpectralSequence*) fillForAn:(NSInteger)n width:(int)width;
 
 -(NSArray*) applySquare:(int)order
                toVector:(NSArray*)vector

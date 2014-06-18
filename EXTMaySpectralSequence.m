@@ -379,7 +379,7 @@
     return diff;
 }
 
-+(EXTMaySpectralSequence*) fillForAn:(int)n width:(int)width {
++(EXTMaySpectralSequence*) fillForAn:(NSInteger)n width:(int)width {
     EXTMaySpectralSequence *sseq = [EXTMaySpectralSequence new];
     
     [sseq.zeroRanges addObject:[EXTZeroRangeStrict newWithSSeq:sseq]];
@@ -416,36 +416,7 @@
 }
 
 +(EXTMaySpectralSequence*) fillToWidth:(int)width {
-    EXTMaySpectralSequence *sseq = [EXTMaySpectralSequence new];
-    EXTZeroRangeTriple *zrTriple = [EXTZeroRangeTriple new];
-    zrTriple.leftEdge = zrTriple.bottomEdge = zrTriple.backEdge = 0;
-    zrTriple.rightEdge = zrTriple.topEdge = zrTriple.frontEdge = width;
-    [sseq.zeroRanges addObject:zrTriple];
-    
-    [sseq.zeroRanges addObject:[EXTZeroRangeStrict newWithSSeq:sseq]];
-    
-    // start by adding the polynomial terms h_{i,j}
-    for (int i = 1; ; i++) {
-        
-        // if we've passed outside of the width, then quit.
-        if ((1 << i)-2 > width)
-            break;
-        
-        for (int j = 0; ; j++) {
-            // calculate the location of the present term
-            int A = 1, B = (1 << j)*((1 << i) - 1), C = i;
-            if (B - 1 > width)
-                break;
-            
-            int limit = ((i == 1) && (j == 0)) ? width : width/(B-1);
-            
-            [sseq addPolyClass:[EXTMayTag tagWithI:i J:j] location:[EXTTriple tripleWithA:A B:B C:C] upTo:limit];
-        }
-    }
-    
-    [sseq buildDifferentials];
-    
-    return sseq;
+    return [EXTMaySpectralSequence fillForAn:width width:width];
 }
 
 -(void) buildDifferentials {
