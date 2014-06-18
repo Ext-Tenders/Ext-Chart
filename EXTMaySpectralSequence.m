@@ -265,6 +265,9 @@
     // build a vector out of them.
     endTerm = self.terms[[self computeLocationForTag:strippedOutputTerms.allKeys[0]]];
     
+    if (!endTerm)
+        return nil;
+    
     NSMutableArray *ret = [NSMutableArray new];
     for (int i = 0; i < endTerm.names.count; i++) {
         EXTPolynomialTag *tag = endTerm.names[i];
@@ -278,9 +281,24 @@
     return @[ret,endTerm];
 }
 
-// applies Sq^(order) to the terms at location to get a differential on page page
-/*
--(void) calculateNakamura:(int)order location:(EXTTriple*)location page:(int)page {
+-(EXTTriple*)computeLocationForTag:(EXTPolynomialTag *)tag {
+    EXTTriple *ret = [EXTTriple identityLocation];
+    
+    for (EXTMayTag *factor in tag.tags) {
+        EXTTriple *hij = [EXTTriple tripleWithA:1 B:((1 << factor.j)*((1 << factor.i) - 1)) C:factor.i];
+        
+        ret = [EXTTriple addLocation:ret to:[EXTTriple scale:hij by:[tag.tags[factor] intValue]]];
+    }
+    
+    return ret;
+}
+
+// applies the rule Sq^order d_page vector = d Sq^order vector to the vector at
+// the location to get a new differential, which it returns.
+-(EXTDifferential*) applyNakamura:(int)order
+                         toVector:(NSArray*)inVector
+                       atLocation:(EXTTriple*)location
+                           onPage:(int)page {
     // we need to look up:
     // * the differential on E_new off the target location of Sq^order
     // * the differential on E_old off location
@@ -291,19 +309,55 @@
     
     EXTDifferential *underlyingDiff = [self findDifflWithSource:location onPage:page];
     if (!underlyingDiff)
-        return;
+        return nil;
     
-    NSArray *startSquarePair = [self squaringMatrix:order location:((EXTTriple*)underlyingDiff.start.location)],
-            *endSquarePair = [self squaringMatrix:order location:((EXTTriple*)underlyingDiff.end.location)];
+    EXTTriple *startLocation = (EXTTriple*)underlyingDiff.start.location,
+              *endLocation = (EXTTriple*)underlyingDiff.end.location;
     
-    EXTMatrix *startSquare = startSquarePair[0], *endSquare = endSquarePair[0];
+    // check that this vector actually lies in the well-defined part of the
+    // partial differentials!  (+) all the inclusion matrices together and take
+    // a pullback to see if it's nonzero.
+    EXTMatrix *bigInclusion = [EXTMatrix matrixWidth:0 height:underlyingDiff.start.names.count];
+    for (EXTPartialDefinition *partial in underlyingDiff.partialDefinitions) {
+        bigInclusion.width = bigInclusion.width + partial.inclusion.width;
+        [bigInclusion.presentation addObjectsFromArray:partial.inclusion.presentation];
+    }
+    EXTMatrix *smallInclusion = [EXTMatrix matrixWidth:1 height:underlyingDiff.start.names.count];
+    smallInclusion.presentation[0] = inVector;
+    EXTMatrix *pullback = (EXTMatrix*)[EXTMatrix formIntersection:bigInclusion with:smallInclusion][1];
+    [pullback modularReduction];
+    
+    bool inVectorIsCovered = false;
+    for (int i = 0; i < pullback.width; i++) {
+        if ([pullback.presentation[i][0] intValue] != 0)
+            inVectorIsCovered = true;
+    }
+    if (!inVectorIsCovered)
+        return nil;
+    
+    // if we've made it this far, then we're really contributing some defn.
+    // try to compute nakamura's rule.
+    [underlyingDiff assemblePresentation];
+    NSArray *outVector = [underlyingDiff.presentation actOn:inVector];
+    
+    NSArray *startSquarePair = [self applySquare:order
+                                        toVector:inVector
+                                      atLocation:startLocation],
+            *endSquarePair = [self applySquare:order
+                                      toVector:outVector
+                                    atLocation:endLocation];
+    
+    // if either squaring calculation failed, bail.
+    if (!startSquarePair || !endSquarePair)
+        return nil;
+    
+    NSArray *startSquare = startSquarePair[0], *endSquare = endSquarePair[0];
     EXTTerm *newStart = startSquarePair[1], *newEnd = endSquarePair[1];
-    if (!newStart || !newEnd)
-        return;
     
     int newPage = [EXTTriple calculateDifflPage:newStart.location end:newEnd.location];
     if (newPage == -1) {
         NSLog(@"Something has gone horribly wrong in calculateNakamura...");
+        return nil;
     }
     
     EXTDifferential *diff = [self findDifflWithSource:newStart.location onPage:newPage];
@@ -312,23 +366,18 @@
         [self addDifferential:diff];
     }
     
-    // for each partial definition A <-- I --> B, we have two squaring morphisms
-    // A --> C and B --> D, which we glue together to get the span
-    // C <-- A <-- I --> B --> D.
-    for (EXTPartialDefinition *oldPartial in underlyingDiff.partialDefinitions) {
-        EXTPartialDefinition *partial = [EXTPartialDefinition new];
-        partial.action = [EXTMatrix newMultiply:endSquare by:oldPartial.action];
-        partial.inclusion = [EXTMatrix newMultiply:startSquare by:oldPartial.inclusion];
-        partial.description = [NSString stringWithFormat:@"Nakamura's lemma applied to Sq^%d on %@ in E%d",order,location,page];
-        [diff.partialDefinitions addObject:partial];
-        // TODO: it's not clear that the rest of the code requires the inclusion
-        // map to be an inclusion.  if it does, we should insert something to
-        // make that so.  otherwise, we shouldn't, since it requires a choice.
-    }
+    // add a new partial definition to diff specified by our rule:
+    //                     d Sq^order v = Sq^order d v.
+    EXTPartialDefinition *partial = [EXTPartialDefinition new];
+    partial.inclusion = [EXTMatrix matrixWidth:1 height:startSquare.count];
+    partial.inclusion.presentation[0] = startSquare;
+    partial.action = [EXTMatrix matrixWidth:1 height:endSquare.count];
+    partial.action.presentation[0] = endSquare;
+    partial.description = [NSString stringWithFormat:@"Nakamura's lemma applied along Sq^%d on E_%d^%@", order, page, location];
+    [diff.partialDefinitions addObject:partial];
 
-    return;
+    return diff;
 }
-*/
 
 +(EXTMaySpectralSequence*) fillForAn:(int)n width:(int)width {
     EXTMaySpectralSequence *sseq = [EXTMaySpectralSequence new];

@@ -289,6 +289,16 @@
 
 -(IBAction)OKPressed:(id)sender {
     // actually do the nakamura calculation.
+    EXTMaySpectralSequence *sseq = ((EXTMaySpectralSequence*)((EXTDocument*)_documentWindowController.document).sseq);
+    EXTDifferential *diff = (EXTDifferential*)self.representedObject;
+    
+    EXTDifferential *resultingDiff =
+        [sseq applyNakamura:self.degree
+                   toVector:self.sourceEditor.representedObject.presentation[0]
+                 atLocation:(EXTTriple*)diff.start.location
+                     onPage:_documentWindowController.chartViewController.currentPage];
+    
+    // maybe change the page and select the new differential?
     
     [_documentWindowController.chartViewController reloadCurrentPage];
     [self.nakamuraPopover close];

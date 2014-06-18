@@ -17,4 +17,9 @@
                toVector:(NSArray*)vector
              atLocation:(EXTTriple*)location;
 
+-(EXTDifferential*) applyNakamura:(int)order
+                         toVector:(NSArray*)inVector
+                       atLocation:(EXTTriple*)location
+                           onPage:(int)page;
+
 @end
