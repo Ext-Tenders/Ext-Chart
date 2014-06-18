@@ -214,8 +214,13 @@ typedef enum : NSInteger {
                                     ];
 
         const NSRect contentFrame = [[[self window] contentView] frame];
-        
-        NSSize scrollViewSize = [NSScrollView contentSizeForFrameSize:[_inspectorView frame].size hasHorizontalScroller:NO hasVerticalScroller:YES borderType:NSNoBorder];
+
+        NSSize scrollViewSize = [NSScrollView contentSizeForFrameSize:_inspectorView.frame.size
+                                              horizontalScrollerClass:nil
+                                                verticalScrollerClass:NSScroller.class
+                                                           borderType:NSNoBorder
+                                                          controlSize:NSRegularControlSize
+                                                        scrollerStyle:NSScrollerStyleOverlay];
         scrollViewSize.height = contentFrame.size.height;
         NSScrollView *inspectorScrollView = [[NSScrollView alloc] initWithFrame:(NSRect){NSZeroPoint, scrollViewSize}];
         [inspectorScrollView setHasHorizontalScroller:NO];
