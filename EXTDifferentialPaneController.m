@@ -64,6 +64,7 @@
 - (void)awakeFromNib {
     [self.tableView setTarget:self];
     [self.tableView setDoubleAction:@selector(doubleClick:)];
+    self.targetEditor.readonly = true;
     
     return;
 }
