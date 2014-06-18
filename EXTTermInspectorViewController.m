@@ -149,9 +149,18 @@
         else
             return @"∞";
     } else if ([tableColumn.identifier isEqualToString:@"vector"]) {
-        NSString *ret = [NSString stringWithFormat:@"%@ %@",
-                         vector[0], term.names[0]];
-        for (int i = 1; i < vector.count; i++)
+        NSString *ret = @"";
+        
+        for (int i = 0; i < vector.count; i++) {
+            if ([ret isEqualToString:@""]) {
+                if ([vector[i] intValue] == 1)
+                    ret = [NSString stringWithFormat:@"%@", term.names[i]];
+                else if ([vector[i] intValue] != 0)
+                    ret = [NSString stringWithFormat:@"%@ %@", vector[i], term.names[i]];
+                // if vector[i] is zero, don't do anything.
+                continue;
+            }
+            
             if ([vector[i] intValue] > 1)
                 ret = [NSString stringWithFormat:@"%@ + %@ %@",
                        ret, vector[i], term.names[i]];
@@ -161,6 +170,7 @@
             else if ([vector[i] intValue] < 0)
                 ret = [NSString stringWithFormat:@"%@ - %@ %@",
                        ret, @(-[vector[i] intValue]), term.names[i]];
+        }
         
         return ret;
     }
