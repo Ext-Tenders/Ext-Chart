@@ -56,6 +56,10 @@
     return (end.b - start.b);
 }
 
+-(int)koszulDegree {
+    return self.b;
+}
+
 /// NSCoder, NSCopying routines ///
 
 -(EXTPair*) copyWithZone:(NSZone*)zone {

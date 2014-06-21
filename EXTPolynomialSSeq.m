@@ -401,7 +401,7 @@
     // if we're here, then we have all the fixin's we need to construct some
     // more partial differential definitions.  let's find a place to put them.
     EXTDifferential *dsum = [self findDifflWithSource:sumterm.location
-                                                    onPage:page];
+                                               onPage:page];
     if (!dsum) {
         dsum = [EXTDifferential differential:sumterm end:targetterm page:page];
         [self addDifferential:dsum];

@@ -42,6 +42,9 @@ enum EXTLocationKinds {
 +(NSObject<EXTLocation>*) scale:(NSObject<EXTLocation>*)loc
                              by:(int)scale;
 
+// for use in e.g. sign rules, for commuting differentials in the leibniz rule
+-(int) koszulDegree;
+
 // these record the affine translation by a differential
 +(NSObject<EXTLocation>*) followDiffl:(NSObject<EXTLocation>*)a
                                  page:(int)page;

@@ -70,6 +70,11 @@
     return (start.c - end.c + 1);
 }
 
+// XXX: i have no idea if this is right or consistent.
+- (int)koszulDegree {
+    return self.a;
+}
+
 -(EXTTriple*) copyWithZone:(NSZone*)zone {
     return [[EXTTriple allocWithZone:zone] initWithA:self.a B:self.b C:self.c];
 }
