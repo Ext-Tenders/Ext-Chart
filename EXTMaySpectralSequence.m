@@ -406,7 +406,9 @@
             
             int limit = ((i == 1) && (j == 0)) ? width : width/(B-1);
             
-            [sseq addPolyClass:[EXTMayTag tagWithI:i J:j] location:[EXTTriple tripleWithA:A B:B C:C] upTo:limit];
+            [sseq addPolyClass:[EXTMayTag tagWithI:i J:j]
+                      location:[EXTTriple tripleWithA:A B:B C:C]
+                          upTo:limit];
         }
     }
     
@@ -462,19 +464,6 @@
     for (NSMutableDictionary *generator in self.generators)
         [locations addObject:[generator objectForKey:@"location"]];
     [self propagateLeibniz:locations page:1];
-    
-    // TODO: use nakamura's lemma to get the higher differentials.
-    //
-    // the present decision to to put the user in charge of this task.
-    /*
-    EXTTriple *h20 = [EXTTriple tripleWithA:1 B:3 C:2];
-    if ([self findTerm:h20])
-        [self calculateNakamura:1 location:h20 page:1];
-    
-    EXTTriple *h20squared = [EXTTriple tripleWithA:2 B:6 C:4];
-    if ([self findTerm:h20squared])
-        [self propagateLeibniz:@[h20squared, [EXTTriple tripleWithA:1 B:1 C:1], [EXTTriple tripleWithA:1 B:2 C:1]] page:2];
-    */
     
     return;
 }

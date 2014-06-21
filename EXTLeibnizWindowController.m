@@ -63,7 +63,8 @@
     for (int i = 0; i < termsUnderClick.count; i++) {
         EXTTerm *term = termsUnderClick[i];
         NSUInteger position = [self.list indexOfObject:term.location];
-        if (position == NSNotFound) {
+        if ((position == NSNotFound) &&
+            ([term dimension:self.documentWindowController.chartViewController.currentPage] != 0)) {
             [self.list addObject:term.location];
             break;
         }
