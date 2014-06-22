@@ -232,6 +232,9 @@
                 upTo:(int)bound
          onCondition:(bool (^)(NSObject<EXTLocation> *))condition {
     
+    if (!condition(loc))
+        return;
+    
     // update the navigation members
     NSMutableDictionary *entry = [NSMutableDictionary new];
     
