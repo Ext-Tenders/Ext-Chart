@@ -447,7 +447,11 @@
                     // poke a 1 in at this location.  the only way to see that
                     // this is a reasonable thing to do is to draw out an
                     // example.  i'm very sorry. :(
-                    ((NSMutableArray*)(i1.presentation[l+Q.size*(j+P.size*(k+i*B.size))]))[APskip + BQoffset + k*Q.size + l] = @1;
+                    //
+                    // addendum: because this is where we deal with commuting
+                    // P across B, this is also where the koszul sign rule shows
+                    // up. that's what that little conditional is about.
+                    ((NSMutableArray*)(i1.presentation[l+Q.size*(j+P.size*(k+i*B.size))]))[APskip + BQoffset + k*Q.size + l] = (B.location.koszulDegree * P.location.koszulDegree) & 0x1 ? @(-1) : @1;
                 }
                 
                 // now, we use this to build the differential presentation.

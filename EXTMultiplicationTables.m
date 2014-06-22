@@ -333,6 +333,10 @@
                 NSArray *AYspan = [EXTMatrix formIntersection:IdpartialJ with:k];
                 EXTMatrix *v = [EXTMatrix newMultiply:Idj by:AYspan[0]],
                 *partialV = [EXTMatrix newMultiply:muK by:AYspan[1]];
+                
+                // apply the koszul sign rule if appropriate
+                if (A.location.koszulDegree & 0x1)
+                    partialV = [partialV scale:-1];
                         
                 // store this to a list of partial definitions.
                 EXTPartialDefinition *partial = [EXTPartialDefinition new];
@@ -416,6 +420,10 @@
                 NSArray *AYspan = [EXTMatrix formIntersection:IdpartialJ with:k];
                 EXTMatrix *v = [EXTMatrix newMultiply:Idj by:AYspan[0]],
                 *partialV = [EXTMatrix newMultiply:muK by:AYspan[1]];
+                
+                // apply the koszul sign rule to partialV if appropriate
+                if (A.location.koszulDegree & 0x1)
+                    partialV = [partialV scale:-1];
                         
                 // lastly, take the intersection span of U >-> A|B <-< V to get
                 // a shared subspace W, hence a pair of cospans both of the form

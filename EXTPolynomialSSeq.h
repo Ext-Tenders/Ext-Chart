@@ -29,6 +29,8 @@
 // some dramatic simplifications to how things are stored and computed.
 @interface EXTPolynomialSSeq : EXTSpectralSequence
 
+// array of NSMutableDictionarys,
+// each of which has keys: "name", "location", "upperBound"
 @property(strong,readonly) NSMutableArray *generators;
 
 -(EXTPolynomialSSeq*) initWithIndexingClass:(Class<EXTLocation>)locClass;
@@ -49,5 +51,7 @@
 -(void) changeName:(NSObject<NSCopying>*)name to:(NSObject<NSCopying>*)newName;
 -(void) deleteClass:(NSObject<NSCopying>*)name;
 -(EXTLocation*) computeLocationForTag:(EXTPolynomialTag*)tag;
+-(int) koszulSignForMultiplying:(EXTPolynomialTag*)left
+                             by:(EXTPolynomialTag*)right;
 
 @end

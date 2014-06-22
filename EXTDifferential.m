@@ -129,6 +129,10 @@ static void *_EXTPresentationParametersContext = &_EXTPresentationParametersCont
     self.partialDefinitions = reducedPartials;
 }
 
+// TODO: the real goal for this guy was to check whether the partialDefinitions
+// were ever in conflict.  this means computing pullbacks along common inclusion
+// subspaces and then checking that the restriction of the action matrix to
+// the common space agrees for every pair of EXTPartialDefinitions.
 -(BOOL) checkForSanity {
     for (EXTPartialDefinition *partial in partialDefinitions) {
         if (partial.inclusion.width != partial.action.width)

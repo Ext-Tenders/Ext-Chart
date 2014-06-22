@@ -169,6 +169,11 @@
         [self.terms setObject:unit forKey:unit.location];
     }
     
+    EXTMatrix *mat = [EXTMatrix matrixWidth:2 height:1];
+    mat.presentation[0][0] = @(-1);
+    mat.presentation[1][0] = @1;
+    [mat columnReduce];
+    
     return self;
 }
 
@@ -366,7 +371,7 @@
         int index = [target.names indexOfObject:sumTag];
         if (index != -1) {
             NSMutableArray *retcol = ret.presentation[i*right.size+j];
-            retcol[index] = @1;
+            retcol[index] = @([self koszulSignForMultiplying:left.names[i] by:right.names[j]]);
         }
     }
     
@@ -616,6 +621,22 @@
     }
     
     return loc;
+}
+
+-(int)koszulSignForMultiplying:(EXTPolynomialTag *)left
+                            by:(EXTPolynomialTag *)right {
+    int power = 1;
+    
+    for (int j = 0; j < self.generators.count; j++) {
+        for (int i = j; i < self.generators.count; i++) {
+            // commute the thing in right[j] across the things in left[i]
+            int rightj = [right.tags[generators[j][@"name"]] intValue],
+                lefti  = [left.tags[generators[i][@"name"]] intValue];
+            power += rightj * lefti * [(EXTLocation*)generators[i][@"location"] koszulDegree] * [(EXTLocation*)generators[j][@"location"] koszulDegree];
+        }
+    }
+    
+    return power & 0x1 ? -1 : 1;
 }
 
 @end
