@@ -36,8 +36,20 @@
 -(EXTPolynomialSSeq*) initWithIndexingClass:(Class<EXTLocation>)locClass;
 +(EXTPolynomialSSeq*) sSeqWithIndexingClass:(Class<EXTLocation>)locClass;
 
--(void) addPolyClass:(NSObject<NSCopying>*)name location:(EXTLocation*)loc upTo:(int)bound;
--(void) resizePolyClass:(NSObject<NSCopying>*)name upTo:(int)newBound;
+-(void) addPolyClass:(NSObject<NSCopying>*)name
+            location:(EXTLocation*)loc
+                upTo:(int)bound;
+-(void) resizePolyClass:(NSObject<NSCopying>*)name
+                   upTo:(int)newBound;
+// and a variant where you can stop class propagation early. this is useful for
+// imposing an error cutoff, for instance.
+-(void) addPolyClass:(NSObject<NSCopying>*)name
+            location:(EXTLocation*)loc
+                upTo:(int)bound
+         onCondition:(bool (^)(EXTLocation*))condition;
+-(void) resizePolyClass:(NSObject<NSCopying>*)name
+                   upTo:(int)newBound
+            onCondition:(bool (^)(EXTLocation*))condition;
 
 -(EXTMatrix*) productWithLeft:(EXTLocation*)left right:(EXTLocation*)right;
 

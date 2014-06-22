@@ -388,6 +388,10 @@
     zrTriple.rightEdge = zrTriple.topEdge = zrTriple.frontEdge = width;
     [sseq.zeroRanges addObject:zrTriple];
     
+    bool (^ condition)(EXTTriple*) = ^(EXTTriple *loc){
+        return (bool) (loc.b <= width);
+    };
+    
     // start by adding the polynomial terms h_{i,j}
     for (int i = 1; ; i++) {
         
@@ -408,7 +412,8 @@
             
             [sseq addPolyClass:[EXTMayTag tagWithI:i J:j]
                       location:[EXTTriple tripleWithA:A B:B C:C]
-                          upTo:limit];
+                          upTo:limit
+                   onCondition:(bool (^)(EXTLocation*))condition];
         }
     }
     
@@ -450,11 +455,18 @@
                     leftEntry = workingEntry;
                 else if ([[workingEntry objectForKey:@"name"] isEqual:tagRight])
                     rightEntry = workingEntry;
-            EXTMatrix *product = [self productWithLeft:[leftEntry objectForKey:@"location"] right:[rightEntry objectForKey:@"location"]];
+            EXTMatrix *product =
+                [self productWithLeft:[leftEntry objectForKey:@"location"]
+                                right:[rightEntry objectForKey:@"location"]];
+            
+            // don't bother if we don't know about this term.
+            if (!product || product.width == 0 || product.height == 0)
+                continue;
+            
             partial.action = [EXTMatrix sum:partial.action with:product];
-            partial.description = [NSString stringWithFormat:@"May d1 differential on %@",tag];
         }
         
+        partial.description = [NSString stringWithFormat:@"May d1 differential on %@",tag];
         [diff.partialDefinitions addObject:partial];
         [self addDifferential:diff];
     }

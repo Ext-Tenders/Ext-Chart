@@ -169,11 +169,6 @@
         [self.terms setObject:unit forKey:unit.location];
     }
     
-    EXTMatrix *mat = [EXTMatrix matrixWidth:2 height:1];
-    mat.presentation[0][0] = @(-1);
-    mat.presentation[1][0] = @1;
-    [mat columnReduce];
-    
     return self;
 }
 
@@ -232,9 +227,11 @@
     return ret;
 }
 
--(void) addPolyClass:(NSObject<NSCopying>*)name
-            location:(EXTLocation*)loc
-                upTo:(int)bound {
+-(void) addPolyClass:(NSObject<NSCopying> *)name
+            location:(NSObject<EXTLocation> *)loc
+                upTo:(int)bound
+         onCondition:(bool (^)(NSObject<EXTLocation> *))condition {
+    
     // update the navigation members
     NSMutableDictionary *entry = [NSMutableDictionary new];
     
@@ -257,12 +254,30 @@
     
     [generators addObject:entry];
     
-    [self resizePolyClass:name upTo:bound];
+    [self resizePolyClass:name upTo:bound onCondition:condition];
+}
+
+-(void) addPolyClass:(NSObject<NSCopying>*)name
+            location:(EXTLocation*)loc
+                upTo:(int)bound {
+    bool (^ condition)(EXTLocation*);
+    condition = ^(EXTLocation *loc){ return (bool)true; };
+    
+    [self addPolyClass:name location:loc upTo:bound onCondition:condition];
     
     return;
 }
 
--(void) resizePolyClass:(NSObject<NSCopying>*)name upTo:(int)newBound {
+-(void) resizePolyClass:(NSObject<NSCopying> *)name upTo:(int)newBound {
+    bool (^ condition)(EXTLocation*);
+    condition = ^(EXTLocation *loc){ return (bool)true; };
+    
+    [self resizePolyClass:name upTo:newBound onCondition:condition];
+}
+
+-(void) resizePolyClass:(NSObject<NSCopying>*)name
+                   upTo:(int)newBound
+            onCondition:(bool (^)(EXTLocation*))condition {
     NSMutableDictionary *entry = nil;
     for (NSMutableDictionary *workingEntry in generators)
         if ([[workingEntry objectForKey:@"name"] isEqual:name]) {
@@ -294,32 +309,34 @@
                          scale:[generator objectForKey:@"location"]
                             by:[[tag.tags objectForKey:
                                   [generator objectForKey:@"name"]] intValue]]];
-        EXTTerm *term = [self findTerm:workingLoc];
+        if (condition(workingLoc)) {
+            EXTTerm *term = [self findTerm:workingLoc];
         
-        // if it doesn't exist, create it
-        if (!term) {
-            term = [EXTTerm term:workingLoc andNames:[NSMutableArray array]];
-            [self.terms setObject:term forKey:workingLoc];
-        }
+            // if it doesn't exist, create it
+            if (!term) {
+                term = [EXTTerm term:workingLoc andNames:[NSMutableArray array]];
+                [self.terms setObject:term forKey:workingLoc];
+            }
         
-        // now add the new tag to its names array
-        [term.names addObject:[tag copy]];
+            // now add the new tag to its names array
+            [term.names addObject:[tag copy]];
         
-        // also need to modify all incoming and outgoing differentials.
-        EXTMatrix *inclusion = [EXTMatrix matrixWidth:(term.size-1)
-                                               height:term.size];
-        for (int i = 0; i < term.size-1; i++)
-            [inclusion.presentation[i] setObject:@1 atIndex:i];
-        for (int i = 1; i < self.differentials.count; i++) {
-            EXTDifferential
-                *outgoing = [self findDifflWithSource:workingLoc onPage:i],
-                *incoming = [self findDifflWithTarget:workingLoc onPage:i];
-            for (EXTPartialDefinition *partial in outgoing.partialDefinitions)
-                partial.inclusion = [EXTMatrix newMultiply:inclusion
-                                                        by:partial.inclusion];
-            for (EXTPartialDefinition *partial in incoming.partialDefinitions)
-                partial.action = [EXTMatrix newMultiply:inclusion
-                                                     by:partial.action];
+            // also need to modify all incoming and outgoing differentials.
+            EXTMatrix *inclusion = [EXTMatrix matrixWidth:(term.size-1)
+                                                   height:term.size];
+            for (int i = 0; i < term.size-1; i++)
+                [inclusion.presentation[i] setObject:@1 atIndex:i];
+            for (int i = 1; i < self.differentials.count; i++) {
+                EXTDifferential
+                    *outgoing = [self findDifflWithSource:workingLoc onPage:i],
+                    *incoming = [self findDifflWithTarget:workingLoc onPage:i];
+                for (EXTPartialDefinition *p in outgoing.partialDefinitions)
+                    p.inclusion = [EXTMatrix newMultiply:inclusion
+                                                      by:p.inclusion];
+                for (EXTPartialDefinition *p in incoming.partialDefinitions)
+                    p.action = [EXTMatrix newMultiply:inclusion
+                                                   by:p.action];
+            }
         }
         
         // increment the counter

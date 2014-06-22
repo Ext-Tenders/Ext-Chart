@@ -679,6 +679,11 @@
             leftLoc = [locClass addLocation:leftLoc to:[locClass scale:locations[i] by:[counter[i] intValue]]];
         leftLoc = [locClass addLocation:leftLoc to:[locClass scale:locations[topEntry] by:([counter[topEntry] intValue]-1)]];
         
+        // probably something more dramatic could happen here in the interest
+        // of speed, like forcing a carry.  this will do for now, though.
+        if (![self findTerm:leftLoc])
+            continue;
+        
         // call -computeLeibniz on (the previous sum + the shifted coordinate)
         [self computeLeibniz:leftLoc with:locations[topEntry] onPage:page];
     }
