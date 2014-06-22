@@ -293,7 +293,7 @@
                 tOld = temp;
             }
             
-            if (gcd == rOld) {
+            if (abs(gcd) == abs(rOld)) {
                 bezout[index] = @0;
                 continue;
             }
