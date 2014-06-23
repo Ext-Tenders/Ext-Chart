@@ -778,10 +778,12 @@
 +(NSDictionary*) findOrdersOf:(EXTMatrix*)B in:(EXTMatrix*)Z {
     // start by forming the pullback square.
     NSArray *pair = [EXTMatrix formIntersection:Z with:B];
+    EXTMatrix *left = pair[0], *right = pair[1];
+    EXTMatrix *invertedRight = [right invert];
     
     // since im Z >= im B and both are full rank, the map P --> B is invertible
     // and B --> P --> Z expresses B as a subspace of Z.
-    EXTMatrix *inclusion = [EXTMatrix newMultiply:(EXTMatrix*)pair[0] by:[(EXTMatrix*)pair[1] invert]];
+    EXTMatrix *inclusion = [EXTMatrix newMultiply:left by:invertedRight];
     
     // pad this out to a map B (+) R --(old map (+) 0)-> Z so that the
     // dimensions line up.

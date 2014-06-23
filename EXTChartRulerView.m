@@ -14,6 +14,7 @@ static const CGFloat _bigHashMarkLength = 13.0;
 static const CGFloat _smallHashMarkLength = 6.0;
 static const CGFloat _labelPosition = 2.0;
 static const CGFloat _labelFontSize = 8.0;
+static const CGFloat _labelWidth = 16.0;
 static const CGFloat _hashMarkWidth = 0.5;
 static const CGFloat _hashMarkHalfWidth = _hashMarkWidth / 2;
 
@@ -63,9 +64,9 @@ static void *_needsRedrawContext = &_needsRedrawContext;
         lastVisibleHashMarkIndex = (NSInteger)(ceil(floor(NSMaxX(viewBoundsInSelf) - viewOriginInSelf.x) / unitStepInSelf.width));
         hashPosition = (firstVisibleHashMarkIndex * unitStepInSelf.width) + viewOriginInSelf.x - _hashMarkHalfWidth;
         labelFrame = (NSRect){
-            .origin.x = hashPosition + _hashMarkWidth,
+            .origin.x = hashPosition + _hashMarkHalfWidth + unitStepInSelf.width/2 - _labelWidth/2,
             .origin.y = self.baselineLocation + _labelPosition,
-            .size.width = unitStepInSelf.width - _hashMarkWidth,
+            .size.width = _labelWidth - _hashMarkWidth,
             .size.height = _ruleLength
         };
     }
@@ -75,9 +76,9 @@ static void *_needsRedrawContext = &_needsRedrawContext;
         hashPosition = (firstVisibleHashMarkIndex * unitStepInSelf.height) + viewOriginInSelf.y - _hashMarkHalfWidth;
         labelFrame = (NSRect){
             .origin.y = self.baselineLocation + _labelPosition,
-            .origin.x = hashPosition + _hashMarkWidth,
+            .origin.x = hashPosition + _hashMarkHalfWidth + unitStepInSelf.width/2 - _labelWidth/2,
             .size.height = _ruleLength,
-            .size.width = unitStepInSelf.width - _hashMarkWidth,
+            .size.width = _labelWidth - _hashMarkWidth,
         };
     }
 
@@ -116,16 +117,20 @@ static void *_needsRedrawContext = &_needsRedrawContext;
             to = (NSPoint){hashPosition, hashMarkLength};
         }
 
-        [path moveToPoint:from];
-        [path lineToPoint:to];
-
-        if (true) { // FIXME: we’ll want to draw labels selectively
+        if (!(unitStepInSelf.width <= 8.0 && (hashMarkIndex & 7))) {
+            [path moveToPoint:from];
+            [path lineToPoint:to];
+        }
+        
+        if (!((unitStepInSelf.width <= 10.0 && (hashMarkIndex & 7)) ||
+             ((unitStepInSelf.width <= 12.0) && (hashMarkIndex & 3)) ||
+             ((unitStepInSelf.width <= 16.0) && (hashMarkIndex & 1)))) {
             NSString *label = [NSString stringWithFormat:@"%ld", (long)hashMarkIndex];
             [label drawInRect:labelFrame withAttributes:_labelAttrs];
         }
 
         hashPosition += unitStepInSelf.width;
-        labelFrame.origin.x = hashPosition + _hashMarkHalfWidth;
+        labelFrame.origin.x += unitStepInSelf.width;
     }
 
     [path stroke];
