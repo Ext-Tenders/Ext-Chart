@@ -68,9 +68,6 @@
 +(EXTMatrix*) assemblePresentation:(NSMutableArray*)partialDefinitions
                    sourceDimension:(int)sourceDimension
                    targetDimension:(int)targetDimension;
-+(NSArray*) assemblePresentationAndOptimize:(NSMutableArray*)partialDefinitions
-                            sourceDimension:(int)sourceDimension
-                            targetDimension:(int)targetDimension;
 
 +(NSDictionary*) findOrdersOf:(EXTMatrix*)B in:(EXTMatrix*)Z;
 

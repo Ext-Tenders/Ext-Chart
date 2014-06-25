@@ -192,19 +192,18 @@
     // clean up the differential's presentation before touching it
     [differential assemblePresentation];
     
-    // restrict its action to the previous cycle group
-    EXTMatrix *restriction = [EXTMatrix matrixWidth:((NSMutableArray*)differential.start.cycles[whichPage-1]).count height:differential.start.size];
-    restriction.presentation = differential.start.cycles[whichPage-1];
-    EXTMatrix *restrictedDiff = [EXTMatrix newMultiply:differential.presentation by:restriction];
-    
     // add these to the old boundaries
-    NSMutableArray *newImage = [restrictedDiff image];
-    EXTMatrix *boundaryInclusion = [EXTMatrix matrixWidth:(newImage.count+((NSMutableArray*)boundaries[whichPage-1]).count) height:differential.end.size];
-    [newImage addObjectsFromArray:boundaries[whichPage-1]];
-    boundaryInclusion.presentation = [NSMutableArray arrayWithArray:newImage];
+    NSMutableArray *oldBoundaries = boundaries[whichPage-1];
+    EXTMatrix *boundaryInclusion =
+        [EXTMatrix matrixWidth:(oldBoundaries.count+
+                                differential.presentation.width)
+                        height:differential.presentation.height];
+    boundaryInclusion.presentation = differential.presentation.presentation;
+    [boundaryInclusion.presentation addObjectsFromArray:oldBoundaries];
+    boundaryInclusion.characteristic = sSeq.defaultCharacteristic;
     
     // find a minimum spanning set and store it
-    [boundaries setObject:[boundaryInclusion image] atIndexedSubscript:whichPage];
+    boundaries[whichPage] = [boundaryInclusion image];
 
     return;
 }
@@ -212,6 +211,9 @@
 -(void) updateDataForPage:(int)whichPage
                    inSSeq:(EXTSpectralSequence*)sSeq
          inCharacteristic:(int)characteristic {
+    if (whichPage == 4 && [[EXTPair pairWithA:11 B:3] isEqualTo:self.location])
+        NSLog(@"pay attention.");
+    
     [self computeCycles:whichPage sSeq:sSeq];
     [self computeBoundaries:whichPage sSeq:sSeq];
     

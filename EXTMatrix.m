@@ -473,7 +473,8 @@
         // and, if it's not all zeroes, we should add it to the collection.
         // NOTE: it's important that we actually return a column from the
         // original matrix.  this is used elsewhere.
-        [ret addObject:[[self presentation] objectAtIndex:i]];
+        //[ret addObject:self.presentation[i]];
+        [ret addObject:reduced.presentation[i]];
     }
     
     return ret;
@@ -573,27 +574,15 @@
     return image.count;
 }
 
-+(EXTMatrix*) assemblePresentation:(NSMutableArray*)partialDefinitions
-                   sourceDimension:(int)sourceDimension
-                   targetDimension:(int)targetDimension {
-    NSArray *pair =
-            [EXTMatrix assemblePresentationAndOptimize:partialDefinitions
-                                       sourceDimension:sourceDimension
-                                       targetDimension:targetDimension];
-    
-    return pair[0];
-}
-
 // returns a pair (EXTMatrix* presentation, NSMutableArray* partialDefinitions),
 // where the right-hand term contains a minimal list of necessary partial def'ns
 // used the generate this presentation.  good for paring these down.
-+(NSArray*) assemblePresentationAndOptimize:(NSMutableArray*)partialDefinitions
-                            sourceDimension:(int)sourceDimension
-                            targetDimension:(int)targetDimension {
++(EXTMatrix*) assemblePresentation:(NSMutableArray*)partialDefinitions
+                   sourceDimension:(int)sourceDimension
+                   targetDimension:(int)targetDimension {
     // first, make sure we're not going to bomb.
     if (partialDefinitions.count == 0)
-        return @[[EXTMatrix matrixWidth:sourceDimension height:targetDimension],
-                 [NSMutableArray array]];
+        return [EXTMatrix matrixWidth:sourceDimension height:targetDimension];
     
     // then, get a characteristic
     int characteristic =
@@ -693,7 +682,7 @@
     if (minimalVectors.count == 0) {
         EXTMatrix *ret = [EXTMatrix matrixWidth:sourceDimension height:targetDimension];
         ret.characteristic = characteristic;
-        return @[ret, [NSMutableArray array]];
+        return ret;
     }
     
     // and so here's our basis matrix.
@@ -734,15 +723,8 @@
     EXTMatrix *stdDifferential =
         [EXTMatrix newMultiply:differentialInCoordinates by:basisConversion];
     
-    // there is one last orthogonal task: returning a list of minimal def'ns
-    NSMutableArray *minimalDefinitions = [NSMutableArray array];
-    for (int index = 0; index < partialDefinitions.count; index++)
-        if (([minimalParents indexOfObject:@(index)] != -1) &&
-            ([minimalDefinitions indexOfObject:partialDefinitions[index]] != -1))
-            [minimalDefinitions addObject:partialDefinitions[index]];
-    
     // finally, all our hard work done, we jump back.
-    return @[stdDifferential, minimalDefinitions];
+    return stdDifferential;
 }
 
 // returns a scaled matrix
@@ -762,6 +744,10 @@
 
 // given a cospan A --> C <-- B, this routine forms the pullback span.
 +(NSArray*) formIntersection:(EXTMatrix*)left with:(EXTMatrix*)right {
+    // perform cleanup to put us in a good state.
+    [left modularReduction];
+    [right modularReduction];
+    
     // form the matrix [P, -Q]
     EXTMatrix *sum = [EXTMatrix matrixWidth:(left.width + right.width)
                                      height:left.height];

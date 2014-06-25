@@ -93,10 +93,7 @@ static void *_EXTPresentationParametersContext = &_EXTPresentationParametersCont
 // this routine assembles from the available partial definitions of the
 // differential a single definition on the cycle group.  it's a bit convoluted.
 -(void) assemblePresentation {
-    NSArray *pair =
-        [EXTMatrix assemblePresentationAndOptimize:partialDefinitions sourceDimension:start.size targetDimension:end.size];
-    _presentation = pair[0];
-    partialDefinitions = pair[1];
+    _presentation = [EXTMatrix assemblePresentation:partialDefinitions sourceDimension:start.size targetDimension:end.size];
     
     return;
 }
