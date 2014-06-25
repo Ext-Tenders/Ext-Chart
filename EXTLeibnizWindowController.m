@@ -64,7 +64,7 @@
         EXTTerm *term = termsUnderClick[i];
         NSUInteger position = [self.list indexOfObject:term.location];
         if ((position == NSNotFound) &&
-            ([term dimension:self.documentWindowController.chartViewController.currentPage inCharacteristic:((EXTDocument*)self.document).sseq.defaultCharacteristic] != 0)) {
+            ([term dimension:self.documentWindowController.chartViewController.currentPage] != 0)) {
             [self.list addObject:term.location];
             break;
         }

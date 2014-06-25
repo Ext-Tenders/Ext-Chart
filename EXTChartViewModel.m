@@ -142,7 +142,7 @@ static dispatch_queue_t _dotLayersQueue;
         EXTIntPoint point = [self.sequence.locConvertor gridPoint:term.location];
         EXTViewModelPoint *viewPoint = [EXTViewModelPoint newViewModelPointWithX:point.x y:point.y];
         NSInteger termCount = ((NSNumber *)counts[viewPoint]).integerValue;
-        termCount += [term dimension:self.currentPage inCharacteristic:self.sequence.defaultCharacteristic];
+        termCount += [term dimension:self.currentPage];
         if (termCount > 0) {
             counts[viewPoint] = @(termCount);
             [[self class] registerLayerForTermCount:termCount];
@@ -161,8 +161,8 @@ static dispatch_queue_t _dotLayersQueue;
 
             int imageSize = [differential.presentation image].count;
             if ((imageSize == 0) ||
-                ([differential.start dimension:differential.page inCharacteristic:self.sequence.defaultCharacteristic] == 0) ||
-                ([differential.end dimension:differential.page inCharacteristic:self.sequence.defaultCharacteristic] == 0))
+                ([differential.start dimension:differential.page] == 0) ||
+                ([differential.end dimension:differential.page] == 0))
                 continue;
 
             const EXTIntPoint startPoint = [self.sequence.locConvertor gridPoint:differential.start.location];

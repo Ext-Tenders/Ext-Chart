@@ -27,6 +27,7 @@
                                              // responders. basis element names.
     @property(retain) NSMutableArray* cycles; // NSArrays of cycle group bases
     @property(retain) NSMutableArray* boundaries; // ...  of bdry group bases
+    @property(retain) NSMutableArray* homologyReps; // of homology dicts.
     @property(retain) EXTMatrix *displayBasis; // change of basis matrix, used
                                                // to display in a nonstd basis
     @property(retain) NSMutableArray* displayNames; // labels for display
@@ -41,9 +42,10 @@
 
     // useful for drawing
     -(int) size;
-    -(int) dimension:(int)whichPage inCharacteristic:(int)characteristic;
-    -(void) computeCycles:(int)whichPage sSeq:(EXTSpectralSequence*)sSeq;
-    -(void) computeBoundaries:(int)whichPage sSeq:(EXTSpectralSequence*)sSeq;
+    -(int) dimension:(int)whichPage;
+    -(void) updateDataForPage:(int)whichPage
+                       inSSeq:(EXTSpectralSequence*)sSeq
+             inCharacteristic:(int)characteristic;
 
     // TODO: here are some other routines that i haven't investigated yet.
     - (void)addSelfToSS:(EXTDocument*)theDocument;

@@ -592,8 +592,7 @@
             [diff assemblePresentation];
     
     for (EXTTerm *term in self.terms.allValues) {
-        [term computeCycles:page sSeq:self];
-        [term computeBoundaries:page sSeq:self];
+        [term updateDataForPage:page inSSeq:self inCharacteristic:self.defaultCharacteristic];
     }
     
     return;

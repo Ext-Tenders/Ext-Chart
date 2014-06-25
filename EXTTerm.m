@@ -22,6 +22,7 @@
 @synthesize boundaries;
 @synthesize displayBasis;
 @synthesize displayNames;
+@synthesize homologyReps;
 
 #pragma mark *** initialization ***
 
@@ -34,6 +35,7 @@
     [self setLocation:whichLocation];
     [self setBoundaries:[NSMutableArray array]];
     [self setCycles:[NSMutableArray array]];
+    [self setHomologyReps:[NSMutableArray array]];
     [self setDisplayBasis:nil];
     [self setDisplayNames:nil];
 
@@ -72,6 +74,7 @@
         // start off with the default cycles and boundaries
         boundaries = [NSMutableArray array];
         cycles = [NSMutableArray array];
+        homologyReps = [NSMutableArray array];
         [cycles addObject:[EXTMatrix identity:names.count].presentation];
         [boundaries addObject:@[]];
 	}
@@ -206,19 +209,28 @@
     return;
 }
 
--(int) dimension:(int)whichPage inCharacteristic:(int)characteristic {
+-(void) updateDataForPage:(int)whichPage
+                   inSSeq:(EXTSpectralSequence*)sSeq
+         inCharacteristic:(int)characteristic {
+    [self computeCycles:whichPage sSeq:sSeq];
+    [self computeBoundaries:whichPage sSeq:sSeq];
+    
     NSMutableArray *cycleArray = self.cycles[whichPage],
-                   *boundaryArray = self.boundaries[whichPage];
+    *boundaryArray = self.boundaries[whichPage];
     EXTMatrix *cycleMat = [EXTMatrix matrixWidth:cycleArray.count
                                           height:self.names.count],
-              *boundaryMat = [EXTMatrix matrixWidth:boundaryArray.count
-                                             height:self.names.count];
+    *boundaryMat = [EXTMatrix matrixWidth:boundaryArray.count
+                                   height:self.names.count];
     cycleMat.presentation = cycleArray;
     boundaryMat.presentation = boundaryArray;
     cycleMat.characteristic = characteristic;
     boundaryMat.characteristic = characteristic;
     
-    return [[EXTMatrix findOrdersOf:boundaryMat in:cycleMat] count];
+    homologyReps[whichPage] = [EXTMatrix findOrdersOf:boundaryMat in:cycleMat];
+}
+
+-(int) dimension:(int)whichPage {
+    return ((NSDictionary*)homologyReps[whichPage]).count;
 }
 
 @end

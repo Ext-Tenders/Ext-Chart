@@ -102,7 +102,7 @@
         self.bMatrixEditor.rowNames = [term.names valueForKey:@"description"];
         self.zMatrixEditor.rowNames = [term.names valueForKey:@"description"];
         
-        homologyReps = [EXTMatrix findOrdersOf:boundaries in:cycles];
+        homologyReps = term.homologyReps[page];
     } else {
         self.bMatrixEditor.representedObject = nil;
         self.zMatrixEditor.representedObject = nil;
