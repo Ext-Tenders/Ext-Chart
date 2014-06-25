@@ -207,16 +207,19 @@
 }
 
 -(int) dimension:(int)whichPage {
-    int cycleCount = [[cycles objectAtIndex:whichPage] count],
-        boundaryCount = [[boundaries objectAtIndex:whichPage] count],
-        dim = cycleCount - boundaryCount;
+    NSMutableArray *cycleArray = self.cycles[whichPage],
+                   *boundaryArray = self.boundaries[whichPage];
+    EXTMatrix *cycleMat = [EXTMatrix matrixWidth:cycleArray.count
+                                          height:self.names.count],
+              *boundaryMat = [EXTMatrix matrixWidth:boundaryArray.count
+                                             height:self.names.count];
+    cycleMat.presentation = cycleArray;
+    boundaryMat.presentation = boundaryArray;
+    /* do we need to set their characteristics? */
+    NSDictionary *homologyReps = [EXTMatrix findOrdersOf:boundaryMat
+                                                      in:cycleMat];
     
-    if (dim < 0) {
-        DLog("term with name %@ has negative dimension on page %d", self.names[0], whichPage);
-        return 0;
-    }
-    
-    return dim;
+    return homologyReps.count;
 }
 
 @end

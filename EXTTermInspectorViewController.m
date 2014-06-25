@@ -145,9 +145,14 @@
         // XXX: over torsion ground rings, that "∞" should be the actual order
         // of the element in the ring.
         if (order)
-            return [NSString stringWithFormat:@"%d", order];
-        else
-            return @"∞";
+            return [NSString stringWithFormat:@"%d", abs(order)];
+        else {
+            EXTDocument *doc = _documentWindowController.document;
+            if (doc.sseq.defaultCharacteristic == 0)
+                return @"∞";
+            else
+                return [NSString stringWithFormat:@"%d", doc.sseq.defaultCharacteristic];
+        }
     } else if ([tableColumn.identifier isEqualToString:@"vector"]) {
         NSString *ret = @"";
         
