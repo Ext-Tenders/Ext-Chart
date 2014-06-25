@@ -255,7 +255,7 @@
     return copy;
 }
 
--(NSArray*) columnReduceWithRightFactor {
+-(NSArray*) columnReduceWithRightFactorAndLimit:(int)limit {
     EXTMatrix *ret = [self copy],
               *rightFactor = [EXTMatrix identity:self.width];
     NSMutableArray *usedColumns = [NSMutableArray array];
@@ -263,7 +263,7 @@
         usedColumns[i] = @(false);
     
     for (int pivotRow = 0, pivotColumn = 0;
-         pivotRow < height;
+         pivotRow < limit;
          pivotRow++) {
         
         int j, firstNonzeroEntry = -1;
@@ -405,7 +405,7 @@
 // runs gaussian column reduction on a matrix over Z.  useful for finding a
 // presentation of the image of the matrix.
 -(EXTMatrix*) columnReduce {
-    return (EXTMatrix*)self.columnReduceWithRightFactor[0];
+    return (EXTMatrix*)([self columnReduceWithRightFactorAndLimit:self.height][0]);
 }
 
 // returns a basis for the kernel of a matrix
@@ -471,9 +471,6 @@
             continue; // so skip it.
         
         // and, if it's not all zeroes, we should add it to the collection.
-        // NOTE: it's important that we actually return a column from the
-        // original matrix.  this is used elsewhere.
-        //[ret addObject:self.presentation[i]];
         [ret addObject:reduced.presentation[i]];
     }
     
@@ -577,6 +574,79 @@
 // returns a pair (EXTMatrix* presentation, NSMutableArray* partialDefinitions),
 // where the right-hand term contains a minimal list of necessary partial def'ns
 // used the generate this presentation.  good for paring these down.
++(EXTMatrix*) assemblePresentation:(NSMutableArray*)partialDefinitions
+                   sourceDimension:(int)sourceDimension
+                   targetDimension:(int)targetDimension {
+    // first, make sure we're not going to bomb.
+    if (partialDefinitions.count == 0)
+        return [EXTMatrix matrixWidth:sourceDimension height:targetDimension];
+    
+    // then, get a characteristic and a total dimension.
+    int characteristic =
+        ((EXTPartialDefinition*)partialDefinitions[0]).action.characteristic;
+    for (EXTPartialDefinition *partial in partialDefinitions)
+        if (characteristic != partial.action.characteristic ||
+            characteristic != partial.inclusion.characteristic) {
+            EXTLog(@"Inequal characteristics in presentation assembly.");
+        }
+    
+    int totalWidth = 0;
+    for (EXTPartialDefinition *partial in partialDefinitions)
+        totalWidth += partial.inclusion.width;
+    
+    // form the block matrix:
+    // I1 | I2 | ... | In | Iheight
+    // ----------------------------
+    // P1 | P2 | ... | Pn |  zero
+    EXTMatrix *bigMatrix =
+            [EXTMatrix matrixWidth:0
+                            height:(sourceDimension + targetDimension)];
+    for (EXTPartialDefinition *partial in partialDefinitions) {
+        for (int i = 0; i < partial.inclusion.width; i++) {
+            NSMutableArray *bigColumn = [NSMutableArray array];
+            [bigColumn addObjectsFromArray:partial.inclusion.presentation[i]];
+            [bigColumn addObjectsFromArray:partial.action.presentation[i]];
+            [bigMatrix.presentation addObject:bigColumn];
+        }
+    }
+    for (int i = totalWidth; i < totalWidth + sourceDimension; i++) {
+        NSMutableArray *column = [NSMutableArray array];
+        for (int j = 0; j < targetDimension + sourceDimension; j++) {
+            if (j == i - totalWidth)
+                column[j] = @1;
+            else
+                column[j] = @0;
+        }
+        [bigMatrix.presentation addObject:column];
+    }
+    bigMatrix.width = totalWidth + sourceDimension;
+    bigMatrix.characteristic = characteristic;
+    
+    // now, perform our usual left-to-right column reduction to it.
+    EXTMatrix *reducedMatrix = [bigMatrix columnReduceWithRightFactorAndLimit:sourceDimension][0];
+    
+    // we find those columns of the form [ej; stuff], and extract the 'stuff'
+    // from this column. this is our differential.
+    EXTMatrix *difflInCoordinates = [EXTMatrix matrixWidth:0 height:targetDimension];
+    for (int i = 0; i < reducedMatrix.width; i++) {
+        int pivotRow = -1;
+        NSArray *column = reducedMatrix.presentation[i];
+        
+        for (int j = 0; j < sourceDimension; j++)
+            if (abs([column[j] intValue]) == 1)
+                pivotRow = j;
+        if (pivotRow == -1)
+            continue;
+        
+        // extracts the stuff.
+        [difflInCoordinates.presentation addObject:[NSMutableArray arrayWithArray:[column subarrayWithRange:NSMakeRange(sourceDimension, targetDimension)]]];
+    }
+    difflInCoordinates.width = sourceDimension;
+    difflInCoordinates.characteristic = characteristic;
+    
+    return difflInCoordinates;
+}
+/*
 +(EXTMatrix*) assemblePresentation:(NSMutableArray*)partialDefinitions
                    sourceDimension:(int)sourceDimension
                    targetDimension:(int)targetDimension {
@@ -726,6 +796,7 @@
     // finally, all our hard work done, we jump back.
     return stdDifferential;
 }
+ */
 
 // returns a scaled matrix
 -(EXTMatrix*) scale:(int)scalar {
@@ -842,9 +913,9 @@
     // write this new map as (invertible1 . diagonal . invertible2) with the
     // outer matrices of determinant 1.  this can be done by column and row
     // reduction.
-    NSArray *columnReduction = [inclusion columnReduceWithRightFactor],
+    NSArray *columnReduction = [inclusion columnReduceWithRightFactorAndLimit:inclusion.height],
             *rowReduction = [[EXTMatrix copyTranspose:columnReduction[0]]
-                                                columnReduceWithRightFactor],
+                                    columnReduceWithRightFactorAndLimit:((EXTMatrix*)columnReduction[0]).width],
             *factorization = @[[[EXTMatrix copyTranspose:rowReduction[1]] invert],
                                [EXTMatrix copyTranspose:rowReduction[0]],
                                [(EXTMatrix*)columnReduction[1] invert]];

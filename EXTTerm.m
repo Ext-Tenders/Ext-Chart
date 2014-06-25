@@ -211,9 +211,6 @@
 -(void) updateDataForPage:(int)whichPage
                    inSSeq:(EXTSpectralSequence*)sSeq
          inCharacteristic:(int)characteristic {
-    if (whichPage == 4 && [[EXTPair pairWithA:11 B:3] isEqualTo:self.location])
-        NSLog(@"pay attention.");
-    
     [self computeCycles:whichPage sSeq:sSeq];
     [self computeBoundaries:whichPage sSeq:sSeq];
     
