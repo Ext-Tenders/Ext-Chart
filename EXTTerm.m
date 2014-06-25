@@ -178,7 +178,7 @@
         [boundaries setObject:@[] atIndexedSubscript:0];
         return;
     }
-        
+    
     // try to get a differential on this page.
     EXTDifferential *differential = [sSeq findDifflWithTarget:self.location onPage:whichPage-1];
     
@@ -211,11 +211,15 @@
 -(void) updateDataForPage:(int)whichPage
                    inSSeq:(EXTSpectralSequence*)sSeq
          inCharacteristic:(int)characteristic {
+    if ([self.location isEqualTo:[EXTTriple tripleWithA:7 B:14 C:9]] &&
+        whichPage == 3)
+        NSLog(@"pay attention.");
+    
     [self computeCycles:whichPage sSeq:sSeq];
     [self computeBoundaries:whichPage sSeq:sSeq];
     
     NSMutableArray *cycleArray = self.cycles[whichPage],
-    *boundaryArray = self.boundaries[whichPage];
+                   *boundaryArray = self.boundaries[whichPage];
     EXTMatrix *cycleMat = [EXTMatrix matrixWidth:cycleArray.count
                                           height:self.names.count],
     *boundaryMat = [EXTMatrix matrixWidth:boundaryArray.count

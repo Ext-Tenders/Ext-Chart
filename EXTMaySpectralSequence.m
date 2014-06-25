@@ -411,7 +411,7 @@
             
             // if we're outside the width limit *or* if we've hit the truncation
             // level, then it's time to move on to the next element.
-            if ((B - 1 > width) || (j >= (1 << (n-i+1))))
+            if ((B - 1 > width) || (j > (n-i+1)))
                 break;
             
             int limit = ((i == 1) && (j == 0)) ? width : width/(B-1);
