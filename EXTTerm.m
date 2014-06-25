@@ -206,7 +206,7 @@
     return;
 }
 
--(int) dimension:(int)whichPage {
+-(int) dimension:(int)whichPage inCharacteristic:(int)characteristic {
     NSMutableArray *cycleArray = self.cycles[whichPage],
                    *boundaryArray = self.boundaries[whichPage];
     EXTMatrix *cycleMat = [EXTMatrix matrixWidth:cycleArray.count
@@ -215,11 +215,10 @@
                                              height:self.names.count];
     cycleMat.presentation = cycleArray;
     boundaryMat.presentation = boundaryArray;
-    /* do we need to set their characteristics? */
-    NSDictionary *homologyReps = [EXTMatrix findOrdersOf:boundaryMat
-                                                      in:cycleMat];
+    cycleMat.characteristic = characteristic;
+    boundaryMat.characteristic = characteristic;
     
-    return homologyReps.count;
+    return [[EXTMatrix findOrdersOf:boundaryMat in:cycleMat] count];
 }
 
 @end

@@ -39,8 +39,9 @@
                    andNames:(NSMutableArray*)whichNames;
     // TODO: a direct sum constructor might be nice?
 
+    // useful for drawing
     -(int) size;
-    -(int) dimension:(int)whichPage; // useful for drawing
+    -(int) dimension:(int)whichPage inCharacteristic:(int)characteristic;
     -(void) computeCycles:(int)whichPage sSeq:(EXTSpectralSequence*)sSeq;
     -(void) computeBoundaries:(int)whichPage sSeq:(EXTSpectralSequence*)sSeq;
 

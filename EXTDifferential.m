@@ -60,7 +60,7 @@ static void *_EXTPresentationParametersContext = &_EXTPresentationParametersCont
     object.end = end;
     object.page = page;
     
-    [object setPresentation:[EXTMatrix matrixWidth:[start dimension:0] height:[end dimension:0]]];
+    [object setPresentation:[EXTMatrix matrixWidth:start.size height:end.size]];
     object.wellDefined = false;
     object.partialDefinitions = [NSMutableArray array];
     
@@ -114,10 +114,15 @@ static void *_EXTPresentationParametersContext = &_EXTPresentationParametersCont
         [partial1.inclusion modularReduction];
         [partial1.action modularReduction];
         
+        // discard this if it's the empty differential
+        if (partial1.inclusion.width == 0)
+            continue;
+        
         for (EXTPartialDefinition *partial2 in reducedPartials) {
-            if ([partial2 isEqual:partial1])
+            if ([partial2 isEqual:partial1]) {
                 discardThis = true;
-            break;
+                break;
+            }
         }
         
         if (discardThis)
