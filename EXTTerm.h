@@ -17,9 +17,6 @@
 // this class models a cell in the spectral sequence.  it needs to keep track of
 // many things, including not just its position but also its cycle/boundary
 // filtration, any multiplicative structures present, ...
-//
-// TODO: for the moment, i'm only even trying to make F2-vector-spaces work. any
-// more sophisticated variant of modules is going to take a substantial rewrite.
 @interface EXTTerm : NSObject <NSCoding>
 
     @property(retain) EXTLocation* location; // position on grid

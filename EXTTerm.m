@@ -210,11 +210,7 @@
 
 -(void) updateDataForPage:(int)whichPage
                    inSSeq:(EXTSpectralSequence*)sSeq
-         inCharacteristic:(int)characteristic {
-    if ([self.location isEqualTo:[EXTTriple tripleWithA:7 B:14 C:9]] &&
-        whichPage == 3)
-        NSLog(@"pay attention.");
-    
+         inCharacteristic:(int)characteristic {    
     [self computeCycles:whichPage sSeq:sSeq];
     [self computeBoundaries:whichPage sSeq:sSeq];
     
