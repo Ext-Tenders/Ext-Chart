@@ -448,7 +448,9 @@
         allZero.inclusion.characteristic = self.defaultCharacteristic;
         allZero.action.characteristic = self.defaultCharacteristic;
         allZero.description =
-            [NSString stringWithFormat:@"Leibniz rule on %@ and %@",loc1,loc2];
+            [NSString stringWithFormat:@"Leibniz rule on %@ and %@",
+             [self.locConvertor convertToString:loc1],
+             [self.locConvertor convertToString:loc2]];
         [dsum.partialDefinitions addObject:allZero];
     } else if (d1Zero && !d2Zero) {
         for (EXTPartialDefinition *partial2 in d2.partialDefinitions) {
@@ -469,7 +471,8 @@
                                           with:partial2.action]];
             partial.description =
                 [NSString stringWithFormat:@"Leibniz rule on %@ and %@",
-                                            loc1, loc2];
+                    [self.locConvertor convertToString:loc1],
+                    [self.locConvertor convertToString:loc2]];
             
             [dsum.partialDefinitions addObject:partial];
         }
@@ -494,7 +497,8 @@
                                           with:[EXTMatrix identity:B.size]]];
             partial.description =
                 [NSString stringWithFormat:@"Leibniz rule on %@ and %@",
-                                            loc1, loc2];
+                    [self.locConvertor convertToString:loc1],
+                    [self.locConvertor convertToString:loc2]];
             
             [dsum.partialDefinitions addObject:partial];
         }
@@ -539,7 +543,8 @@
                          with:[EXTMatrix newMultiply:rightMultiply by:pair[1]]];
             partial.description =
                 [NSString stringWithFormat:@"Leibniz rule on %@ and %@",
-                                           loc1, loc2];
+                    [self.locConvertor convertToString:loc1],
+                    [self.locConvertor convertToString:loc2]];
             
             [dsum.partialDefinitions addObject:partial];
         }
