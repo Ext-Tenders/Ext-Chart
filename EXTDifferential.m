@@ -104,27 +104,25 @@ static void *_EXTPresentationParametersContext = &_EXTPresentationParametersCont
 // about this routine to EXTDifferential.
 -(void) stripDuplicates {
     NSMutableArray *reducedPartials = [NSMutableArray array];
+    EXTMatrix *inclusionSum = [EXTMatrix matrixWidth:0 height:self.start.names.count];
+    NSArray *workingImage = [NSArray array];
     
     for (EXTPartialDefinition *partial1 in self.partialDefinitions) {
-        bool discardThis = false;
+        EXTMatrix *testMatrix = [inclusionSum copy];
+        testMatrix.characteristic = partial1.inclusion.characteristic;
         
         [partial1.inclusion modularReduction];
         [partial1.action modularReduction];
         
-        // discard this if it's the empty differential
-        if (partial1.inclusion.width == 0)
+        [testMatrix.presentation addObjectsFromArray:partial1.inclusion.presentation];
+        testMatrix.width += partial1.inclusion.width;
+        NSArray *image = [testMatrix image];
+        
+        if ([image isEqualToArray:workingImage])
             continue;
         
-        for (EXTPartialDefinition *partial2 in reducedPartials) {
-            if ([partial2 isEqual:partial1]) {
-                discardThis = true;
-                break;
-            }
-        }
-        
-        if (discardThis)
-            continue;
-        
+        inclusionSum = testMatrix;
+        workingImage = image;
         [reducedPartials addObject:partial1];
     }
     
