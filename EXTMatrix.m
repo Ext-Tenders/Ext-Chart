@@ -78,11 +78,13 @@
 // XXX: somehow change the presentation getter to recompute the presentation off
 // of the partial definitions --- but ideally not every time we need to access
 // the presentation, just when it's somehow "dirty"...
+@synthesize characteristic;
 @synthesize height, width;
 @synthesize presentation;
 
 - (instancetype)initWithCoder:(NSCoder *)aDecoder {
     if (self = [super init]) {
+        characteristic = [aDecoder decodeIntForKey:@"characteristic"];
         height = [aDecoder decodeIntForKey:@"height"];
         width = [aDecoder decodeIntForKey:@"width"];
         presentation = [aDecoder decodeObjectForKey:@"presentation"];
@@ -92,6 +94,7 @@
 }
 
 - (void)encodeWithCoder:(NSCoder *)aCoder {
+    [aCoder encodeInt:characteristic forKey:@"characteristic"];
     [aCoder encodeInt:height forKey:@"height"];
     [aCoder encodeInt:width forKey:@"width"];
     [aCoder encodeObject:presentation forKey:@"presentation"];
@@ -103,14 +106,29 @@
     
     EXTMatrix *mat = (EXTMatrix*)object;
     
-    if ((mat.width != self.width) || (mat.height != self.height))
+    if ((mat.width != self.width) ||
+        (mat.height != self.height) ||
+        (mat.characteristic != self.characteristic))
         return false;
     
     for (int i = 0; i < self.width; i++)
-        for (int j = 0; j < self.height; j++)
-            if ([((NSMutableArray*)self.presentation[i])[j] intValue] !=
-                [((NSMutableArray*)mat.presentation[i])[j] intValue])
+        for (int j = 0; j < self.height; j++) {
+            int s = [((NSMutableArray*)self.presentation[i])[j] intValue],
+                m = [((NSMutableArray*)mat.presentation[i])[j] intValue];
+            
+            if (s >= self.characteristic && self.characteristic != 0) {
+                s %= self.characteristic;
+                self.presentation[i][j] = @(s);
+            }
+            
+            if (m >= self.characteristic && self.characteristic != 0) {
+                m %= self.characteristic;
+                mat.presentation[i][j] = @(m);
+            }
+            
+            if (s != m)
                 return false;
+        }
     
     return true;
 }
@@ -123,6 +141,7 @@
     // set the basic properties
     [obj setHeight:newHeight];
     [obj setWidth:newWidth];
+    [obj setCharacteristic:0];
     
     // allocate the matrix
     NSMutableArray *matrix = [NSMutableArray arrayWithCapacity:obj.width];
@@ -142,6 +161,17 @@
 +(EXTMatrix*) hadamardProduct:(EXTMatrix*)left with:(EXTMatrix*)right {
     EXTMatrix *ret = [EXTMatrix matrixWidth:(left.width*right.width)
                                      height:(left.height*right.height)];
+    if (left.characteristic == right.characteristic)
+        ret.characteristic = left.characteristic;
+    else {
+        int a = left.characteristic,
+            b = right.characteristic,
+            gcd = 0;
+        
+        EXTComputeGCD(&a, &b, &gcd, NULL, NULL);
+        
+        ret.characteristic = gcd;
+    }
     
     for (int i = 0; i < left.width; i++) {
         NSMutableArray *leftcol = left.presentation[i];
@@ -150,8 +180,10 @@
                              *retcol = ret.presentation[i*right.width+j];
             for (int k = 0; k < left.height; k++) {
                 for (int l = 0; l < right.height; l++) {
-                    retcol[k*right.height+l] =
-                            @([leftcol[k] intValue] * [rightcol[l] intValue]);
+                    int val = [leftcol[k] intValue] * [rightcol[l] intValue];
+                    if (ret.characteristic != 0)
+                        val %= ret.characteristic;
+                    retcol[k*right.height+l] = @(val);
                 }
             }
         }
@@ -177,6 +209,7 @@
 +(EXTMatrix*) copyTranspose:(EXTMatrix *)input {
     EXTMatrix *ret = [EXTMatrix matrixWidth:input.height
                                      height:input.width];
+    ret.characteristic = input.characteristic;
     
     for (int i = 0; i < [input height]; i++) {
         NSMutableArray *newColumn =
@@ -193,21 +226,25 @@
     return ret;
 }
 
-// replaces all the elements of a matrix with their reductions mod 2
--(void) modularReduction {
+// replaces all the elements of a matrix with their reductions mod char
+-(EXTMatrix*) modularReduction {
+    if (self.characteristic == 0)
+        return self;
+    
     for (int i = 0; i < width; i++) {
         NSMutableArray *column = [presentation objectAtIndex:i];
         
-        for (int j = 0; j < height; j++) {
-            [column setObject:@([[column objectAtIndex:j] intValue] % 2)
-                    atIndexedSubscript:j];
-        }
+        for (int j = 0; j < height; j++)
+            column[j] = @([column[j] intValue] % self.characteristic);
     }
+    
+    return self;
 }
 
 // performs a deep copy of the matrix
 -(EXTMatrix*) copy {
     EXTMatrix *copy = [EXTMatrix matrixWidth:width height:height];
+    copy.characteristic = self.characteristic;
     
     for (int i = 0; i < width; i++)
         for (int j = 0; j < height; j++) {
@@ -252,7 +289,7 @@
         // compute the bezout vector for this row.
         NSMutableArray *bezout =
         [NSMutableArray arrayWithCapacity:rowToBezout.count];
-        NSInteger gcd = [rowToBezout[firstNonzeroEntry] intValue];
+        int gcd = [rowToBezout[firstNonzeroEntry] intValue];
         for (int k = 0; k < firstNonzeroEntry; k++)
             bezout[k] = @0;
         bezout[firstNonzeroEntry] = @1;
@@ -267,41 +304,28 @@
                 continue;
             }
             
-            int rOld = gcd, rNew = [row[index] intValue];
-            int sOld = 1, sNew = 0;
-            int tOld = 0, tNew = 1;
-            int temp, quotient;
-            
-            if (rNew == 0) {
+            if ([row[index] intValue] == 0) {
                 bezout[index] = @0;
                 continue;
             }
             
-            while (rNew != 0) {
-                quotient = rOld / rNew;
-                
-                temp = rNew;
-                rNew = rOld - quotient * rNew;
-                rOld = temp;
-                
-                temp = sNew;
-                sNew = sOld - sNew * quotient;
-                sOld = temp;
-                
-                temp = tNew;
-                tNew = tOld - tNew * quotient;
-                tOld = temp;
-            }
+            int a = gcd,
+                b = [row[index] intValue],
+                newGcd = 0,
+                r = 0,
+                s = 0;
             
-            if (abs(gcd) == abs(rOld)) {
+            EXTComputeGCD(&a, &b, &newGcd, &r, &s);
+            
+            if (abs(gcd) == abs(newGcd)) {
                 bezout[index] = @0;
                 continue;
             }
             
-            gcd = rOld;
-            bezout[index] = @(tOld);
+            gcd = newGcd;
+            bezout[index] = @(s);
             for (NSInteger j = 0; j < index; j++)
-                bezout[j] = @([bezout[j] intValue] * sOld);
+                bezout[j] = @([bezout[j] intValue] * r);
         }
         
         // find the first nonzero entry in this row, right of where we're at
@@ -369,6 +393,9 @@
             }
         }
         
+        // if necessary, put the matrix back in its modular equivalence class.
+        [ret modularReduction];
+        
         rightFactor = [EXTMatrix newMultiply:rightFactor by:rightmostFactor];
     }
     
@@ -388,7 +415,7 @@
     [augmentedMatrix setHeight:(self.height + self.width)];
     
     for (int i = 0; i < self.width; i++) {
-        NSMutableArray *column = [augmentedMatrix.presentation objectAtIndex:i];
+        NSMutableArray *column = augmentedMatrix.presentation[i];
         for (int j = 0; j < self.width; j++) {
             if (i == j)
                 [column addObject:@(1)];
@@ -454,11 +481,20 @@
 
 // returns the product of two matrices.
 +(EXTMatrix*) newMultiply:(EXTMatrix*)left by:(EXTMatrix*)right {
-    EXTMatrix *product = [EXTMatrix matrixWidth:[right width]
-                                         height:[left height]];
-    
     if (left.width != right.height)
         NSLog(@"Mismatched multiplication.");
+    
+    EXTMatrix *product = [EXTMatrix matrixWidth:[right width]
+                                         height:[left height]];
+    {
+        int a = left.characteristic,
+            b = right.characteristic,
+            gcd = 0;
+        
+        EXTComputeGCD(&a, &b, &gcd, NULL, NULL);
+        
+        product.characteristic = gcd;
+    }
     
     for (int k = 0; k < [right width]; k++) {
         NSMutableArray *rightColumn = [[right presentation] objectAtIndex:k],
@@ -467,15 +503,16 @@
             int total = 0;
             
             for (int j = 0; j < [left width]; j++)
-                total += [[rightColumn objectAtIndex:j] intValue] *
-                    [[[left.presentation objectAtIndex:j]
-                      objectAtIndex:i] intValue];
+                total += [rightColumn[j] intValue] *
+                         [left.presentation[j][i] intValue];
             
-            [column setObject:@(total) atIndexedSubscript:i];
+            column[i] = @(total);
         }
         
         [[product presentation] setObject:column atIndexedSubscript:k];
     }
+    
+    [product modularReduction];
     
     return product;
 }
@@ -483,6 +520,7 @@
 // matrix acts on a vector from the left.
 -(NSMutableArray*) actOn:(NSArray *)vector {
     EXTMatrix *tempMatrix = [EXTMatrix matrixWidth:1 height:vector.count];
+    tempMatrix.characteristic = self.characteristic;
     
     [tempMatrix.presentation setObject:[NSMutableArray arrayWithArray:vector]
                     atIndexedSubscript:0];
@@ -521,10 +559,10 @@
     // peel off the inverse from the augmented portion
     // XXX: some kind of error checking would be nice
     EXTMatrix *ret = [EXTMatrix matrixWidth:self.width height:self.width];
+    ret.characteristic = self.characteristic;
     for (int i = 0; i < self.width; i++) {
         ret.presentation[i] = unflip.presentation[self.width+i];
     }
-    
     
     return ret;
 }
@@ -557,6 +595,14 @@
         return @[[EXTMatrix matrixWidth:sourceDimension height:targetDimension],
                  [NSMutableArray array]];
     
+    // then, get a characteristic
+    int characteristic =
+           ((EXTPartialDefinition*)partialDefinitions[0]).action.characteristic;
+    for (EXTPartialDefinition *partial in partialDefinitions)
+        if (characteristic != partial.action.characteristic ||
+            characteristic != partial.inclusion.characteristic)
+            EXTLog(@"Inequal characteristics in presentation assembly.");
+    
     // we first need to assemble all the inclusion image vectors into one
     // massive array.
     NSMutableArray *imageVectors = [NSMutableArray array], // array of vectors
@@ -577,6 +623,7 @@
     // minimal spanning set for their image.
     EXTMatrix *enormousMat = [EXTMatrix matrixWidth:imageVectors.count
                                              height:sourceDimension];
+    enormousMat.characteristic = characteristic;
     enormousMat.presentation = imageVectors;
     enormousMat = [enormousMat columnReduce];
     
@@ -585,8 +632,8 @@
     // calculations.  if they aren't of full rank, we can use this to see that
     // and bail if necessary.
     NSMutableArray *minimalVectors = [NSMutableArray array],
-    *minimalParents = [NSMutableArray array],
-    *minimalIndices = [NSMutableArray array];
+                   *minimalParents = [NSMutableArray array],
+                   *minimalIndices = [NSMutableArray array];
     
     for (int i = 0; i < enormousMat.width; i++) {
         bool isEmpty = true;
@@ -595,7 +642,7 @@
             if ([enormousMat.presentation[i][j] intValue] != 0)
                 isEmpty = false;
         
-        // if this vector is inessential, it will have been eliminated by rcef.
+        // if this vector is inessential, it will have been eliminated by cef.
         if (isEmpty)
             continue;
         
@@ -627,6 +674,7 @@
     EXTMatrix *augmentedMat =
         [EXTMatrix matrixWidth:augmentedVectors.count height:sourceDimension];
     augmentedMat.presentation = augmentedVectors;
+    augmentedMat.characteristic = characteristic;
     EXTMatrix *reducedMat = [augmentedMat columnReduce];
     NSMutableArray *reducedVectors = reducedMat.presentation;
     
@@ -642,36 +690,38 @@
             [minimalVectors addObject:augmentedVectors[i]];
     }
     
-    if (minimalVectors.count == 0)
-        return @[[EXTMatrix matrixWidth:sourceDimension height:targetDimension],
-                 [NSMutableArray array]];
+    if (minimalVectors.count == 0) {
+        EXTMatrix *ret = [EXTMatrix matrixWidth:sourceDimension height:targetDimension];
+        ret.characteristic = characteristic;
+        return @[ret, [NSMutableArray array]];
+    }
     
     // and so here's our basis matrix.
     EXTMatrix *basisMatrix =
         [EXTMatrix matrixWidth:minimalVectors.count
                         height:[minimalVectors[0] count]];
+    basisMatrix.characteristic = characteristic;
     basisMatrix.presentation = minimalVectors;
     
     // now, we construct a matrix presenting the differential in this basis.
     // this is where the partial definitions actually get used.
     EXTMatrix *differentialInCoordinates =
             [EXTMatrix matrixWidth:basisMatrix.width height:targetDimension];
+    differentialInCoordinates.characteristic = characteristic;
     for (int i = 0; i < basisMatrix.width; i++) {
         // if we're in the range of partially determined stuff, use the def'ns
         if (i < minimalParents.count) {
             EXTPartialDefinition *pdiffl =
-                [partialDefinitions
-                    objectAtIndex:[[minimalParents objectAtIndex:i] intValue]];
+                partialDefinitions[[minimalParents[i] intValue]];
             EXTMatrix *diffl = [pdiffl action];
             differentialInCoordinates.presentation[i] =
-                [[diffl presentation]
-                    objectAtIndex:[[minimalIndices objectAtIndex:i] intValue]];
+                diffl.presentation[[minimalIndices[i] intValue]];
         } else {
             // otherwise, extend by zero.
             NSMutableArray *workingColumn = [NSMutableArray array];
             
             for (int j = 0; j < targetDimension; j++)
-                [workingColumn setObject:@0 atIndexedSubscript:j];
+                workingColumn[j] = @0;
             
             differentialInCoordinates.presentation[i] = workingColumn;
         }
@@ -704,6 +754,8 @@
         for (int j = 0; j < col.count; j++)
             col[j] = @(scalar * [col[j] intValue]);
     }
+    
+    [ret modularReduction];
     
     return ret;
 }
@@ -744,7 +796,12 @@
 }
 
 +(EXTMatrix*) sum:(EXTMatrix*)a with:(EXTMatrix*)b {
-    EXTMatrix *ret = [EXTMatrix matrixWidth:a.width height:b.height];
+    if ((a.height != b.height) || (a.width != b.width) ||
+        (a.characteristic != b.characteristic))
+        return nil;
+    
+    EXTMatrix *ret = [EXTMatrix matrixWidth:a.width height:a.height];
+    ret.characteristic = a.characteristic;
     
     for (int i = 0; i < a.width; i++) {
         NSMutableArray *acol = a.presentation[i],

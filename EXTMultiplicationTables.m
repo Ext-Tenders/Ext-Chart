@@ -308,6 +308,8 @@
         allZero.inclusion = [EXTMatrix identity:sumterm.size];
         allZero.action = [EXTMatrix matrixWidth:sumterm.size
                                                height:targetterm.size];
+        allZero.inclusion.characteristic = self.sSeq.defaultCharacteristic;
+        allZero.action.characteristic = self.sSeq.defaultCharacteristic;
         [dsum.partialDefinitions addObject:allZero];
     } else if (d1Zero && !d2Zero) {
         for (EXTPartialDefinition *partial2 in d2.partialDefinitions) {

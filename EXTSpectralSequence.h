@@ -24,6 +24,7 @@
 @property(nonatomic, assign, readonly) Class<EXTLocation> indexClass;
 @property(nonatomic, strong) EXTLocationToPoint *locConvertor;
 @property(nonatomic, strong) NSMutableArray *zeroRanges;
+@property(assign) int defaultCharacteristic;
 
 -(EXTSpectralSequence*) initWithIndexingClass:(Class<EXTLocation>)locClass;
 +(EXTSpectralSequence*) sSeqWithIndexingClass:(Class<EXTLocation>)locClass;

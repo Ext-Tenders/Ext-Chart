@@ -99,3 +99,38 @@ static inline EXTIntPoint EXTIntUpperRightPointOfRect(EXTIntRect rect) {
 static inline bool EXTIntersectsIntRects(EXTIntRect rect1, EXTIntRect rect2) {
     return EXTIntPointInRect(rect1.origin, rect2) || EXTIntPointInRect(rect2.origin, rect1);
 }
+
+#pragma mark - math routines
+
+/* compute GCDs of things */
+static inline void EXTComputeGCD(int *a, int *b, int *gcd, int *s, int *t) {
+    int rOld = *a, rNew = *b;
+    int sOld = 1, sNew = 0;
+    int tOld = 0, tNew = 1;
+    int temp, quotient;
+    
+    while (rNew != 0) {
+        quotient = rOld / rNew;
+        
+        temp = rNew;
+        rNew = rOld - quotient * rNew;
+        rOld = temp;
+        
+        temp = sNew;
+        sNew = sOld - sNew * quotient;
+        sOld = temp;
+        
+        temp = tNew;
+        tNew = tOld - tNew * quotient;
+        tOld = temp;
+    }
+    
+    if (gcd)
+        *gcd = rOld;
+    if (s)
+        *s = sOld;
+    if (t)
+        *t = tOld;
+    
+    return;
+}

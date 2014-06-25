@@ -17,11 +17,13 @@
 @implementation EXTSpectralSequence
 
 @synthesize terms, differentials, multTables, indexClass, zeroRanges,
-            locConvertor;
+            locConvertor, defaultCharacteristic;
 
 - (instancetype)initWithCoder:(NSCoder *)aDecoder {
     if (self = [super init]) {
         terms = [aDecoder decodeObjectForKey:@"terms"];
+        defaultCharacteristic =
+                        [aDecoder decodeIntegerForKey:@"defaultCharacteristic"];
         
         differentials = [aDecoder decodeObjectForKey:@"differentials"];
         for (NSDictionary *page in differentials)
@@ -61,6 +63,7 @@
 
 - (void)encodeWithCoder:(NSCoder *)aCoder {
     [aCoder encodeObject:terms forKey:@"terms"];
+    [aCoder encodeInt:defaultCharacteristic forKey:@"defaultCharacteristic"];
     [aCoder encodeObject:differentials forKey:@"differentials"];
     [aCoder encodeObject:multTables forKey:@"multTables"];
     [aCoder encodeObject:zeroRanges forKey:@"zeroRanges"];
@@ -79,6 +82,7 @@
 
 -(EXTSpectralSequence*) initWithIndexingClass:(Class<EXTLocation>)locClass {
     if (self = [super init]) {
+        defaultCharacteristic = 0;
         terms = [NSMutableDictionary dictionary];
         differentials = [NSMutableArray array];
         differentials[0] = [NSMutableDictionary dictionary];
@@ -103,6 +107,7 @@
     self = [super init];
     
     // and allocate the internal parts of things
+    defaultCharacteristic = 0;
     terms = [NSMutableDictionary dictionary];
     differentials = [NSMutableArray array];
     differentials[0] = [NSMutableDictionary dictionary];
@@ -139,6 +144,15 @@
 -(EXTSpectralSequence*) tensorWithSSeq:(EXTSpectralSequence *)p {
     // what we'll eventually be returning.
     EXTSpectralSequence *ret = [EXTSpectralSequence sSeqWithIndexingClass:self.indexClass];
+    {
+        int a = self.defaultCharacteristic,
+            b = p.defaultCharacteristic,
+            gcd = 0;
+        
+        EXTComputeGCD(&a, &b, &gcd, NULL, NULL);
+        
+        ret.defaultCharacteristic = gcd;
+    }
 
     NSMutableArray *tensorTerms = [NSMutableArray array];
     
@@ -261,6 +275,8 @@
                 EXTPartialDefinition *newPartial = [EXTPartialDefinition new];
                 EXTMatrix *ix1 = [EXTMatrix hadamardProduct:partial.inclusion with:idP];
                 EXTMatrix *dx1 = [EXTMatrix hadamardProduct:partial.action with:idP];
+                ix1.characteristic = ret.defaultCharacteristic;
+                dx1.characteristic = ret.defaultCharacteristic;
                 newPartial.inclusion = [EXTMatrix newMultiply:i1 by:ix1];
                 newPartial.action = [EXTMatrix newMultiply:i2 by:dx1];
                 partial.description = [NSString stringWithFormat:@"Tensored up from %@ (x) %@",d1.start.location,P.location];
@@ -330,6 +346,8 @@
                 EXTPartialDefinition *newPartial = [EXTPartialDefinition new];
                 EXTMatrix *ix1 = [EXTMatrix hadamardProduct:idA with:partial.inclusion];
                 EXTMatrix *dx1 = [EXTMatrix hadamardProduct:idA with:partial.action];
+                ix1.characteristic = ret.defaultCharacteristic;
+                dx1.characteristic = ret.defaultCharacteristic;
                 newPartial.inclusion = [EXTMatrix newMultiply:i1 by:ix1];
                 newPartial.action = [EXTMatrix newMultiply:i2 by:dx1];
                 partial.description = [NSString stringWithFormat:@"Tensored up from %@ (x) %@",A.location,d2.start.location];

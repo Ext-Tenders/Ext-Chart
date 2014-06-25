@@ -81,7 +81,11 @@
 @implementation EXTMaySpectralSequence
 
 -(instancetype) init {
-    return self = [super initWithIndexingClass:[EXTTriple class]];
+    if (self = [super initWithIndexingClass:[EXTTriple class]]) {
+        self.defaultCharacteristic = 2;
+    }
+    
+    return self;
 }
 
 // returns a pair {NSArray *vector, EXTTerm *term}
@@ -371,8 +375,10 @@
     EXTPartialDefinition *partial = [EXTPartialDefinition new];
     partial.inclusion = [EXTMatrix matrixWidth:1 height:startSquare.count];
     partial.inclusion.presentation[0] = startSquare;
+    partial.inclusion.characteristic = 2;
     partial.action = [EXTMatrix matrixWidth:1 height:endSquare.count];
     partial.action.presentation[0] = endSquare;
+    partial.action.characteristic = 2;
     partial.description = [NSString stringWithFormat:@"Nakamura's lemma applied along Sq^%d on E_%d^%@", order, page, location];
     [diff.partialDefinitions addObject:partial];
 
@@ -442,6 +448,8 @@
         EXTPartialDefinition *partial = [EXTPartialDefinition new];
         partial.inclusion = [EXTMatrix identity:1];
         partial.action = [EXTMatrix matrixWidth:1 height:target.size];
+        partial.inclusion.characteristic = 2;
+        partial.action.characteristic = 2;
         
         // the formula for the May d_1 comes straight from the Steenrod
         // diagonal: d_1 h_{i,j} = sum_{k=1}^{i-1} h_{k,i-k+j} h_{i-k,j}

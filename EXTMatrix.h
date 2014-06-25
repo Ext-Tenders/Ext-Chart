@@ -30,13 +30,12 @@
 
 @end
 
-
-
 @interface EXTMatrix : NSObject <NSCoding> {
     NSUInteger height, width;
     NSMutableArray *presentation;
 }
 
+@property(assign) NSUInteger characteristic;
 @property(assign) NSUInteger height, width;
 @property(strong) NSMutableArray *presentation;
 
@@ -55,7 +54,7 @@
 +(EXTMatrix*) identity:(int)width;
 -(EXTMatrix*) invert;
 -(EXTMatrix*) columnReduce;
--(void) modularReduction;
+-(EXTMatrix*) modularReduction;
 -(NSMutableArray*) kernel;
 -(NSMutableArray*) image;
 -(NSMutableArray*) actOn:(NSArray*)vector;

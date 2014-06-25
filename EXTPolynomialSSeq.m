@@ -189,6 +189,7 @@
                     [EXTSpectralSequence sSeqWithIndexingClass:self.indexClass];
     ret.multTables.unitTerm =
         [self findTerm:[self.indexClass identityLocation]];
+    ret.defaultCharacteristic = self.defaultCharacteristic;
     
     // for the most part, we're already tracking the structure of a general sseq
     ret.terms = self.terms;
@@ -196,7 +197,7 @@
     
     // the zero ranges can mostly be copied over, except for EXTZeroRangeStrict,
     // which is chained to the parent spectral sequence.  so, we make a special
-    // except for that class.  ideally this would be 
+    // exception for that class.  ideally this would be
     ret.zeroRanges = [NSMutableArray arrayWithCapacity:self.zeroRanges.count];
     for (EXTZeroRange *zeroRange in self.zeroRanges) {
         EXTZeroRange *newZeroRange = nil;
@@ -383,6 +384,7 @@
     
     EXTMatrix *ret = [EXTMatrix matrixWidth:(left.size*right.size)
                                      height:target.size];
+    ret.characteristic = self.defaultCharacteristic;
     
     for (int i = 0; i < left.size; i++)
     for (int j = 0; j < right.size; j++) {
@@ -443,6 +445,8 @@
         allZero.inclusion = [EXTMatrix identity:sumterm.size];
         allZero.action = [EXTMatrix matrixWidth:sumterm.size
                                                height:targetterm.size];
+        allZero.inclusion.characteristic = self.defaultCharacteristic;
+        allZero.action.characteristic = self.defaultCharacteristic;
         allZero.description =
             [NSString stringWithFormat:@"Leibniz rule on %@ and %@",loc1,loc2];
         [dsum.partialDefinitions addObject:allZero];
@@ -592,8 +596,7 @@
         EXTMatrix *inclusion = [EXTMatrix matrixWidth:indexList.count
                                                height:term.size];
         for (int index = 0; index < indexList.count; index++)
-            [inclusion.presentation[index] setObject:@1
-                                           atIndex:[indexList[index] intValue]];
+            inclusion.presentation[index][[indexList[index] intValue]] = @1;
         
         for (int page = 0; page < self.differentials.count; page++) {
             EXTDifferential *outgoing = [self findDifflWithSource:term.location
