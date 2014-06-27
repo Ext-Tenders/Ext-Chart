@@ -113,7 +113,7 @@
     // differential d2 b30 = h12^2 h21 + h13 h20^2 + h21^2 h11 + h22 h10^2.
     // however, the outer two terms are of lower May filtration than the middle
     // two, and so we project to the higher nonzero May filtration degree to get
-    // just d2 b30 = h13 h20^2 + h21^2 h11.
+    // just d2 b30 = h13 h20^2 + h21^2 h11.1
     
     EXTTerm *startTerm = [self findTerm:location],
             *endTerm = nil;
@@ -242,15 +242,28 @@
     int activeMayFiltration = -1;
     NSMutableDictionary *strippedOutputTerms = [NSMutableDictionary new];
     for (EXTPolynomialTag *factor in allOutputTerms.allKeys) {
-        int mayFiltration = 0;
+        int a = 0, b = 0, mayFiltration = 0;
         
         // i got this convention from 3.2.3 in the green book. might not be
         // consistent but i don't think that will get in the way. this is a
         // highly localized calculation.
-        for (EXTMayTag *subfactor in factor.tags)
-            mayFiltration += 2*subfactor.i - 1;
+        for (EXTMayTag *subfactor in factor.tags) {
+            int power = [factor.tags[subfactor] intValue];
+            a += 1*power;
+            b += power*((1 << subfactor.j)*((1<<subfactor.i)-1));
+            mayFiltration += power*subfactor.i;
+        }
         
         if (mayFiltration > activeMayFiltration) {
+            // first make sure we're not poking into empty space.
+            EXTTerm *term = [self findTerm:[EXTTriple tripleWithA:a B:b C:mayFiltration]];
+            if (!term)
+                continue;
+            
+            // then also check that this summand has survived to this location
+            if ([term.names indexOfObject:factor] == NSNotFound)
+                continue;
+            
             strippedOutputTerms = [NSMutableDictionary new];
             activeMayFiltration = mayFiltration;
         }
