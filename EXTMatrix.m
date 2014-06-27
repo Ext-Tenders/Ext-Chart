@@ -329,20 +329,25 @@
         }
         
         // find the first nonzero entry in this row, right of where we're at
+        int highStrikerValue = 0, highStrikerKey = width;
         for (j = 0; j < width; j++) {
             if ([usedColumns[j] intValue])
                 continue;
-            if (0 != [bezout[j] intValue])
-                break;
+            if (0 != [bezout[j] intValue]) {
+                if (abs([row[j] intValue]) > highStrikerValue) {
+                    highStrikerKey = j;
+                    highStrikerValue = abs([row[j] intValue]);
+                }
+            }
         }
         
         // if we found a nonzero entry, then this is the new pivot column.
         // if we didn't, then we should skip this row entirely.
-        if (j == width)
+        if (highStrikerKey == width)
             continue;
         else {
-            pivotColumn = j;
-            usedColumns[j] = @(true);
+            pivotColumn = highStrikerKey;
+            usedColumns[highStrikerKey] = @(true);
         }
         
         // if we've made it here, then we have a new pivot location, and we're
@@ -646,157 +651,6 @@
     
     return difflInCoordinates;
 }
-/*
-+(EXTMatrix*) assemblePresentation:(NSMutableArray*)partialDefinitions
-                   sourceDimension:(int)sourceDimension
-                   targetDimension:(int)targetDimension {
-    // first, make sure we're not going to bomb.
-    if (partialDefinitions.count == 0)
-        return [EXTMatrix matrixWidth:sourceDimension height:targetDimension];
-    
-    // then, get a characteristic
-    int characteristic =
-           ((EXTPartialDefinition*)partialDefinitions[0]).action.characteristic;
-    for (EXTPartialDefinition *partial in partialDefinitions)
-        if (characteristic != partial.action.characteristic ||
-            characteristic != partial.inclusion.characteristic)
-            EXTLog(@"Inequal characteristics in presentation assembly.");
-    
-    // we first need to assemble all the inclusion image vectors into one
-    // massive array.
-    NSMutableArray *imageVectors = [NSMutableArray array], // array of vectors
-        *imageParents = [NSMutableArray array], // def'n indices they belong to
-        *imageIndices = [NSMutableArray array]; // column indices they belong to
-    
-    for (int i = 0; i < partialDefinitions.count; i++) {
-        EXTPartialDefinition *workingPartial = partialDefinitions[i];
-        NSMutableArray *workingVectors = workingPartial.inclusion.presentation;
-        for (int j = 0; j < workingVectors.count; j++) {
-            [imageVectors addObject:workingVectors[j]];
-            [imageParents addObject:@(i)];
-            [imageIndices addObject:@(j)];
-        }
-    }
-    
-    // the point of doing that was to perform column reduction and find a
-    // minimal spanning set for their image.
-    EXTMatrix *enormousMat = [EXTMatrix matrixWidth:imageVectors.count
-                                             height:sourceDimension];
-    enormousMat.characteristic = characteristic;
-    enormousMat.presentation = imageVectors;
-    enormousMat = [enormousMat columnReduce];
-    
-    // from this, let's extract a *minimal* generating set for the image.  if
-    // the inclusions are jointly of full rank, we'll need this for later
-    // calculations.  if they aren't of full rank, we can use this to see that
-    // and bail if necessary.
-    NSMutableArray *minimalVectors = [NSMutableArray array],
-                   *minimalParents = [NSMutableArray array],
-                   *minimalIndices = [NSMutableArray array];
-    
-    for (int i = 0; i < enormousMat.width; i++) {
-        bool isEmpty = true;
-        
-        for (int j = 0; j < enormousMat.height; j++)
-            if ([enormousMat.presentation[i][j] intValue] != 0)
-                isEmpty = false;
-        
-        // if this vector is inessential, it will have been eliminated by cef.
-        if (isEmpty)
-            continue;
-        
-        // if it's essential, we should add it. :)
-        [minimalVectors addObject:imageVectors[i]];
-        [minimalParents addObject:imageParents[i]];
-        [minimalIndices addObject:imageIndices[i]];
-    }
-    
-    // we want to extend this basis of the cycle groups to a basis of the entire
-    // E_1 term.  start by augmenting to a matrix containing a definite surplus
-    // of basis vectors.
-    NSMutableArray *augmentedVectors =
-                                [NSMutableArray arrayWithArray:minimalVectors];
-    for (int i = 0; i < sourceDimension; i++) {
-        NSMutableArray *en = [NSMutableArray array];
-        for (int j = 0; j < sourceDimension; j++) {
-            if (i == j) {
-                [en addObject:@1];
-            } else {
-                [en addObject:@0];
-            }
-        }
-        
-        [augmentedVectors addObject:en];
-    }
-    
-    // then, column reduce it.  the vectors that survive will be our full basis.
-    EXTMatrix *augmentedMat =
-        [EXTMatrix matrixWidth:augmentedVectors.count height:sourceDimension];
-    augmentedMat.presentation = augmentedVectors;
-    augmentedMat.characteristic = characteristic;
-    EXTMatrix *reducedMat = [augmentedMat columnReduce];
-    NSMutableArray *reducedVectors = reducedMat.presentation;
-    
-    // having reduced it, we pull out the basis vectors we needed for extension
-    for (int i = minimalVectors.count; i < reducedVectors.count; i++) {
-        bool needThisOne = false;
-        for (int j = 0; j < [reducedVectors[i] count]; j++) {
-            if (![[reducedVectors[i] objectAtIndex:j] isEqual:@0])
-                needThisOne = true;
-        }
-        
-        if (needThisOne)
-            [minimalVectors addObject:augmentedVectors[i]];
-    }
-    
-    if (minimalVectors.count == 0) {
-        EXTMatrix *ret = [EXTMatrix matrixWidth:sourceDimension height:targetDimension];
-        ret.characteristic = characteristic;
-        return ret;
-    }
-    
-    // and so here's our basis matrix.
-    EXTMatrix *basisMatrix =
-        [EXTMatrix matrixWidth:minimalVectors.count
-                        height:[minimalVectors[0] count]];
-    basisMatrix.characteristic = characteristic;
-    basisMatrix.presentation = minimalVectors;
-    
-    // now, we construct a matrix presenting the differential in this basis.
-    // this is where the partial definitions actually get used.
-    EXTMatrix *differentialInCoordinates =
-            [EXTMatrix matrixWidth:basisMatrix.width height:targetDimension];
-    differentialInCoordinates.characteristic = characteristic;
-    for (int i = 0; i < basisMatrix.width; i++) {
-        // if we're in the range of partially determined stuff, use the def'ns
-        if (i < minimalParents.count) {
-            EXTPartialDefinition *pdiffl =
-                partialDefinitions[[minimalParents[i] intValue]];
-            EXTMatrix *diffl = [pdiffl action];
-            differentialInCoordinates.presentation[i] =
-                diffl.presentation[[minimalIndices[i] intValue]];
-        } else {
-            // otherwise, extend by zero.
-            NSMutableArray *workingColumn = [NSMutableArray array];
-            
-            for (int j = 0; j < targetDimension; j++)
-                workingColumn[j] = @0;
-            
-            differentialInCoordinates.presentation[i] = workingColumn;
-        }
-    }
-    
-    // finally, we need to put these matrices together to build a presentation
-    // of the differential in the standard basis.  this is simple: just invert
-    // and multiply. :)
-    EXTMatrix *basisConversion = [basisMatrix invert];
-    EXTMatrix *stdDifferential =
-        [EXTMatrix newMultiply:differentialInCoordinates by:basisConversion];
-    
-    // finally, all our hard work done, we jump back.
-    return stdDifferential;
-}
- */
 
 // returns a scaled matrix
 -(EXTMatrix*) scale:(int)scalar {

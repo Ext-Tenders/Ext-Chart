@@ -113,7 +113,10 @@
     // differential d2 b30 = h12^2 h21 + h13 h20^2 + h21^2 h11 + h22 h10^2.
     // however, the outer two terms are of lower May filtration than the middle
     // two, and so we project to the higher nonzero May filtration degree to get
-    // just d2 b30 = h13 h20^2 + h21^2 h11.1
+    // just d2 b30 = h13 h20^2 + h21^2 h11.  of course, we should *also* only
+    // project away to higher filtration classes that actually exist.  for the
+    // A(2) May SS, this means that d2 b30 = h12^2 h21, since the other classes
+    // have all been deleted by the A --> A(2) quotient.
     
     EXTTerm *startTerm = [self findTerm:location],
             *endTerm = nil;

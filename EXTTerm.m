@@ -210,7 +210,11 @@
 
 -(void) updateDataForPage:(int)whichPage
                    inSSeq:(EXTSpectralSequence*)sSeq
-         inCharacteristic:(int)characteristic {    
+         inCharacteristic:(int)characteristic {
+    if ([self.location isEqual:[EXTPair pairWithA:20 B:0]] &&
+        whichPage == 4)
+        NSLog(@"pay attention.");
+    
     [self computeCycles:whichPage sSeq:sSeq];
     [self computeBoundaries:whichPage sSeq:sSeq];
     
