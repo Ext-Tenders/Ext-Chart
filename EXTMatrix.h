@@ -71,7 +71,4 @@
 
 +(NSDictionary*) findOrdersOf:(EXTMatrix*)B in:(EXTMatrix*)Z;
 
-// debug operations
--(void) log;
-
 @end

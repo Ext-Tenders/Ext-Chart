@@ -157,12 +157,19 @@
     EXTMatrix *left =
         [EXTMatrix matrixWidth:boundariesArray.count
                         height:differential.end.size];
-    left.presentation = boundariesArray;
+    left.presentation = (NSMutableArray*)boundariesArray;
     EXTMatrix *incomingCycles =
                     [EXTMatrix matrixWidth:((NSArray*)cycles[whichPage-1]).count
                                     height:self.size];
     incomingCycles.presentation = cycles[whichPage-1];
     EXTMatrix *right = differential.presentation;
+    
+    // if there's something to match the characteristic by, then do it
+    if (differential.partialDefinitions.count > 0) {
+        EXTPartialDefinition *firstP = differential.partialDefinitions[0];
+        left.characteristic = firstP.inclusion.characteristic;
+        right.characteristic = firstP.action.characteristic;
+    }
     
     // this is the span B^{r-1}_{s, t} <-- S --> Z^{r-1}_{s+1, t-r+2}.
     NSArray *span = [EXTMatrix formIntersection:left with:right];

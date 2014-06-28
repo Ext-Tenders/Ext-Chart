@@ -632,7 +632,7 @@
     
     // we find those columns of the form [ej; stuff], and extract the 'stuff'
     // from this column. this is our differential.
-    EXTMatrix *difflInCoordinates = [EXTMatrix matrixWidth:0 height:targetDimension];
+    EXTMatrix *difflInCoordinates = [EXTMatrix matrixWidth:sourceDimension height:targetDimension];
     for (int i = 0; i < reducedMatrix.width; i++) {
         int pivotRow = -1;
         NSArray *column = reducedMatrix.presentation[i];
@@ -644,9 +644,8 @@
             continue;
         
         // extracts the stuff.
-        [difflInCoordinates.presentation addObject:[NSMutableArray arrayWithArray:[column subarrayWithRange:NSMakeRange(sourceDimension, targetDimension)]]];
+        difflInCoordinates.presentation[pivotRow] = [NSMutableArray arrayWithArray:[column subarrayWithRange:NSMakeRange(sourceDimension, targetDimension)]];
     }
-    difflInCoordinates.width = sourceDimension;
     difflInCoordinates.characteristic = characteristic;
     
     return difflInCoordinates;
@@ -678,6 +677,7 @@
                                      height:left.height];
     sum.presentation = [NSMutableArray arrayWithArray:left.presentation];
     [sum.presentation addObjectsFromArray:[right scale:(-1)].presentation];
+    sum.characteristic = left.characteristic;
     
     // the nullspace of [P, -Q] is a vertical sum [I; J] of the two inclusions
     // we want, since the nullspace of P (+) -Q are the pairs (x; y) such that
@@ -727,7 +727,8 @@
 }
 
 // debug routine to dump the matrix to the console.
--(void) log {
+-(NSString*) description {
+    NSString *ret = @"(";
     for (int i = 0; i < width; i++) {
         NSString *output = @"";
         
@@ -736,8 +737,10 @@
                       [[presentation objectAtIndex:i] objectAtIndex:j]];
         }
         
-        NSLog(@"%@", output);
+        ret = [NSString stringWithFormat:@"%@| %@|",ret, output];
     }
+    
+    return [NSString stringWithFormat:@"%@]",ret];
 }
 
 // here we have a pair of inclusions B --> C <-- Z, with the implicit assumption
