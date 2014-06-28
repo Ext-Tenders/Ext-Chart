@@ -592,7 +592,7 @@
     for (EXTPartialDefinition *partial in partialDefinitions)
         if (characteristic != partial.action.characteristic ||
             characteristic != partial.inclusion.characteristic) {
-            EXTLog(@"Inequal characteristics in presentation assembly.");
+            EXTLog(@"Unequal characteristics in presentation assembly.");
         }
     
     int totalWidth = 0;
@@ -742,12 +742,16 @@
 
 // here we have a pair of inclusions B --> C <-- Z, with the implicit assumption
 // that B --> C factors through B --> Z --> C.  we find a presentation of the
-// quotient Z/B in the sequence B --> Z --> Z/B.
+// quotient Z/B in the sequence B --> Z --> Z/B in terms of the classification
+// theorem for finitely generated modules over a Euclidean domain.
 +(NSDictionary*) findOrdersOf:(EXTMatrix*)B in:(EXTMatrix*)Z {
     // start by forming the pullback square.
     NSArray *pair = [EXTMatrix formIntersection:Z with:B];
     EXTMatrix *left = pair[0], *right = pair[1];
     EXTMatrix *invertedRight = [right invert];
+    
+    if (!invertedRight)
+        NSLog(@"B does not live in Z.");
     
     // since im Z >= im B and both are full rank, the map P --> B is invertible
     // and B --> P --> Z expresses B as a subspace of Z.

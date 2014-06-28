@@ -93,7 +93,59 @@ static void *_EXTPresentationParametersContext = &_EXTPresentationParametersCont
 // this routine assembles from the available partial definitions of the
 // differential a single definition on the cycle group.  it's a bit convoluted.
 -(void) assemblePresentation {
-    _presentation = [EXTMatrix assemblePresentation:partialDefinitions sourceDimension:start.size targetDimension:end.size];
+    NSMutableArray *cycles, *boundaries,
+                   *newPartials = [NSMutableArray array];
+    int characteristic = 0;
+    
+    if (start.cycles.count > page)
+        cycles = start.cycles[page];
+    else
+        cycles = [EXTMatrix identity:start.size].presentation;
+    
+    if (start.boundaries.count > page)
+        boundaries = start.boundaries[page];
+    else
+        boundaries = [NSMutableArray array];
+    
+    EXTMatrix *cycleMatrix = [EXTMatrix matrixWidth:cycles.count
+                                             height:start.size];
+    cycleMatrix.presentation = cycles;
+    
+    for (EXTPartialDefinition *partial in partialDefinitions) {
+        characteristic = partial.inclusion.characteristic;
+        cycleMatrix.characteristic = partial.inclusion.characteristic;
+        NSArray *pair = [EXTMatrix formIntersection:cycleMatrix
+                                               with:partial.inclusion];
+        EXTPartialDefinition *newPartial = [EXTPartialDefinition new];
+        newPartial.inclusion = pair[0];
+        newPartial.inclusion.characteristic = partial.inclusion.characteristic;
+        newPartial.action = [EXTMatrix newMultiply:partial.action by:pair[1]];
+        newPartial.action.characteristic = partial.action.characteristic;
+        newPartial.description = partial.description;
+        [newPartials addObject:newPartial];
+    }
+    
+    EXTPartialDefinition *boundaryPartial = [EXTPartialDefinition new];
+    EXTMatrix *boundaryMatrix = [EXTMatrix matrixWidth:boundaries.count
+                                                height:start.size];
+    boundaryMatrix.presentation = boundaries;
+    EXTMatrix *boundariesInCycleCoords =
+                [EXTMatrix formIntersection:boundaryMatrix with:cycleMatrix][1];
+    boundaryPartial.inclusion = boundariesInCycleCoords;
+    boundaryPartial.action = [EXTMatrix matrixWidth:boundaryMatrix.width
+                                             height:end.size];
+    boundaryPartial.inclusion.characteristic = characteristic;
+    boundaryPartial.action.characteristic = characteristic;
+    boundaryPartial.description = @"differential is null on boundaries";
+    [newPartials addObject:boundaryPartial];
+    
+    _presentation = [EXTMatrix assemblePresentation:newPartials
+                                    sourceDimension:cycles.count
+                                    targetDimension:end.size];
+    
+    if (_presentation.height != end.size ||
+        _presentation.width != cycles.count)
+        NSLog(@"strange assembly dimensions.");
     
     return;
 }

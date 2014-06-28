@@ -153,11 +153,16 @@
     // are the elements of Z^r_{s+1, t-r+2} which we want.  following the
     // composite Z^r_{s+1, t-r+2} --> Z^{r-1}_{s+1, t-r+2} --> E^1_{s+1, t-r+2}
     // gives the cycle matrix in the form we've been expecting it.
-    EXTMatrix *left = [EXTMatrix matrixWidth:[[differential.end.boundaries objectAtIndex:(whichPage-1)] count] height:differential.end.size];
-    left.presentation = [differential.end.boundaries objectAtIndex:(whichPage-1)];
-    EXTMatrix *incomingCycles = [EXTMatrix matrixWidth:[cycles[whichPage-1] count] height:self.size];
+    NSArray *boundariesArray = differential.end.boundaries[(whichPage-1)];
+    EXTMatrix *left =
+        [EXTMatrix matrixWidth:boundariesArray.count
+                        height:differential.end.size];
+    left.presentation = boundariesArray;
+    EXTMatrix *incomingCycles =
+                    [EXTMatrix matrixWidth:((NSArray*)cycles[whichPage-1]).count
+                                    height:self.size];
     incomingCycles.presentation = cycles[whichPage-1];
-    EXTMatrix *right = [EXTMatrix newMultiply:differential.presentation by:incomingCycles];
+    EXTMatrix *right = differential.presentation;
     
     // this is the span B^{r-1}_{s, t} <-- S --> Z^{r-1}_{s+1, t-r+2}.
     NSArray *span = [EXTMatrix formIntersection:left with:right];
@@ -167,7 +172,7 @@
     EXTMatrix *cycleComposite = [EXTMatrix newMultiply:incomingCycles by:span[1]];
     
     // store it to the cycles list
-    [cycles setObject:cycleComposite.presentation atIndexedSubscript:whichPage];
+    cycles[whichPage] = cycleComposite.presentation;
         
     return;
 }
@@ -211,10 +216,6 @@
 -(void) updateDataForPage:(int)whichPage
                    inSSeq:(EXTSpectralSequence*)sSeq
          inCharacteristic:(int)characteristic {
-    if ([self.location isEqual:[EXTPair pairWithA:20 B:0]] &&
-        whichPage == 4)
-        NSLog(@"pay attention.");
-    
     [self computeCycles:whichPage sSeq:sSeq];
     [self computeBoundaries:whichPage sSeq:sSeq];
     

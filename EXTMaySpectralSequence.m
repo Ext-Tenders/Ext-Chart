@@ -338,11 +338,13 @@
     // partial differentials!  (+) all the inclusion matrices together and take
     // a pullback to see if it's nonzero.
     EXTMatrix *bigInclusion = [EXTMatrix matrixWidth:0 height:underlyingDiff.start.names.count];
+    bigInclusion.characteristic = 2;
     for (EXTPartialDefinition *partial in underlyingDiff.partialDefinitions) {
         bigInclusion.width = bigInclusion.width + partial.inclusion.width;
         [bigInclusion.presentation addObjectsFromArray:partial.inclusion.presentation];
     }
     EXTMatrix *smallInclusion = [EXTMatrix matrixWidth:1 height:underlyingDiff.start.names.count];
+    smallInclusion.characteristic = 2;
     smallInclusion.presentation[0] = inVector;
     EXTMatrix *pullback = (EXTMatrix*)[EXTMatrix formIntersection:bigInclusion with:smallInclusion][1];
     [pullback modularReduction];
@@ -357,8 +359,15 @@
     
     // if we've made it this far, then we're really contributing some defn.
     // try to compute nakamura's rule.
+    NSMutableArray *cycles = underlyingDiff.start.cycles[underlyingDiff.page];
+    EXTMatrix *cycleInclusion =
+        [EXTMatrix matrixWidth:cycles.count height:underlyingDiff.start.size];
+    cycleInclusion.presentation = cycles;
+    cycleInclusion.characteristic = 2;
+    EXTMatrix *vectorInCycleCoords = [EXTMatrix formIntersection:smallInclusion with:cycleInclusion][1];
     [underlyingDiff assemblePresentation];
-    NSArray *outVector = [underlyingDiff.presentation actOn:inVector];
+    
+    NSArray *outVector = [EXTMatrix newMultiply:underlyingDiff.presentation by:vectorInCycleCoords].presentation[0];
     
     NSArray *startSquarePair = [self applySquare:order
                                         toVector:inVector
