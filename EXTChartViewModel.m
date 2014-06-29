@@ -158,9 +158,22 @@ static dispatch_queue_t _dotLayersQueue;
             // some sanity checks to make sure this differential is worth drawing
             if ([differential page] != self.currentPage)
                 continue;
-
-            int imageSize = [differential.presentation image].count;
-            if ((imageSize == 0) ||
+            
+            NSMutableArray *boundaryList = differential.end.boundaries[self.currentPage];
+            EXTMatrix *boundaryMatrix = [EXTMatrix matrixWidth:boundaryList.count height:differential.end.size];
+            boundaryMatrix.presentation = boundaryList;
+            boundaryMatrix.characteristic = differential.presentation.characteristic;
+            NSArray *span = [EXTMatrix formIntersection:differential.presentation with:boundaryMatrix];
+            EXTMatrix *reducedMatrix = [(EXTMatrix*)span[0] columnReduce];
+            int imageSize = differential.presentation.width;
+            for (NSArray *column in reducedMatrix.presentation)
+                for (NSNumber *entry in column)
+                    if (abs([entry intValue]) == 1) {
+                        imageSize--;
+                        continue;
+                    }
+            
+            if ((imageSize <= 0) ||
                 ([differential.start dimension:differential.page] == 0) ||
                 ([differential.end dimension:differential.page] == 0))
                 continue;
