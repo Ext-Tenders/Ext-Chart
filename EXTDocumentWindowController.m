@@ -61,6 +61,7 @@ typedef enum : NSInteger {
     @property(nonatomic, strong) IBOutlet NSView *sidebarView;
 
     @property(nonatomic, weak) IBOutlet NSTextField *highlightLabel;
+    @property(nonatomic, weak) IBOutlet NSProgressIndicator *progressIndicator;
 
     @property(nonatomic, assign) EXTToolboxTag selectedToolTag;
     @property(nonatomic, strong) EXTChartViewController *chartViewController;

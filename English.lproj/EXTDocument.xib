@@ -13,6 +13,7 @@
                 <outlet property="mainView" destination="100330" id="100331"/>
                 <outlet property="pageControlsToolbarItem" destination="gXd-HP-dFT" id="Olw-mL-gQn"/>
                 <outlet property="pageControlsView" destination="Vjq-aA-FAN" id="nRq-rw-fep"/>
+                <outlet property="progressIndicator" destination="7EI-0V-ryw" id="Vx4-yd-fKG"/>
                 <outlet property="sidebarView" destination="100488" id="100489"/>
                 <outlet property="window" destination="5" id="100055"/>
                 <outlet property="zoomPopUpButton" destination="Y5Z-RM-p2I" id="1hC-dX-eZl"/>
@@ -53,7 +54,7 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
                                 <scroller key="verticalScroller" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="100040">
-                                    <rect key="frame" x="775" y="0.0" width="15" height="584"/>
+                                    <rect key="frame" x="774" y="0.0" width="16" height="584"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
                             </scrollView>
@@ -70,6 +71,10 @@
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
+                                    <progressIndicator maxValue="1" displayedWhenStopped="NO" style="bar" id="7EI-0V-ryw">
+                                        <rect key="frame" x="688" y="2" width="96" height="20"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES"/>
+                                    </progressIndicator>
                                 </subviews>
                             </customView>
                         </subviews>
