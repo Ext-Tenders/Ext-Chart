@@ -51,6 +51,8 @@
 		3841EBD2177380C000ADA929 /* EXTZeroRange.m in Sources */ = {isa = PBXBuildFile; fileRef = 3841EBD1177380C000ADA929 /* EXTZeroRange.m */; };
 		385BF10D17AAD8C2008CA5B6 /* EXTGeneratorInspectorView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 385BF10B17AAD8C2008CA5B6 /* EXTGeneratorInspectorView.xib */; };
 		385BF11017AAD8D5008CA5B6 /* EXTGeneratorInspectorViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 385BF10F17AAD8D5008CA5B6 /* EXTGeneratorInspectorViewController.m */; };
+		386330A61960F6E600AB8D05 /* EXTMultAnnotationInspectorController.m in Sources */ = {isa = PBXBuildFile; fileRef = 386330A41960F6E600AB8D05 /* EXTMultAnnotationInspectorController.m */; };
+		386330A71960F6E600AB8D05 /* EXTMultAnnotationInspectorView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 386330A51960F6E600AB8D05 /* EXTMultAnnotationInspectorView.xib */; };
 		3869FCF817B4587100D0D740 /* EXTDifferentialPaneController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3869FCF617B4587100D0D740 /* EXTDifferentialPaneController.m */; };
 		3869FCF917B4587100D0D740 /* EXTDifferentialPane.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3869FCF717B4587100D0D740 /* EXTDifferentialPane.xib */; };
 		3896548D16F538D90008FB8D /* EXTMatrix.m in Sources */ = {isa = PBXBuildFile; fileRef = 3896548C16F538D90008FB8D /* EXTMatrix.m */; };
@@ -183,6 +185,9 @@
 		385BF10C17AAD8C2008CA5B6 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/EXTGeneratorInspectorView.xib; sourceTree = "<group>"; };
 		385BF10E17AAD8D5008CA5B6 /* EXTGeneratorInspectorViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTGeneratorInspectorViewController.h; sourceTree = "<group>"; };
 		385BF10F17AAD8D5008CA5B6 /* EXTGeneratorInspectorViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTGeneratorInspectorViewController.m; sourceTree = "<group>"; };
+		386330A31960F6E600AB8D05 /* EXTMultAnnotationInspectorController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTMultAnnotationInspectorController.h; sourceTree = "<group>"; };
+		386330A41960F6E600AB8D05 /* EXTMultAnnotationInspectorController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTMultAnnotationInspectorController.m; sourceTree = "<group>"; };
+		386330A51960F6E600AB8D05 /* EXTMultAnnotationInspectorView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = EXTMultAnnotationInspectorView.xib; sourceTree = "<group>"; };
 		3869FCF517B4587100D0D740 /* EXTDifferentialPaneController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTDifferentialPaneController.h; sourceTree = "<group>"; };
 		3869FCF617B4587100D0D740 /* EXTDifferentialPaneController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTDifferentialPaneController.m; sourceTree = "<group>"; };
 		3869FCF717B4587100D0D740 /* EXTDifferentialPane.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = EXTDifferentialPane.xib; sourceTree = "<group>"; };
@@ -386,6 +391,8 @@
 				14E757CC17BF128F008BED48 /* EXTGridInspectorViewController.m */,
 				38F707B517CDCD9C002273B1 /* EXTLeibnizWindowController.h */,
 				38F707B617CDCD9C002273B1 /* EXTLeibnizWindowController.m */,
+				386330A31960F6E600AB8D05 /* EXTMultAnnotationInspectorController.h */,
+				386330A41960F6E600AB8D05 /* EXTMultAnnotationInspectorController.m */,
 				1498319D17AE04F3000380A5 /* EXTNewDocumentWindowController.h */,
 				1498319E17AE04F3000380A5 /* EXTNewDocumentWindowController.m */,
 				1460B40A17B735BD00B575E3 /* EXTPreferencesWindowController.h */,
@@ -429,6 +436,7 @@
 				385BF10B17AAD8C2008CA5B6 /* EXTGeneratorInspectorView.xib */,
 				14F930BA17BF39EC0000176A /* EXTGridInspectorView.xib */,
 				38F707B717CDCD9D002273B1 /* EXTLeibnizWindow.xib */,
+				386330A51960F6E600AB8D05 /* EXTMultAnnotationInspectorView.xib */,
 				1498319F17AE04F3000380A5 /* EXTNewDocument.xib */,
 				381A47FF194E12BA005054BD /* EXTTermInspector.xib */,
 				3897740417F78B5800C6AD2F /* EXTZeroRangesInspector.xib */,
@@ -628,6 +636,7 @@
 				149831A717AE65EA000380A5 /* KUhC2 Example.pdf in Resources */,
 				149831A817AE65EA000380A5 /* Random Example.pdf in Resources */,
 				149831A917AE65EA000380A5 /* S5 Example.pdf in Resources */,
+				386330A71960F6E600AB8D05 /* EXTMultAnnotationInspectorView.xib in Resources */,
 				3869FCF917B4587100D0D740 /* EXTDifferentialPane.xib in Resources */,
 				1460B40E17B7360700B575E3 /* EXTPreferences.xib in Resources */,
 				382BAD221943E26B00E1DDED /* Credits.rtf in Resources */,
@@ -687,6 +696,7 @@
 				3897740517F78B5800C6AD2F /* EXTZeroRangesInspector.m in Sources */,
 				3804BF6E17C07D7300A74325 /* EXTMatrixEditor.m in Sources */,
 				38F707B817CDCD9D002273B1 /* EXTLeibnizWindowController.m in Sources */,
+				386330A61960F6E600AB8D05 /* EXTMultAnnotationInspectorController.m in Sources */,
 				14F16A1617D34EE5002EACD3 /* NSKeyedArchiver+EXTAdditions.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
