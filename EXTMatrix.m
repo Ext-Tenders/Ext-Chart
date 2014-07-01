@@ -158,12 +158,12 @@
     return obj;
 }
 
-+(EXTMatrix*) hadamardVectors:(NSArray*)left with:(NSArray*)right {
++(NSArray*) hadamardVectors:(NSArray*)left with:(NSArray*)right {
     EXTMatrix *leftMat = [EXTMatrix matrixWidth:1 height:left.count],
               *rightMat = [EXTMatrix matrixWidth:1 height:right.count];
     leftMat.presentation[0] = [NSMutableArray arrayWithArray:left];
     rightMat.presentation[0] = [NSMutableArray arrayWithArray:right];
-    return [EXTMatrix hadamardProduct:leftMat with:rightMat];
+    return [EXTMatrix hadamardProduct:leftMat with:rightMat].presentation[0];
 }
 
 +(EXTMatrix*) hadamardProduct:(EXTMatrix*)left with:(EXTMatrix*)right {

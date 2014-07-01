@@ -119,6 +119,7 @@ static dispatch_queue_t _dotLayersQueue;
     if (self) {
         _termCounts = [NSMutableDictionary new];
         _differentials = [NSMutableDictionary new];
+        _multAnnotations = [NSMutableDictionary new];
     }
     return self;
 }
@@ -293,8 +294,24 @@ static dispatch_queue_t _dotLayersQueue;
 }
 
 - (NSArray *)chartView:(EXTChartView *)chartView multAnnotationsInRect:(NSRect)gridRect {
-    
-    return [NSArray new];
+    NSMutableArray *result = [NSMutableArray array];
+    for (NSMutableDictionary *annoGroup in self.multAnnotations[@(self.currentPage)]) {
+        NSMutableArray *convertedAnnotations = [NSMutableArray new];
+        for (EXTViewModelMultAnnotation *anno in annoGroup[@"annotations"]) {
+            if (lineSegmentOverRect(anno.start, anno.end, gridRect)) {
+                EXTChartViewMultAnnotationData *data = [EXTChartViewMultAnnotationData new];
+                data.start = anno.start;
+                data.end = anno.end;
+                [convertedAnnotations addObject:data];
+            }
+        }
+        NSMutableDictionary *entry = [NSMutableDictionary new];
+        entry[@"annotations"] = convertedAnnotations;
+        if (annoGroup[@"style"])
+            entry[@"style"] = annoGroup[@"style"];
+        [result addObject:entry];
+    }
+    return result.copy;
 }
 
 - (NSArray *)chartViewBackgroundRectsForSelectedObject:(EXTChartView *)chartView

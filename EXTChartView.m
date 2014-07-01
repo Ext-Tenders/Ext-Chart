@@ -195,6 +195,8 @@ static CGFloat const _EXTHighlightLineWidth = 0.5;
             [line moveToPoint:annoData.start];
             [line lineToPoint:annoData.end];
         }
+        
+        [line stroke];
     }
 
     // TODO: draw highlighted object.

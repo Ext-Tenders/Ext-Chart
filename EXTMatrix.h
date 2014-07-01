@@ -43,7 +43,7 @@
 -(EXTMatrix*) copy;
 
 +(EXTMatrix*) hadamardProduct:(EXTMatrix*)left with:(EXTMatrix*)right;
-+(EXTMatrix*) hadamardVectors:(NSArray*)left with:(NSArray*)right;
++(NSArray*) hadamardVectors:(NSArray*)left with:(NSArray*)right;
 +(EXTMatrix*) includeEvenlySpacedBasis:(int)startDim
                                 endDim:(int)endDim
                                 offset:(int)offset

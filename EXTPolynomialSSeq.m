@@ -685,6 +685,7 @@
     for (NSArray *cycle in term.cycles[page]) {
         [cycleMatrix.presentation addObject:[EXTMatrix hadamardVectors:vector with:cycle]];
     }
+    cycleMatrix.width = cycleMatrix.presentation.count;
     
     EXTMatrix *boundaryMatrix = [EXTMatrix matrixWidth:((NSArray*)sumTerm.boundaries[page]).count height:sumTerm.size];
     boundaryMatrix.presentation = sumTerm.boundaries[page];
