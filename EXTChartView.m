@@ -185,10 +185,10 @@ static NSArray *dotPositions(NSInteger count, CGPoint gridPoint, CGFloat gridSpa
 
             // Since the frame extends past the bounds rectangle, we need observe the drawingRect in order to know what to refresh when the artBoard changes
             [_artBoard addObserver:self forKeyPath:@"drawingRect" options:NSKeyValueObservingOptionOld context:_EXTChartViewArtBoardDrawingRectContext];
-        }
 
-        [rootLayer addSublayer:_artBoardBackgroundLayer];
-        [rootLayer addSublayer:_artBoardBorderLayer];
+            [rootLayer addSublayer:_artBoardBackgroundLayer];
+            [rootLayer addSublayer:_artBoardBorderLayer];
+        }
 
         // See http://www.cocoabuilder.com/archive/cocoa/324875-calayer-renderincontext-changes-zposition-of-some-child-layers.html
         // See http://www.cocoabuilder.com/archive/cocoa/193266-reordering-calayer-sublayers-without-raping-my-performance.html
