@@ -292,7 +292,7 @@
     EXTMaySpectralSequence *sseq = ((EXTMaySpectralSequence*)((EXTDocument*)_documentWindowController.document).sseq);
     EXTDifferential *diff = (EXTDifferential*)self.representedObject;
     
-    EXTDifferential *resultingDiff =
+    //EXTDifferential *resultingDiff =
         [sseq applyNakamura:self.degree
                    toVector:self.sourceEditor.representedObject.presentation[0]
                  atLocation:(EXTTriple*)diff.start.location
