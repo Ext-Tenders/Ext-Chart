@@ -161,8 +161,8 @@
 +(EXTMatrix*) hadamardVectors:(NSArray*)left with:(NSArray*)right {
     EXTMatrix *leftMat = [EXTMatrix matrixWidth:1 height:left.count],
               *rightMat = [EXTMatrix matrixWidth:1 height:right.count];
-    leftMat.presentation = [NSMutableArray arrayWithArray:left];
-    rightMat.presentation = [NSMutableArray arrayWithArray:right];
+    leftMat.presentation[0] = [NSMutableArray arrayWithArray:left];
+    rightMat.presentation[0] = [NSMutableArray arrayWithArray:right];
     return [EXTMatrix hadamardProduct:leftMat with:rightMat];
 }
 

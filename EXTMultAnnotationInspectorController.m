@@ -12,6 +12,7 @@
 #import "EXTSpectralSequence.h"
 #import "EXTDocument.h"
 #import "EXTTerm.h"
+#import "EXTChartViewController.h"
 
 @interface EXTMultAnnotationInspectorController () <EXTDocumentInspectorViewDelegate, NSTableViewDataSource, NSTableViewDelegate, NSPopoverDelegate>
 
@@ -79,38 +80,83 @@
 
 -(IBAction)addButtonPressed:(id)sender {
     // check to see if an EXTTerm is presently highlighted. if not, quit.
+    if (![self.selectedObject isKindOfClass:[EXTTerm class]]
+        || !self.multiplicationAnnotations || !self.sseq)
+        return;
+    
+    EXTTerm *term = self.selectedObject;
     
     // if so, add a new entry to the multiplicationAnnotations with some default
     // settings, including the disabled option.
+    NSMutableDictionary *anno = [NSMutableDictionary new];
+    anno[@"location"] = term.location;
+    anno[@"vector"] = [EXTMatrix matrixWidth:1 height:term.size].presentation[0];
+    anno[@"enabled"] = @(false);
+    
+    [self.multiplicationAnnotations addObject:anno];
     
     // refresh the tableview.
+    [self.table reloadData];
     
     // select the new row and send a double-click message to open the popover.
+    [self.table selectRowIndexes:[NSIndexSet indexSetWithIndex:(self.multiplicationAnnotations.count-1)] byExtendingSelection:NO];
+    [self doubleClick:sender];
+    
     return;
 }
 
 -(IBAction)deleteButtonPressed:(id)sender {
     // check to see if a row is highlighted. if not, quit.
+    int row = self.table.selectedRow;
+    
+    if (!self.multiplicationAnnotations ||
+        row < 0 ||
+        row >= self.multiplicationAnnotations.count)
+        return;
     
     // remove this entry from the array.
+    [self.table deselectAll:nil];
+    [self.multiplicationAnnotations removeObjectAtIndex:row];
     
-    // deselect all rows, refresh the tableview, and refresh the chart.
+    // refresh the tableview, and refresh the chart.
+    [self.table reloadData];
+    [self.documentWindowController.chartViewController reloadCurrentPage];
     return;
 }
 
 -(IBAction)doubleClick:(id)sender {
     // check to make sure that a row is selected. if not, quit.
+    int row = self.table.selectedRow;
+    
+    if (!self.multiplicationAnnotations ||
+        row < 0 ||
+        row >= self.multiplicationAnnotations.count)
+        return;
+    
+    NSMutableDictionary *entry = self.multiplicationAnnotations[row];
+    EXTTerm *term = [self.sseq findTerm:entry[@"location"]];
     
     // set up the popover, using the data from that row and the ambient sseq.
+    self.matrixEditor.representedObject = [EXTMatrix matrixWidth:1 height:term.size];
+    if (((NSArray*)entry[@"vector"]).count == self.matrixEditor.representedObject.height) {
+        self.matrixEditor.representedObject.presentation[0] = entry[@"vector"];
+    }
+    self.matrixEditor.rowNames = [term.names valueForKey:@"description"];
     
     // show the popover.
+    [self.popover showRelativeToRect:[_table rectOfRow:_table.selectedRow]
+                              ofView:_table
+                       preferredEdge:NSMinXEdge];
+    [self.matrixEditor reloadData];
+    
     return;
 }
 
 -(void)popoverWillClose:(NSNotification *)notification {
-    // store the data from the popover's last state to the array.
-    
     // refresh the tableview and refresh the chart.
+    [self.matrixEditor reloadData];
+    [self.documentWindowController.chartViewController reloadCurrentPage];
+    
     return;
 }
 
@@ -142,7 +188,7 @@ objectValueForTableColumn:(NSTableColumn *)tableColumn
         
     } else if ([tableColumn.identifier isEqualToString:@"style"]) {
         // just return nil for now.
-        return nil;
+        return @"unimpl.";
         
     } else if ([tableColumn.identifier isEqualToString:@"enabled"]) {
         return entry[@"enabled"];
@@ -151,8 +197,33 @@ objectValueForTableColumn:(NSTableColumn *)tableColumn
     return @"Unimplemented column.";
 }
 
-- (void)tableView:(NSTableView *)tableView setObjectValue:(id)object forTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row {
+- (void)tableView:(NSTableView *)tableView
+   setObjectValue:(id)object
+   forTableColumn:(NSTableColumn *)tableColumn
+              row:(NSInteger)row {
+    if (!self.multiplicationAnnotations ||
+        row < 0 ||
+        row >= self.multiplicationAnnotations.count)
+        return;
     
+    NSMutableDictionary *entry = self.multiplicationAnnotations[row];
+    
+    if ([tableColumn.identifier isEqualToString:@"element"]) {
+        return;
+        
+    } else if ([tableColumn.identifier isEqualToString:@"style"]) {
+        // do nothing for now.
+        return;
+        
+    } else if ([tableColumn.identifier isEqualToString:@"enabled"]) {
+        entry[@"enabled"] = object;
+        [self.documentWindowController.chartViewController reloadCurrentPage];
+        
+        return;
+    }
+    
+    DLog(@"Unimplemented column \"%@\".", tableColumn.identifier);
+    return;
 }
 
 @end
