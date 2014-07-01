@@ -61,6 +61,8 @@
     [self bind:@"selectedObject" toObject:windowController.chartViewController withKeyPath:@"selectedObject" options:nil];
     self.documentWindowController = windowController;
     
+    [self.table reloadData];
+    
     return;
 }
 

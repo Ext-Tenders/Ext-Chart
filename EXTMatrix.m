@@ -779,8 +779,8 @@
     }
     inclusion.width = inclusion.height;
     
-    // write this new map as (invertible1 . diagonal . invertible2) with the
-    // outer matrices of determinant 1.  this can be done by column and row
+    // write this new map as (invertible1 . quasidiagonal . invertible2) with
+    // the outer matrices of determinant 1.  this can be done by column and row
     // reduction.
     NSArray *columnReduction = [inclusion columnReduceWithRightFactorAndLimit:inclusion.height],
             *rowReduction = [[EXTMatrix copyTranspose:columnReduction[0]]
@@ -790,15 +790,51 @@
                                [(EXTMatrix*)columnReduction[1] invert]];
     
     // the diagonal entries give the orders of the abelian group decomposition.
-    // (the order '0' means that this factor is torsionfree.) the matrix
-    // invertible1^-1 . invertible2^-1 gives a column-matrix of vectors
-    // generating these factors.
-    //
-    // store these in a dictionary.
+    // (the order '0' means that this factor is torsionfree.) this is
+    // complicated slightly by the middle matrix being only quasidiagonal.  so,
+    // we take the old middle matrix, replace all its nonzero entries by 1s, and
+    // then poke in extra 1s so that every row and every column has precisely one
+    // 1 in it. the resulting matrix
+    //            invertible1^-1 . divisibleSubspace . invertible2^-1
+    // gives a column-matrix of vectors generating these factors.
+    EXTMatrix *divisibleSubspace = [factorization[1] copy];
+    for (int i = 0; i < divisibleSubspace.width; i++) {
+        NSMutableArray *column = divisibleSubspace.presentation[i];
+        
+        // either this column has a nonzero element in it or it doesn't.
+        bool isAllZeroes = true;
+        
+        for (int j = 0; j < divisibleSubspace.height; j++) {
+            if ([column[j] intValue] == 0)
+                continue;
+            
+            column[j] = @1;
+            isAllZeroes = false;
+        }
+        
+        if (!isAllZeroes)
+            continue;
+        
+        for (int j = 0; j < divisibleSubspace.height; j++) {
+            bool rowIsAllZeroes = true;
+            
+            for (int iprime = 0; iprime < divisibleSubspace.width; iprime++)
+                if ([divisibleSubspace.presentation[iprime][j] intValue] != 0)
+                    rowIsAllZeroes = false;
+            
+            if (!rowIsAllZeroes)
+                continue;
+            
+            divisibleSubspace.presentation[i][j] = @1;
+            break;
+        }
+    }
+    
     EXTMatrix *columns =
             [EXTMatrix newMultiply:Z
-                                by:[EXTMatrix newMultiply:factorization[0]
-                                                       by:factorization[2]]];
+                by:[EXTMatrix newMultiply:factorization[0]
+                    by:[EXTMatrix newMultiply:divisibleSubspace
+                                           by:factorization[2]]]];
     NSMutableDictionary *ret = [NSMutableDictionary new];
     
     for (int i = 0; i < columns.width; i++) {
