@@ -26,6 +26,7 @@
 		149831A717AE65EA000380A5 /* KUhC2 Example.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 149831A317AE65EA000380A5 /* KUhC2 Example.pdf */; };
 		149831A817AE65EA000380A5 /* Random Example.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 149831A417AE65EA000380A5 /* Random Example.pdf */; };
 		149831A917AE65EA000380A5 /* S5 Example.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 149831A517AE65EA000380A5 /* S5 Example.pdf */; };
+		14BCCBAD1961489E0019FEC3 /* EXTChartClipView.m in Sources */ = {isa = PBXBuildFile; fileRef = 14BCCBAC1961489E0019FEC3 /* EXTChartClipView.m */; };
 		14CCA38C1794F21D002EF861 /* ArtBoardTool.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 14CCA3891794F21D002EF861 /* ArtBoardTool.pdf */; };
 		14CCA38E1794F21D002EF861 /* Ext Chart.iconset in Resources */ = {isa = PBXBuildFile; fileRef = 14CCA38B1794F21D002EF861 /* Ext Chart.iconset */; };
 		14CD477117F00273007D71F1 /* EXTMarquee.m in Sources */ = {isa = PBXBuildFile; fileRef = 14CD477017F00273007D71F1 /* EXTMarquee.m */; };
@@ -135,6 +136,8 @@
 		149831A417AE65EA000380A5 /* Random Example.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = "Random Example.pdf"; path = "Images/Random Example.pdf"; sourceTree = "<group>"; };
 		149831A517AE65EA000380A5 /* S5 Example.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = "S5 Example.pdf"; path = "Images/S5 Example.pdf"; sourceTree = "<group>"; };
 		149A0EA6176C409C006F6142 /* NSCursor+EXTApplePrivate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSCursor+EXTApplePrivate.h"; sourceTree = "<group>"; };
+		14BCCBAB1961489E0019FEC3 /* EXTChartClipView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTChartClipView.h; sourceTree = "<group>"; usesTabs = 0; };
+		14BCCBAC1961489E0019FEC3 /* EXTChartClipView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTChartClipView.m; sourceTree = "<group>"; usesTabs = 0; };
 		14CCA3891794F21D002EF861 /* ArtBoardTool.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = ArtBoardTool.pdf; path = Images/ArtBoardTool.pdf; sourceTree = "<group>"; };
 		14CCA38B1794F21D002EF861 /* Ext Chart.iconset */ = {isa = PBXFileReference; lastKnownFileType = folder.iconset; name = "Ext Chart.iconset"; path = "Images/Ext Chart.iconset"; sourceTree = "<group>"; };
 		14CD476F17F00273007D71F1 /* EXTMarquee.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTMarquee.h; sourceTree = "<group>"; };
@@ -365,6 +368,8 @@
 				144709A41946CDF8009C6958 /* EXTChartViewModel.m */,
 				1435D32D194C10FA00863A90 /* EXTChartRulerView.h */,
 				1435D32E194C10FA00863A90 /* EXTChartRulerView.m */,
+				14BCCBAB1961489E0019FEC3 /* EXTChartClipView.h */,
+				14BCCBAC1961489E0019FEC3 /* EXTChartClipView.m */,
 			);
 			name = Views;
 			sourceTree = "<group>";
@@ -658,6 +663,7 @@
 				31D403BB13DA0476006A8C06 /* EXTTerm.m in Sources */,
 				31D403C013DA04D8006A8C06 /* EXTDifferential.m in Sources */,
 				3187BA2713DC6C6C00C26803 /* EXTScrollView.m in Sources */,
+				14BCCBAD1961489E0019FEC3 /* EXTChartClipView.m in Sources */,
 				093AEADD13E10759003E9F58 /* EXTPair.m in Sources */,
 				381A4800194E12BA005054BD /* EXTTermInspectorViewController.m in Sources */,
 				31C77BA813E63F6800E9DBFC /* EXTAppController.m in Sources */,

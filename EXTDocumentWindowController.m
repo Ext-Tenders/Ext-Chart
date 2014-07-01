@@ -27,6 +27,7 @@
 #import "EXTToolboxTag.h"
 #import "EXTTermInspectorViewController.h"
 #import "EXTChartRulerView.h"
+#import "EXTChartClipView.h"
 
 
 #pragma mark - Private variables
@@ -138,6 +139,14 @@ typedef enum : NSInteger {
 
     // Chart scroll view
     {
+        [_chartScrollView setWantsLayer:YES];
+
+        // Swap clip view
+        EXTChartClipView *clipView = [[EXTChartClipView alloc] initWithFrame:_chartScrollView.contentView.frame];
+        clipView.postsBoundsChangedNotifications = YES;
+        _chartScrollView.contentView = clipView;
+        _chartScrollView.documentView = _chartView;
+
         [_chartScrollView setHasHorizontalRuler:YES];
         [_chartScrollView setHasVerticalRuler:YES];
 
@@ -175,6 +184,9 @@ typedef enum : NSInteger {
         // related to the document view bounds being fractional?
         // FIXME
         _chartScrollView.magnification = lround(_chartScrollView.magnification * _EXTMagnificationStepRoundingMultiplier) / _EXTMagnificationStepRoundingMultiplier;
+
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(clipViewBoundsDidChange:) name:NSViewBoundsDidChangeNotification object:clipView];
+        [self clipViewBoundsDidChange:nil];
     }
 
     // Toolbox
@@ -272,6 +284,13 @@ typedef enum : NSInteger {
     [[self window] makeFirstResponder:_chartView];
 }
 
+- (void)clipViewBoundsDidChange:(NSNotification *)notification
+{
+    EXTChartClipView *clipView = (EXTChartClipView *)_chartScrollView.contentView;
+    NSRect visibleRect = [_chartView convertRect:clipView.bounds fromView:clipView];
+    [_chartView adjustContentForRect:visibleRect];
+}
+
 - (void)windowWillClose:(NSNotification *)notification {
     // TODO: should these observer adds and removes be put into the EXTDIVD calls?
     [_chartScrollView removeObserver:self forKeyPath:@"magnification"];
@@ -299,6 +318,8 @@ typedef enum : NSInteger {
         if (delegate && [delegate respondsToSelector:@selector(documentWindowController:willRemoveInspectorView:)])
             [delegate documentWindowController:self willRemoveInspectorView:viewDelegatePair[@"view"]];
     }
+
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:NSViewBoundsDidChangeNotification object:[_chartScrollView contentView]];
 }
 
 #pragma mark - Zoom

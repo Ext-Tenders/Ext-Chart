@@ -25,6 +25,10 @@
 @property (nonatomic, weak) id<EXTChartViewDataSource> dataSource;
 @property(nonatomic, weak) id<EXTChartViewDelegate> delegate;
 
+// New chart view
+- (void)adjustContentForRect:(NSRect)rect;
+- (void)reloadCurrentPage;
+
 // TODO: I feel like maybe this doesn't belong here.  Shouldn't this be handled
 // by the controller somehow?  Hmph.
 - (void)resetHighlightPath;

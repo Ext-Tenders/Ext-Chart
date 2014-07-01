@@ -141,6 +141,7 @@ static void *_selectedToolTagContext = &_selectedToolTagContext;
     [self.chartViewModel reloadCurrentPage];
     [self.chartView resetHighlightPath];
     [self.chartView setNeedsDisplay:YES];
+    [self.chartView reloadCurrentPage];
 }
 
 #pragma mark - EXTChartViewDelegate
