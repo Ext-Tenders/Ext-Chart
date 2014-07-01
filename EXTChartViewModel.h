@@ -38,3 +38,9 @@
 @property (nonatomic, assign) NSPoint end;
 + (instancetype)newViewModelDifferentialWithStart:(NSPoint)start end:(NSPoint)end;
 @end
+
+@interface EXTViewModelMultAnnotation : NSObject
+@property (nonatomic, assign) NSPoint start;
+@property (nonatomic, assign) NSPoint end;
++ (instancetype)newViewModelMultAnnotationWithStart:(NSPoint)start end:(NSPoint)end;
+@end

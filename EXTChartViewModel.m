@@ -218,8 +218,6 @@ static dispatch_queue_t _dotLayersQueue;
         if (![rule[@"enabled"] boolValue])
             continue;
         
-        EXTLocation *loc = rule[@"location"];
-        
         NSMutableArray *annotationArray = [NSMutableArray new];
         
         for (EXTTerm *term in self.sequence.terms.allValues) {
@@ -227,11 +225,28 @@ static dispatch_queue_t _dotLayersQueue;
                                         inLocation:rule[@"location"]
                                           actingAt:term.location
                                             onPage:self.currentPage];
-            
             if (rank == 0)
                 continue;
             
             // otherwise, draw something.
+            const EXTIntPoint startPoint = [self.sequence.locConvertor gridPoint:term.location];
+            const EXTIntPoint endPoint = [self.sequence.locConvertor gridPoint:[self.sequence.indexClass addLocation:term.location to:rule[@"location"]]];
+            EXTViewModelPoint *modelStartPoint = [EXTViewModelPoint newViewModelPointWithX:startPoint.x y:startPoint.y];
+            EXTViewModelPoint *modelEndPoint = [EXTViewModelPoint newViewModelPointWithX:endPoint.x y:endPoint.y];
+            const NSInteger startCount = [counts[modelStartPoint] integerValue];
+            const NSInteger endCount = [counts[modelEndPoint] integerValue];
+            NSArray *startRects = dotPositions(startCount, startPoint, self.grid.gridSpacing);
+            NSArray *endRects = dotPositions(endCount, endPoint, self.grid.gridSpacing);
+                
+            NSRect startRect = [startRects[0] rectValue];
+            NSRect endRect = [endRects[0] rectValue];
+            NSPoint viewStartPoint = (NSPoint){startRect.origin.x, startRect.origin.y + startRect.size.height / 2};
+            NSPoint viewEndPoint = (NSPoint){
+                endRect.origin.x + endRect.size.width - 0.1 * self.grid.gridSpacing,
+                endRect.origin.y + endRect.size.height / 2
+            };
+            EXTViewModelMultAnnotation *anno = [EXTViewModelMultAnnotation newViewModelMultAnnotationWithStart:viewStartPoint end:viewEndPoint];
+            [annotationArray addObject:anno];
         }
         
         // add the array of annotations we've constructed as an entry
@@ -376,8 +391,21 @@ static dispatch_queue_t _dotLayersQueue;
 }
 @end
 
+@implementation EXTViewModelMultAnnotation
++ (instancetype)newViewModelMultAnnotationWithStart:(NSPoint)start
+                                                end:(NSPoint)end
+{
+    EXTViewModelMultAnnotation *newAnno = [[self class] new];
+    newAnno->_start = start;
+    newAnno->_end = end;
+    return newAnno;
+}
+@end
 
-NSArray *dotPositions(NSInteger count, EXTIntPoint gridPoint, CGFloat gridSpacing)
+
+NSArray *dotPositions(NSInteger count,
+                      EXTIntPoint gridPoint,
+                      CGFloat gridSpacing)
 {
 
     switch (count) {
