@@ -9,6 +9,7 @@
             <connections>
                 <outlet property="addButton" destination="xsb-Yv-dBr" id="ti0-N4-XiB"/>
                 <outlet property="deleteButton" destination="fWV-YM-HMG" id="MJX-V2-ott"/>
+                <outlet property="locLabel" destination="o7e-63-auV" id="1uV-5y-NZM"/>
                 <outlet property="matrixEditor" destination="Yd7-Np-Z95" id="6JX-nO-eWK"/>
                 <outlet property="popover" destination="gde-7V-AJB" id="J0b-vI-1ib"/>
                 <outlet property="table" destination="2il-w1-JrY" id="Mpq-8C-sXn"/>
@@ -131,13 +132,22 @@
             </connections>
         </popover>
         <customView id="0Xp-Mq-LNK">
-            <rect key="frame" x="0.0" y="0.0" width="190" height="191"/>
+            <rect key="frame" x="0.0" y="0.0" width="190" height="216"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
                 <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Yd7-Np-Z95" userLabel="Inclusion Matrix Editor" customClass="EXTMatrixEditor">
                     <rect key="frame" x="20" y="21" width="150" height="150"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                 </customView>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="o7e-63-auV">
+                    <rect key="frame" x="18" y="179" width="154" height="17"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Term at (?, ?, ?)" id="ngQ-t3-Rji">
+                        <font key="font" metaFont="system"/>
+                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
             </subviews>
         </customView>
     </objects>

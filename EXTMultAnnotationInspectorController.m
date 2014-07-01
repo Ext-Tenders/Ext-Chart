@@ -20,6 +20,7 @@
 @property IBOutlet NSButton *addButton;
 @property IBOutlet NSButton *deleteButton;
 
+@property IBOutlet NSTextField *locLabel;
 @property IBOutlet EXTMatrixEditor *matrixEditor;
 @property IBOutlet NSPopover *popover;
 
@@ -142,6 +143,7 @@
         self.matrixEditor.representedObject.presentation[0] = entry[@"vector"];
     }
     self.matrixEditor.rowNames = [term.names valueForKey:@"description"];
+    self.locLabel.stringValue = [NSString stringWithFormat:@"Term at %@",[self.sseq.locConvertor convertToString:term.location]];
     
     // show the popover.
     [self.popover showRelativeToRect:[_table rectOfRow:_table.selectedRow]
