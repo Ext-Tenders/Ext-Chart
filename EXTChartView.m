@@ -45,6 +45,9 @@ static const CGFloat _kEmphasisGridLineWidth = 0.2;
 static const CGFloat _kAxesGridLineWidth = 0.4;
 
 static const CGFloat _kArtBoardBorderWidth = 0.75;
+static const CGSize _kArtBoardShadowOffset = {-1.0, -2.0};
+static const CGFloat _kArtBoardShadowRadius = 2.0;
+static const CGFloat _kArtBoardShadowOpacity = 1.0;
 
 static const CGFloat _kDifferentialLineWidth = 0.25;
 
@@ -59,6 +62,7 @@ static CGColorRef _emphasisGridStrokeColor;
 static CGColorRef _axesGridStrokeColor;
 static CGColorRef _artBoardBackgroundColor;
 static CGColorRef _artBoardBorderColor;
+static CGColorRef _artBoardShadowColor;
 static CGColorRef _differentialStrokeColor;
 static CGColorRef _termCountFillColor;
 static CGColorRef _termCountStrokeColor;
@@ -109,6 +113,7 @@ static NSArray *dotPositions(NSInteger count, CGPoint gridPoint, CGFloat gridSpa
         _axesGridStrokeColor = CGColorCreateCopy([[NSColor blueColor] CGColor]);
         _artBoardBackgroundColor = CGColorCreateCopy([[NSColor whiteColor] CGColor]);
         _artBoardBorderColor = CGColorCreateCopy([[NSColor blackColor] CGColor]);
+        _artBoardShadowColor = CGColorCreateCopy([[NSColor blackColor] CGColor]);
         _differentialStrokeColor = CGColorCreateCopy([[NSColor blackColor] CGColor]);
         _termCountFillColor = CGColorCreateCopy([[NSColor blackColor] CGColor]);
         _termCountStrokeColor = CGColorCreateCopy([[NSColor blackColor] CGColor]);
@@ -165,10 +170,15 @@ static NSArray *dotPositions(NSInteger count, CGPoint gridPoint, CGFloat gridSpa
 
             _artBoardBackgroundLayer.backgroundColor = _artBoardBackgroundColor;
             _artBoardBackgroundLayer.zPosition = _kBelowGridLevel;
-            
+
             _artBoardBorderLayer.zPosition = _kAboveGridLevel;
             _artBoardBorderLayer.borderWidth = _kArtBoardBorderWidth;
             _artBoardBorderLayer.borderColor = _artBoardBorderColor;
+
+            _artBoardBorderLayer.shadowOffset = _kArtBoardShadowOffset;
+            _artBoardBorderLayer.shadowColor = _artBoardShadowColor;
+            _artBoardBorderLayer.shadowRadius = _kArtBoardShadowRadius;
+            _artBoardBorderLayer.shadowOpacity = _kArtBoardShadowOpacity;
 
             [self _extAlignArtBoardToGrid];
             [self _extUpdateArtBoardMinimumSize];
