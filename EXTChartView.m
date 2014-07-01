@@ -129,41 +129,53 @@ static NSArray *dotPositions(NSInteger count, CGPoint gridPoint, CGFloat gridSpa
 
         rootLayer.transform = CATransform3DMakeTranslation(NSMidX(frame), NSMidY(frame), 0);
 
-        _gridLayer = [CAShapeLayer layer];
-        _gridLayer.frame = (CGRect){CGPointZero, frame.size};
-        _gridLayer.zPosition = _kGridLevel;
-        [rootLayer addSublayer:_gridLayer];
+        // Grid
+        {
+            _grid = [EXTGrid new];
+            
+            _gridLayer = [CAShapeLayer layer];
+            _gridLayer.frame = (CGRect){CGPointZero, frame.size};
+            _gridLayer.zPosition = _kGridLevel;
+            [rootLayer addSublayer:_gridLayer];
+            
+            CAShapeLayer *(^gridSublayer)(CGRect, CGFloat, CGColorRef, CGFloat) = ^(CGRect frame, CGFloat zPosition, CGColorRef strokeColor, CGFloat lineWidth){
+                CAShapeLayer *layer = [CAShapeLayer layer];
+                layer.frame = frame;
+                layer.zPosition = zPosition;
+                layer.strokeColor = strokeColor;
+                layer.lineWidth = lineWidth;
+                return layer;
+            };
+            
+            _baseGridLayer = gridSublayer(_gridLayer.frame, _kBaseGridLevel, _baseGridStrokeColor, _kBaseGridLineWidth);
+            _emphasisGridLayer = gridSublayer(_gridLayer.frame, _kEmphasisGridLevel, _emphasisGridStrokeColor, _kEmphasisGridLineWidth);
+            _axesGridLayer = gridSublayer(_gridLayer.frame, _kAxesGridLevel, _axesGridStrokeColor, _kAxesGridLineWidth);
+            
+            [_gridLayer addSublayer:_baseGridLayer];
+            [_gridLayer addSublayer:_emphasisGridLayer];
+            [_gridLayer addSublayer:_axesGridLayer];
+        }
 
-        CAShapeLayer *(^gridSublayer)(CGRect, CGFloat, CGColorRef, CGFloat) = ^(CGRect frame, CGFloat zPosition, CGColorRef strokeColor, CGFloat lineWidth){
-            CAShapeLayer *layer = [CAShapeLayer layer];
-            layer.frame = frame;
-            layer.zPosition = zPosition;
-            layer.strokeColor = strokeColor;
-            layer.lineWidth = lineWidth;
-            return layer;
-        };
+        // Art board
+        {
+            _artBoard = [EXTArtBoard new];
 
-        _baseGridLayer = gridSublayer(_gridLayer.frame, _kBaseGridLevel, _baseGridStrokeColor, _kBaseGridLineWidth);
-        _emphasisGridLayer = gridSublayer(_gridLayer.frame, _kEmphasisGridLevel, _emphasisGridStrokeColor, _kEmphasisGridLineWidth);
-        _axesGridLayer = gridSublayer(_gridLayer.frame, _kAxesGridLevel, _axesGridStrokeColor, _kAxesGridLineWidth);
+            _artBoardBackgroundLayer = [CALayer layer];
+            _artBoardBorderLayer = [CALayer layer];
 
-        [_gridLayer addSublayer:_baseGridLayer];
-        [_gridLayer addSublayer:_emphasisGridLayer];
-        [_gridLayer addSublayer:_axesGridLayer];
+            _artBoardBackgroundLayer.backgroundColor = _artBoardBackgroundColor;
+            _artBoardBackgroundLayer.zPosition = _kBelowGridLevel;
+            
+            _artBoardBorderLayer.zPosition = _kAboveGridLevel;
+            _artBoardBorderLayer.borderWidth = _kArtBoardBorderWidth;
+            _artBoardBorderLayer.borderColor = _artBoardBorderColor;
 
+            [self _extAlignArtBoardToGrid];
+            [self _extUpdateArtBoardMinimumSize];
 
-        _grid = [EXTGrid new];
-        const CGFloat gridSpacing = [_grid gridSpacing];
-        _artBoardBackgroundLayer = [CALayer layer];
-        _artBoardBorderLayer = [CALayer layer];
-        _artBoardBackgroundLayer.frame = _artBoardBorderLayer.frame = (CGRect){{gridSpacing * 0, gridSpacing * 0}, {gridSpacing * 18, gridSpacing * 8}};
-
-        _artBoardBackgroundLayer.backgroundColor = _artBoardBackgroundColor;
-        _artBoardBackgroundLayer.zPosition = _kBelowGridLevel;
-
-        _artBoardBorderLayer.zPosition = _kAboveGridLevel;
-        _artBoardBorderLayer.borderWidth = _kArtBoardBorderWidth;
-        _artBoardBorderLayer.borderColor = _artBoardBorderColor;
+            // Since the frame extends past the bounds rectangle, we need observe the drawingRect in order to know what to refresh when the artBoard changes
+            [_artBoard addObserver:self forKeyPath:@"drawingRect" options:NSKeyValueObservingOptionOld context:_EXTChartViewArtBoardDrawingRectContext];
+        }
 
         [rootLayer addSublayer:_artBoardBackgroundLayer];
         [rootLayer addSublayer:_artBoardBorderLayer];
@@ -190,16 +202,6 @@ static NSArray *dotPositions(NSInteger count, CGPoint gridPoint, CGFloat gridSpa
             [_grid addObserver:self forKeyPath:@"gridSpacing" options:0 context:_EXTChartViewGridSpacingContext];
         }
 
-        // Art board
-        {
-            _artBoard = [EXTArtBoard new];
-            [self _extAlignArtBoardToGrid];
-            [self _extUpdateArtBoardMinimumSize];
-
-            // Since the frame extends past the bounds rectangle, we need observe the drawingRect in order to know what to refresh when the artBoard changes
-            [_artBoard addObserver:self forKeyPath:@"drawingRect" options:NSKeyValueObservingOptionOld context:_EXTChartViewArtBoardDrawingRectContext];
-        }
-
         // Highlighting
 		{
             _highlightsGridPositionUnderCursor = true;
@@ -215,12 +217,12 @@ static NSArray *dotPositions(NSInteger count, CGPoint gridPoint, CGFloat gridSpa
 - (void)dealloc {
     // ----- Obsolete Begin
     /*
-    [_artBoard removeObserver:self forKeyPath:@"drawingRect" context:_EXTChartViewArtBoardDrawingRectContext];
     [_grid removeObserver:self forKeyPath:EXTGridAnyKey context:_EXTChartViewGridAnyKeyContext];
     [_grid removeObserver:self forKeyPath:@"gridSpacing" context:_EXTChartViewGridSpacingContext];
      */
     // ----- Obsolete End
     
+    [_artBoard removeObserver:self forKeyPath:@"drawingRect" context:_EXTChartViewArtBoardDrawingRectContext];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
@@ -324,6 +326,7 @@ static NSArray *dotPositions(NSInteger count, CGPoint gridPoint, CGFloat gridSpa
         for (EXTChartViewTermCountData *countData in counts) {
             CALayer *newTermLayer = [self layerForTermCount:countData.count];
             newTermLayer.frame = (CGRect){{countData.point.x * _grid.gridSpacing, countData.point.y * _grid.gridSpacing}, {_grid.gridSpacing, _grid.gridSpacing}};
+//            newTermLayer.shouldRasterize = true;
             [newTermLayers addObject:newTermLayer];
             [self.layer addSublayer:newTermLayer];
         }
@@ -492,6 +495,11 @@ static NSArray *dotPositions(NSInteger count, CGPoint gridPoint, CGFloat gridSpa
     return path;
 }
 
+- (void)resetCursorRects {
+	if (self.editingArtBoard)
+		[_artBoard buildCursorRectsInView:self];
+}
+
 #pragma mark - Drawing
 
 - (void)resetHighlightPath {
@@ -601,11 +609,6 @@ static NSArray *dotPositions(NSInteger count, CGPoint gridPoint, CGFloat gridSpa
 
 #pragma mark - Mouse tracking and cursor
 
-- (void)resetCursorRects {
-	if (self.editingArtBoard)
-		[_artBoard buildCursorRectsInView:self];
-}
-
 - (void)_extDragArtBoardWithEvent:(NSEvent *)event {
 	// ripped off from sketch.   according to apple's document, it is better not to override the event loop like this.  Also, see the DragItemAround code for what I think is a better way to organize this.
 
@@ -700,6 +703,8 @@ static NSArray *dotPositions(NSInteger count, CGPoint gridPoint, CGFloat gridSpa
     };
 
     [_artBoard setFrame:artBoardFrame];
+    _artBoardBackgroundLayer.frame = artBoardFrame;
+    _artBoardBorderLayer.frame = artBoardFrame;
 }
 
 - (void)_extUpdateArtBoardMinimumSize {
