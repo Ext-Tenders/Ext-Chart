@@ -27,6 +27,7 @@
 #import "EXTToolboxTag.h"
 #import "EXTTermInspectorViewController.h"
 #import "EXTChartRulerView.h"
+#import "EXTMultAnnotationInspectorController.h"
 
 
 #pragma mark - Private variables
@@ -75,6 +76,7 @@ typedef enum : NSInteger {
     EXTDifferentialPaneController *_differentialPaneController;
     EXTLeibnizWindowController *_leibnizWindowController;
     EXTZeroRangesInspector *_zeroRangesInspectorController;
+    EXTMultAnnotationInspectorController *_multAnnotationInspectorController;
     NSArray *_inspectorViewDelegates;
     EXTDocumentInspectorView *_inspectorView;
     bool _sidebarHidden;
@@ -202,6 +204,9 @@ typedef enum : NSInteger {
         
         _zeroRangesInspectorController = [EXTZeroRangesInspector new];
         [_inspectorView addSubview:_zeroRangesInspectorController.view withTitle:@"Zero Ranges" collapsed:true centered:true];
+        
+        _multAnnotationInspectorController = [EXTMultAnnotationInspectorController new];
+        [_inspectorView addSubview:_multAnnotationInspectorController.view withTitle:@"Multiplication Annotations" collapsed:true centered:true];
 
         _gridInspectorViewController = [EXTGridInspectorViewController new];
         [_inspectorView addSubview:_gridInspectorViewController.view withTitle:@"Grid" collapsed:true centered:false];
@@ -212,6 +217,7 @@ typedef enum : NSInteger {
                                     @{@"view" : _differentialPaneController.view, @"delegate" : _differentialPaneController},
                                     @{@"view" : _zeroRangesInspectorController.view, @"delegate" : _zeroRangesInspectorController },
                                     @{@"view" : _gridInspectorViewController.view, @"delegate" : _gridInspectorViewController},
+                                    @{@"view" : _multAnnotationInspectorController.view, @"delegate" : _multAnnotationInspectorController},
                                     ];
 
         const NSRect contentFrame = [[[self window] contentView] frame];
