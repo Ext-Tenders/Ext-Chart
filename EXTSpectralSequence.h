@@ -62,4 +62,9 @@
                   with:(EXTLocation *)loc2
                 onPage:(int)page;
 
+-(int) rankOfVector:(NSArray*)vector
+         inLocation:(EXTLocation*)loc
+           actingAt:(EXTLocation*)otherLoc
+             onPage:(int)page;
+
 @end

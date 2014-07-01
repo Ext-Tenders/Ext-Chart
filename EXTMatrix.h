@@ -43,6 +43,7 @@
 -(EXTMatrix*) copy;
 
 +(EXTMatrix*) hadamardProduct:(EXTMatrix*)left with:(EXTMatrix*)right;
++(EXTMatrix*) hadamardVectors:(NSArray*)left with:(NSArray*)right;
 +(EXTMatrix*) includeEvenlySpacedBasis:(int)startDim
                                 endDim:(int)endDim
                                 offset:(int)offset
@@ -70,5 +71,6 @@
                    targetDimension:(int)targetDimension;
 
 +(NSDictionary*) findOrdersOf:(EXTMatrix*)B in:(EXTMatrix*)Z;
++(int) rankOfMap:(EXTMatrix*)map intoQuotientByTheInclusion:(EXTMatrix*)incl;
 
 @end

@@ -11,6 +11,7 @@
 #import "EXTGrid.h"
 #import "EXTTerm.h"
 #import "EXTDifferential.h"
+#import "EXTPolynomialSSeq.h"
 
 
 @interface EXTChartViewModel ()
@@ -164,15 +165,7 @@ static dispatch_queue_t _dotLayersQueue;
             EXTMatrix *boundaryMatrix = [EXTMatrix matrixWidth:boundaryList.count height:differential.end.size];
             boundaryMatrix.presentation = boundaryList;
             boundaryMatrix.characteristic = differential.presentation.characteristic;
-            NSArray *span = [EXTMatrix formIntersection:differential.presentation with:boundaryMatrix];
-            EXTMatrix *reducedMatrix = [(EXTMatrix*)span[0] columnReduce];
-            int imageSize = differential.presentation.width;
-            for (NSArray *column in reducedMatrix.presentation)
-                for (NSNumber *entry in column)
-                    if (abs([entry intValue]) == 1) {
-                        imageSize--;
-                        continue;
-                    }
+            int imageSize = [EXTMatrix rankOfMap:differential.presentation intoQuotientByTheInclusion:boundaryMatrix];
             
             if ((imageSize <= 0) ||
                 ([differential.start dimension:differential.page] == 0) ||
@@ -216,6 +209,38 @@ static dispatch_queue_t _dotLayersQueue;
     
     // --- Multiplicative annotations
     NSMutableArray *annotationPairs = [NSMutableArray new];
+    for (NSMutableDictionary *rule in self.multiplicationAnnotationRules) {
+        // each of these dictionaries has:
+        //   @"enabled": bool toggling whether we should bother to draw these
+        //   @"style": unimplemented, reserved for a class describing line style
+        //   @"location": location of the term we're going to multiply through
+        //   @"vector": vector in the term at @"location" we're ^^^
+        if (![rule[@"enabled"] boolValue])
+            continue;
+        
+        EXTLocation *loc = rule[@"location"];
+        
+        NSMutableArray *annotationArray = [NSMutableArray new];
+        
+        for (EXTTerm *term in self.sequence.terms.allValues) {
+            int rank = [self.sequence rankOfVector:rule[@"vector"]
+                                        inLocation:rule[@"location"]
+                                          actingAt:term.location
+                                            onPage:self.currentPage];
+            
+            if (rank == 0)
+                continue;
+            
+            // otherwise, draw something.
+        }
+        
+        // add the array of annotations we've constructed as an entry
+        NSMutableDictionary *entry = [NSMutableDictionary new];
+        entry[@"annotations"] = annotationArray;
+        if (rule[@"style"])
+            entry[@"style"] = rule[@"style"];
+        [annotationPairs addObject:entry];
+    }
 
     self.termCounts[@(self.currentPage)] = counts;
     self.differentials[@(self.currentPage)] = differentials;

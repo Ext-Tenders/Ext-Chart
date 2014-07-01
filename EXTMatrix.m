@@ -158,6 +158,14 @@
     return obj;
 }
 
++(EXTMatrix*) hadamardVectors:(NSArray*)left with:(NSArray*)right {
+    EXTMatrix *leftMat = [EXTMatrix matrixWidth:1 height:left.count],
+              *rightMat = [EXTMatrix matrixWidth:1 height:right.count];
+    leftMat.presentation = [NSMutableArray arrayWithArray:left];
+    rightMat.presentation = [NSMutableArray arrayWithArray:right];
+    return [EXTMatrix hadamardProduct:leftMat with:rightMat];
+}
+
 +(EXTMatrix*) hadamardProduct:(EXTMatrix*)left with:(EXTMatrix*)right {
     EXTMatrix *ret = [EXTMatrix matrixWidth:(left.width*right.width)
                                      height:(left.height*right.height)];
@@ -811,6 +819,20 @@
     }
     
     return ret;
+}
+
++(int) rankOfMap:(EXTMatrix*)map intoQuotientByTheInclusion:(EXTMatrix*)incl {
+    NSArray *span = [EXTMatrix formIntersection:map with:incl];
+    EXTMatrix *reducedMatrix = [(EXTMatrix*)span[0] columnReduce];
+    int imageSize = map.width;
+    for (NSArray *column in reducedMatrix.presentation)
+        for (NSNumber *entry in column)
+            if (abs([entry intValue]) == 1) {
+                imageSize--;
+                continue;
+            }
+    
+    return imageSize;
 }
 
 @end

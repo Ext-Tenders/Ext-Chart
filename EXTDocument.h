@@ -28,6 +28,7 @@
     @property(nonatomic, assign) EXTIntRect artBoardGridFrame;
     @property(nonatomic, readonly) EXTDocumentWindowController *mainWindowController;
 
+    // array of dictionaries: {"style", "enabled", "location", "vector"}
     @property(nonatomic, strong) NSMutableArray *multiplicationAnnotations;
 @end
 

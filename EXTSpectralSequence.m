@@ -708,4 +708,28 @@
     return;
 }
 
+- (int)rankOfVector:(NSArray *)vector inLocation:(NSObject<EXTLocation> *)loc actingAt:(NSObject<EXTLocation> *)otherLoc onPage:(int)page {
+    EXTTerm *term = self.terms[loc];
+    if (!term)
+        return 0;
+    
+    EXTMatrix *multMatrix = [self.multTables getMatrixFor:loc with:otherLoc];
+    
+    EXTLocation *sumLoc = [self.indexClass addLocation:loc to:otherLoc];
+    EXTTerm *sumTerm = self.terms[sumLoc];
+    
+    if (!sumTerm || !multMatrix)
+        return 0;
+    
+    EXTMatrix *cycleMatrix = [EXTMatrix matrixWidth:0
+                                             height:sumTerm.size];
+    for (NSArray *cycle in term.cycles[page]) {
+        [cycleMatrix.presentation addObject:[EXTMatrix hadamardVectors:vector with:cycle]];
+    }
+    
+    EXTMatrix *boundaryMatrix = [EXTMatrix matrixWidth:((NSArray*)sumTerm.boundaries[page]).count height:sumTerm.size];
+    boundaryMatrix.presentation = sumTerm.boundaries[page];
+    return [EXTMatrix rankOfMap:[EXTMatrix newMultiply:multMatrix by:cycleMatrix] intoQuotientByTheInclusion:boundaryMatrix];
+}
+
 @end
