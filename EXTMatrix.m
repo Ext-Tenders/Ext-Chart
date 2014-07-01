@@ -825,12 +825,16 @@
     NSArray *span = [EXTMatrix formIntersection:map with:incl];
     EXTMatrix *reducedMatrix = [(EXTMatrix*)span[0] columnReduce];
     int imageSize = map.width;
-    for (NSArray *column in reducedMatrix.presentation)
+    for (NSArray *column in reducedMatrix.presentation) {
+        bool decrement = false;
+        
         for (NSNumber *entry in column)
-            if (abs([entry intValue]) == 1) {
-                imageSize--;
-                continue;
-            }
+            if (abs([entry intValue]) == 1)
+                decrement = true;
+        
+        if (decrement)
+            imageSize--;
+    }
     
     return imageSize;
 }

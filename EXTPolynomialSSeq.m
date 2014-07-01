@@ -667,11 +667,15 @@
     return power & 0x1 ? -1 : 1;
 }
 
-- (int)rankOfVector:(NSArray *)vector inLocation:(NSObject<EXTLocation> *)loc actingAt:(NSObject<EXTLocation> *)otherLoc onPage:(int)page {
-    EXTTerm *term = self.terms[loc];
-    if (!term)
+- (int)rankOfVector:(NSArray *)vector
+         inLocation:(NSObject<EXTLocation> *)loc
+           actingAt:(NSObject<EXTLocation> *)otherLoc
+             onPage:(int)page {
+    EXTTerm *otherTerm = self.terms[otherLoc];
+    if (!otherTerm)
         return 0;
     
+    // polynomial sseqs compute their products in a different way.
     EXTMatrix *multMatrix = [self productWithLeft:loc right:otherLoc];
     
     EXTLocation *sumLoc = [self.indexClass addLocation:loc to:otherLoc];
@@ -680,9 +684,8 @@
     if (!sumTerm || !multMatrix)
         return 0;
     
-    EXTMatrix *cycleMatrix = [EXTMatrix matrixWidth:0
-                                             height:sumTerm.size];
-    for (NSArray *cycle in term.cycles[page]) {
+    EXTMatrix *cycleMatrix = [EXTMatrix matrixWidth:0 height:(vector.count*otherTerm.size)];
+    for (NSArray *cycle in otherTerm.homologyReps[page]) {
         [cycleMatrix.presentation addObject:[EXTMatrix hadamardVectors:vector with:cycle]];
     }
     cycleMatrix.width = cycleMatrix.presentation.count;

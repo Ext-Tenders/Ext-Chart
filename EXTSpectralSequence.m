@@ -709,8 +709,8 @@
 }
 
 - (int)rankOfVector:(NSArray *)vector inLocation:(NSObject<EXTLocation> *)loc actingAt:(NSObject<EXTLocation> *)otherLoc onPage:(int)page {
-    EXTTerm *term = self.terms[loc];
-    if (!term)
+    EXTTerm *otherTerm = [self findTerm:otherLoc];
+    if (!otherTerm)
         return 0;
     
     EXTMatrix *multMatrix = [self.multTables getMatrixFor:loc with:otherLoc];
@@ -721,11 +721,11 @@
     if (!sumTerm || !multMatrix)
         return 0;
     
-    EXTMatrix *cycleMatrix = [EXTMatrix matrixWidth:0
-                                             height:sumTerm.size];
-    for (NSArray *cycle in term.cycles[page]) {
+    EXTMatrix *cycleMatrix = [EXTMatrix matrixWidth:0 height:(vector.count*otherTerm.size)];
+    for (NSArray *cycle in otherTerm.homologyReps[page]) {
         [cycleMatrix.presentation addObject:[EXTMatrix hadamardVectors:vector with:cycle]];
     }
+    cycleMatrix.width = cycleMatrix.presentation.count;
     
     EXTMatrix *boundaryMatrix = [EXTMatrix matrixWidth:((NSArray*)sumTerm.boundaries[page]).count height:sumTerm.size];
     boundaryMatrix.presentation = sumTerm.boundaries[page];
