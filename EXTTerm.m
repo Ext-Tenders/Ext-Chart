@@ -244,4 +244,31 @@
     return ((NSDictionary*)homologyReps[whichPage]).count;
 }
 
+-(NSString*) nameForVector:(NSArray*)vector {
+    NSString *ret = @"";
+    
+    for (int i = 0; i < vector.count; i++) {
+        if ([ret isEqualToString:@""]) {
+            if ([vector[i] intValue] == 1)
+                ret = [NSString stringWithFormat:@"%@", self.names[i]];
+            else if ([vector[i] intValue] != 0)
+                ret = [NSString stringWithFormat:@"%@ %@", vector[i], self.names[i]];
+            // if vector[i] is zero, don't do anything.
+            continue;
+        }
+        
+        if ([vector[i] intValue] > 1)
+            ret = [NSString stringWithFormat:@"%@ + %@ %@",
+                   ret, vector[i], self.names[i]];
+        else if ([vector[i] intValue] == 1)
+            ret = [NSString stringWithFormat:@"%@ + %@",
+                   ret, self.names[i]];
+        else if ([vector[i] intValue] < 0)
+            ret = [NSString stringWithFormat:@"%@ - %@ %@",
+                   ret, @(-[vector[i] intValue]), self.names[i]];
+    }
+    
+    return ret;
+}
+
 @end

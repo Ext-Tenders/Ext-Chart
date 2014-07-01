@@ -11,6 +11,7 @@
 #import "EXTDocumentWindowController.h"
 #import "EXTSpectralSequence.h"
 #import "EXTDocument.h"
+#import "EXTTerm.h"
 
 @interface EXTMultAnnotationInspectorController () <EXTDocumentInspectorViewDelegate, NSTableViewDataSource, NSTableViewDelegate, NSPopoverDelegate>
 
@@ -133,18 +134,21 @@ objectValueForTableColumn:(NSTableColumn *)tableColumn
     NSMutableDictionary *entry = self.multiplicationAnnotations[row];
     
     if ([tableColumn.identifier isEqualToString:@"element"]) {
-        // take the pretty-printing stuff from EXTTermInspectorViewController,
-        // box it up into an EXTTerm message, and reuse it here.
-        return nil;
+        EXTTerm *term = [self.sseq findTerm:entry[@"location"]];
+        if (!term)
+            return @"Term not found.";
+        
+        return [term nameForVector:entry[@"vector"]];
+        
     } else if ([tableColumn.identifier isEqualToString:@"style"]) {
         // just return nil for now.
         return nil;
+        
     } else if ([tableColumn.identifier isEqualToString:@"enabled"]) {
-        // return the boolean stored in entry[@"enabled"].
-        return nil;
+        return entry[@"enabled"];
     }
     
-    return nil;
+    return @"Unimplemented column.";
 }
 
 - (void)tableView:(NSTableView *)tableView setObjectValue:(id)object forTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row {

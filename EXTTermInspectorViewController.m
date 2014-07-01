@@ -154,30 +154,7 @@
                 return [NSString stringWithFormat:@"%d", doc.sseq.defaultCharacteristic];
         }
     } else if ([tableColumn.identifier isEqualToString:@"vector"]) {
-        NSString *ret = @"";
-        
-        for (int i = 0; i < vector.count; i++) {
-            if ([ret isEqualToString:@""]) {
-                if ([vector[i] intValue] == 1)
-                    ret = [NSString stringWithFormat:@"%@", term.names[i]];
-                else if ([vector[i] intValue] != 0)
-                    ret = [NSString stringWithFormat:@"%@ %@", vector[i], term.names[i]];
-                // if vector[i] is zero, don't do anything.
-                continue;
-            }
-            
-            if ([vector[i] intValue] > 1)
-                ret = [NSString stringWithFormat:@"%@ + %@ %@",
-                       ret, vector[i], term.names[i]];
-            else if ([vector[i] intValue] == 1)
-                ret = [NSString stringWithFormat:@"%@ + %@",
-                       ret, term.names[i]];
-            else if ([vector[i] intValue] < 0)
-                ret = [NSString stringWithFormat:@"%@ - %@ %@",
-                       ret, @(-[vector[i] intValue]), term.names[i]];
-        }
-        
-        return ret;
+        return [term nameForVector:vector];
     }
     
     // else

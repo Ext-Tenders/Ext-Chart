@@ -46,4 +46,6 @@
 
     // TODO: here are some other routines that i haven't investigated yet.
     - (void)addSelfToSS:(EXTDocument*)theDocument;
+
+    -(NSString*) nameForVector:(NSArray*)vector;
 @end
