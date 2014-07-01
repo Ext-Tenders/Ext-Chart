@@ -16,6 +16,7 @@
 @interface EXTChartViewModel ()
 @property (nonatomic, strong) NSMutableDictionary *termCounts; // indexed by @(page). Each element is a dictionary mapping an EXTViewModelPoint to a term count
 @property (nonatomic, strong) NSMutableDictionary *differentials; // indexed by @(page). Each element is an array (edge quadtree?) of EXTViewModelDifferential objects
+@property (nonatomic, strong) NSMutableDictionary *multAnnotations; // indexed by @(page). Each element is a mutable dictionary of a style, keyed on @"style", and an array, keyed on @"annotations", of EXTViewModelMultAnnotation objects
 @end
 
 
@@ -212,9 +213,13 @@ static dispatch_queue_t _dotLayersQueue;
             }
         }
     }
+    
+    // --- Multiplicative annotations
+    NSMutableArray *annotationPairs = [NSMutableArray new];
 
     self.termCounts[@(self.currentPage)] = counts;
     self.differentials[@(self.currentPage)] = differentials;
+    self.multAnnotations[@(self.currentPage)] = annotationPairs;
 }
 
 - (NSArray *)chartView:(EXTChartView *)chartView termCountsInGridRect:(EXTIntRect)gridRect
@@ -245,6 +250,11 @@ static dispatch_queue_t _dotLayersQueue;
         }
     }
     return result.copy;
+}
+
+- (NSArray *)chartView:(EXTChartView *)chartView multAnnotationsInRect:(NSRect)gridRect {
+    
+    return [NSArray new];
 }
 
 - (NSArray *)chartViewBackgroundRectsForSelectedObject:(EXTChartView *)chartView
@@ -298,6 +308,9 @@ static dispatch_queue_t _dotLayersQueue;
 }
 
 @end
+
+
+#pragma mark -- helper classes --
 
 
 @implementation EXTViewModelPoint

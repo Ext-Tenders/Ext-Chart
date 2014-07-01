@@ -59,6 +59,10 @@ static void *_selectedToolTagContext = &_selectedToolTagContext;
                      toObject:document.mainWindowController
                   withKeyPath:@"selectedToolTag"
                       options:nil];
+        [_chartViewModel bind:@"multiplicationAnnotationRules"
+                     toObject:document
+                  withKeyPath:@"multiplicationAnnotations"
+                      options:nil];
     }
     return self;
 }
@@ -75,6 +79,7 @@ static void *_selectedToolTagContext = &_selectedToolTagContext;
 
     [_chartViewModel unbind:@"selectedObject"];
     [_chartViewModel unbind:@"selectedToolTag"];
+    [_chartViewModel unbind:@"multiplicationAnnotationRules"];
 
     self.chartViewModel = nil;
     _document = nil;

@@ -20,6 +20,7 @@
 @property (nonatomic, weak) EXTGrid *grid;
 @property (nonatomic, weak) id selectedObject;
 @property (nonatomic, assign) EXTToolboxTag selectedToolTag;
+@property (weak) NSMutableArray *multiplicationAnnotationRules;
 
 - (void)reloadCurrentPage;
 @end

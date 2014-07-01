@@ -17,7 +17,7 @@
 #import "NSKeyedArchiver+EXTAdditions.h"
 
 
-#define PRESENT_FILE_VERSION 3
+#define PRESENT_FILE_VERSION 4
 #define MINIMUM_FILE_VERSION_ALLOWED 3
 
 
@@ -40,6 +40,7 @@
         _gridSpacing = [defaults doubleForKey:EXTGridSpacingPreferenceKey];
         _gridEmphasisSpacing = [defaults integerForKey:EXTGridEmphasisSpacingPreferenceKey];
         _artBoardGridFrame = (EXTIntRect){{0}, {20, 15}};
+        _multiplicationAnnotations = [NSMutableArray new];
     }
     return self;
 }
@@ -72,6 +73,7 @@
     [arch encodeDouble:_gridSpacing forKey:@"gridSpacing"];
     [arch encodeInteger:_gridEmphasisSpacing forKey:@"gridEmphasisSpacing"];
     [arch extEncodeIntRect:_artBoardGridFrame forKey:@"artBoardGridFrame"];
+    [arch encodeObject:_multiplicationAnnotations forKey:@"multiplicationAnnotations"];
 
     [arch finishEncoding];
 
@@ -117,6 +119,9 @@
     EXTIntRect tentativeArtBoardGridFrame = [unarchiver extDecodeIntRectForKey:@"artBoardGridFrame"];
     if (tentativeArtBoardGridFrame.size.width > 0 && tentativeArtBoardGridFrame.size.height > 0)
         self.artBoardGridFrame = tentativeArtBoardGridFrame;
+    
+    if ([unarchiver containsValueForKey:@"multiplicationAnnotations"])
+        self.multiplicationAnnotations = [unarchiver decodeObjectForKey:@"multiplicationAnnotations"];
 
     return YES;
 }

@@ -40,9 +40,11 @@
 
 
 @protocol EXTChartViewDataSource <NSObject>
+
 - (CGLayerRef)chartView:(EXTChartView *)chartView layerForTermCount:(NSInteger)count;
 - (NSArray *)chartView:(EXTChartView *)chartView termCountsInGridRect:(EXTIntRect)gridRect; // an array of EXTChartViewTermCountData
 - (NSArray *)chartView:(EXTChartView *)chartView differentialsInRect:(NSRect)gridRect; // an array of EXTChartViewDifferentialData
+- (NSArray *)chartView:(EXTChartView *)chartView multAnnotationsInRect:(NSRect)gridRect; // an array of {style, array of EXTChartViewMultAnnotationData}
 - (NSArray *)chartViewBackgroundRectsForSelectedObject:(EXTChartView *)chartView; // an array of NSRects
 - (NSBezierPath *)chartView:(EXTChartView *)chartView highlightPathForToolAtGridLocation:(EXTIntPoint)gridLocation;
 @end
@@ -59,6 +61,12 @@
 @property (nonatomic, assign) NSPoint start;
 @property (nonatomic, assign) NSPoint end;
 + (instancetype)chartViewDifferentialDataWithStart:(NSPoint)start end:(NSPoint)end;
+@end
+
+@interface EXTChartViewMultAnnotationData : NSObject
+@property (nonatomic, assign) NSPoint start;
+@property (nonatomic, assign) NSPoint end;
++ (instancetype)chartViewMultAnnotationDataWithStart:(NSPoint)start end:(NSPoint)end;
 @end
 
 #pragma mark - Exported variables

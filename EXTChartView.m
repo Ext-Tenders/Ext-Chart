@@ -177,6 +177,25 @@ static CGFloat const _EXTHighlightLineWidth = 0.5;
     [line stroke];
 
     // TODO: draw certain multiplicative structures?
+    
+    // this is an array of dictionaries: {"style", array of
+    NSArray *multAnnotationsData = [self.dataSource chartView:self multAnnotationsInRect:dirtyRect];
+    for (NSDictionary *annotationGroup in multAnnotationsData) {
+        NSArray *multAnnotations = annotationGroup[@"annotations"];
+        
+        // TODO: eventually we will want to read the style we're supposed to
+        // draw these multiplications in from the "style" key of the dicationary
+        
+        [[NSColor blackColor] set];
+        NSBezierPath *line = [NSBezierPath bezierPath];
+        [line setLineWidth:0.25];
+        [line setLineCapStyle:NSRoundLineCapStyle];
+        
+        for (EXTChartViewMultAnnotationData *annoData in multAnnotations) {
+            [line moveToPoint:annoData.start];
+            [line lineToPoint:annoData.end];
+        }
+    }
 
     // TODO: draw highlighted object.
 
@@ -495,6 +514,35 @@ static CGFloat const _EXTHighlightLineWidth = 0.5;
 {
     EXTChartViewDifferentialData *other = object;
     return ([other isKindOfClass:[EXTChartViewDifferentialData class]] &&
+            NSEqualPoints(other.start, _start) &&
+            NSEqualPoints(other.end, _end));
+}
+
+- (NSUInteger)hash
+{
+    return (NSUINTROTATE(((NSUInteger)_start.x), NSUINT_BIT / 2) ^ (NSUInteger)_start.y ^
+            NSUINTROTATE(((NSUInteger)_end.y), NSUINT_BIT / 2) ^ (NSUInteger)_end.x);
+}
+@end
+
+@implementation EXTChartViewMultAnnotationData
++ (instancetype)chartViewMultAnnotationDataWithStart:(NSPoint)start end:(NSPoint)end
+{
+    EXTChartViewMultAnnotationData *result = [self new];
+    result.start = start;
+    result.end = end;
+    return result;
+}
+
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"Annotation from %@ to %@", NSStringFromPoint(self.start), NSStringFromPoint(self.end)];
+}
+
+- (BOOL)isEqual:(id)object
+{
+    EXTChartViewMultAnnotationData *other = object;
+    return ([other isKindOfClass:[EXTChartViewMultAnnotationData class]] &&
             NSEqualPoints(other.start, _start) &&
             NSEqualPoints(other.end, _end));
 }

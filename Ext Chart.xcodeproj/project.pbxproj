@@ -355,8 +355,12 @@
 			children = (
 				31D5D2E313F6933B00F1B2F9 /* EXTArtBoard.h */,
 				31D5D2E413F6933B00F1B2F9 /* EXTArtBoard.m */,
+				1435D32D194C10FA00863A90 /* EXTChartRulerView.h */,
+				1435D32E194C10FA00863A90 /* EXTChartRulerView.m */,
 				317707DF13D7893A003475A2 /* EXTChartView.h */,
 				317707E013D7893A003475A2 /* EXTChartView.m */,
+				144709A31946CDF8009C6958 /* EXTChartViewModel.h */,
+				144709A41946CDF8009C6958 /* EXTChartViewModel.m */,
 				149314561783B6EA0080EF28 /* EXTDocumentControlsView.h */,
 				149314571783B6EA0080EF28 /* EXTDocumentControlsView.m */,
 				1467B26C178CF15E0084A2F6 /* EXTDocumentInspectorView.h */,
@@ -366,10 +370,6 @@
 				3187BA2313DC6C6C00C26803 /* EXTScrollView.h */,
 				3187BA2413DC6C6C00C26803 /* EXTScrollView.m */,
 				1462B38917D19D4A00BFDF50 /* EXTToolboxTag.h */,
-				144709A31946CDF8009C6958 /* EXTChartViewModel.h */,
-				144709A41946CDF8009C6958 /* EXTChartViewModel.m */,
-				1435D32D194C10FA00863A90 /* EXTChartRulerView.h */,
-				1435D32E194C10FA00863A90 /* EXTChartRulerView.m */,
 			);
 			name = Views;
 			sourceTree = "<group>";
