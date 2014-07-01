@@ -44,7 +44,7 @@ static const CGFloat _kBaseGridLineWidth = 0.2;
 static const CGFloat _kEmphasisGridLineWidth = 0.2;
 static const CGFloat _kAxesGridLineWidth = 0.4;
 
-static const CGFloat _kArtBoardBorderWidth = 0.4;
+static const CGFloat _kArtBoardBorderWidth = 0.75;
 
 static const CGFloat _kDifferentialLineWidth = 0.25;
 
