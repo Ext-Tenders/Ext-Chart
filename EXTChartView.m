@@ -89,6 +89,8 @@ static NSArray *dotPositions(NSInteger count, CGPoint gridPoint, CGFloat gridSpa
 
     NSArray *_termLayers;
     NSArray *_differentialLayers;
+
+    NSArray *_highlightedLayers;
 }
 
 
@@ -337,7 +339,7 @@ static NSArray *dotPositions(NSInteger count, CGPoint gridPoint, CGFloat gridSpa
         for (EXTChartViewTermCountData *countData in counts) {
             CALayer *newTermLayer = [self layerForTermCount:countData.count];
             newTermLayer.frame = (CGRect){{countData.point.x * _grid.gridSpacing, countData.point.y * _grid.gridSpacing}, {_grid.gridSpacing, _grid.gridSpacing}};
-//            newTermLayer.shouldRasterize = true;
+            [newTermLayer setValue:@(countData.count) forKey:@"termCount"];
             [newTermLayers addObject:newTermLayer];
             [self.layer addSublayer:newTermLayer];
         }
@@ -506,12 +508,82 @@ static NSArray *dotPositions(NSInteger count, CGPoint gridPoint, CGFloat gridSpa
     return path;
 }
 
-- (void)resetCursorRects {
-	if (self.editingArtBoard)
-		[_artBoard buildCursorRectsInView:self];
+- (void)resetCursorRects
+{
+	if (self.editingArtBoard) [_artBoard buildCursorRectsInView:self];
 }
 
-#pragma mark - Drawing
+- (void)updateHighlight
+{
+    CAShapeLayer *layerToHighlight = nil;
+
+    const NSRect dataRect = [_trackingArea rect];
+    const NSPoint currentMouseLocation = [self convertPoint:[[self window] mouseLocationOutsideOfEventStream] fromView:nil];
+    if (NSPointInRect(currentMouseLocation, dataRect)) {
+        const EXTIntPoint mouseLocationInGrid = [_grid convertPointFromView:currentMouseLocation];
+        const NSPoint gridCellOrigin = [_grid convertPointToView:mouseLocationInGrid];
+        for (CAShapeLayer *layer in _termLayers) {
+            if (NSEqualPoints(layer.frame.origin, gridCellOrigin)) {
+                layerToHighlight = layer;
+                break;
+            }
+        }
+    }
+
+    CAShapeLayer *currentlyHighlightedLayer = [_highlightedLayers firstObject];
+    if (currentlyHighlightedLayer != layerToHighlight) {
+        [CATransaction begin];
+        [CATransaction setAnimationDuration:0.2];
+        {
+            [self removeHighlightFromTermLayer:currentlyHighlightedLayer];
+            [self addHighlightToTermLayer:layerToHighlight];
+        }
+        [CATransaction commit];
+
+        if (layerToHighlight) {
+            _highlightedLayers = @[layerToHighlight];
+        }
+        else {
+            _highlightedLayers = nil;
+        }
+    }
+}
+
+// FIXME: These two methods should be part of a CAShapeLayer subclass that knows how to
+// highlight/select term layers; other object types should probably have subclasses as well
+- (void)addHighlightToTermLayer:(CAShapeLayer *)layer
+{
+    if (!layer) return;
+
+    NSInteger termCount = [[layer valueForKey:@"termCount"] integerValue];
+    if (termCount <= 3) {
+        layer.fillColor = [_highlightColor CGColor];
+    }
+    else {
+        layer.strokeColor = [_highlightColor CGColor];
+        for (CAShapeLayer *sublayer in layer.sublayers) {
+            sublayer.fillColor = [_highlightColor CGColor];
+        }
+    }
+}
+
+- (void)removeHighlightFromTermLayer:(CAShapeLayer *)layer
+{
+    if (!layer) return;
+
+    NSInteger termCount = [[layer valueForKey:@"termCount"] integerValue];
+    if (termCount <= 3) {
+        layer.fillColor = _termCountFillColor;
+    }
+    else {
+        layer.strokeColor = _termCountStrokeColor;
+        for (CAShapeLayer *sublayer in layer.sublayers) {
+            sublayer.fillColor = _termCountStrokeColor;
+        }
+    }
+}
+
+#pragma mark - Drawingk
 
 - (void)resetHighlightPath {
     if (_highlightPath)
@@ -671,14 +743,17 @@ static NSArray *dotPositions(NSInteger count, CGPoint gridPoint, CGFloat gridSpa
 
 - (void)mouseMoved:(NSEvent *)event {
     [self resetHighlightPath];
+    [self updateHighlight];
 }
 
 - (void)mouseEntered:(NSEvent *)event {
     [self resetHighlightPath];
+    [self updateHighlight];
 }
 
 - (void)mouseExited:(NSEvent *)event {
     [self resetHighlightPath];
+    [self updateHighlight];
 }
 
 - (void)updateTrackingAreas {
@@ -693,6 +768,7 @@ static NSArray *dotPositions(NSInteger count, CGPoint gridPoint, CGFloat gridSpa
                                                 userInfo:nil];
     [self addTrackingArea:_trackingArea];
     [self resetHighlightPath];
+    [self updateHighlight];
 }
 
 #pragma mark - Art board
