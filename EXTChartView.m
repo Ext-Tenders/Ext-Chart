@@ -48,6 +48,7 @@ static const CGFloat _kArtBoardBorderWidth = 0.75;
 static const CGSize _kArtBoardShadowOffset = {-1.0, -2.0};
 static const CGFloat _kArtBoardShadowRadius = 2.0;
 static const CGFloat _kArtBoardShadowOpacity = 1.0;
+static const CFTimeInterval _kArtBoardTransitionDuration = 0.125;
 
 static const CGFloat _kDifferentialLineWidth = 0.25;
 
@@ -713,8 +714,13 @@ static NSArray *dotPositions(NSInteger count, CGPoint gridPoint, CGFloat gridSpa
     };
 
     [_artBoard setFrame:artBoardFrame];
-    _artBoardBackgroundLayer.frame = artBoardFrame;
-    _artBoardBorderLayer.frame = artBoardFrame;
+    [CATransaction begin];
+    [CATransaction setAnimationDuration:_kArtBoardTransitionDuration];
+    {
+        _artBoardBackgroundLayer.frame = artBoardFrame;
+        _artBoardBorderLayer.frame = artBoardFrame;
+    }
+    [CATransaction commit];
 }
 
 - (void)_extUpdateArtBoardMinimumSize {
