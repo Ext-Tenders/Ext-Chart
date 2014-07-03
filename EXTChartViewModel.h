@@ -28,12 +28,21 @@
 @interface EXTViewModelPoint : NSObject <NSCopying> // NSValue with (floating-point) NSPoint?
 @property (nonatomic, readonly, assign) NSInteger x;
 @property (nonatomic, readonly, assign) NSInteger y;
-+ (instancetype)newViewModelPointWithX:(NSInteger)x y:(NSInteger)y;
+
++ (instancetype)viewModelPointWithX:(NSInteger)x y:(NSInteger)y;
 @end
 
 
 @interface EXTViewModelDifferential : NSObject
-@property (nonatomic, assign) NSPoint start;
-@property (nonatomic, assign) NSPoint end;
-+ (instancetype)newViewModelDifferentialWithStart:(NSPoint)start end:(NSPoint)end;
+@property (nonatomic, assign) EXTIntPoint startLocation;
+@property (nonatomic, assign) NSInteger startIndex;
+@property (nonatomic, assign) EXTIntPoint endLocation;
+@property (nonatomic, assign) NSInteger endIndex;
+
++ (instancetype)viewModelDifferentialWithStartLocation:(EXTIntPoint)startLocation
+                                            startIndex:(NSInteger)startIndex
+                                           endLocation:(EXTIntPoint)endLocation
+                                              endIndex:(NSInteger)endIndex;
+
+- (EXTChartViewDifferentialData *)chartViewDifferentialData;
 @end

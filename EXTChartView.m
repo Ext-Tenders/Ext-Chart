@@ -70,7 +70,7 @@ static CGColorRef _termCountStrokeColor;
 
 
 
-static NSArray *dotPositions(NSInteger count, CGPoint gridPoint, CGFloat gridSpacing);
+static NSRect dotBoundingBox(NSInteger count, NSInteger index, EXTIntPoint gridPoint, CGFloat gridSpacing);
 
 
 
@@ -338,7 +338,7 @@ static NSArray *dotPositions(NSInteger count, CGPoint gridPoint, CGFloat gridSpa
         NSArray *counts = [self.dataSource chartView:self termCountsInGridRect:reloadGridRect];
         for (EXTChartViewTermCountData *countData in counts) {
             CALayer *newTermLayer = [self layerForTermCount:countData.count];
-            newTermLayer.frame = (CGRect){{countData.point.x * _grid.gridSpacing, countData.point.y * _grid.gridSpacing}, {_grid.gridSpacing, _grid.gridSpacing}};
+            newTermLayer.frame = (CGRect){{countData.location.x * _grid.gridSpacing, countData.location.y * _grid.gridSpacing}, {_grid.gridSpacing, _grid.gridSpacing}};
             [newTermLayer setValue:@(countData.count) forKey:@"termCount"];
             [newTermLayers addObject:newTermLayer];
             [self.layer addSublayer:newTermLayer];
@@ -357,8 +357,10 @@ static NSArray *dotPositions(NSInteger count, CGPoint gridPoint, CGFloat gridSpa
         NSArray *differentials = [self.dataSource chartView:self differentialsInRect:reloadRect];
         for (EXTChartViewDifferentialData *diffData in differentials) {
             CAShapeLayer *newDifferentialLayer = [CAShapeLayer layer];
-            const CGPoint origin = {MIN(diffData.start.x, diffData.end.x), MIN(diffData.start.y, diffData.end.y)};
-            const CGSize size = {ABS(diffData.start.x - diffData.end.x), ABS(diffData.start.y - diffData.end.y)};
+            const CGPoint start = [_grid convertPointToView:diffData.startLocation];
+            const CGPoint end = [_grid convertPointToView:diffData.endLocation];
+            const CGPoint origin = {MIN(start.x, end.x), MIN(start.y, end.y)};
+            const CGSize size = {ABS(start.x - end.x), ABS(start.y - end.y)};
             newDifferentialLayer.frame = (CGRect){origin, size};
             newDifferentialLayer.lineWidth = _kDifferentialLineWidth;
             newDifferentialLayer.strokeColor = _differentialStrokeColor;
@@ -366,11 +368,38 @@ static NSArray *dotPositions(NSInteger count, CGPoint gridPoint, CGFloat gridSpa
             [newDifferentialLayers addObject:newDifferentialLayer];
             [self.layer addSublayer:newDifferentialLayer];
 
-            const CGPoint start = [newDifferentialLayer convertPoint:diffData.start fromLayer:self.layer];
-            const CGPoint end = [newDifferentialLayer convertPoint:diffData.end fromLayer:self.layer];
+            // FIXME: This is ugly, oh so ugly
+            NSInteger startCount = 0;
+            const NSPoint startOrigin = [_grid convertPointToView:diffData.startLocation];
+            for (CAShapeLayer *layer in _termLayers) {
+                if (NSEqualPoints(layer.frame.origin, startOrigin)) {
+                    startCount = [[layer valueForKey:@"termCount"] integerValue];
+                    break;
+                }
+            }
+
+            NSInteger endCount = 0;
+            const NSPoint endOrigin = [_grid convertPointToView:diffData.endLocation];
+            for (CAShapeLayer *layer in _termLayers) {
+                if (NSEqualPoints(layer.frame.origin, endOrigin)) {
+                    endCount = [[layer valueForKey:@"termCount"] integerValue];
+                    break;
+                }
+            }
+
+            const NSRect startDotRect = dotBoundingBox(startCount, diffData.startIndex, diffData.startLocation, _grid.gridSpacing);
+            const NSRect endDotRect = dotBoundingBox(endCount, diffData.endIndex, diffData.endLocation, _grid.gridSpacing);
+            const CGPoint startDotConnectionPoint = (startCount <= 3 ?
+                                                     (CGPoint){NSMidX(startDotRect), NSMidY(startDotRect)} :
+                                                     (CGPoint){NSMinX(startDotRect), NSMidY(startDotRect)});
+            const CGPoint endDotConnectionPoint = (endCount <= 3 ?
+                                                   (CGPoint){NSMidX(endDotRect), NSMidY(endDotRect)} :
+                                                   (CGPoint){NSMaxX(endDotRect), NSMidY(endDotRect)});
+            const CGPoint startInLayer = [newDifferentialLayer convertPoint:startDotConnectionPoint fromLayer:self.layer];
+            const CGPoint endInLayer = [newDifferentialLayer convertPoint:endDotConnectionPoint fromLayer:self.layer];
             CGMutablePathRef path = CGPathCreateMutable();
-            CGPathMoveToPoint(path, NULL, start.x, start.y);
-            CGPathAddLineToPoint(path, NULL, end.x, end.y);
+            CGPathMoveToPoint(path, NULL, startInLayer.x, startInLayer.y);
+            CGPathAddLineToPoint(path, NULL, endInLayer.x, endInLayer.y);
             newDifferentialLayer.path = path;
         }
 
@@ -386,8 +415,8 @@ static NSArray *dotPositions(NSInteger count, CGPoint gridPoint, CGFloat gridSpa
 
     const CGFloat _gridSpacing = _grid.gridSpacing;
 
-    for (NSValue *rectObject in dotPositions(count, (CGPoint){0}, _gridSpacing)) {
-        CGPathAddEllipseInRect(path, NULL, rectObject.rectValue);
+    for (NSInteger i = 0; i < count; ++i) {
+        CGPathAddEllipseInRect(path, NULL, dotBoundingBox(count, i, (EXTIntPoint){0}, _gridSpacing));
     }
 
     if (count <= 3) {
@@ -888,19 +917,19 @@ static NSArray *dotPositions(NSInteger count, CGPoint gridPoint, CGFloat gridSpa
     }
 
     // actually loop through the available positions and perform the draw.
-    const EXTIntRect gridRect = [self.grid convertRectFromView:dirtyRect];
-    CGContextRef currentCGContext = [[NSGraphicsContext currentContext] graphicsPort];
-    CGRect layerFrame = {.size = {self.grid.gridSpacing, self.grid.gridSpacing}};
+//    const EXTIntRect gridRect = [self.grid convertRectFromView:dirtyRect];
+//    CGContextRef currentCGContext = [[NSGraphicsContext currentContext] graphicsPort];
+//    CGRect layerFrame = {.size = {self.grid.gridSpacing, self.grid.gridSpacing}};
 
-    NSArray *counts = [self.dataSource chartView:self termCountsInGridRect:gridRect];
-    for (EXTChartViewTermCountData *countData in counts) {
-        CGLayerRef dotLayer = [self.dataSource chartView:self layerForTermCount:countData.count];
-        layerFrame.origin = (CGPoint){countData.point.x * self.grid.gridSpacing, countData.point.y * self.grid.gridSpacing};
-        CGContextDrawLayerInRect(currentCGContext, layerFrame, dotLayer);
-    }
+//    NSArray *counts = [self.dataSource chartView:self termCountsInGridRect:gridRect];
+//    for (EXTChartViewTermCountData *countData in counts) {
+//        CGLayerRef dotLayer = [self.dataSource chartView:self layerForTermCount:countData.count];
+//        layerFrame.origin = (CGPoint){countData.point.x * self.grid.gridSpacing, countData.point.y * self.grid.gridSpacing};
+//        CGContextDrawLayerInRect(currentCGContext, layerFrame, dotLayer);
+//    }
 
     // iterate also through the available differentials
-    NSArray *differentials = [self.dataSource chartView:self differentialsInRect:dirtyRect];
+//    NSArray *differentials = [self.dataSource chartView:self differentialsInRect:dirtyRect];
 
     //    const bool differentialSelected = (differential == _selectedObject);
     //    if (differentialSelected)
@@ -908,15 +937,15 @@ static NSArray *dotPositions(NSInteger count, CGPoint gridPoint, CGFloat gridSpa
     //    else
     //        [[NSColor blackColor] set];
 
-    [[NSColor blackColor] set];
-    NSBezierPath *line = [NSBezierPath bezierPath];
-    [line setLineWidth:0.25];
-    [line setLineCapStyle:NSRoundLineCapStyle];
-    for (EXTChartViewDifferentialData *diffData in differentials) {
-        [line moveToPoint:diffData.start];
-        [line lineToPoint:diffData.end];
-    }
-    [line stroke];
+//    [[NSColor blackColor] set];
+//    NSBezierPath *line = [NSBezierPath bezierPath];
+//    [line setLineWidth:0.25];
+//    [line setLineCapStyle:NSRoundLineCapStyle];
+//    for (EXTChartViewDifferentialData *diffData in differentials) {
+//        [line moveToPoint:diffData.start];
+//        [line lineToPoint:diffData.end];
+//    }
+//    [line stroke];
 
     // TODO: draw certain multiplicative structures?
 
@@ -949,17 +978,17 @@ static NSArray *dotPositions(NSInteger count, CGPoint gridPoint, CGFloat gridSpa
 
 
 @implementation EXTChartViewTermCountData
-+ (instancetype)chartViewTermCountDataWithCount:(NSInteger)count atGridPoint:(EXTIntPoint)gridPoint
++ (instancetype)chartViewTermCountDataWithCount:(NSInteger)count location:(EXTIntPoint)location
 {
     EXTChartViewTermCountData *result = [self new];
     result.count = count;
-    result.point = gridPoint;
+    result.location = location;
     return result;
 }
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"Term count %ld at (%ld, %ld)", self.count, self.point.x, self.point.y];
+    return [NSString stringWithFormat:@"Term count %ld at (%ld, %ld)", self.count, self.location.x, self.location.y];
 }
 
 - (BOOL)isEqual:(id)object
@@ -967,99 +996,111 @@ static NSArray *dotPositions(NSInteger count, CGPoint gridPoint, CGFloat gridSpa
     EXTChartViewTermCountData *other = object;
     return ([other isKindOfClass:[EXTChartViewTermCountData class]] &&
             other.count == _count &&
-            other.point.x == _point.x &&
-            other.point.y == _point.y);
+            other.location.x == _location.x &&
+            other.location.y == _location.y);
 
 }
 
 - (NSUInteger)hash
 {
-    return NSUINTROTATE(((NSUInteger)_point.x), NSUINT_BIT / 2) ^ _point.y ^ _count;
+    return NSUINTROTATE(((NSUInteger)_location.x), NSUINT_BIT / 2) ^ _location.y ^ _count;
 }
 @end
 
 
 @implementation EXTChartViewDifferentialData
-+ (instancetype)chartViewDifferentialDataWithStart:(NSPoint)start end:(NSPoint)end
++ (instancetype)chartViewDifferentialDataWithStartLocation:(EXTIntPoint)startLocation
+                                                startIndex:(NSInteger)startIndex
+                                               endLocation:(EXTIntPoint)endLocation
+                                                  endIndex:(NSInteger)endIndex
 {
     EXTChartViewDifferentialData *result = [self new];
-    result.start = start;
-    result.end = end;
+    result.startLocation = startLocation;
+    result.startIndex = startIndex;
+    result.endLocation = endLocation;
+    result.endIndex = endIndex;
     return result;
 }
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"Differential from %@ to %@", NSStringFromPoint(self.start), NSStringFromPoint(self.end)];
+    return [NSString stringWithFormat:@"Differential from (%ld,%ld _ %ld) to (%ld,%ld _ %ld)",
+            self.startLocation.x, self.startLocation.y, self.startIndex,
+            self.endLocation.x, self.endLocation.y, self.endIndex];
 }
 
 - (BOOL)isEqual:(id)object
 {
     EXTChartViewDifferentialData *other = object;
     return ([other isKindOfClass:[EXTChartViewDifferentialData class]] &&
-            NSEqualPoints(other.start, _start) &&
-            NSEqualPoints(other.end, _end));
+            EXTEqualIntPoints(other.startLocation, _startLocation) &&
+            other.startIndex == _startIndex &&
+            EXTEqualIntPoints(other.endLocation, _endLocation) &&
+            other.endIndex == _endIndex);
 }
 
 - (NSUInteger)hash
 {
-    return (NSUINTROTATE(((NSUInteger)_start.x), NSUINT_BIT / 2) ^ (NSUInteger)_start.y ^
-            NSUINTROTATE(((NSUInteger)_end.y), NSUINT_BIT / 2) ^ (NSUInteger)_end.x);
+    return (NSUINTROTATE(((NSUInteger)_startLocation.x), NSUINT_BIT / 2) ^ (NSUInteger)_startLocation.y ^
+            NSUINTROTATE(((NSUInteger)_endLocation.y), NSUINT_BIT / 2) ^ (NSUInteger)_endLocation.x ^
+            (NSUInteger)_startIndex ^
+            (NSUInteger)_endIndex);
 }
 @end
 
 
-
-
-
-
-NSArray *dotPositions(NSInteger count, CGPoint gridPoint, CGFloat gridSpacing)
+NSRect dotBoundingBox(NSInteger count, NSInteger index, EXTIntPoint gridPoint, CGFloat gridSpacing)
 {
+//    NSCAssert(count > 0, @"Cannot determine the bounding box for zero terms");
+//    NSCAssert(index >= 0 && index < count, @"Index out of bounds");
 
     switch (count) {
         case 1:
-            return @[[NSValue valueWithRect:
-                      NSMakeRect(gridPoint.x*gridSpacing + 2.0/6.0*gridSpacing,
-                                 gridPoint.y*gridSpacing + 2.0/6.0*gridSpacing,
-                                 2.0*gridSpacing/6.0,
-                                 2.0*gridSpacing/6.0)]];
-
+            return NSMakeRect(gridPoint.x*gridSpacing + 2.0/6.0*gridSpacing,
+                              gridPoint.y*gridSpacing + 2.0/6.0*gridSpacing,
+                              2.0*gridSpacing/6.0,
+                              2.0*gridSpacing/6.0);
+            
         case 2:
-            return @[[NSValue valueWithRect:
-                      NSMakeRect(gridPoint.x*gridSpacing + 1.0/6.0*gridSpacing,
-                                 gridPoint.y*gridSpacing + 1.0/6.0*gridSpacing,
-                                 2.0*gridSpacing/6.0,
-                                 2.0*gridSpacing/6.0)],
-                     [NSValue valueWithRect:
-                      NSMakeRect(gridPoint.x*gridSpacing + 3.0/6.0*gridSpacing,
-                                 gridPoint.y*gridSpacing + 3.0/6.0*gridSpacing,
-                                 2.0*gridSpacing/6.0,
-                                 2.0*gridSpacing/6.0)]];
+            switch (index) {
+                case 0:
+                    return NSMakeRect(gridPoint.x*gridSpacing + 1.0/6.0*gridSpacing,
+                                      gridPoint.y*gridSpacing + 1.0/6.0*gridSpacing,
+                                      2.0*gridSpacing/6.0,
+                                      2.0*gridSpacing/6.0);
+                case 1:
+                    return NSMakeRect(gridPoint.x*gridSpacing + 3.0/6.0*gridSpacing,
+                                      gridPoint.y*gridSpacing + 3.0/6.0*gridSpacing,
+                                      2.0*gridSpacing/6.0,
+                                      2.0*gridSpacing/6.0);
+            }
 
         case 3:
-            return @[[NSValue valueWithRect:
-                      NSMakeRect(gridPoint.x*gridSpacing + 0.66/6.0*gridSpacing,
-                                 gridPoint.y*gridSpacing + 1.0/6.0*gridSpacing,
-                                 2.0*gridSpacing/6.0,
-                                 2.0*gridSpacing/6.0)],
-                     [NSValue valueWithRect:
-                      NSMakeRect(gridPoint.x*gridSpacing + 2.0/6.0*gridSpacing,
-                                 gridPoint.y*gridSpacing + 3.0/6.0*gridSpacing,
-                                 2.0*gridSpacing/6.0,
-                                 2.0*gridSpacing/6.0)],
-                     [NSValue valueWithRect:
-                      NSMakeRect(gridPoint.x*gridSpacing + 3.33/6.0*gridSpacing,
-                                 gridPoint.y*gridSpacing + 1.0/6.0*gridSpacing,
-                                 2.0*gridSpacing/6.0,
-                                 2.0*gridSpacing/6.0)]];
+            switch (index) {
+                case 0:
+                    return NSMakeRect(gridPoint.x*gridSpacing + 0.66/6.0*gridSpacing,
+                                      gridPoint.y*gridSpacing + 1.0/6.0*gridSpacing,
+                                      2.0*gridSpacing/6.0,
+                                      2.0*gridSpacing/6.0);
+                case 1:
+                    return NSMakeRect(gridPoint.x*gridSpacing + 2.0/6.0*gridSpacing,
+                                      gridPoint.y*gridSpacing + 3.0/6.0*gridSpacing,
+                                      2.0*gridSpacing/6.0,
+                                      2.0*gridSpacing/6.0);
+                case 2:
+                    return NSMakeRect(gridPoint.x*gridSpacing + 3.33/6.0*gridSpacing,
+                                      gridPoint.y*gridSpacing + 1.0/6.0*gridSpacing,
+                                      2.0*gridSpacing/6.0,
+                                      2.0*gridSpacing/6.0);
+
+            }
 
         default:
-            return @[[NSValue valueWithRect:
-                      NSMakeRect(gridPoint.x*gridSpacing+0.15*gridSpacing,
-                                 gridPoint.y*gridSpacing+0.15*gridSpacing,
-                                 0.7*gridSpacing,
-                                 0.7*gridSpacing)]];
+            return NSMakeRect(gridPoint.x*gridSpacing+0.15*gridSpacing,
+                              gridPoint.y*gridSpacing+0.15*gridSpacing,
+                              0.7*gridSpacing,
+                              0.7*gridSpacing);
     }
-    
-    return nil;
+
+    return NSZeroRect;
 }

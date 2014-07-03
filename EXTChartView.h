@@ -58,7 +58,6 @@ typedef NS_ENUM(NSInteger, EXTChartViewInteractionType)
 
 
 @protocol EXTChartViewDataSource <NSObject>
-- (CGLayerRef)chartView:(EXTChartView *)chartView layerForTermCount:(NSInteger)count;
 - (NSArray *)chartView:(EXTChartView *)chartView termCountsInGridRect:(EXTIntRect)gridRect; // an array of EXTChartViewTermCountData
 - (NSArray *)chartView:(EXTChartView *)chartView differentialsInRect:(NSRect)gridRect; // an array of EXTChartViewDifferentialData
 - (NSArray *)chartViewBackgroundRectsForSelectedObject:(EXTChartView *)chartView; // an array of NSRects
@@ -67,16 +66,33 @@ typedef NS_ENUM(NSInteger, EXTChartViewInteractionType)
 
 
 @interface EXTChartViewTermCountData : NSObject
-@property (nonatomic, assign) EXTIntPoint point;
+/// Location in grid coordinates.
+@property (nonatomic, assign) EXTIntPoint location;
+
+/// Number of terms in a given grid location.
 @property (nonatomic, assign) NSInteger count;
-+ (instancetype)chartViewTermCountDataWithCount:(NSInteger)count atGridPoint:(EXTIntPoint)gridPoint;
+
++ (instancetype)chartViewTermCountDataWithCount:(NSInteger)count location:(EXTIntPoint)location;
 @end
 
 
 @interface EXTChartViewDifferentialData : NSObject
-@property (nonatomic, assign) NSPoint start;
-@property (nonatomic, assign) NSPoint end;
-+ (instancetype)chartViewDifferentialDataWithStart:(NSPoint)start end:(NSPoint)end;
+/// Start endpoint in grid coordinates.
+@property (nonatomic, assign) EXTIntPoint startLocation;
+
+/// If several terms are present in startLocation, 0-based index of which of those terms this differential refers to.
+@property (nonatomic, assign) NSInteger startIndex;
+
+/// End endpoint in grid coordinates.
+@property (nonatomic, assign) EXTIntPoint endLocation;
+
+/// If several terms are present in startLocation, 0-based index of which of those terms this differential refers to.
+@property (nonatomic, assign) NSInteger endIndex;
+
++ (instancetype)chartViewDifferentialDataWithStartLocation:(EXTIntPoint)startLocation
+                                                startIndex:(NSInteger)startIndex
+                                               endLocation:(EXTIntPoint)endLocation
+                                                  endIndex:(NSInteger)endIndex;
 @end
 
 #pragma mark - Exported variables
