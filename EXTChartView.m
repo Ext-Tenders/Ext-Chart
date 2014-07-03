@@ -544,6 +544,19 @@ static NSRect dotBoundingBox(NSInteger count, NSInteger index, EXTIntPoint gridP
 
 - (void)updateHighlight
 {
+    switch (self.interactionType) {
+        case EXTChartViewInteractionTypeTerm: [self updateTermHighlight]; break;
+        case EXTChartViewInteractionTypeDifferential: [self updateDifferentialHighlight]; break;
+        case EXTChartViewInteractionTypeMultiplicativeStructure:
+        case EXTChartViewInteractionTypeArtBoard:
+        case EXTChartViewInteractionTypeNone:
+        default:
+            break;
+    }
+}
+
+- (void)updateTermHighlight
+{
     CAShapeLayer *layerToHighlight = nil;
 
     const NSRect dataRect = [_trackingArea rect];
@@ -571,6 +584,42 @@ static NSRect dotBoundingBox(NSInteger count, NSInteger index, EXTIntPoint gridP
 
         if (layerToHighlight) {
             _highlightedLayers = @[layerToHighlight];
+        }
+        else {
+            _highlightedLayers = nil;
+        }
+    }
+}
+
+- (void)updateDifferentialHighlight
+{
+    CAShapeLayer *differentialToHighlight = nil;
+
+    const NSRect dataRect = [_trackingArea rect];
+    const NSPoint currentMouseLocation = [self convertPoint:[[self window] mouseLocationOutsideOfEventStream] fromView:nil];
+    if (NSPointInRect(currentMouseLocation, dataRect)) {
+        const EXTIntPoint mouseLocationInGrid = [_grid convertPointFromView:currentMouseLocation];
+        const NSPoint gridCellOrigin = [_grid convertPointToView:mouseLocationInGrid];
+        for (CAShapeLayer *layer in _differentialLayers) {
+            if (NSEqualPoints(layer.frame.origin, gridCellOrigin)) {
+                differentialToHighlight = layer;
+                break;
+            }
+        }
+    }
+
+    CAShapeLayer *currentlyHighlightedLayer = [_highlightedLayers firstObject];
+    if (currentlyHighlightedLayer != differentialToHighlight) {
+        [CATransaction begin];
+        [CATransaction setAnimationDuration:0.2];
+        {
+            [self removeHighlightFromDifferentialLayer:currentlyHighlightedLayer];
+            [self addHighlightToDifferentialLayer:differentialToHighlight];
+        }
+        [CATransaction commit];
+
+        if (differentialToHighlight) {
+            _highlightedLayers = @[differentialToHighlight];
         }
         else {
             _highlightedLayers = nil;
@@ -611,6 +660,23 @@ static NSRect dotBoundingBox(NSInteger count, NSInteger index, EXTIntPoint gridP
         }
     }
 }
+
+- (void)addHighlightToDifferentialLayer:(CAShapeLayer *)layer
+{
+    if (!layer) return;
+
+    layer.strokeColor = [_highlightColor CGColor];
+    layer.lineWidth = _kDifferentialLineWidth * 10;
+}
+
+- (void)removeHighlightFromDifferentialLayer:(CAShapeLayer *)layer
+{
+    if (!layer) return;
+
+    layer.strokeColor = _differentialStrokeColor;
+    layer.lineWidth = _kDifferentialLineWidth;
+}
+
 
 #pragma mark - Drawingk
 

@@ -1,4 +1,4 @@
-//
+///
 //  EXTChartViewController.m
 //  Ext Chart
 //
@@ -89,6 +89,7 @@ static void *_selectedToolTagContext = &_selectedToolTagContext;
 
     self.chartView.delegate = self;
     self.chartView.dataSource = self.chartViewModel;
+    self.chartView.interactionType = [EXTChartViewController interactionTypeFromToolTag:_document.mainWindowController.selectedToolTag];
     self.chartViewModel.grid = self.chartView.grid;
 
     [self reloadCurrentPage];
@@ -323,6 +324,8 @@ static void *_selectedToolTagContext = &_selectedToolTagContext;
         self.chartView.highlightsGridPositionUnderCursor = (newTag != EXTToolTagArtboard);
         self.chartView.editingArtBoard = (newTag == EXTToolTagArtboard);
         [self.chartView resetHighlightPath];
+
+        self.chartView.interactionType = [EXTChartViewController interactionTypeFromToolTag:newTag];
     }
     else [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
 }
@@ -335,6 +338,25 @@ static void *_selectedToolTagContext = &_selectedToolTagContext;
     }
     else
         [super setNilValueForKey:key];
+}
+
+#pragma mark - Support
+
++ (EXTChartViewInteractionType)interactionTypeFromToolTag:(EXTToolboxTag)tag
+{
+    EXTChartViewInteractionType type;
+    switch (tag) {
+        case EXTToolTagArtboard: type = EXTChartViewInteractionTypeArtBoard; break;
+        case EXTToolTagGenerator: type = EXTChartViewInteractionTypeTerm; break;
+        case EXTToolTagDifferential: type = EXTChartViewInteractionTypeDifferential; break;
+        case EXTToolTagMultiplicativeStructure: type = EXTChartViewInteractionTypeMultiplicativeStructure; break;
+        case EXTToolTagMarquee:
+        case EXTToolTagLastSentinel:
+        default:
+            type = EXTChartViewInteractionTypeNone;
+    }
+    
+    return type;
 }
 
 @end
