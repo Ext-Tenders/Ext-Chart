@@ -51,6 +51,7 @@ static const CGFloat _kArtBoardShadowOpacity = 1.0;
 static const CFTimeInterval _kArtBoardTransitionDuration = 0.125;
 
 static const CGFloat _kDifferentialLineWidth = 0.25;
+static const CGFloat _kHighlightedDifferentialLineWidth = _kDifferentialLineWidth * 5;
 
 static const CGFloat _kTermCountLineWidth = 1.0;
 static const CGFloat _kTermCountSingleDigitFontSizeFactor = 0.7;
@@ -67,6 +68,11 @@ static CGColorRef _artBoardShadowColor;
 static CGColorRef _differentialStrokeColor;
 static CGColorRef _termCountFillColor;
 static CGColorRef _termCountStrokeColor;
+
+static const CFTimeInterval _kTermHighlightAddAnimationDuration = 0.09 * 1.8;
+static const CFTimeInterval _kTermHighlightRemoveAnimationDuration = 0.07 * 1.8;
+static const CFTimeInterval _kDifferentialHighlightAddAnimationDuration = 0.09;
+static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.07;
 
 static NSString * const _kTermDataKey = @"EXTChartViewTermData";
 static NSString * const _kDifferentialDataKey = @"EXTChartViewDifferentialData";
@@ -565,9 +571,9 @@ static NSRect dotBoundingBox(NSInteger count, NSInteger index, EXTIntPoint gridP
     const NSPoint currentMouseLocation = [self convertPoint:[[self window] mouseLocationOutsideOfEventStream] fromView:nil];
     if (NSPointInRect(currentMouseLocation, dataRect)) {
         const EXTIntPoint mouseLocationInGrid = [_grid convertPointFromView:currentMouseLocation];
-        const NSPoint gridCellOrigin = [_grid convertPointToView:mouseLocationInGrid];
         for (CAShapeLayer *layer in _termLayers) {
-            if (NSEqualPoints(layer.frame.origin, gridCellOrigin)) {
+            EXTChartViewTermCountData *termData = [layer valueForKey:_kTermDataKey];
+            if (EXTEqualIntPoints(termData.location, mouseLocationInGrid)) {
                 layerToHighlight = layer;
                 break;
             }
@@ -577,19 +583,23 @@ static NSRect dotBoundingBox(NSInteger count, NSInteger index, EXTIntPoint gridP
     CAShapeLayer *currentlyHighlightedLayer = [_highlightedLayers firstObject];
     if (currentlyHighlightedLayer != layerToHighlight) {
         [CATransaction begin];
-        [CATransaction setAnimationDuration:0.2];
         {
-            [self removeHighlightFromTermLayer:currentlyHighlightedLayer];
-            [self addHighlightToTermLayer:layerToHighlight];
+            {
+                [CATransaction setAnimationDuration:_kTermHighlightRemoveAnimationDuration];
+                [CATransaction setAnimationTimingFunction:[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseIn]];
+
+                [self removeHighlightFromTermLayer:currentlyHighlightedLayer];
+            }
+            {
+                [CATransaction setAnimationDuration:_kTermHighlightAddAnimationDuration];
+                [CATransaction setAnimationTimingFunction:[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseOut]];
+
+                [self addHighlightToTermLayer:layerToHighlight];
+            }
         }
         [CATransaction commit];
 
-        if (layerToHighlight) {
-            _highlightedLayers = @[layerToHighlight];
-        }
-        else {
-            _highlightedLayers = nil;
-        }
+        _highlightedLayers = (layerToHighlight ? @[layerToHighlight] : nil);
     }
 }
 
@@ -610,10 +620,19 @@ static NSRect dotBoundingBox(NSInteger count, NSInteger index, EXTIntPoint gridP
     }
 
     [CATransaction begin];
-    [CATransaction setAnimationDuration:0.2];
     {
-        for (CAShapeLayer *layer in _highlightedLayers) [self removeHighlightFromDifferentialLayer:layer];
-        for (CAShapeLayer *layer in layersToHighlight) [self addHighlightToDifferentialLayer:layer];
+        [CATransaction setAnimationTimingFunction:[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseOut]];
+
+        {
+            [CATransaction setAnimationDuration:_kDifferentialHighlightRemoveAnimationDuration];
+
+            for (CAShapeLayer *layer in _highlightedLayers) [self removeHighlightFromDifferentialLayer:layer];
+        }
+        {
+            [CATransaction setAnimationDuration:_kDifferentialHighlightAddAnimationDuration];
+
+            for (CAShapeLayer *layer in layersToHighlight) [self addHighlightToDifferentialLayer:layer];
+        }
     }
     [CATransaction commit];
 
@@ -659,7 +678,7 @@ static NSRect dotBoundingBox(NSInteger count, NSInteger index, EXTIntPoint gridP
     if (!layer) return;
 
     layer.strokeColor = [_highlightColor CGColor];
-    layer.lineWidth = _kDifferentialLineWidth * 10;
+    layer.lineWidth = _kHighlightedDifferentialLineWidth;
 }
 
 - (void)removeHighlightFromDifferentialLayer:(CAShapeLayer *)layer
