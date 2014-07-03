@@ -68,10 +68,11 @@ static CGColorRef _differentialStrokeColor;
 static CGColorRef _termCountFillColor;
 static CGColorRef _termCountStrokeColor;
 
+static NSString * const _kTermDataKey = @"EXTChartViewTermData";
+static NSString * const _kDifferentialDataKey = @"EXTChartViewDifferentialData";
 
 
 static NSRect dotBoundingBox(NSInteger count, NSInteger index, EXTIntPoint gridPoint, CGFloat gridSpacing);
-
 
 
 @implementation EXTChartView
@@ -339,7 +340,7 @@ static NSRect dotBoundingBox(NSInteger count, NSInteger index, EXTIntPoint gridP
         for (EXTChartViewTermCountData *countData in counts) {
             CALayer *newTermLayer = [self layerForTermCount:countData.count];
             newTermLayer.frame = (CGRect){{countData.location.x * _grid.gridSpacing, countData.location.y * _grid.gridSpacing}, {_grid.gridSpacing, _grid.gridSpacing}};
-            [newTermLayer setValue:@(countData.count) forKey:@"termCount"];
+            [newTermLayer setValue:countData forKey:_kTermDataKey];
             [newTermLayers addObject:newTermLayer];
             [self.layer addSublayer:newTermLayer];
         }
@@ -365,24 +366,25 @@ static NSRect dotBoundingBox(NSInteger count, NSInteger index, EXTIntPoint gridP
             newDifferentialLayer.lineWidth = _kDifferentialLineWidth;
             newDifferentialLayer.strokeColor = _differentialStrokeColor;
             newDifferentialLayer.lineCap = kCALineCapRound;
+            [newDifferentialLayer setValue:diffData forKey:_kDifferentialDataKey];
             [newDifferentialLayers addObject:newDifferentialLayer];
             [self.layer addSublayer:newDifferentialLayer];
 
             // FIXME: This is ugly, oh so ugly
             NSInteger startCount = 0;
-            const NSPoint startOrigin = [_grid convertPointToView:diffData.startLocation];
             for (CAShapeLayer *layer in _termLayers) {
-                if (NSEqualPoints(layer.frame.origin, startOrigin)) {
-                    startCount = [[layer valueForKey:@"termCount"] integerValue];
+                EXTChartViewTermCountData *termData = [layer valueForKey:_kTermDataKey];
+                if (EXTEqualIntPoints(termData.location, diffData.startLocation)) {
+                    startCount = termData.count;
                     break;
                 }
             }
 
             NSInteger endCount = 0;
-            const NSPoint endOrigin = [_grid convertPointToView:diffData.endLocation];
             for (CAShapeLayer *layer in _termLayers) {
-                if (NSEqualPoints(layer.frame.origin, endOrigin)) {
-                    endCount = [[layer valueForKey:@"termCount"] integerValue];
+                EXTChartViewTermCountData *termData = [layer valueForKey:_kTermDataKey];
+                if (EXTEqualIntPoints(termData.location, diffData.endLocation)) {
+                    endCount = termData.count;
                     break;
                 }
             }
@@ -593,38 +595,31 @@ static NSRect dotBoundingBox(NSInteger count, NSInteger index, EXTIntPoint gridP
 
 - (void)updateDifferentialHighlight
 {
-    CAShapeLayer *differentialToHighlight = nil;
+    NSMutableArray *layersToHighlight = [NSMutableArray new];
 
     const NSRect dataRect = [_trackingArea rect];
     const NSPoint currentMouseLocation = [self convertPoint:[[self window] mouseLocationOutsideOfEventStream] fromView:nil];
     if (NSPointInRect(currentMouseLocation, dataRect)) {
         const EXTIntPoint mouseLocationInGrid = [_grid convertPointFromView:currentMouseLocation];
-        const NSPoint gridCellOrigin = [_grid convertPointToView:mouseLocationInGrid];
         for (CAShapeLayer *layer in _differentialLayers) {
-            if (NSEqualPoints(layer.frame.origin, gridCellOrigin)) {
-                differentialToHighlight = layer;
-                break;
+            EXTChartViewDifferentialData *diffData = [layer valueForKey:_kDifferentialDataKey];
+            if (EXTEqualIntPoints(diffData.startLocation, mouseLocationInGrid) ||
+                EXTEqualIntPoints(diffData.endLocation, mouseLocationInGrid))
+            {
+                [layersToHighlight addObject:layer];
             }
         }
     }
 
-    CAShapeLayer *currentlyHighlightedLayer = [_highlightedLayers firstObject];
-    if (currentlyHighlightedLayer != differentialToHighlight) {
-        [CATransaction begin];
-        [CATransaction setAnimationDuration:0.2];
-        {
-            [self removeHighlightFromDifferentialLayer:currentlyHighlightedLayer];
-            [self addHighlightToDifferentialLayer:differentialToHighlight];
-        }
-        [CATransaction commit];
-
-        if (differentialToHighlight) {
-            _highlightedLayers = @[differentialToHighlight];
-        }
-        else {
-            _highlightedLayers = nil;
-        }
+    [CATransaction begin];
+    [CATransaction setAnimationDuration:0.2];
+    {
+        for (CAShapeLayer *layer in _highlightedLayers) [self removeHighlightFromDifferentialLayer:layer];
+        for (CAShapeLayer *layer in layersToHighlight) [self addHighlightToDifferentialLayer:layer];
     }
+    [CATransaction commit];
+
+    _highlightedLayers = (layersToHighlight.count == 0 ? nil : [layersToHighlight copy]);
 }
 
 // FIXME: These two methods should be part of a CAShapeLayer subclass that knows how to
@@ -633,8 +628,8 @@ static NSRect dotBoundingBox(NSInteger count, NSInteger index, EXTIntPoint gridP
 {
     if (!layer) return;
 
-    NSInteger termCount = [[layer valueForKey:@"termCount"] integerValue];
-    if (termCount <= 3) {
+    EXTChartViewTermCountData *termData = [layer valueForKey:_kTermDataKey];
+    if (termData.count <= 3) {
         layer.fillColor = [_highlightColor CGColor];
     }
     else {
@@ -649,8 +644,8 @@ static NSRect dotBoundingBox(NSInteger count, NSInteger index, EXTIntPoint gridP
 {
     if (!layer) return;
 
-    NSInteger termCount = [[layer valueForKey:@"termCount"] integerValue];
-    if (termCount <= 3) {
+    EXTChartViewTermCountData *termData = [layer valueForKey:_kTermDataKey];
+    if (termData.count <= 3) {
         layer.fillColor = _termCountFillColor;
     }
     else {
