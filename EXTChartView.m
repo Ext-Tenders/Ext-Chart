@@ -603,9 +603,7 @@ static NSRect dotBoundingBox(NSInteger count, NSInteger index, EXTIntPoint gridP
         const EXTIntPoint mouseLocationInGrid = [_grid convertPointFromView:currentMouseLocation];
         for (CAShapeLayer *layer in _differentialLayers) {
             EXTChartViewDifferentialData *diffData = [layer valueForKey:_kDifferentialDataKey];
-            if (EXTEqualIntPoints(diffData.startLocation, mouseLocationInGrid) ||
-                EXTEqualIntPoints(diffData.endLocation, mouseLocationInGrid))
-            {
+            if (EXTEqualIntPoints(diffData.startLocation, mouseLocationInGrid)) {
                 [layersToHighlight addObject:layer];
             }
         }
