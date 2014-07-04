@@ -513,8 +513,6 @@ typedef enum : NSInteger {
 }
 
 - (IBAction)exportArtBoard:(id)sender {
-    NSData *artBoardPDFData = [_chartView dataWithPDFInsideRect:[[_chartView artBoard] frame]];
-
     NSSavePanel *savePanel = [NSSavePanel savePanel];
     [savePanel setNameFieldStringValue:[NSString stringWithFormat:@"page_%d", [_chartViewController currentPage]]];
     [savePanel setAllowedFileTypes:@[@"pdf"]];
@@ -523,8 +521,32 @@ typedef enum : NSInteger {
     [savePanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result) {
         // TODO: error handling
         if (result == NSFileHandlingPanelOKButton)
-            [artBoardPDFData writeToURL:[savePanel URL] atomically:YES];
+            [self exportArtBoardToURL:[savePanel URL]];
     }];
+}
+
+- (void)exportArtBoardToURL:(NSURL *)URL
+{
+    const CGRect frame = self.chartView.artBoard.frame;
+    CGContextRef PDFContext = CGPDFContextCreateWithURL((__bridge CFURLRef)URL, &frame, NULL);
+
+    CGLayerRef layer = CGLayerCreateWithContext(PDFContext, frame.size, NULL);
+    CGContextRef layerContext = CGLayerGetContext(layer);
+
+    // Funny thing: -[CALayer renderInContext:] does not respect CALayer.zPosition. Instead, it simply follows
+    // the order in CALayer.sublayers.
+
+    NSGraphicsContext *drawingContext = [NSGraphicsContext graphicsContextWithGraphicsPort:layerContext flipped:NO];
+    [NSGraphicsContext saveGraphicsState];
+    [NSGraphicsContext setCurrentContext:drawingContext];
+    CGContextBeginPage(PDFContext, &frame);
+    {
+        [self.chartView.layer renderInContext:PDFContext];
+    }
+    CGContextEndPage(PDFContext);
+    CGPDFContextClose(PDFContext);
+    CGContextRelease(PDFContext);
+    [NSGraphicsContext restoreGraphicsState];
 }
 
 - (IBAction)resetGridToDefaults:(id)sender {
