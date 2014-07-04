@@ -18,7 +18,6 @@
 @property (nonatomic, strong) EXTChartViewModel *chartViewModel;
 
 @property (nonatomic, assign) EXTIntRect baseGridRect;
-@property (nonatomic, assign) NSRect baseRect; // FIXME: useBaseGridRect instead when the view model accepts EXTIntRect for differentials
 @end
 
 @implementation EXTTestCaseS5Demo
