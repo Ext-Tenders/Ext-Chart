@@ -29,6 +29,7 @@ static void *_EXTChartViewArtBoardDrawingRectContext = &_EXTChartViewArtBoardDra
 static void *_EXTChartViewGridAnyKeyContext = &_EXTChartViewGridAnyKeyContext;
 static void *_EXTChartViewGridSpacingContext = &_EXTChartViewGridSpacingContext;
 static void *_interactionTypeContext = &_interactionTypeContext;
+static void *_showsGridContext = &_showsGridContext;
 
 static const CGFloat _kBelowGridLevel = -3.0;
 static const CGFloat _kGridLevel = -2.0;
@@ -127,6 +128,7 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
 
         // Grid
         {
+            _showsGrid = true;
             _grid = [EXTGrid new];
             
             _gridLayer = [CAShapeLayer layer];
@@ -150,6 +152,8 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
             [_gridLayer addSublayer:_baseGridLayer];
             [_gridLayer addSublayer:_emphasisGridLayer];
             [_gridLayer addSublayer:_axesGridLayer];
+
+            [self addObserver:self forKeyPath:@"showsGrid" options:NSKeyValueObservingOptionNew context:_showsGridContext];
         }
 
         // Art board
@@ -197,7 +201,6 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
         /*
         // Grid
         {
-            _showsGrid = true;
 
             _grid = [EXTGrid new];
             [_grid setBoundsRect:[self bounds]];
@@ -220,6 +223,7 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
      */
     // ----- Obsolete End
 
+    [self removeObserver:self forKeyPath:@"showsGrid" context:_showsGridContext];
     [self removeObserver:self forKeyPath:@"interactionType" context:_interactionTypeContext];
     
     [_artBoard removeObserver:self forKeyPath:@"drawingRect" context:_EXTChartViewArtBoardDrawingRectContext];
@@ -508,13 +512,6 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
 
 #pragma mark - Properties
 
-- (void)setShowsGrid:(bool)showsGrid {
-    if (showsGrid != _showsGrid) {
-        _showsGrid = showsGrid;
-        [self setNeedsDisplay:YES];
-    }
-}
-
 - (void)setHighlightsGridPositionUnderCursor:(bool)highlightsGridPositionUnderCursor {
     if (highlightsGridPositionUnderCursor != _highlightsGridPositionUnderCursor) {
         _highlightsGridPositionUnderCursor = highlightsGridPositionUnderCursor;
@@ -579,6 +576,18 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
 
         _highlightedLayers = nil;
         [self updateHighlight];
+    }
+    else if (context == _showsGridContext) {
+        bool showsGrid = [change[NSKeyValueChangeNewKey] boolValue];
+        if (showsGrid) {
+            [self.layer addSublayer:_gridLayer];
+            NSClipView *clipView = [[self enclosingScrollView] contentView];
+            const NSRect visibleRect = [self convertRect:clipView.bounds fromView:clipView];
+            [self adjustContentForRect:visibleRect];
+        }
+        else {
+            [_gridLayer removeFromSuperlayer];
+        }
     }
 	else {
 		[super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
