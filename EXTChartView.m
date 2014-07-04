@@ -14,6 +14,7 @@
 #import "EXTArtBoard.h"
 #import "EXTTermLayer.h"
 #import "EXTDifferentialLayer.h"
+#import "EXTChartViewInteraction.h"
 #import "NSUserDefaults+EXTAdditions.h"
 
 
@@ -27,6 +28,7 @@ NSString * const EXTChartViewHighlightColorPreferenceKey = @"EXTChartViewHighlig
 static void *_EXTChartViewArtBoardDrawingRectContext = &_EXTChartViewArtBoardDrawingRectContext;
 static void *_EXTChartViewGridAnyKeyContext = &_EXTChartViewGridAnyKeyContext;
 static void *_EXTChartViewGridSpacingContext = &_EXTChartViewGridSpacingContext;
+static void *_interactionTypeContext = &_interactionTypeContext;
 
 static const CGFloat _kBelowGridLevel = -3.0;
 static const CGFloat _kGridLevel = -2.0;
@@ -75,7 +77,7 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
     NSArray *_termLayers;
     NSArray *_differentialLayers;
 
-    NSArray *_highlightedLayers;
+    NSArray *_highlightedLayers; // an array of CALayer<EXTChartViewInteraction> objects, or nil
 }
 
 
@@ -189,6 +191,8 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
         self.layer = rootLayer;
         self.wantsLayer = YES;
 
+        [self addObserver:self forKeyPath:@"interactionType" options:NSKeyValueObservingOptionNew context:_interactionTypeContext];
+
         // ----- Obsolete Begin
         /*
         // Grid
@@ -215,6 +219,8 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
     [_grid removeObserver:self forKeyPath:@"gridSpacing" context:_EXTChartViewGridSpacingContext];
      */
     // ----- Obsolete End
+
+    [self removeObserver:self forKeyPath:@"interactionType" context:_interactionTypeContext];
     
     [_artBoard removeObserver:self forKeyPath:@"drawingRect" context:_EXTChartViewArtBoardDrawingRectContext];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
@@ -434,7 +440,7 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
         }
     }
 
-    EXTTermLayer *currentlyHighlightedLayer = [_highlightedLayers firstObject];
+    CALayer<EXTChartViewInteraction> *currentlyHighlightedLayer = [_highlightedLayers firstObject];
     if (currentlyHighlightedLayer != layerToHighlight) {
         [CATransaction begin];
         {
@@ -487,12 +493,12 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
         {
             [CATransaction setAnimationDuration:_kDifferentialHighlightRemoveAnimationDuration];
 
-            for (EXTDifferentialLayer *layer in layersToRemoveHighlight) layer.highlighted = false;
+            for (CALayer<EXTChartViewInteraction> *layer in layersToRemoveHighlight) layer.highlighted = false;
         }
         {
             [CATransaction setAnimationDuration:_kDifferentialHighlightAddAnimationDuration];
 
-            for (EXTDifferentialLayer *layer in layersToHighlight) layer.highlighted = true;
+            for (CALayer<EXTChartViewInteraction> *layer in layersToHighlight) layer.highlighted = true;
         }
     }
     [CATransaction commit];
@@ -565,6 +571,14 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
     else if (context == _EXTChartViewGridSpacingContext) {
         [self _extAlignArtBoardToGrid];
         [self _extUpdateArtBoardMinimumSize];
+    }
+    else if (context == _interactionTypeContext) {
+        for (CALayer<EXTChartViewInteraction> *layer in _highlightedLayers) {
+            layer.highlighted = false;
+        }
+
+        _highlightedLayers = nil;
+        [self updateHighlight];
     }
 	else {
 		[super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
