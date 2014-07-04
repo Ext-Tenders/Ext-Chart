@@ -129,8 +129,6 @@ static void commonInit(EXTTermLayer *self)
 
         CTRunGetPositions(run, (CFRange){0}, positions);
         CTRunGetGlyphs(run, (CFRange){0}, glyphs);
-        //        CFDictionaryRef attributes = CTRunGetAttributes(run);
-        //        CTFontRef runFont = CFDictionaryGetValue(attributes, kCTFontAttributeName);
         for (CFIndex glyphIndex = 0; glyphIndex < runGlyphCount; ++glyphIndex) {
             CAShapeLayer *layer = CAShapeLayer.layer;
             layer.position = positions[glyphIndex];
