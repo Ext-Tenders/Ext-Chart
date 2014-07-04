@@ -12,4 +12,6 @@
 
 @interface EXTDifferentialLayer : CAShapeLayer
 @property (nonatomic, strong) EXTChartViewDifferentialData *differentialData;
+@property (nonatomic, assign, getter = isHighlighted) bool highlighted;
+@property (nonatomic, assign) CGColorRef highlightColor;
 @end

@@ -46,9 +46,6 @@ static const CGFloat _kArtBoardShadowRadius = 2.0;
 static const CGFloat _kArtBoardShadowOpacity = 1.0;
 static const CFTimeInterval _kArtBoardTransitionDuration = 0.125;
 
-static const CGFloat _kDifferentialLineWidth = 0.25;
-static const CGFloat _kHighlightedDifferentialLineWidth = _kDifferentialLineWidth * 5;
-
 static CGColorRef _viewBackgroundColor;
 static CGColorRef _baseGridStrokeColor;
 static CGColorRef _emphasisGridStrokeColor;
@@ -56,7 +53,6 @@ static CGColorRef _axesGridStrokeColor;
 static CGColorRef _artBoardBackgroundColor;
 static CGColorRef _artBoardBorderColor;
 static CGColorRef _artBoardShadowColor;
-static CGColorRef _differentialStrokeColor;
 
 static const CFTimeInterval _kTermHighlightAddAnimationDuration = 0.09 * 1.8;
 static const CFTimeInterval _kTermHighlightRemoveAnimationDuration = 0.07 * 1.8;
@@ -104,7 +100,6 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
         _artBoardBackgroundColor = CGColorCreateCopy([[NSColor whiteColor] CGColor]);
         _artBoardBorderColor = CGColorCreateCopy([[NSColor blackColor] CGColor]);
         _artBoardShadowColor = CGColorCreateCopy([[NSColor blackColor] CGColor]);
-        _differentialStrokeColor = CGColorCreateCopy([[NSColor blackColor] CGColor]);
     }
 }
 
@@ -349,10 +344,8 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
             const CGPoint origin = {MIN(start.x, end.x), MIN(start.y, end.y)};
             const CGSize size = {ABS(start.x - end.x), ABS(start.y - end.y)};
             newDifferentialLayer.frame = (CGRect){origin, size};
-            newDifferentialLayer.lineWidth = _kDifferentialLineWidth;
-            newDifferentialLayer.strokeColor = _differentialStrokeColor;
-            newDifferentialLayer.lineCap = kCALineCapRound;
             newDifferentialLayer.differentialData = diffData;
+            newDifferentialLayer.highlightColor = [self.highlightColor CGColor];
             [newDifferentialLayers addObject:newDifferentialLayer];
             [self.layer addSublayer:newDifferentialLayer];
 
@@ -390,6 +383,7 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
                                                    (CGPoint){NSMaxX(endDotRect), NSMidY(endDotRect)});
             const CGPoint startInLayer = [newDifferentialLayer convertPoint:startDotConnectionPoint fromLayer:self.layer];
             const CGPoint endInLayer = [newDifferentialLayer convertPoint:endDotConnectionPoint fromLayer:self.layer];
+
             CGMutablePathRef path = CGPathCreateMutable();
             CGPathMoveToPoint(path, NULL, startInLayer.x, startInLayer.y);
             CGPathAddLineToPoint(path, NULL, endInLayer.x, endInLayer.y);
@@ -473,6 +467,21 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
         }
     }
 
+//    NSMutableArray *layersToRemoveHighlight = [NSMutableArray new];
+//    for (EXTDifferentialLayer *layer in _highlightedLayers) {
+//        if (![layersToHighlight containsObject:layer]) {
+//            [layersToRemoveHighlight addObject:layer];
+//        }
+//    }
+
+    // To avoid flicker, do not remove highlight from a layer if we are going to add highlight to it anyway.
+    // This happens when the mouse has moved but it’s still in the same grid cell.
+    // TODO: Maybe a better option is to track whether the mouse has moved to a different grid cell, and do not send
+    //       -updateHighlight if the grid cell is the same.
+
+    NSMutableSet *layersToRemoveHighlight = [NSMutableSet setWithArray:_highlightedLayers];
+    [layersToRemoveHighlight minusSet:[NSSet setWithArray:layersToHighlight]];
+
     [CATransaction begin];
     {
         [CATransaction setAnimationTimingFunction:[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseOut]];
@@ -480,33 +489,17 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
         {
             [CATransaction setAnimationDuration:_kDifferentialHighlightRemoveAnimationDuration];
 
-            for (EXTDifferentialLayer *layer in _highlightedLayers) [self removeHighlightFromDifferentialLayer:layer];
+            for (EXTDifferentialLayer *layer in layersToRemoveHighlight) layer.highlighted = false;
         }
         {
             [CATransaction setAnimationDuration:_kDifferentialHighlightAddAnimationDuration];
 
-            for (EXTDifferentialLayer *layer in layersToHighlight) [self addHighlightToDifferentialLayer:layer];
+            for (EXTDifferentialLayer *layer in layersToHighlight) layer.highlighted = true;
         }
     }
     [CATransaction commit];
 
     _highlightedLayers = (layersToHighlight.count == 0 ? nil : [layersToHighlight copy]);
-}
-
-- (void)addHighlightToDifferentialLayer:(EXTDifferentialLayer *)layer
-{
-    if (!layer) return;
-
-    layer.strokeColor = [_highlightColor CGColor];
-    layer.lineWidth = _kHighlightedDifferentialLineWidth;
-}
-
-- (void)removeHighlightFromDifferentialLayer:(EXTDifferentialLayer *)layer
-{
-    if (!layer) return;
-
-    layer.strokeColor = _differentialStrokeColor;
-    layer.lineWidth = _kDifferentialLineWidth;
 }
 
 #pragma mark - Properties
