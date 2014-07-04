@@ -467,13 +467,6 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
         }
     }
 
-//    NSMutableArray *layersToRemoveHighlight = [NSMutableArray new];
-//    for (EXTDifferentialLayer *layer in _highlightedLayers) {
-//        if (![layersToHighlight containsObject:layer]) {
-//            [layersToRemoveHighlight addObject:layer];
-//        }
-//    }
-
     // To avoid flicker, do not remove highlight from a layer if we are going to add highlight to it anyway.
     // This happens when the mouse has moved but it’s still in the same grid cell.
     // TODO: Maybe a better option is to track whether the mouse has moved to a different grid cell, and do not send
