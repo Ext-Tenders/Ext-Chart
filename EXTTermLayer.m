@@ -142,6 +142,8 @@ static void commonInit(EXTTermLayer *self)
 
     outSize->width = CTLineGetTypographicBounds(line, NULL, NULL, NULL);
 
+    CFRelease(line);
+
     return layers;
 }
 
