@@ -388,6 +388,7 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
             CGPathMoveToPoint(path, NULL, startInLayer.x, startInLayer.y);
             CGPathAddLineToPoint(path, NULL, endInLayer.x, endInLayer.y);
             newDifferentialLayer.path = path;
+            CGPathRelease(path);
         }
 
         _differentialLayers = [newDifferentialLayers copy];
