@@ -301,6 +301,10 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
         _axesGridLayer.path = axesPath;
     }
     [CATransaction commit];
+
+    CGPathRelease(basePath);
+    CGPathRelease(emphasisPath);
+    CGPathRelease(axesPath);
 }
 
 - (void)reloadCurrentPage
