@@ -28,8 +28,6 @@ static void *_EXTChartViewArtBoardDrawingRectContext = &_EXTChartViewArtBoardDra
 static void *_EXTChartViewGridAnyKeyContext = &_EXTChartViewGridAnyKeyContext;
 static void *_EXTChartViewGridSpacingContext = &_EXTChartViewGridSpacingContext;
 
-static CFMutableDictionaryRef _glyphPathCache;
-
 static const CGFloat _kBelowGridLevel = -3.0;
 static const CGFloat _kGridLevel = -2.0;
 static const CGFloat _kAboveGridLevel = -1.0;
@@ -51,11 +49,6 @@ static const CFTimeInterval _kArtBoardTransitionDuration = 0.125;
 static const CGFloat _kDifferentialLineWidth = 0.25;
 static const CGFloat _kHighlightedDifferentialLineWidth = _kDifferentialLineWidth * 5;
 
-static const CGFloat _kTermCountLineWidth = 1.0;
-static const CGFloat _kTermCountSingleDigitFontSizeFactor = 0.7;
-static const CGFloat _kTermCountDoubleDigitFontSizeFactor = 0.55;
-static NSString * const _kTermCountFontName = @"Palatino-Roman";
-
 static CGColorRef _viewBackgroundColor;
 static CGColorRef _baseGridStrokeColor;
 static CGColorRef _emphasisGridStrokeColor;
@@ -64,16 +57,11 @@ static CGColorRef _artBoardBackgroundColor;
 static CGColorRef _artBoardBorderColor;
 static CGColorRef _artBoardShadowColor;
 static CGColorRef _differentialStrokeColor;
-static CGColorRef _termCountFillColor;
-static CGColorRef _termCountStrokeColor;
 
 static const CFTimeInterval _kTermHighlightAddAnimationDuration = 0.09 * 1.8;
 static const CFTimeInterval _kTermHighlightRemoveAnimationDuration = 0.07 * 1.8;
 static const CFTimeInterval _kDifferentialHighlightAddAnimationDuration = 0.09;
 static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.07;
-
-
-static NSRect dotBoundingBox(NSInteger count, NSInteger index, EXTIntPoint gridPoint, CGFloat gridSpacing);
 
 
 @implementation EXTChartView
@@ -109,8 +97,6 @@ static NSRect dotBoundingBox(NSInteger count, NSInteger index, EXTIntPoint gridP
 + (void)initialize
 {
     if (self == [EXTChartView class]) {
-        _glyphPathCache = CFDictionaryCreateMutable(kCFAllocatorDefault, 0, NULL, &kCFTypeDictionaryValueCallBacks);
-
         _viewBackgroundColor = CGColorCreateCopy([[NSColor windowBackgroundColor] CGColor]);
         _baseGridStrokeColor = CGColorCreateCopy([[NSColor lightGrayColor] CGColor]);
         _emphasisGridStrokeColor = CGColorCreateCopy([[NSColor darkGrayColor] CGColor]);
@@ -119,8 +105,6 @@ static NSRect dotBoundingBox(NSInteger count, NSInteger index, EXTIntPoint gridP
         _artBoardBorderColor = CGColorCreateCopy([[NSColor blackColor] CGColor]);
         _artBoardShadowColor = CGColorCreateCopy([[NSColor blackColor] CGColor]);
         _differentialStrokeColor = CGColorCreateCopy([[NSColor blackColor] CGColor]);
-        _termCountFillColor = CGColorCreateCopy([[NSColor blackColor] CGColor]);
-        _termCountStrokeColor = CGColorCreateCopy([[NSColor blackColor] CGColor]);
     }
 }
 
@@ -128,6 +112,12 @@ static NSRect dotBoundingBox(NSInteger count, NSInteger index, EXTIntPoint gridP
     self = [super initWithFrame:frame];
     if (self) {
 		[self translateOriginToPoint:NSMakePoint(NSMidX(frame), NSMidY(frame))];
+
+        // Highlighting
+		{
+            _highlightsGridPositionUnderCursor = true;
+            _highlightColor = [[NSUserDefaults standardUserDefaults] extColorForKey:EXTChartViewHighlightColorPreferenceKey];
+        }
 
         CALayer *rootLayer = [CALayer layer];
         rootLayer.frame = self.bounds;
@@ -216,11 +206,6 @@ static NSRect dotBoundingBox(NSInteger count, NSInteger index, EXTIntPoint gridP
             [_grid addObserver:self forKeyPath:@"gridSpacing" options:0 context:_EXTChartViewGridSpacingContext];
         }
 
-        // Highlighting
-		{
-            _highlightsGridPositionUnderCursor = true;
-            _highlightColor = [[NSUserDefaults standardUserDefaults] extColorForKey:EXTChartViewHighlightColorPreferenceKey];
-        }
          */
         // ----- Obsolete End
     }
@@ -338,9 +323,10 @@ static NSRect dotBoundingBox(NSInteger count, NSInteger index, EXTIntPoint gridP
         
         NSArray *counts = [self.dataSource chartView:self termCountsInGridRect:reloadGridRect];
         for (EXTChartViewTermCountData *countData in counts) {
-            EXTTermLayer *newTermLayer = [self layerForTermCount:countData.count];
+            EXTTermLayer *newTermLayer = [EXTTermLayer termLayerWithCount:countData.count length:_grid.gridSpacing];
             newTermLayer.frame = (CGRect){{countData.location.x * _grid.gridSpacing, countData.location.y * _grid.gridSpacing}, {_grid.gridSpacing, _grid.gridSpacing}};
             newTermLayer.termData = countData;
+            newTermLayer.highlightColor = [_highlightColor CGColor];
             [newTermLayers addObject:newTermLayer];
             [self.layer addSublayer:newTermLayer];
         }
@@ -387,8 +373,15 @@ static NSRect dotBoundingBox(NSInteger count, NSInteger index, EXTIntPoint gridP
                 }
             }
 
-            const NSRect startDotRect = dotBoundingBox(startCount, diffData.startIndex, diffData.startLocation, _grid.gridSpacing);
-            const NSRect endDotRect = dotBoundingBox(endCount, diffData.endIndex, diffData.endLocation, _grid.gridSpacing);
+            const NSRect startDotRect = [EXTChartView dotBoundingBoxForTermCount:startCount
+                                                                       termIndex:diffData.startIndex
+                                                                    gridLocation:diffData.startLocation
+                                                                     gridSpacing:_grid.gridSpacing];
+            const NSRect endDotRect = [EXTChartView dotBoundingBoxForTermCount:endCount
+                                                                     termIndex:diffData.endIndex
+                                                                  gridLocation:diffData.endLocation
+                                                                   gridSpacing:_grid.gridSpacing];
+
             const CGPoint startDotConnectionPoint = (startCount <= 3 ?
                                                      (CGPoint){NSMidX(startDotRect), NSMidY(startDotRect)} :
                                                      (CGPoint){NSMinX(startDotRect), NSMidY(startDotRect)});
@@ -407,135 +400,6 @@ static NSRect dotBoundingBox(NSInteger count, NSInteger index, EXTIntPoint gridP
     }
 }
 
-- (EXTTermLayer *)layerForTermCount:(NSInteger)count
-{
-    EXTTermLayer *layer = [EXTTermLayer layer];
-    CGMutablePathRef path = CGPathCreateMutable();
-    CGPathMoveToPoint(path, NULL, 0.0, 0.0);
-
-    const CGFloat _gridSpacing = _grid.gridSpacing;
-
-    for (NSInteger i = 0; i < count; ++i) {
-        CGPathAddEllipseInRect(path, NULL, dotBoundingBox(count, i, (EXTIntPoint){0}, _gridSpacing));
-    }
-
-    if (count <= 3) {
-        layer.fillColor = _termCountFillColor;
-        layer.lineWidth = 0.0;
-    }
-    else {
-        layer.fillColor = [[NSColor clearColor] CGColor];
-        layer.strokeColor = _termCountStrokeColor;
-        layer.lineWidth = _kTermCountLineWidth;
-
-        NSString *label = [NSString stringWithFormat:@"%ld", (long)count];
-        CGFloat fontSize = round((count < 10 ?
-                                  _gridSpacing * _kTermCountSingleDigitFontSizeFactor :
-                                  _gridSpacing * _kTermCountDoubleDigitFontSizeFactor));
-        CGSize textSize;
-        NSArray *glyphLayers = [self layersForString:label atSize:fontSize totalSize:&textSize];
-        // Centre the layers horizontally
-        const CGSize offset = {(_gridSpacing - textSize.width) / 2.0, (_gridSpacing - textSize.height) / 2.0};
-
-        for (CAShapeLayer *glyphLayer in glyphLayers) {
-            CGPoint position = glyphLayer.position;
-            position.x += offset.width;
-            position.y = offset.height;
-            glyphLayer.position = position;
-
-            [layer addSublayer:glyphLayer];
-        }
-    }
-
-    layer.path = path;
-    CGPathRelease(path);
-
-    return layer;
-}
-
-- (NSArray *)layersForString:(NSString *)string atSize:(CGFloat)fontSize totalSize:(CGSize *)outSize
-{
-    NSParameterAssert(outSize);
-
-    NSMutableArray *layers = [NSMutableArray new];
-    outSize->width = outSize->height = 0.0;
-    NSFont *font = [NSFont fontWithName:_kTermCountFontName size:fontSize];
-    NSDictionary *attrs = @{NSFontAttributeName: font};
-
-    NSAttributedString *attrString = [[NSAttributedString alloc] initWithString:string attributes:attrs];
-    CTLineRef line = CTLineCreateWithAttributedString((__bridge CFAttributedStringRef)attrString);
-    CFArrayRef glyphRuns = CTLineGetGlyphRuns(line);
-    CFIndex glyphRunsCount = CFArrayGetCount(glyphRuns);
-    for (CFIndex glyphRunIndex = 0; glyphRunIndex < glyphRunsCount; ++glyphRunIndex) {
-        CTRunRef run = CFArrayGetValueAtIndex(glyphRuns, glyphRunIndex);
-        CFIndex runGlyphCount = CTRunGetGlyphCount(run);
-        CGPoint positions[runGlyphCount];
-        CGGlyph glyphs[runGlyphCount];
-
-        CTRunGetPositions(run, (CFRange){0}, positions);
-        CTRunGetGlyphs(run, (CFRange){0}, glyphs);
-        //        CFDictionaryRef attributes = CTRunGetAttributes(run);
-        //        CTFontRef runFont = CFDictionaryGetValue(attributes, kCTFontAttributeName);
-        for (CFIndex glyphIndex = 0; glyphIndex < runGlyphCount; ++glyphIndex) {
-            CAShapeLayer *layer = CAShapeLayer.layer;
-            layer.position = positions[glyphIndex];
-            layer.path = [self pathForGlyph:glyphs[glyphIndex] atSize:fontSize];
-            [layers addObject:layer];
-
-            NSRect glyphBoundingRect = [font boundingRectForGlyph:glyphs[glyphIndex]];
-            outSize->height = MAX(outSize->height, glyphBoundingRect.size.height);
-        }
-    }
-
-    outSize->width = CTLineGetTypographicBounds(line, NULL, NULL, NULL);
-
-    return layers;
-}
-
-- (CGPathRef)pathForGlyph:(CGGlyph)glyph atSize:(CGFloat)fontSize
-{
-    CTFontRef font = CTFontCreateWithName(CFSTR("Palatino-Roman"), fontSize, NULL);
-    CGPathRef path = [self pathForGlyph:glyph fromFont:font];
-    CFRelease(font);
-    return path;
-}
-
-// From Apple’s CoreAnimationText sample code
-// _glyphPathCache is a two-level dictionary where the first key is the font, the second key is the glyph and the value is the corresponding path
-- (CGPathRef)pathForGlyph:(CGGlyph)glyph fromFont:(CTFontRef)font
-{
-    // First we lookup the font to get to its glyph dictionary
-    CFMutableDictionaryRef glyphDict = (CFMutableDictionaryRef)CFDictionaryGetValue(_glyphPathCache, font);
-    if(glyphDict == NULL)
-    {
-        // And if this font hasn't been seen before, we'll create and set the dictionary for it
-        glyphDict = CFDictionaryCreateMutable(kCFAllocatorDefault, 0, NULL, &kCFTypeDictionaryValueCallBacks);
-        CFDictionarySetValue(_glyphPathCache, font, glyphDict);
-        CFRelease(glyphDict);
-    }
-    // Next we try to get a path for the given glyph from the glyph dictionary
-    CGPathRef path = (CGPathRef)CFDictionaryGetValue(glyphDict, (const void *)(uintptr_t)glyph);
-    if(path == NULL)
-    {
-        // If the path hasn't been seen before, then we'll create the path from the font & glyph and cache it.
-        path = CTFontCreatePathForGlyph(font, glyph, NULL);
-        if(path == NULL)
-        {
-            // If a glyph does not have a path, then we need a placeholder to set in the dictionary
-            path = (CGPathRef)kCFNull;
-        }
-        CFDictionarySetValue(glyphDict, (const void *)(uintptr_t)glyph, path);
-        CFRelease(path);
-    }
-    if(path == (CGPathRef)kCFNull)
-    {
-        // If we got the placeholder, then set the path to NULL
-        // (this will happen either after discovering the glyph path is NULL,
-        // or after looking that up in the dictionary).
-        path = NULL;
-    }
-    return path;
-}
 
 - (void)resetCursorRects
 {
@@ -579,13 +443,13 @@ static NSRect dotBoundingBox(NSInteger count, NSInteger index, EXTIntPoint gridP
                 [CATransaction setAnimationDuration:_kTermHighlightRemoveAnimationDuration];
                 [CATransaction setAnimationTimingFunction:[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseIn]];
 
-                [self removeHighlightFromTermLayer:currentlyHighlightedLayer];
+                currentlyHighlightedLayer.highlighted = false;
             }
             {
                 [CATransaction setAnimationDuration:_kTermHighlightAddAnimationDuration];
                 [CATransaction setAnimationTimingFunction:[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseOut]];
 
-                [self addHighlightToTermLayer:layerToHighlight];
+                layerToHighlight.highlighted = true;
             }
         }
         [CATransaction commit];
@@ -627,38 +491,6 @@ static NSRect dotBoundingBox(NSInteger count, NSInteger index, EXTIntPoint gridP
     [CATransaction commit];
 
     _highlightedLayers = (layersToHighlight.count == 0 ? nil : [layersToHighlight copy]);
-}
-
-// FIXME: These two methods should be part of a CAShapeLayer subclass that knows how to
-// highlight/select term layers; other object types should probably have subclasses as well
-- (void)addHighlightToTermLayer:(EXTTermLayer *)layer
-{
-    if (!layer) return;
-
-    if (layer.termData.count <= 3) {
-        layer.fillColor = [_highlightColor CGColor];
-    }
-    else {
-        layer.strokeColor = [_highlightColor CGColor];
-        for (CAShapeLayer *sublayer in layer.sublayers) {
-            sublayer.fillColor = [_highlightColor CGColor];
-        }
-    }
-}
-
-- (void)removeHighlightFromTermLayer:(EXTTermLayer *)layer
-{
-    if (!layer) return;
-
-    if (layer.termData.count <= 3) {
-        layer.fillColor = _termCountFillColor;
-    }
-    else {
-        layer.strokeColor = _termCountStrokeColor;
-        for (CAShapeLayer *sublayer in layer.sublayers) {
-            sublayer.fillColor = _termCountStrokeColor;
-        }
-    }
 }
 
 - (void)addHighlightToDifferentialLayer:(EXTDifferentialLayer *)layer
@@ -1010,6 +842,64 @@ static NSRect dotBoundingBox(NSInteger count, NSInteger index, EXTIntPoint gridP
     //	[theContext restoreGraphicsState];
 }
 
+#pragma mark - Util
+
++ (CGRect)dotBoundingBoxForTermCount:(NSInteger)termCount
+                           termIndex:(NSInteger)termIndex
+                        gridLocation:(EXTIntPoint)gridLocation
+                         gridSpacing:(CGFloat)gridSpacing
+{
+    switch (termCount) {
+        case 1:
+            return CGRectMake(gridLocation.x*gridSpacing + 2.0/6.0*gridSpacing,
+                              gridLocation.y*gridSpacing + 2.0/6.0*gridSpacing,
+                              2.0*gridSpacing/6.0,
+                              2.0*gridSpacing/6.0);
+
+        case 2:
+            switch (termIndex) {
+                case 0:
+                    return CGRectMake(gridLocation.x*gridSpacing + 1.0/6.0*gridSpacing,
+                                      gridLocation.y*gridSpacing + 1.0/6.0*gridSpacing,
+                                      2.0*gridSpacing/6.0,
+                                      2.0*gridSpacing/6.0);
+                case 1:
+                    return CGRectMake(gridLocation.x*gridSpacing + 3.0/6.0*gridSpacing,
+                                      gridLocation.y*gridSpacing + 3.0/6.0*gridSpacing,
+                                      2.0*gridSpacing/6.0,
+                                      2.0*gridSpacing/6.0);
+            }
+
+        case 3:
+            switch (termIndex) {
+                case 0:
+                    return CGRectMake(gridLocation.x*gridSpacing + 0.66/6.0*gridSpacing,
+                                      gridLocation.y*gridSpacing + 1.0/6.0*gridSpacing,
+                                      2.0*gridSpacing/6.0,
+                                      2.0*gridSpacing/6.0);
+                case 1:
+                    return CGRectMake(gridLocation.x*gridSpacing + 2.0/6.0*gridSpacing,
+                                      gridLocation.y*gridSpacing + 3.0/6.0*gridSpacing,
+                                      2.0*gridSpacing/6.0,
+                                      2.0*gridSpacing/6.0);
+                case 2:
+                    return CGRectMake(gridLocation.x*gridSpacing + 3.33/6.0*gridSpacing,
+                                      gridLocation.y*gridSpacing + 1.0/6.0*gridSpacing,
+                                      2.0*gridSpacing/6.0,
+                                      2.0*gridSpacing/6.0);
+
+            }
+
+        default:
+            return CGRectMake(gridLocation.x*gridSpacing+0.15*gridSpacing,
+                              gridLocation.y*gridSpacing+0.15*gridSpacing,
+                              0.7*gridSpacing,
+                              0.7*gridSpacing);
+    }
+    
+    return CGRectZero;
+}
+
 @end
 
 
@@ -1083,60 +973,3 @@ static NSRect dotBoundingBox(NSInteger count, NSInteger index, EXTIntPoint gridP
             (NSUInteger)_endIndex);
 }
 @end
-
-
-NSRect dotBoundingBox(NSInteger count, NSInteger index, EXTIntPoint gridPoint, CGFloat gridSpacing)
-{
-//    NSCAssert(count > 0, @"Cannot determine the bounding box for zero terms");
-//    NSCAssert(index >= 0 && index < count, @"Index out of bounds");
-
-    switch (count) {
-        case 1:
-            return NSMakeRect(gridPoint.x*gridSpacing + 2.0/6.0*gridSpacing,
-                              gridPoint.y*gridSpacing + 2.0/6.0*gridSpacing,
-                              2.0*gridSpacing/6.0,
-                              2.0*gridSpacing/6.0);
-            
-        case 2:
-            switch (index) {
-                case 0:
-                    return NSMakeRect(gridPoint.x*gridSpacing + 1.0/6.0*gridSpacing,
-                                      gridPoint.y*gridSpacing + 1.0/6.0*gridSpacing,
-                                      2.0*gridSpacing/6.0,
-                                      2.0*gridSpacing/6.0);
-                case 1:
-                    return NSMakeRect(gridPoint.x*gridSpacing + 3.0/6.0*gridSpacing,
-                                      gridPoint.y*gridSpacing + 3.0/6.0*gridSpacing,
-                                      2.0*gridSpacing/6.0,
-                                      2.0*gridSpacing/6.0);
-            }
-
-        case 3:
-            switch (index) {
-                case 0:
-                    return NSMakeRect(gridPoint.x*gridSpacing + 0.66/6.0*gridSpacing,
-                                      gridPoint.y*gridSpacing + 1.0/6.0*gridSpacing,
-                                      2.0*gridSpacing/6.0,
-                                      2.0*gridSpacing/6.0);
-                case 1:
-                    return NSMakeRect(gridPoint.x*gridSpacing + 2.0/6.0*gridSpacing,
-                                      gridPoint.y*gridSpacing + 3.0/6.0*gridSpacing,
-                                      2.0*gridSpacing/6.0,
-                                      2.0*gridSpacing/6.0);
-                case 2:
-                    return NSMakeRect(gridPoint.x*gridSpacing + 3.33/6.0*gridSpacing,
-                                      gridPoint.y*gridSpacing + 1.0/6.0*gridSpacing,
-                                      2.0*gridSpacing/6.0,
-                                      2.0*gridSpacing/6.0);
-
-            }
-
-        default:
-            return NSMakeRect(gridPoint.x*gridSpacing+0.15*gridSpacing,
-                              gridPoint.y*gridSpacing+0.15*gridSpacing,
-                              0.7*gridSpacing,
-                              0.7*gridSpacing);
-    }
-
-    return NSZeroRect;
-}

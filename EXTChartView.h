@@ -45,6 +45,12 @@ typedef NS_ENUM(NSInteger, EXTChartViewInteractionType)
 
 // Actions
 - (IBAction)zoomToFit:(id)sender;
+
+// Util
++ (CGRect)dotBoundingBoxForTermCount:(NSInteger)termCount
+                           termIndex:(NSInteger)termIndex
+                        gridLocation:(EXTIntPoint)gridLocation
+                         gridSpacing:(CGFloat)gridSpacing;
 @end
 
 
