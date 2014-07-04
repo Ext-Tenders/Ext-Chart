@@ -417,8 +417,14 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
 - (void)updateHighlight
 {
     switch (self.interactionType) {
-        case EXTChartViewInteractionTypeTerm: [self updateTermHighlight]; break;
-        case EXTChartViewInteractionTypeDifferential: [self updateDifferentialHighlight]; break;
+        case EXTChartViewInteractionTypeTerm:
+            [self updateTermHighlight];
+            break;
+
+        case EXTChartViewInteractionTypeDifferential:
+            [self updateDifferentialHighlight];
+            break;
+
         case EXTChartViewInteractionTypeMultiplicativeStructure:
         case EXTChartViewInteractionTypeArtBoard:
         case EXTChartViewInteractionTypeNone:
