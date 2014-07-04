@@ -546,6 +546,7 @@ typedef enum : NSInteger {
     CGContextEndPage(PDFContext);
     CGPDFContextClose(PDFContext);
     CGContextRelease(PDFContext);
+    CGLayerRelease(layer);
     [NSGraphicsContext restoreGraphicsState];
 }
 
