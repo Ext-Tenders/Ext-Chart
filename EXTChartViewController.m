@@ -320,8 +320,6 @@ static void *_selectedToolTagContext = &_selectedToolTagContext;
         EXTToolboxTag newTag = [change[NSKeyValueChangeNewKey] integerValue];
         self.selectedObject = nil;
         [self.chartView.window invalidateCursorRectsForView:self.chartView];
-        self.chartView.highlightsGridPositionUnderCursor = (newTag != EXTToolTagArtboard);
-        self.chartView.editingArtBoard = (newTag == EXTToolTagArtboard);
 
         self.chartView.interactionType = [EXTChartViewController interactionTypeFromToolTag:newTag];
     }

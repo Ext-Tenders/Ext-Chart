@@ -30,11 +30,9 @@ typedef NS_ENUM(NSInteger, EXTChartViewInteractionType)
 @property (nonatomic, strong) EXTArtBoard *artBoard;
 @property (nonatomic, readonly) EXTGrid *grid;
 @property (nonatomic, assign) EXTIntRect artBoardGridFrame; // the art board frame in grid coordinate space
-@property (nonatomic, assign) bool editingArtBoard;
 
 @property (nonatomic, assign) EXTChartViewInteractionType interactionType; // FIXME: should encompass editingArtBoard, too
 @property (nonatomic, strong) NSColor *highlightColor;
-@property (nonatomic, assign) bool highlightsGridPositionUnderCursor;
 
 @property (nonatomic, weak) id<EXTChartViewDataSource> dataSource;
 @property (nonatomic, weak) id<EXTChartViewDelegate> delegate;
