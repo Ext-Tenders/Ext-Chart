@@ -12,6 +12,8 @@
 #import "EXTScrollView.h"
 #import "EXTGrid.h"
 #import "EXTArtBoard.h"
+#import "EXTTermLayer.h"
+#import "EXTDifferentialLayer.h"
 #import "NSUserDefaults+EXTAdditions.h"
 
 
@@ -25,10 +27,6 @@ NSString * const EXTChartViewHighlightColorPreferenceKey = @"EXTChartViewHighlig
 static void *_EXTChartViewArtBoardDrawingRectContext = &_EXTChartViewArtBoardDrawingRectContext;
 static void *_EXTChartViewGridAnyKeyContext = &_EXTChartViewGridAnyKeyContext;
 static void *_EXTChartViewGridSpacingContext = &_EXTChartViewGridSpacingContext;
-
-static CGFloat const _EXTHighlightLineWidth = 0.5;
-
-
 
 static CFMutableDictionaryRef _glyphPathCache;
 
@@ -344,9 +342,9 @@ static NSRect dotBoundingBox(NSInteger count, NSInteger index, EXTIntPoint gridP
         
         NSArray *counts = [self.dataSource chartView:self termCountsInGridRect:reloadGridRect];
         for (EXTChartViewTermCountData *countData in counts) {
-            CALayer *newTermLayer = [self layerForTermCount:countData.count];
+            EXTTermLayer *newTermLayer = [self layerForTermCount:countData.count];
             newTermLayer.frame = (CGRect){{countData.location.x * _grid.gridSpacing, countData.location.y * _grid.gridSpacing}, {_grid.gridSpacing, _grid.gridSpacing}};
-            [newTermLayer setValue:countData forKey:_kTermDataKey];
+            newTermLayer.termData = countData;
             [newTermLayers addObject:newTermLayer];
             [self.layer addSublayer:newTermLayer];
         }
@@ -363,7 +361,7 @@ static NSRect dotBoundingBox(NSInteger count, NSInteger index, EXTIntPoint gridP
 
         NSArray *differentials = [self.dataSource chartView:self differentialsInRect:reloadRect];
         for (EXTChartViewDifferentialData *diffData in differentials) {
-            CAShapeLayer *newDifferentialLayer = [CAShapeLayer layer];
+            EXTDifferentialLayer *newDifferentialLayer = [EXTDifferentialLayer layer];
             const CGPoint start = [_grid convertPointToView:diffData.startLocation];
             const CGPoint end = [_grid convertPointToView:diffData.endLocation];
             const CGPoint origin = {MIN(start.x, end.x), MIN(start.y, end.y)};
@@ -372,25 +370,23 @@ static NSRect dotBoundingBox(NSInteger count, NSInteger index, EXTIntPoint gridP
             newDifferentialLayer.lineWidth = _kDifferentialLineWidth;
             newDifferentialLayer.strokeColor = _differentialStrokeColor;
             newDifferentialLayer.lineCap = kCALineCapRound;
-            [newDifferentialLayer setValue:diffData forKey:_kDifferentialDataKey];
+            newDifferentialLayer.differentialData = diffData;
             [newDifferentialLayers addObject:newDifferentialLayer];
             [self.layer addSublayer:newDifferentialLayer];
 
             // FIXME: This is ugly, oh so ugly
             NSInteger startCount = 0;
-            for (CAShapeLayer *layer in _termLayers) {
-                EXTChartViewTermCountData *termData = [layer valueForKey:_kTermDataKey];
-                if (EXTEqualIntPoints(termData.location, diffData.startLocation)) {
-                    startCount = termData.count;
+            for (EXTTermLayer *layer in _termLayers) {
+                if (EXTEqualIntPoints(layer.termData.location, diffData.startLocation)) {
+                    startCount = layer.termData.count;
                     break;
                 }
             }
 
             NSInteger endCount = 0;
-            for (CAShapeLayer *layer in _termLayers) {
-                EXTChartViewTermCountData *termData = [layer valueForKey:_kTermDataKey];
-                if (EXTEqualIntPoints(termData.location, diffData.endLocation)) {
-                    endCount = termData.count;
+            for (EXTTermLayer *layer in _termLayers) {
+                if (EXTEqualIntPoints(layer.termData.location, diffData.endLocation)) {
+                    endCount = layer.termData.count;
                     break;
                 }
             }
@@ -415,9 +411,9 @@ static NSRect dotBoundingBox(NSInteger count, NSInteger index, EXTIntPoint gridP
     }
 }
 
-- (CAShapeLayer *)layerForTermCount:(NSInteger)count
+- (EXTTermLayer *)layerForTermCount:(NSInteger)count
 {
-    CAShapeLayer *layer = CAShapeLayer.layer;
+    EXTTermLayer *layer = [EXTTermLayer layer];
     CGMutablePathRef path = CGPathCreateMutable();
     CGPathMoveToPoint(path, NULL, 0.0, 0.0);
 
@@ -565,22 +561,21 @@ static NSRect dotBoundingBox(NSInteger count, NSInteger index, EXTIntPoint gridP
 
 - (void)updateTermHighlight
 {
-    CAShapeLayer *layerToHighlight = nil;
+    EXTTermLayer *layerToHighlight = nil;
 
     const NSRect dataRect = [_trackingArea rect];
     const NSPoint currentMouseLocation = [self convertPoint:[[self window] mouseLocationOutsideOfEventStream] fromView:nil];
     if (NSPointInRect(currentMouseLocation, dataRect)) {
         const EXTIntPoint mouseLocationInGrid = [_grid convertPointFromView:currentMouseLocation];
-        for (CAShapeLayer *layer in _termLayers) {
-            EXTChartViewTermCountData *termData = [layer valueForKey:_kTermDataKey];
-            if (EXTEqualIntPoints(termData.location, mouseLocationInGrid)) {
+        for (EXTTermLayer *layer in _termLayers) {
+            if (EXTEqualIntPoints(layer.termData.location, mouseLocationInGrid)) {
                 layerToHighlight = layer;
                 break;
             }
         }
     }
 
-    CAShapeLayer *currentlyHighlightedLayer = [_highlightedLayers firstObject];
+    EXTTermLayer *currentlyHighlightedLayer = [_highlightedLayers firstObject];
     if (currentlyHighlightedLayer != layerToHighlight) {
         [CATransaction begin];
         {
@@ -611,9 +606,8 @@ static NSRect dotBoundingBox(NSInteger count, NSInteger index, EXTIntPoint gridP
     const NSPoint currentMouseLocation = [self convertPoint:[[self window] mouseLocationOutsideOfEventStream] fromView:nil];
     if (NSPointInRect(currentMouseLocation, dataRect)) {
         const EXTIntPoint mouseLocationInGrid = [_grid convertPointFromView:currentMouseLocation];
-        for (CAShapeLayer *layer in _differentialLayers) {
-            EXTChartViewDifferentialData *diffData = [layer valueForKey:_kDifferentialDataKey];
-            if (EXTEqualIntPoints(diffData.startLocation, mouseLocationInGrid)) {
+        for (EXTDifferentialLayer *layer in _differentialLayers) {
+            if (EXTEqualIntPoints(layer.differentialData.startLocation, mouseLocationInGrid)) {
                 [layersToHighlight addObject:layer];
             }
         }
@@ -626,12 +620,12 @@ static NSRect dotBoundingBox(NSInteger count, NSInteger index, EXTIntPoint gridP
         {
             [CATransaction setAnimationDuration:_kDifferentialHighlightRemoveAnimationDuration];
 
-            for (CAShapeLayer *layer in _highlightedLayers) [self removeHighlightFromDifferentialLayer:layer];
+            for (EXTDifferentialLayer *layer in _highlightedLayers) [self removeHighlightFromDifferentialLayer:layer];
         }
         {
             [CATransaction setAnimationDuration:_kDifferentialHighlightAddAnimationDuration];
 
-            for (CAShapeLayer *layer in layersToHighlight) [self addHighlightToDifferentialLayer:layer];
+            for (EXTDifferentialLayer *layer in layersToHighlight) [self addHighlightToDifferentialLayer:layer];
         }
     }
     [CATransaction commit];
@@ -641,12 +635,11 @@ static NSRect dotBoundingBox(NSInteger count, NSInteger index, EXTIntPoint gridP
 
 // FIXME: These two methods should be part of a CAShapeLayer subclass that knows how to
 // highlight/select term layers; other object types should probably have subclasses as well
-- (void)addHighlightToTermLayer:(CAShapeLayer *)layer
+- (void)addHighlightToTermLayer:(EXTTermLayer *)layer
 {
     if (!layer) return;
 
-    EXTChartViewTermCountData *termData = [layer valueForKey:_kTermDataKey];
-    if (termData.count <= 3) {
+    if (layer.termData.count <= 3) {
         layer.fillColor = [_highlightColor CGColor];
     }
     else {
@@ -657,12 +650,11 @@ static NSRect dotBoundingBox(NSInteger count, NSInteger index, EXTIntPoint gridP
     }
 }
 
-- (void)removeHighlightFromTermLayer:(CAShapeLayer *)layer
+- (void)removeHighlightFromTermLayer:(EXTTermLayer *)layer
 {
     if (!layer) return;
 
-    EXTChartViewTermCountData *termData = [layer valueForKey:_kTermDataKey];
-    if (termData.count <= 3) {
+    if (layer.termData.count <= 3) {
         layer.fillColor = _termCountFillColor;
     }
     else {
@@ -673,7 +665,7 @@ static NSRect dotBoundingBox(NSInteger count, NSInteger index, EXTIntPoint gridP
     }
 }
 
-- (void)addHighlightToDifferentialLayer:(CAShapeLayer *)layer
+- (void)addHighlightToDifferentialLayer:(EXTDifferentialLayer *)layer
 {
     if (!layer) return;
 
@@ -681,7 +673,7 @@ static NSRect dotBoundingBox(NSInteger count, NSInteger index, EXTIntPoint gridP
     layer.lineWidth = _kHighlightedDifferentialLineWidth;
 }
 
-- (void)removeHighlightFromDifferentialLayer:(CAShapeLayer *)layer
+- (void)removeHighlightFromDifferentialLayer:(EXTDifferentialLayer *)layer
 {
     if (!layer) return;
 
