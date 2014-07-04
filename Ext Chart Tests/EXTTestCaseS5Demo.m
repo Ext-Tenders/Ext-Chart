@@ -36,7 +36,6 @@
     self.chartViewModel.grid = self.grid;
 
     self.baseGridRect = (EXTIntRect){{0, 0}, {2, 5}};
-    self.baseRect = (NSRect){{0, 0}, {100, 100}};
 }
 
 - (void)goToPage:(NSInteger)targetPage
@@ -71,7 +70,7 @@
 {
     [self goToPage:0];
 
-    NSArray *diffs = [self.chartViewModel chartView:nil differentialsInRect:self.baseRect];
+    NSArray *diffs = [self.chartViewModel chartView:nil differentialsInGridRect:self.baseGridRect];
     XCTAssertEqual(diffs.count, 0, @"There should be no differentials on page 0");
 }
 
@@ -79,7 +78,7 @@
 {
     [self goToPage:1];
 
-    NSArray *diffs = [self.chartViewModel chartView:nil differentialsInRect:self.baseRect];
+    NSArray *diffs = [self.chartViewModel chartView:nil differentialsInGridRect:self.baseGridRect];
     XCTAssertEqual(diffs.count, 0, @"There should be no differentials on page 1");
 }
 
@@ -87,7 +86,7 @@
 {
     [self goToPage:2];
 
-    NSArray *diffs = [self.chartViewModel chartView:nil differentialsInRect:self.baseRect];
+    NSArray *diffs = [self.chartViewModel chartView:nil differentialsInGridRect:self.baseGridRect];
     XCTAssertEqual(diffs.count, 2, @"There should be two differentials on page 2");
 
     NSArray *expectedDiffsArray = @[

@@ -349,7 +349,7 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
 
         NSMutableArray *newDifferentialLayers = [NSMutableArray new];
 
-        NSArray *differentials = [self.dataSource chartView:self differentialsInRect:reloadRect];
+        NSArray *differentials = [self.dataSource chartView:self differentialsInGridRect:reloadGridRect];
         for (EXTChartViewDifferentialData *diffData in differentials) {
             EXTDifferentialLayer *newDifferentialLayer = [EXTDifferentialLayer layer];
             const CGPoint start = [_grid convertPointToView:diffData.startLocation];

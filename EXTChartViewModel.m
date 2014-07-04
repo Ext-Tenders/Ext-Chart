@@ -130,14 +130,17 @@ static bool lineSegmentIntersectsLineSegment(NSPoint l1p1, NSPoint l1p2, NSPoint
     return result.copy;
 }
 
-- (NSArray *)chartView:(EXTChartView *)chartView differentialsInRect:(NSRect)rect
+- (NSArray *)chartView:(EXTChartView *)chartView differentialsInGridRect:(EXTIntRect)gridRect
 {
+    const NSRect rect = [self.grid convertRectToView:gridRect];
+
     NSMutableArray *result = [NSMutableArray array];
     for (EXTViewModelDifferential *diff in self.differentials[@(self.currentPage)]) {
-        // FIXME: line intersection in grid coordinates
-//        if (lineSegmentOverRect(diff.start, diff.end, rect)) {
+        const NSPoint start = [self.grid convertPointToView:diff.startLocation];
+        const NSPoint end = [self.grid convertPointToView:diff.endLocation];
+        if (lineSegmentOverRect(start, end, rect)) {
             [result addObject:[diff chartViewDifferentialData]];
-//        }
+        }
     }
     return result.copy;
 }
