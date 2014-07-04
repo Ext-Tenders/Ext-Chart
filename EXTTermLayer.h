@@ -7,12 +7,12 @@
 //
 
 #import <QuartzCore/QuartzCore.h>
+#import "EXTChartViewInteraction.h"
 
 @class EXTChartViewTermCountData;
 
-@interface EXTTermLayer : CAShapeLayer
+@interface EXTTermLayer : CAShapeLayer <EXTChartViewInteraction>
 @property (nonatomic, strong) EXTChartViewTermCountData *termData;
-@property (nonatomic, assign, getter = isHighlighted) bool highlighted;
 @property (nonatomic, assign) CGColorRef highlightColor;
 
 + (instancetype)termLayerWithCount:(NSInteger)count length:(CGFloat)length;

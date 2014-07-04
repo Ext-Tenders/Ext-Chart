@@ -23,6 +23,8 @@ static NSString * const _kTermCountFontName = @"Palatino-Roman";
 
 @implementation EXTTermLayer
 
+@synthesize highlighted = _highlighted;
+
 static void commonInit(EXTTermLayer *self)
 {
     [self addObserver:self forKeyPath:@"highlighted" options:NSKeyValueObservingOptionNew context:_highlightedContext];

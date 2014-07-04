@@ -7,11 +7,11 @@
 //
 
 #import <QuartzCore/QuartzCore.h>
+#import "EXTChartViewInteraction.h"
 
 @class EXTChartViewDifferentialData;
 
-@interface EXTDifferentialLayer : CAShapeLayer
+@interface EXTDifferentialLayer : CAShapeLayer <EXTChartViewInteraction>
 @property (nonatomic, strong) EXTChartViewDifferentialData *differentialData;
-@property (nonatomic, assign, getter = isHighlighted) bool highlighted;
 @property (nonatomic, assign) CGColorRef highlightColor;
 @end

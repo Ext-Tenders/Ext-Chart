@@ -18,6 +18,9 @@ static CGColorRef _differentialStrokeColor;
 
 @implementation EXTDifferentialLayer
 
+@synthesize highlighted = _highlighted;
+
+
 static void commonInit(EXTDifferentialLayer *self)
 {
     self.lineWidth = _kDifferentialLineWidth;
