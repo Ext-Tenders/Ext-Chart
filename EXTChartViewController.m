@@ -140,7 +140,6 @@ static void *_selectedToolTagContext = &_selectedToolTagContext;
 
 - (void)reloadCurrentPage {
     [self.chartViewModel reloadCurrentPage];
-    [self.chartView resetHighlightPath];
     [self.chartView setNeedsDisplay:YES];
     [self.chartView reloadCurrentPage];
 }
@@ -323,7 +322,6 @@ static void *_selectedToolTagContext = &_selectedToolTagContext;
         [self.chartView.window invalidateCursorRectsForView:self.chartView];
         self.chartView.highlightsGridPositionUnderCursor = (newTag != EXTToolTagArtboard);
         self.chartView.editingArtBoard = (newTag == EXTToolTagArtboard);
-        [self.chartView resetHighlightPath];
 
         self.chartView.interactionType = [EXTChartViewController interactionTypeFromToolTag:newTag];
     }

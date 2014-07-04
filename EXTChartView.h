@@ -43,10 +43,6 @@ typedef NS_ENUM(NSInteger, EXTChartViewInteractionType)
 - (void)adjustContentForRect:(NSRect)rect;
 - (void)reloadCurrentPage;
 
-// TODO: I feel like maybe this doesn't belong here.  Shouldn't this be handled
-// by the controller somehow?  Hmph.
-- (void)resetHighlightPath;
-
 // Actions
 - (IBAction)zoomToFit:(id)sender;
 @end
