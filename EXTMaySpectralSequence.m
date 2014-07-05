@@ -203,7 +203,7 @@
                 // if this tag exists in the dictionary, we must discard it,
                 // since 1 + 1 = 0 mod 2.
                 if (allOutputTerms[targetTag] != nil) {
-                    allOutputTerms[targetTag] = nil;
+                    [allOutputTerms removeObjectForKey:targetTag];
                 } else {
                     // but if it doesn't exist, then poke a 1 in.
                     allOutputTerms[targetTag] = @1;
