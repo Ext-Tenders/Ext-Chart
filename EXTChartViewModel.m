@@ -163,7 +163,9 @@ static dispatch_queue_t _dotLayersQueue;
                 continue;
             
             NSMutableArray *boundaryList = differential.end.boundaries[self.currentPage];
-            EXTMatrix *boundaryMatrix = [EXTMatrix matrixWidth:boundaryList.count height:differential.end.size];
+            EXTMatrix *boundaryMatrix = [EXTMatrix new];
+            boundaryMatrix.width = boundaryList.count;
+            boundaryMatrix.height = differential.end.size;
             boundaryMatrix.presentation = boundaryList;
             boundaryMatrix.characteristic = differential.presentation.characteristic;
             int imageSize = [EXTMatrix rankOfMap:differential.presentation intoQuotientByTheInclusion:boundaryMatrix];

@@ -215,8 +215,9 @@
 
 // allocates and initializes a new matrix 
 +(EXTMatrix*) copyTranspose:(EXTMatrix *)input {
-    EXTMatrix *ret = [EXTMatrix matrixWidth:input.height
-                                     height:input.width];
+    EXTMatrix *ret = [EXTMatrix new];
+    ret.width = input.height; ret.height = input.width;
+    ret.presentation = [NSMutableArray arrayWithCapacity:ret.width];
     ret.characteristic = input.characteristic;
     
     for (int i = 0; i < [input height]; i++) {
@@ -251,14 +252,19 @@
 
 // performs a deep copy of the matrix
 -(EXTMatrix*) copy {
-    EXTMatrix *copy = [EXTMatrix matrixWidth:width height:height];
+    EXTMatrix *copy = [EXTMatrix new];
+    copy.width = width; copy.height = height;
+    copy.presentation = [NSMutableArray arrayWithCapacity:width];
     copy.characteristic = self.characteristic;
     
-    for (int i = 0; i < width; i++)
+    for (int i = 0; i < width; i++) {
+        NSMutableArray *column = (copy.presentation[i] = [NSMutableArray arrayWithCapacity:height]);
+    
         for (int j = 0; j < height; j++) {
             NSNumber *num = ((NSArray*)presentation[i])[j];
-            ((NSMutableArray*)copy.presentation[i])[j] = num;
+            column[j] = num;
         }
+    }
     
     return copy;
 }
@@ -495,8 +501,10 @@
     if (left.width != right.height)
         NSLog(@"Mismatched multiplication.");
     
-    EXTMatrix *product = [EXTMatrix matrixWidth:[right width]
-                                         height:[left height]];
+    EXTMatrix *product = [EXTMatrix new];
+    product.width = right.width;
+    product.height = left.height;
+    product.presentation = [NSMutableArray arrayWithCapacity:product.width];
     {
         int a = left.characteristic,
             b = right.characteristic,
@@ -569,7 +577,9 @@
     
     // peel off the inverse from the augmented portion
     // XXX: some kind of error checking would be nice
-    EXTMatrix *ret = [EXTMatrix matrixWidth:self.width height:self.width];
+    EXTMatrix *ret = [EXTMatrix new];
+    ret.width = self.width; ret.height = self.width;
+    ret.presentation = [NSMutableArray arrayWithCapacity:self.width];
     ret.characteristic = self.characteristic;
     for (int i = 0; i < self.width; i++) {
         ret.presentation[i] = unflip.presentation[self.width+i];
@@ -681,8 +691,8 @@
     [right modularReduction];
     
     // form the matrix [P, -Q]
-    EXTMatrix *sum = [EXTMatrix matrixWidth:(left.width + right.width)
-                                     height:left.height];
+    EXTMatrix *sum = [EXTMatrix new];
+    sum.width = left.width + right.width; sum.height = left.height;
     sum.presentation = [NSMutableArray arrayWithArray:left.presentation];
     [sum.presentation addObjectsFromArray:[right scale:(-1)].presentation];
     sum.characteristic = left.characteristic;
@@ -696,17 +706,21 @@
                                                height:left.width],
               *rightinclusion = [EXTMatrix matrixWidth:nullspace.count
                                                 height:right.width];
+    leftinclusion.width = nullspace.count; leftinclusion.height = left.width;
+    rightinclusion.width = nullspace.count; rightinclusion.height = right.width;
+    leftinclusion.presentation = [NSMutableArray arrayWithCapacity:nullspace.count];
+    rightinclusion.presentation = [NSMutableArray arrayWithCapacity:nullspace.count];
     
     for (int i = 0; i < nullspace.count; i++) {
         NSArray *col = nullspace[i];
+        NSMutableArray *leftcol = (leftinclusion.presentation[i] = [NSMutableArray arrayWithCapacity:left.width]),
+                       *rightcol = (rightinclusion.presentation[i] = [NSMutableArray arrayWithCapacity:right.width]);
         
         for (int j = 0; j < left.width; j++) {
-            NSMutableArray *leftcol = leftinclusion.presentation[i];
             leftcol[j] = col[j];
         }
         
         for (int j = 0; j < right.width; j++) {
-            NSMutableArray *rightcol = rightinclusion.presentation[i];
             rightcol[j] = col[j + left.width];
         }
     }

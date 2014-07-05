@@ -348,9 +348,7 @@
              i < generators.count ? TRUE : !(totalRollover = TRUE);
              i++) {
             NSDictionary *generator = generators[i];
-            int value =
-                [[tag.tags objectForKey:[generator objectForKey:@"name"]]
-                        intValue] + 1;
+            int value = [tag.tags[generator[@"name"]] intValue] + 1;
             
             // there are two kinds of roll-over
             if ((generator == entry) && (value > newBound)) {
