@@ -269,7 +269,9 @@
 -(NSArray*) columnReduceWithRightFactor:(bool)dealWithFactor
                                andLimit:(int)limit {
     EXTMatrix *ret = [self copy],
-              *rightFactor = [EXTMatrix identity:self.width];
+              *rightFactor = nil;
+    if (dealWithFactor)
+        rightFactor = [EXTMatrix identity:self.width];
     
     int *retData = ret.presentation.mutableBytes;
     
@@ -379,10 +381,14 @@
         for (int j = 0; j < height; j++)
             retData[pivotColumn*ret.height+j] = [newColumn[j] intValue];
         
-        EXTMatrix *rightmostFactor = [EXTMatrix identity:self.width];
-        int *rightmostData = rightmostFactor.presentation.mutableBytes;
-        for (int j = 0; j < width; j++)
-            rightmostData[pivotColumn*rightmostFactor.height+j] = bezout[j];
+        EXTMatrix *rightmostFactor = nil;
+        int *rightmostData = nil;
+        if (dealWithFactor) {
+            rightmostFactor = [EXTMatrix identity:self.width];
+            rightmostData = rightmostFactor.presentation.mutableBytes;
+            for (int j = 0; j < width; j++)
+                rightmostData[pivotColumn*rightmostFactor.height+j] = bezout[j];
+        }
         
         // then iterate through the other columns...
         for (j = 0; j < width; j++) {
@@ -416,15 +422,18 @@
                 retData[j*ret.height+i] -= factor * retData[pivotColumn*ret.height+i];
             }
             
-            for (int i = 0; i < width; i++) {
-                rightmostData[j*rightmostFactor.height+i] -= factor * bezout[i];
+            if (dealWithFactor) {
+                for (int i = 0; i < width; i++) {
+                    rightmostData[j*rightmostFactor.height+i] -= factor * bezout[i];
+                }
             }
         }
         
         // if necessary, put the matrix back in its modular equivalence class.
         [ret modularReduction];
         
-        rightFactor = [EXTMatrix newMultiply:rightFactor by:rightmostFactor];
+        if (dealWithFactor)
+            rightFactor = [EXTMatrix newMultiply:rightFactor by:rightmostFactor];
     }
     
     // manually deallocate data
@@ -435,13 +444,16 @@
     usedColumns = NULL;
     rowToBezout = row = bezout = NULL;
     
-    return @[ret, rightFactor];
+    if (dealWithFactor)
+        return @[ret, rightFactor];
+    else
+        return @[ret];
 }
 
 // runs gaussian column reduction on a matrix over Z.  useful for finding a
 // presentation of the image of the matrix.
 -(EXTMatrix*) columnReduce {
-    return (EXTMatrix*)([self columnReduceWithRightFactor:true andLimit:self.height][0]);
+    return (EXTMatrix*)([self columnReduceWithRightFactor:false andLimit:self.height][0]);
 }
 
 // returns a basis for the kernel of a matrix
@@ -674,7 +686,7 @@
     
     // now, perform our usual left-to-right column reduction to it.
     // TODO: implement a version of cRWRFAL that doesn't compute the right factor
-    EXTMatrix *reducedMatrix = [bigMatrix columnReduceWithRightFactor:true andLimit:sourceDimension][0];
+    EXTMatrix *reducedMatrix = [bigMatrix columnReduceWithRightFactor:false andLimit:sourceDimension][0];
     
     // we find those columns of the form [ej; stuff], and extract the 'stuff'
     // from this column. this is our differential.
