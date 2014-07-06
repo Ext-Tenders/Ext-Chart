@@ -120,17 +120,17 @@
                  sSeq:(EXTSpectralSequence*)sSeq {
     // if we're at the bottom page, then there are no differentials to test.
     if (whichPage == 0) {
-        [cycles setObject:[EXTMatrix identity:self.size].presentation atIndexedSubscript:0];
+        [cycles setObject:[EXTMatrix identity:self.size] atIndexedSubscript:0];
         return;
     }
 
     // otherwise...
-    NSMutableArray *oldCycles = [cycles objectAtIndex:(whichPage-1)];
+    EXTMatrix *oldCycles = [cycles objectAtIndex:(whichPage-1)];
 
     // if the EXTTerm has already been emptied, don't even bother computing any
     // new differentials.
-    if ([oldCycles count] == 0) {
-        [cycles setObject:@[] atIndexedSubscript:whichPage];
+    if ([oldCycles width] == 0) {
+        cycles[whichPage] = [EXTMatrix matrixWidth:0 height:self.size];
         return;
     }
     
@@ -139,7 +139,7 @@
     
     // if no differentials act, then copy the old cycles anew.
     if (!differential) {
-        [cycles setObject:[[cycles objectAtIndex:(whichPage-1)] copy] atIndexedSubscript:whichPage];
+        cycles[whichPage] = [cycles[whichPage-1] copy];
         return;
     }
     
@@ -153,22 +153,14 @@
     // are the elements of Z^r_{s+1, t-r+2} which we want.  following the
     // composite Z^r_{s+1, t-r+2} --> Z^{r-1}_{s+1, t-r+2} --> E^1_{s+1, t-r+2}
     // gives the cycle matrix in the form we've been expecting it.
-    NSArray *boundariesArray = differential.end.boundaries[(whichPage-1)];
-    EXTMatrix *left =
-        [EXTMatrix matrixWidth:boundariesArray.count
-                        height:differential.end.size];
-    left.presentation = (NSMutableArray*)boundariesArray;
-    EXTMatrix *incomingCycles =
-                    [EXTMatrix matrixWidth:((NSArray*)cycles[whichPage-1]).count
-                                    height:self.size];
-    incomingCycles.presentation = cycles[whichPage-1];
+    EXTMatrix *left = differential.end.boundaries[(whichPage-1)];
+    EXTMatrix *incomingCycles = cycles[whichPage-1];
     EXTMatrix *right = differential.presentation;
     
     // if there's something to match the characteristic by, then do it
     if (differential.partialDefinitions.count > 0) {
         EXTPartialDefinition *firstP = differential.partialDefinitions[0];
         left.characteristic = firstP.inclusion.characteristic;
-        right.characteristic = firstP.action.characteristic;
     }
     
     // this is the span B^{r-1}_{s, t} <-- S --> Z^{r-1}_{s+1, t-r+2}.
@@ -179,8 +171,8 @@
     EXTMatrix *cycleComposite = [EXTMatrix newMultiply:incomingCycles by:span[1]];
     
     // store it to the cycles list
-    cycles[whichPage] = cycleComposite.presentation;
-        
+    cycles[whichPage] = cycleComposite;
+    
     return;
 }
 
@@ -205,17 +197,18 @@
     [differential assemblePresentation];
     
     // add these to the old boundaries
-    NSMutableArray *oldBoundaries = boundaries[whichPage-1];
-    EXTMatrix *boundaryInclusion =
-        [EXTMatrix matrixWidth:(oldBoundaries.count+
-                                differential.presentation.width)
-                        height:differential.presentation.height];
-    boundaryInclusion.presentation = differential.presentation.presentation;
-    [boundaryInclusion.presentation addObjectsFromArray:oldBoundaries];
-    boundaryInclusion.characteristic = sSeq.defaultCharacteristic;
+    EXTMatrix *newBoundaries = [boundaries[whichPage - 1] copy];
+    [newBoundaries.presentation increaseLengthBy:differential.presentation.presentation.length];
+    
+    int *newBoundariesData = newBoundaries.presentation.mutableBytes,
+        *differentialData = differential.presentation.presentation.mutableBytes;
+    for (int i = 0; i < differential.presentation.width; i++)
+        for (int j = 0; j < differential.presentation.height; j++)
+            newBoundariesData[(newBoundaries.width+i)*newBoundaries.height+j] = differentialData[differential.presentation.height*i+j];
+    newBoundaries.width += differential.presentation.width;
     
     // find a minimum spanning set and store it
-    boundaries[whichPage] = [boundaryInclusion image];
+    boundaries[whichPage] = [newBoundaries image];
 
     return;
 }
@@ -226,16 +219,8 @@
     [self computeCycles:whichPage sSeq:sSeq];
     [self computeBoundaries:whichPage sSeq:sSeq];
     
-    NSMutableArray *cycleArray = self.cycles[whichPage],
-                   *boundaryArray = self.boundaries[whichPage];
-    EXTMatrix *cycleMat = [EXTMatrix matrixWidth:cycleArray.count
-                                          height:self.names.count],
-    *boundaryMat = [EXTMatrix matrixWidth:boundaryArray.count
-                                   height:self.names.count];
-    cycleMat.presentation = cycleArray;
-    boundaryMat.presentation = boundaryArray;
-    cycleMat.characteristic = characteristic;
-    boundaryMat.characteristic = characteristic;
+    EXTMatrix *cycleMat = self.cycles[whichPage],
+              *boundaryMat = self.boundaries[whichPage];
     
     homologyReps[whichPage] = [EXTMatrix findOrdersOf:boundaryMat in:cycleMat];
 }

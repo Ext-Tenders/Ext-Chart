@@ -328,8 +328,9 @@
             // also need to modify all incoming and outgoing differentials.
             EXTMatrix *inclusion = [EXTMatrix matrixWidth:(term.size-1)
                                                    height:term.size];
+            int *inclusionData = inclusion.presentation.mutableBytes;
             for (int i = 0; i < term.size-1; i++)
-                [inclusion.presentation[i] setObject:@1 atIndex:i];
+                inclusionData[i*inclusion.height + i] = 1;
             for (int i = 1; i < self.differentials.count; i++) {
                 EXTDifferential
                     *outgoing = [self findDifflWithSource:workingLoc onPage:i],
@@ -384,14 +385,14 @@
                                      height:target.size];
     ret.characteristic = self.defaultCharacteristic;
     
+    int *retData = ret.presentation.mutableBytes;
     for (int i = 0; i < left.size; i++)
     for (int j = 0; j < right.size; j++) {
         EXTPolynomialTag *sumTag = [EXTPolynomialTag sum:left.names[i]
                                                     with:right.names[j]];
         int index = [target.names indexOfObject:sumTag];
         if (index != -1) {
-            NSMutableArray *retcol = ret.presentation[i*right.size+j];
-            retcol[index] = @([self koszulSignForMultiplying:left.names[i] by:right.names[j]]);
+            retData[(i*right.size+j)*ret.height+index] = [self koszulSignForMultiplying:left.names[i] by:right.names[j]];
         }
     }
     
@@ -598,8 +599,10 @@
         
         EXTMatrix *inclusion = [EXTMatrix matrixWidth:indexList.count
                                                height:term.size];
+        int *inclusionData = inclusion.presentation.mutableBytes;
         for (int index = 0; index < indexList.count; index++)
-            inclusion.presentation[index][[indexList[index] intValue]] = @1;
+            inclusionData[index*inclusion.height +
+                          [indexList[index] intValue]] = 1;
         
         for (int page = 0; page < self.differentials.count; page++) {
             EXTDifferential *outgoing = [self findDifflWithSource:term.location
@@ -665,11 +668,8 @@
     return power & 0x1 ? -1 : 1;
 }
 
-- (int)rankOfVector:(NSArray *)vector
-         inLocation:(NSObject<EXTLocation> *)loc
-           actingAt:(NSObject<EXTLocation> *)otherLoc
-             onPage:(int)page {
-    EXTTerm *otherTerm = self.terms[otherLoc];
+- (int)rankOfVector:(NSArray *)vector inLocation:(NSObject<EXTLocation> *)loc actingAt:(NSObject<EXTLocation> *)otherLoc onPage:(int)page {
+    EXTTerm *otherTerm = [self findTerm:otherLoc];
     if (!otherTerm)
         return 0;
     
@@ -682,11 +682,16 @@
     if (!sumTerm || !multMatrix)
         return 0;
     
-    EXTMatrix *cycleMatrix = [EXTMatrix matrixWidth:0 height:(vector.count*otherTerm.size)];
+    EXTMatrix *cycleMatrix = [EXTMatrix matrixWidth:((NSMutableDictionary*)otherTerm.homologyReps[page]).count height:(vector.count*otherTerm.size)];
+    cycleMatrix.width = 0;
+    int *cycleData = cycleMatrix.presentation.mutableBytes;
     for (NSArray *cycle in otherTerm.homologyReps[page]) {
-        [cycleMatrix.presentation addObject:[EXTMatrix hadamardVectors:vector with:cycle]];
+        NSArray *hadamardResult = [EXTMatrix hadamardVectors:vector with:cycle];
+        for (int j = 0; j < cycle.count; j++)
+            cycleData[cycleMatrix.height*cycleMatrix.width+j] =
+            [hadamardResult[j] intValue];
+        cycleMatrix.width += 1;
     }
-    cycleMatrix.width = cycleMatrix.presentation.count;
     
     EXTMatrix *boundaryMatrix = [EXTMatrix matrixWidth:((NSArray*)sumTerm.boundaries[page]).count height:sumTerm.size];
     boundaryMatrix.presentation = sumTerm.boundaries[page];

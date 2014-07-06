@@ -340,18 +340,20 @@
     EXTMatrix *bigInclusion = [EXTMatrix matrixWidth:0 height:underlyingDiff.start.names.count];
     bigInclusion.characteristic = 2;
     for (EXTPartialDefinition *partial in underlyingDiff.partialDefinitions) {
+        [bigInclusion.presentation increaseLengthBy:partial.inclusion.presentation.length];
+        memcpy(((int*)bigInclusion.presentation.mutableBytes)+bigInclusion.width*bigInclusion.height, partial.inclusion.presentation.mutableBytes, partial.inclusion.presentation.length);
         bigInclusion.width = bigInclusion.width + partial.inclusion.width;
-        [bigInclusion.presentation addObjectsFromArray:partial.inclusion.presentation];
     }
     EXTMatrix *smallInclusion = [EXTMatrix matrixWidth:1 height:underlyingDiff.start.names.count];
     smallInclusion.characteristic = 2;
-    smallInclusion.presentation[0] = inVector;
+    for (int i = 0; i < inVector.count; i++)
+        ((int*)smallInclusion.presentation.mutableBytes)[i] = [inVector[i] intValue];
     EXTMatrix *pullback = (EXTMatrix*)[EXTMatrix formIntersection:bigInclusion with:smallInclusion][1];
     [pullback modularReduction];
     
     bool inVectorIsCovered = false;
     for (int i = 0; i < pullback.width; i++) {
-        if ([pullback.presentation[i][0] intValue] != 0)
+        if (((int*)pullback.presentation.mutableBytes)[i*pullback.height+0] != 0)
             inVectorIsCovered = true;
     }
     if (!inVectorIsCovered)
@@ -359,15 +361,15 @@
     
     // if we've made it this far, then we're really contributing some defn.
     // try to compute nakamura's rule.
-    NSMutableArray *cycles = underlyingDiff.start.cycles[underlyingDiff.page];
-    EXTMatrix *cycleInclusion =
-        [EXTMatrix matrixWidth:cycles.count height:underlyingDiff.start.size];
-    cycleInclusion.presentation = cycles;
-    cycleInclusion.characteristic = 2;
-    EXTMatrix *vectorInCycleCoords = [EXTMatrix formIntersection:smallInclusion with:cycleInclusion][1];
+    EXTMatrix *cycles = underlyingDiff.start.cycles[underlyingDiff.page];
+    cycles.characteristic = 2;
+    EXTMatrix *vectorInCycleCoords = [EXTMatrix formIntersection:smallInclusion with:cycles][1];
     [underlyingDiff assemblePresentation];
     
-    NSArray *outVector = [EXTMatrix newMultiply:underlyingDiff.presentation by:vectorInCycleCoords].presentation[0];
+    EXTMatrix *product = [EXTMatrix newMultiply:underlyingDiff.presentation by:vectorInCycleCoords];
+    NSMutableArray *outVector = [NSMutableArray arrayWithCapacity:product.height];
+    for (int i = 0; i < product.height; i++)
+        outVector[i] = @(((int*)product.presentation.mutableBytes)[i]);
     
     NSArray *startSquarePair = [self applySquare:order
                                         toVector:inVector
@@ -399,10 +401,12 @@
     //                     d Sq^order v = Sq^order d v.
     EXTPartialDefinition *partial = [EXTPartialDefinition new];
     partial.inclusion = [EXTMatrix matrixWidth:1 height:startSquare.count];
-    partial.inclusion.presentation[0] = startSquare;
+    for (int i = 0; i < startSquare.count; i++)
+        ((int*)partial.inclusion.presentation.mutableBytes)[i] = [startSquare[i] intValue];
     partial.inclusion.characteristic = 2;
     partial.action = [EXTMatrix matrixWidth:1 height:endSquare.count];
-    partial.action.presentation[0] = endSquare;
+    for (int i = 0; i < endSquare.count; i++)
+        ((int*)partial.action.presentation.mutableBytes)[i] = [endSquare[i] intValue];
     partial.action.characteristic = 2;
     partial.description = [NSString stringWithFormat:@"Nakamura's lemma applied along Sq^%d on E_%d^%@", order, page, location];
     [diff.partialDefinitions addObject:partial];

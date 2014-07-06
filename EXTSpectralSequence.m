@@ -469,7 +469,7 @@
                     // addendum: because this is where we deal with commuting
                     // P across B, this is also where the koszul sign rule shows
                     // up. that's what that little conditional is about.
-                    ((NSMutableArray*)(i1.presentation[l+Q.size*(j+P.size*(k+i*B.size))]))[APskip + BQoffset + k*Q.size + l] = (B.location.koszulDegree * P.location.koszulDegree) & 0x1 ? @(-1) : @1;
+                    ((int*)i1.presentation.mutableBytes)[(l+Q.size*(j+P.size*(k+i*B.size)))*i1.height + (APskip + BQoffset + k*Q.size + l)] = (B.location.koszulDegree * P.location.koszulDegree) & 0x1 ? -1 : 1;
                 }
                 
                 // now, we use this to build the differential presentation.
@@ -721,11 +721,16 @@
     if (!sumTerm || !multMatrix)
         return 0;
     
-    EXTMatrix *cycleMatrix = [EXTMatrix matrixWidth:0 height:(vector.count*otherTerm.size)];
+    EXTMatrix *cycleMatrix = [EXTMatrix matrixWidth:((NSMutableDictionary*)otherTerm.homologyReps[page]).count height:(vector.count*otherTerm.size)];
+    cycleMatrix.width = 0;
+    int *cycleData = cycleMatrix.presentation.mutableBytes;
     for (NSArray *cycle in otherTerm.homologyReps[page]) {
-        [cycleMatrix.presentation addObject:[EXTMatrix hadamardVectors:vector with:cycle]];
+        NSArray *hadamardResult = [EXTMatrix hadamardVectors:vector with:cycle];
+        for (int j = 0; j < cycle.count; j++)
+            cycleData[cycleMatrix.height*cycleMatrix.width+j] =
+                                                [hadamardResult[j] intValue];
+        cycleMatrix.width += 1;
     }
-    cycleMatrix.width = cycleMatrix.presentation.count;
     
     EXTMatrix *boundaryMatrix = [EXTMatrix matrixWidth:((NSArray*)sumTerm.boundaries[page]).count height:sumTerm.size];
     boundaryMatrix.presentation = sumTerm.boundaries[page];

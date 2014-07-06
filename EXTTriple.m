@@ -131,77 +131,33 @@
     self.internalToUser = [EXTMatrix identity:3];
     self.userToScreen = [EXTMatrix matrixWidth:3 height:2];
     
-    self.userToScreen.presentation[0][0] = @(-1);
-    self.userToScreen.presentation[0][1] = @1;
-    self.userToScreen.presentation[1][0] = @1;
+    int *userToScreenData = userToScreen.presentation.mutableBytes;
+    
+    userToScreenData[2*0+0] = -1;
+    userToScreenData[2*0+1] = 1;
+    userToScreenData[2*1+0] = 1;
     
     return self;
 }
 
 -(EXTTriple*) convertFromInternalToUser:(EXTTriple*)loc {
     EXTMatrix *matFromPair = [EXTMatrix matrixWidth:1 height:3];
-    matFromPair.presentation[0][0] = @(loc.a);
-    matFromPair.presentation[0][1] = @(loc.b);
-    matFromPair.presentation[0][2] = @(loc.c);
+    int *matFromPairData = matFromPair.presentation.mutableBytes;
+    matFromPairData[1*0 + 0] = loc.a;
+    matFromPairData[1*0 + 1] = loc.b;
+    matFromPairData[1*0 + 2] = loc.c;
     
     EXTMatrix *converted = [EXTMatrix newMultiply:internalToUser by:matFromPair];
-    return [EXTTriple tripleWithA:[converted.presentation[0][0] intValue]
-                                B:[converted.presentation[0][1] intValue]
-                                C:[converted.presentation[0][2] intValue]];
+    int *convertedData = converted.presentation.mutableBytes;
+    return [EXTTriple tripleWithA:convertedData[3*0+0]
+                                B:convertedData[3*0+1]
+                                C:convertedData[3*0+2]];
 }
 
 -(EXTTriple*) convertFromUserToInternal:(EXTTriple*)loc {
-    // TODO: we'd like to just use the -invert method here, but at the moment it
-    // looks like it uses -columnReduce, which is fixed to mod 2 arithmetic.
+    EXTMatrix *userToInternal = [internalToUser invert];
     
-    NSArray *m = internalToUser.presentation;
-    
-    NSInteger det = [m[0][0] intValue] *
-                    ([m[1][1] intValue] * [m[2][2] intValue] -
-                     [m[1][2] intValue] * [m[2][1] intValue]) -
-                    [m[1][0] intValue] *
-                    ([m[0][1] intValue] * [m[2][2] intValue] -
-                     [m[2][1] intValue] * [m[0][2] intValue]) +
-                    [m[2][0] intValue] *
-                    ([m[0][1] intValue] * [m[1][2] intValue] -
-                     [m[1][1] intValue] * [m[0][2] intValue]);
-    
-    // XXX: surely this can be handled more gracefully. in any case, det should
-    // be a multiplicative unit.
-    assert(det == 1 || det == -1);
-    
-    // TODO: this actually write out the formula for an inverse manually.
-    // this is terrible. :( it will be a wonder if i get it completely right.
-    EXTMatrix *userToInternal = [EXTMatrix matrixWidth:3 height:3];
-    userToInternal.presentation[0][0] =
-        @([m[1][1] intValue]*[m[2][2] intValue] -
-          [m[2][0] intValue]*[m[1][2] intValue]);
-    userToInternal.presentation[0][1] =
-        @([m[2][1] intValue]*[m[0][2] intValue] -
-          [m[0][1] intValue]*[m[2][2] intValue]);
-    userToInternal.presentation[0][2] =
-        @([m[0][1] intValue]*[m[1][2] intValue] -
-          [m[1][1] intValue]*[m[0][2] intValue]);
-    userToInternal.presentation[1][0] =
-        @([m[2][0] intValue]*[m[1][2] intValue] -
-          [m[1][0] intValue]*[m[2][2] intValue]);
-    userToInternal.presentation[1][1] =
-        @([m[0][0] intValue]*[m[2][2] intValue] -
-          [m[2][0] intValue]*[m[0][2] intValue]);
-    userToInternal.presentation[1][2] =
-        @([m[1][0] intValue]*[m[0][2] intValue] -
-          [m[0][0] intValue]*[m[1][2] intValue]);
-    userToInternal.presentation[2][0] =
-        @([m[1][0] intValue]*[m[2][1] intValue] -
-          [m[2][0] intValue]*[m[1][1] intValue]);
-    userToInternal.presentation[2][1] =
-        @([m[2][0] intValue]*[m[0][1] intValue] -
-          [m[0][0] intValue]*[m[2][1] intValue]);
-    userToInternal.presentation[2][2] =
-        @([m[0][0] intValue]*[m[1][1] intValue] -
-          [m[1][0] intValue]*[m[0][1] intValue]);
-    
-    userToInternal = [userToInternal scale:(1/det)];
+    assert(userToInternal != nil);
     
     NSArray *result = [userToInternal actOn:@[@(loc.a), @(loc.b), @(loc.c)]];
     
@@ -212,17 +168,14 @@
 
 -(EXTIntPoint) gridPoint:(EXTTriple*)loc {
     EXTTriple *userCoordsTriple = [self convertFromInternalToUser:loc];
+    NSArray *userCoords = @[@(userCoordsTriple.a),
+                            @(userCoordsTriple.b),
+                            @(userCoordsTriple.c)];
     
-    EXTMatrix *userCoords = [EXTMatrix matrixWidth:1 height:3];
-    userCoords.presentation[0][0] = @(userCoordsTriple.a);
-    userCoords.presentation[0][1] = @(userCoordsTriple.b);
-    userCoords.presentation[0][2] = @(userCoordsTriple.c);
+    NSArray *screenCoords = [userToScreen actOn:userCoords];
     
-    EXTMatrix *screenCoords = [EXTMatrix newMultiply:userToScreen by:userCoords];
-    
-    return (EXTIntPoint)
-    {[screenCoords.presentation[0][0] intValue],
-        [screenCoords.presentation[0][1] intValue]};
+    return (EXTIntPoint){[screenCoords[0] intValue],
+                         [screenCoords[1] intValue]};
 }
 
 -(EXTIntPoint) followDifflAtGridLocation:(EXTIntPoint)gridLocation
@@ -231,29 +184,28 @@
                                                by:internalToUser];
     
     EXTMatrix *clickCoord = [EXTMatrix matrixWidth:1 height:2];
-    clickCoord.presentation[0][0] = @((int)gridLocation.x);
-    clickCoord.presentation[0][1] = @((int)gridLocation.y);
+    int *clickCoordData = clickCoord.presentation.mutableBytes;
+    clickCoordData[2*0+0] = (int)gridLocation.x;
+    clickCoordData[2*0+1] = (int)gridLocation.y;
     
     NSArray *pair = [EXTMatrix formIntersection:composite with:clickCoord];
     
     EXTTriple *liftedTriple;
-    NSArray *lift;
     
-    if ([((EXTMatrix*)pair[1]).presentation[0][0] intValue] != 0) {
-        lift = ((EXTMatrix*)pair[0]).presentation[0];
-        
-        liftedTriple = [EXTTriple tripleWithA:[lift[0] intValue]
-                                            B:[lift[1] intValue]
-                                            C:[lift[2] intValue]];
-        if ([((EXTMatrix*)pair[1]).presentation[0][0] intValue] == -1)
+    int *leftData = ((EXTMatrix*)pair[0]).presentation.mutableBytes,
+        *rightData = ((EXTMatrix*)pair[1]).presentation.mutableBytes;
+    
+    if (rightData[0] != 0) {
+        liftedTriple = [EXTTriple tripleWithA:leftData[0]
+                                            B:leftData[1]
+                                            C:leftData[2]];
+        if (rightData[0] == -1)
             liftedTriple = [EXTTriple scale:liftedTriple by:-1];
     } else {
-        lift = ((EXTMatrix*)pair[0]).presentation[1];
-        
-        liftedTriple = [EXTTriple tripleWithA:[lift[0] intValue]
-                                            B:[lift[1] intValue]
-                                            C:[lift[2] intValue]];
-        if ([((EXTMatrix*)pair[1]).presentation[1][0] intValue] == -1)
+        liftedTriple = [EXTTriple tripleWithA:leftData[3]
+                                            B:leftData[4]
+                                            C:leftData[5]];
+        if (rightData[1] == -1)
             liftedTriple = [EXTTriple scale:liftedTriple by:-1];
     }
     

@@ -81,19 +81,15 @@
 - (id)tableGrid:(MBTableGrid *)aTableGrid objectValueForColumn:(NSUInteger)columnIndex row:(NSUInteger)rowIndex {
     if (!representedObject)
         return nil;
-    return [NSString stringWithFormat:@"%@",
-                [representedObject.presentation[columnIndex]
-                                                    objectAtIndex:rowIndex]];
+    return [NSString stringWithFormat:@"%d",
+            ((int*)representedObject.presentation.mutableBytes)[columnIndex*representedObject.height+rowIndex]];
 }
 
 - (void)tableGrid:(MBTableGrid *)aTableGrid setObjectValue:(id)anObject forColumn:(NSUInteger)columnIndex row:(NSUInteger)rowIndex {
     if (!representedObject || readonly)
         return;
     
-    NSMutableArray *presentation = representedObject.presentation;
-    NSMutableArray *column = presentation[columnIndex];
-    NSInteger value = [anObject intValue];
-    column[rowIndex] = @(value);
+    ((int*)representedObject.presentation.mutableBytes)[columnIndex*representedObject.height+rowIndex] = [anObject intValue];
     
     if ([self.externalDelegate respondsToSelector:@selector(matrixEditorDidUpdate)])
         [self.externalDelegate matrixEditorDidUpdate];

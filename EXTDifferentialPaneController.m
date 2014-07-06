@@ -252,13 +252,8 @@
     
     // or, if this dimension is smaller than the one we were, we should modify
     // the dimensions of our matrices and lop them off / extend accordingly.
-    for (int i = 0; i < MIN(value,inclusion.width); i++)
-        for (int j = 0; j < inclusion.height; j++)
-            newInclusion.presentation[i][j] = inclusion.presentation[i][j];
-    
-    for (int i = 0; i < MIN(value,action.width); i++)
-        for (int j = 0; j < action.height; j++)
-            newAction.presentation[i][j] = action.presentation[i][j];
+    memcpy(newInclusion.presentation.mutableBytes, inclusion.presentation.mutableBytes, newInclusion.presentation.length);
+    memcpy(newAction.presentation.mutableBytes, action.presentation.mutableBytes, newAction.presentation.length);
     
     // store the fresh matrices
     self.actionEditor.representedObject = newAction;
@@ -292,9 +287,13 @@
     EXTMaySpectralSequence *sseq = ((EXTMaySpectralSequence*)((EXTDocument*)_documentWindowController.document).sseq);
     EXTDifferential *diff = (EXTDifferential*)self.representedObject;
     
+    NSMutableArray *column = [NSMutableArray arrayWithCapacity:self.sourceEditor.representedObject.height];
+    for (int i = 0; i < self.sourceEditor.representedObject.height; i++)
+        column[i] = @(((int*)self.sourceEditor.representedObject.presentation.mutableBytes)[i]);
+    
     //EXTDifferential *resultingDiff =
         [sseq applyNakamura:self.degree
-                   toVector:self.sourceEditor.representedObject.presentation[0]
+                   toVector:column
                  atLocation:(EXTTriple*)diff.start.location
                      onPage:_documentWindowController.chartViewController.currentPage];
     
@@ -320,7 +319,13 @@
     EXTTerm *term = diff.start;
     EXTMaySpectralSequence *sseq = ((EXTMaySpectralSequence*)((EXTDocument*)_documentWindowController.document).sseq);
     
-    NSArray *output = [sseq applySquare:self.degree toVector:self.sourceEditor.representedObject.presentation[0] atLocation:(EXTTriple*)term.location];
+    NSMutableArray *vector = [NSMutableArray arrayWithCapacity:self.sourceEditor.representedObject.height];
+    for (int i = 0; i < self.sourceEditor.representedObject.height; i++)
+    vector[i] = @(((int*)self.sourceEditor.representedObject.presentation.mutableBytes)[i]);
+    
+    NSArray *output = [sseq applySquare:self.degree
+                               toVector:vector
+                             atLocation:(EXTTriple*)term.location];
     
     // it's possible for nakamura to fail, whereupon we should empty the table
     if (!output) {
@@ -332,7 +337,8 @@
     
     EXTTerm *endTerm = output[1];
     EXTMatrix *resultMatrix = [EXTMatrix matrixWidth:1 height:endTerm.names.count];
-    resultMatrix.presentation[0] = output[0];
+    for (int i = 0; i < ((NSArray*)output[0]).count; i++)
+        ((int*)resultMatrix.presentation.mutableBytes)[i] = [output[0][i] intValue];
     
     self.targetEditor.representedObject = resultMatrix;
     self.targetEditor.rowNames = [endTerm.names valueForKey:@"description"];

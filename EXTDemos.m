@@ -209,8 +209,8 @@
     EXTPartialDefinition *firstpartial = [EXTPartialDefinition new];
     EXTMatrix *inclusion = [EXTMatrix matrixWidth:1 height:1];
     EXTMatrix *action = [EXTMatrix matrixWidth:1 height:1];
-    [[inclusion.presentation objectAtIndex:0] setObject:@1 atIndex:0];
-    [[action.presentation objectAtIndex:0] setObject:@1 atIndex:0];
+    ((int*)inclusion.presentation.mutableBytes)[0] = 1;
+    ((int*)action.presentation.mutableBytes)[0] = 1;
     firstpartial.inclusion = inclusion;
     firstpartial.action = action;
     firstdiff.partialDefinitions[0] = firstpartial;
@@ -221,7 +221,7 @@
     
     // specify the multiplicative structure
     EXTMatrix *matrix = [EXTMatrix matrixWidth:1 height:1];
-    [matrix.presentation[0] setObject:@1 atIndex:0];
+    ((int*)matrix.presentation.mutableBytes)[0] = 1;
     EXTPartialDefinition *partialDefinition = [EXTPartialDefinition new];
     partialDefinition.inclusion = matrix;
     partialDefinition.action = matrix;

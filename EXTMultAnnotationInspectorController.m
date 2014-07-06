@@ -93,7 +93,10 @@
     // settings, including the disabled option.
     NSMutableDictionary *anno = [NSMutableDictionary new];
     anno[@"location"] = term.location;
-    anno[@"vector"] = [EXTMatrix matrixWidth:1 height:term.size].presentation[0];
+    NSMutableArray *vector = [NSMutableArray arrayWithCapacity:term.size];
+    for (int i = 0; i < vector.count; i++)
+        vector[i] = @0;
+    anno[@"vector"] = vector;
     anno[@"enabled"] = @(false);
     
     [self.multiplicationAnnotations addObject:anno];
@@ -141,9 +144,9 @@
     
     // set up the popover, using the data from that row and the ambient sseq.
     self.matrixEditor.representedObject = [EXTMatrix matrixWidth:1 height:term.size];
-    if (((NSArray*)entry[@"vector"]).count == self.matrixEditor.representedObject.height) {
-        self.matrixEditor.representedObject.presentation[0] = entry[@"vector"];
-    }
+    if (((NSArray*)entry[@"vector"]).count == self.matrixEditor.representedObject.height)
+        for (int i = 0; i < self.matrixEditor.representedObject.height; i++)
+            ((int*)self.matrixEditor.representedObject.presentation.mutableBytes)[i] = [((NSArray*)entry[@"vector"])[i] intValue];
     self.matrixEditor.rowNames = [term.names valueForKey:@"description"];
     self.locLabel.stringValue = [NSString stringWithFormat:@"Term at %@",[self.sseq.locConvertor convertToString:term.location]];
     

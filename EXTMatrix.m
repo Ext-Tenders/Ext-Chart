@@ -676,7 +676,7 @@
     
     // now, perform our usual left-to-right column reduction to it.
     // TODO: implement a version of cRWRFAL that doesn't compute the right factor
-    EXTMatrix *reducedMatrix = [bigMatrix columnReduceWithRightFactorAndLimit:sourceDimension][0];
+    EXTMatrix *reducedMatrix = [bigMatrix columnReduceWithRightFactor:true andLimit:sourceDimension][0];
     
     // we find those columns of the form [ej; stuff], and extract the 'stuff'
     // from this column. this is our differential.
@@ -816,9 +816,11 @@
     // write this new map as (invertible1 . quasidiagonal . invertible2) with
     // the outer matrices of determinant 1.  this can be done by column and row
     // reduction.
-    NSArray *columnReduction = [inclusion columnReduceWithRightFactorAndLimit:inclusion.height],
+    NSArray *columnReduction = [inclusion columnReduceWithRightFactor:true
+                                                    andLimit:inclusion.height],
             *rowReduction = [[EXTMatrix copyTranspose:columnReduction[0]]
-                                    columnReduceWithRightFactorAndLimit:((EXTMatrix*)columnReduction[0]).width],
+                             columnReduceWithRightFactor:true
+                             andLimit:((EXTMatrix*)columnReduction[0]).width],
             *factorization = @[[[EXTMatrix copyTranspose:rowReduction[1]] invert],
                                [EXTMatrix copyTranspose:rowReduction[0]],
                                [(EXTMatrix*)columnReduction[1] invert]];

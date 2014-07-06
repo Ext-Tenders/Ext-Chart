@@ -129,16 +129,18 @@
     self = [self init];
     
     // (a, b) |-> (b, a+b)
-    internalToUser.presentation[0][0] = @0;
-    internalToUser.presentation[0][1] = @1;
-    internalToUser.presentation[1][0] = @1;
-    internalToUser.presentation[1][1] = @1;
+    int *internalToUserData = internalToUser.presentation.mutableBytes;
+    internalToUserData[0*2 + 0] = 0;
+    internalToUserData[0*2 + 1] = 1;
+    internalToUserData[1*2 + 0] = 1;
+    internalToUserData[1*2 + 1] = 1;
     
     // (s, t) |-> (t-s, s)
-    userToScreen.presentation[0][0] = @(-1);
-    userToScreen.presentation[0][1] = @1;
-    userToScreen.presentation[1][0] = @1;
-    userToScreen.presentation[1][1] = @0;
+    int *userToScreenData = userToScreen.presentation.mutableBytes;
+    userToScreenData[0*2 + 0] = -1;
+    userToScreenData[0*2 + 1] = 1;
+    userToScreenData[1*2 + 0] = 1;
+    userToScreenData[1*2 + 1] = 0;
     
     return self;
 }
@@ -147,10 +149,11 @@
     self = [self init];
     
     // differentials should go d_r: E_r^{s, t} --> E_r^{s+r, t-r+1}.
-    internalToUser.presentation[0][0] = @0;
-    internalToUser.presentation[0][1] = @(-1);
-    internalToUser.presentation[1][0] = @1;
-    internalToUser.presentation[1][1] = @(-1);
+    int *internalToUserData = internalToUser.presentation.mutableBytes;
+    internalToUserData[2*0 + 0] = 0;
+    internalToUserData[2*0 + 1] = -1;
+    internalToUserData[2*1 + 0] = 1;
+    internalToUserData[2*1 + 1] = -1;
     
     // internal coordinates = visible coordinates.
     // perform a NOP to project to screen.
@@ -163,10 +166,11 @@
     self = [self init];
     
     // differentials should go d_r: E_r^{s, t} --> E_r^{s-r, t+r-1}.
-    internalToUser.presentation[0][0] = @0;
-    internalToUser.presentation[0][1] = @1;
-    internalToUser.presentation[1][0] = @(-1);
-    internalToUser.presentation[1][1] = @1;
+    int *internalToUserData = internalToUser.presentation.mutableBytes;
+    internalToUserData[2*0 + 0] = 0;
+    internalToUserData[2*0 + 1] = 1;
+    internalToUserData[2*1 + 0] = -1;
+    internalToUserData[2*1 + 1] = 1;
     
     // internal coordinates = visible coordinates.
     // perform a NOP to project to screen.
@@ -185,19 +189,21 @@
     // TODO: we'd like to just use the -invert method here, but at the moment it
     // looks like it uses -columnReduce, which is fixed to mod 2 arithmetic.
     
-    NSInteger det = ([internalToUser.presentation[0][0] intValue] *
-                     [internalToUser.presentation[1][1] intValue]) -
-                    ([internalToUser.presentation[0][1] intValue] *
-                     [internalToUser.presentation[1][0] intValue]);
+    int *internalToUserData = internalToUser.presentation.mutableBytes;
+    
+    NSInteger det = (internalToUserData[2*0 + 0] *
+                     internalToUserData[2*1 + 1]) -
+                    (internalToUserData[2*0 + 1] *
+                     internalToUserData[2*1 + 0]);
     
     // XXX: surely this can be handled more gracefully. in any case, det should
     // be a multiplicative unit.
     assert(det == 1 || det == -1);
     
-    int a = (loc.a*[internalToUser.presentation[1][1] intValue] -
-             loc.b*[internalToUser.presentation[1][0] intValue])/det,
-        b = (loc.a*[internalToUser.presentation[0][1] intValue]*(-1) +
-             loc.b*[internalToUser.presentation[0][0] intValue])/det;
+    int a = (loc.a*internalToUserData[2*1+1] -
+             loc.b*internalToUserData[2*1+0]) / det,
+        b = (loc.a*internalToUserData[2*0+1]*(-1) +
+             loc.b*internalToUserData[2*0+0]) / det;
     
     return [EXTPair pairWithA:a B:b];
 }
@@ -205,15 +211,9 @@
 -(EXTIntPoint) gridPoint:(EXTPair*)loc {
     EXTPair *userCoordsPair = [self convertFromInternalToUser:loc];
     
-    EXTMatrix *userCoords = [EXTMatrix matrixWidth:1 height:2];
-    userCoords.presentation[0][0] = @(userCoordsPair.a);
-    userCoords.presentation[0][1] = @(userCoordsPair.b);
-    
-    EXTMatrix *screenCoords = [EXTMatrix newMultiply:userToScreen by:userCoords];
-    
-    return (EXTIntPoint)
-       {[screenCoords.presentation[0][0] intValue],
-        [screenCoords.presentation[0][1] intValue]};
+    NSArray *result = [userToScreen actOn:@[@(userCoordsPair.a),
+                                            @(userCoordsPair.b)]];
+    return (EXTIntPoint){[result[0] intValue], [result[1] intValue]};
 }
 
 -(EXTIntPoint) followDifflAtGridLocation:(EXTIntPoint)gridLocation
@@ -222,16 +222,19 @@
                                                by:internalToUser];
     
     EXTMatrix *clickCoord = [EXTMatrix matrixWidth:1 height:2];
-    clickCoord.presentation[0][0] = @((int)gridLocation.x);
-    clickCoord.presentation[0][1] = @((int)gridLocation.y);
+    int *clickCoordData = clickCoord.presentation.mutableBytes;
+    clickCoordData[0] = (int)gridLocation.x;
+    clickCoordData[1] = (int)gridLocation.y;
     
     NSArray *pair = [EXTMatrix formIntersection:composite with:clickCoord];
     
-    NSArray *lift = ((EXTMatrix*)pair[0]).presentation[0];
+    int *liftData = ((EXTMatrix*)pair[0]).presentation.mutableBytes;
+    NSArray *lift = @[@(liftData[0]), @(liftData[1])];
     
     EXTPair *liftedPair = [EXTPair pairWithA:[lift[0] intValue] B:[lift[1] intValue]];
     
-    if ([((EXTMatrix*)pair[1]).presentation[0][0] intValue] == -1) {
+    int *scaleData = ((EXTMatrix*)pair[1]).presentation.mutableBytes;
+    if (*scaleData == -1) {
         liftedPair = [EXTPair scale:liftedPair by:-1];
     }
     

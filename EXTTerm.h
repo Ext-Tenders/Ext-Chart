@@ -22,7 +22,7 @@
     @property(retain) EXTLocation* location; // position on grid
     @property(retain) NSMutableArray* names; // NSObjects with -description
                                              // responders. basis element names.
-    @property(retain) NSMutableArray* cycles; // NSArrays of cycle group bases
+    @property(retain) NSMutableArray* cycles; // EXTMatrixs of cycle group bases
     @property(retain) NSMutableArray* boundaries; // ...  of bdry group bases
     @property(retain) NSMutableArray* homologyReps; // of homology dicts.
     @property(retain) EXTMatrix *displayBasis; // change of basis matrix, used

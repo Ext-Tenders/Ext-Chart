@@ -93,28 +93,23 @@ static void *_EXTPresentationParametersContext = &_EXTPresentationParametersCont
 // this routine assembles from the available partial definitions of the
 // differential a single definition on the cycle group.  it's a bit convoluted.
 -(void) assemblePresentation {
-    NSMutableArray *cycles, *boundaries,
-                   *newPartials = [NSMutableArray array];
+    EXTMatrix *cycles, *boundaries;
+    NSMutableArray *newPartials = [NSMutableArray array];
     int characteristic = 0;
     
     if (start.cycles.count > page)
         cycles = start.cycles[page];
     else
-        cycles = [EXTMatrix identity:start.size].presentation;
+        cycles = [EXTMatrix identity:start.size];
     
     if (start.boundaries.count > page)
         boundaries = start.boundaries[page];
     else
-        boundaries = [NSMutableArray array];
-    
-    EXTMatrix *cycleMatrix = [EXTMatrix matrixWidth:cycles.count
-                                             height:start.size];
-    cycleMatrix.presentation = cycles;
+        boundaries = [EXTMatrix matrixWidth:0 height:start.size];
     
     for (EXTPartialDefinition *partial in partialDefinitions) {
         characteristic = partial.inclusion.characteristic;
-        cycleMatrix.characteristic = partial.inclusion.characteristic;
-        NSArray *pair = [EXTMatrix formIntersection:cycleMatrix
+        NSArray *pair = [EXTMatrix formIntersection:cycles
                                                with:partial.inclusion];
         EXTPartialDefinition *newPartial = [EXTPartialDefinition new];
         newPartial.inclusion = pair[0];
@@ -126,13 +121,10 @@ static void *_EXTPresentationParametersContext = &_EXTPresentationParametersCont
     }
     
     EXTPartialDefinition *boundaryPartial = [EXTPartialDefinition new];
-    EXTMatrix *boundaryMatrix = [EXTMatrix matrixWidth:boundaries.count
-                                                height:start.size];
-    boundaryMatrix.presentation = boundaries;
     EXTMatrix *boundariesInCycleCoords =
-                [EXTMatrix formIntersection:boundaryMatrix with:cycleMatrix][1];
+                [EXTMatrix formIntersection:boundaries with:cycles][1];
     boundaryPartial.inclusion = boundariesInCycleCoords;
-    boundaryPartial.action = [EXTMatrix matrixWidth:boundaryMatrix.width
+    boundaryPartial.action = [EXTMatrix matrixWidth:boundaries.width
                                              height:end.size];
     boundaryPartial.inclusion.characteristic = characteristic;
     boundaryPartial.action.characteristic = characteristic;
@@ -140,11 +132,11 @@ static void *_EXTPresentationParametersContext = &_EXTPresentationParametersCont
     [newPartials addObject:boundaryPartial];
     
     _presentation = [EXTMatrix assemblePresentation:newPartials
-                                    sourceDimension:cycles.count
+                                    sourceDimension:cycles.width
                                     targetDimension:end.size];
     
     if (_presentation.height != end.size ||
-        _presentation.width != cycles.count)
+        _presentation.width != cycles.width)
         NSLog(@"strange assembly dimensions.");
     
     return;
@@ -156,8 +148,8 @@ static void *_EXTPresentationParametersContext = &_EXTPresentationParametersCont
 // about this routine to EXTDifferential.
 -(void) stripDuplicates {
     NSMutableArray *reducedPartials = [NSMutableArray array];
-    EXTMatrix *inclusionSum = [EXTMatrix matrixWidth:0 height:self.start.names.count];
-    NSArray *workingImage = [NSArray array];
+    EXTMatrix *inclusionSum = [EXTMatrix matrixWidth:0 height:self.start.size];
+    EXTMatrix *workingImage = [EXTMatrix matrixWidth:0 height:self.start.size];
     
     for (EXTPartialDefinition *partial1 in self.partialDefinitions) {
         EXTMatrix *testMatrix = [inclusionSum copy];
@@ -166,11 +158,12 @@ static void *_EXTPresentationParametersContext = &_EXTPresentationParametersCont
         [partial1.inclusion modularReduction];
         [partial1.action modularReduction];
         
-        [testMatrix.presentation addObjectsFromArray:partial1.inclusion.presentation];
+        [testMatrix.presentation increaseLengthBy:partial1.inclusion.presentation.length];
+        memcpy((int*)testMatrix.presentation.mutableBytes+testMatrix.width*testMatrix.height, partial1.inclusion.presentation.mutableBytes, partial1.inclusion.presentation.length);
         testMatrix.width += partial1.inclusion.width;
-        NSArray *image = [testMatrix image];
+        EXTMatrix *image = [testMatrix image];
         
-        if ([image isEqualToArray:workingImage])
+        if ([image isEqualTo:workingImage])
             continue;
         
         inclusionSum = testMatrix;
