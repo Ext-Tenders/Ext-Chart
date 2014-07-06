@@ -172,7 +172,7 @@
     _entry[@"vector"] = vector;
     
     // refresh the tableview and refresh the chart.
-    [self.matrixEditor reloadData];
+    [self.table reloadData];
     [self.documentWindowController.chartViewController reloadCurrentPage];
     
     return;
