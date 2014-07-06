@@ -80,21 +80,8 @@
         EXTTerm *term = (EXTTerm*)representedObject;
         int page = _documentWindowController.chartViewController.currentPage;
         
-        int boundaryCount = ((NSArray*)term.boundaries[page]).count,
-            cycleCount = ((NSArray*)term.cycles[page]).count;
-        
-        EXTMatrix *boundaries, *cycles;
-        if (boundaryCount > 0) {
-            boundaries = [EXTMatrix matrixWidth:boundaryCount height:((NSArray*)((NSArray*)term.boundaries[page])[0]).count];
-            boundaries.presentation = term.boundaries[page];
-        } else
-            boundaries = nil;
-        
-        if (cycleCount > 0) {
-            cycles = [EXTMatrix matrixWidth:cycleCount height:((NSArray*)((NSArray*)term.cycles[page])[0]).count];
-            cycles.presentation = term.cycles[page];
-        } else
-            cycles = nil;
+        EXTMatrix *boundaries = term.boundaries[page],
+                  *cycles = term.cycles[page];
         
         self.bMatrixEditor.representedObject = boundaries;
         self.zMatrixEditor.representedObject = cycles;
