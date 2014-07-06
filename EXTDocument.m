@@ -17,8 +17,8 @@
 #import "NSKeyedArchiver+EXTAdditions.h"
 
 
-#define PRESENT_FILE_VERSION 4
-#define MINIMUM_FILE_VERSION_ALLOWED 3
+#define PRESENT_FILE_VERSION 5
+#define MINIMUM_FILE_VERSION_ALLOWED 5
 
 
 @implementation EXTDocument
