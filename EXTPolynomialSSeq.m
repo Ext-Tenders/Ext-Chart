@@ -668,7 +668,10 @@
     return power & 0x1 ? -1 : 1;
 }
 
-- (int)rankOfVector:(NSArray *)vector inLocation:(NSObject<EXTLocation> *)loc actingAt:(NSObject<EXTLocation> *)otherLoc onPage:(int)page {
+- (int)rankOfVector:(NSArray *)vector
+         inLocation:(NSObject<EXTLocation> *)loc
+           actingAt:(NSObject<EXTLocation> *)otherLoc
+             onPage:(int)page {
     EXTTerm *otherTerm = [self findTerm:otherLoc];
     if (!otherTerm)
         return 0;
@@ -684,17 +687,19 @@
     
     EXTMatrix *cycleMatrix = [EXTMatrix matrixWidth:((NSMutableDictionary*)otherTerm.homologyReps[page]).count height:(vector.count*otherTerm.size)];
     cycleMatrix.width = 0;
+    cycleMatrix.characteristic = multMatrix.characteristic;
     int *cycleData = cycleMatrix.presentation.mutableBytes;
     for (NSArray *cycle in otherTerm.homologyReps[page]) {
         NSArray *hadamardResult = [EXTMatrix hadamardVectors:vector with:cycle];
-        for (int j = 0; j < cycle.count; j++)
+        for (int j = 0; j < hadamardResult.count; j++)
             cycleData[cycleMatrix.height*cycleMatrix.width+j] =
             [hadamardResult[j] intValue];
         cycleMatrix.width += 1;
     }
     
     EXTMatrix *boundaryMatrix = sumTerm.boundaries[page];
-    return [EXTMatrix rankOfMap:[EXTMatrix newMultiply:multMatrix by:cycleMatrix] intoQuotientByTheInclusion:boundaryMatrix];
+    EXTMatrix *pushedForwardCycles = [EXTMatrix newMultiply:multMatrix by:cycleMatrix];
+    return [EXTMatrix rankOfMap:pushedForwardCycles intoQuotientByTheInclusion:boundaryMatrix];
 }
 
 @end

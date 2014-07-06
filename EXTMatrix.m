@@ -886,7 +886,7 @@
             continue;
         
         NSMutableArray *column = [NSMutableArray arrayWithCapacity:middleMatrix.height];
-        for (int j = 0; j < middleMatrix.height; j++)
+        for (int j = 0; j < columns.height; j++)
             column[j] = @(columnsData[i*columns.height+j]);
         
         [ret setObject:@(order) forKey:column];
