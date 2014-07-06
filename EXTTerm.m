@@ -179,7 +179,7 @@
 -(void) computeBoundaries:(int)whichPage sSeq:(EXTSpectralSequence*)sSeq {
     // if this is page 0, we have a default value to start with.
     if (whichPage == 0) {
-        [boundaries setObject:@[] atIndexedSubscript:0];
+        [boundaries setObject:[EXTMatrix matrixWidth:0 height:self.size] atIndexedSubscript:0];
         return;
     }
     

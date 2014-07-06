@@ -260,7 +260,7 @@
 -(EXTMatrix*) copy {
     EXTMatrix *copy = [EXTMatrix new];
     copy.width = width; copy.height = height;
-    copy.presentation = [self.presentation copy];
+    copy.presentation = [NSMutableData dataWithData:self.presentation];
     copy.characteristic = self.characteristic;
     
     return copy;
@@ -406,7 +406,9 @@
             
             // NOTE: this is *always* an integer, because the pivotRow entry of
             // our pivotColumn now contains the gcd of all the pivotRow values.
-            int factor = retData[j*ret.height+pivotRow] /
+            int factor = 0;
+            if (retData[pivotColumn*ret.height+pivotRow] != 0)
+                factor = retData[j*ret.height+pivotRow] /
                                     retData[pivotColumn*ret.height+pivotRow];
             
             // ... and for each entry in this column, subtract.
@@ -530,9 +532,7 @@
     if (left.width != right.height)
         NSLog(@"Mismatched multiplication.");
     
-    EXTMatrix *product = [EXTMatrix new];
-    product.width = right.width;
-    product.height = left.height;
+    EXTMatrix *product = [EXTMatrix matrixWidth:right.width height:left.height];
     {
         int a = left.characteristic,
             b = right.characteristic,
