@@ -693,8 +693,7 @@
         cycleMatrix.width += 1;
     }
     
-    EXTMatrix *boundaryMatrix = [EXTMatrix matrixWidth:((NSArray*)sumTerm.boundaries[page]).count height:sumTerm.size];
-    boundaryMatrix.presentation = sumTerm.boundaries[page];
+    EXTMatrix *boundaryMatrix = sumTerm.boundaries[page];
     return [EXTMatrix rankOfMap:[EXTMatrix newMultiply:multMatrix by:cycleMatrix] intoQuotientByTheInclusion:boundaryMatrix];
 }
 

@@ -15,6 +15,9 @@
 #import "EXTChartViewController.h"
 
 @interface EXTMultAnnotationInspectorController () <EXTDocumentInspectorViewDelegate, NSTableViewDataSource, NSTableViewDelegate, NSPopoverDelegate>
+{
+    NSMutableDictionary *_entry;
+}
 
 @property IBOutlet NSTableView *table;
 @property IBOutlet NSButton *addButton;
@@ -156,10 +159,18 @@
                        preferredEdge:NSMinXEdge];
     [self.matrixEditor reloadData];
     
+    _entry = entry;
+    
     return;
 }
 
 -(void)popoverWillClose:(NSNotification *)notification {
+    NSMutableArray *vector = [NSMutableArray arrayWithCapacity:self.matrixEditor.representedObject.height];
+    
+    for (int i = 0; i < self.matrixEditor.representedObject.height; i++)
+        vector[i] = @(((int*)self.matrixEditor.representedObject.presentation.mutableBytes)[i]);
+    _entry[@"vector"] = vector;
+    
     // refresh the tableview and refresh the chart.
     [self.matrixEditor reloadData];
     [self.documentWindowController.chartViewController reloadCurrentPage];
