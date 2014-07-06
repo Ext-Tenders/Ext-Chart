@@ -158,8 +158,7 @@ static void *_EXTPresentationParametersContext = &_EXTPresentationParametersCont
         [partial1.inclusion modularReduction];
         [partial1.action modularReduction];
         
-        [testMatrix.presentation increaseLengthBy:partial1.inclusion.presentation.length];
-        memcpy((int*)testMatrix.presentation.mutableBytes+testMatrix.width*testMatrix.height, partial1.inclusion.presentation.mutableBytes, partial1.inclusion.presentation.length);
+        [testMatrix.presentation appendData:partial1.inclusion.presentation];
         testMatrix.width += partial1.inclusion.width;
         EXTMatrix *image = [testMatrix image];
         

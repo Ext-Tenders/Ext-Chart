@@ -198,13 +198,7 @@
     
     // add these to the old boundaries
     EXTMatrix *newBoundaries = [boundaries[whichPage - 1] copy];
-    [newBoundaries.presentation increaseLengthBy:differential.presentation.presentation.length];
-    
-    int *newBoundariesData = newBoundaries.presentation.mutableBytes,
-        *differentialData = differential.presentation.presentation.mutableBytes;
-    for (int i = 0; i < differential.presentation.width; i++)
-        for (int j = 0; j < differential.presentation.height; j++)
-            newBoundariesData[(newBoundaries.width+i)*newBoundaries.height+j] = differentialData[differential.presentation.height*i+j];
+    [newBoundaries.presentation appendData:differential.presentation.presentation];
     newBoundaries.width += differential.presentation.width;
     
     // find a minimum spanning set and store it
@@ -218,6 +212,8 @@
          inCharacteristic:(int)characteristic {
     [self computeCycles:whichPage sSeq:sSeq];
     [self computeBoundaries:whichPage sSeq:sSeq];
+    ((EXTMatrix*)cycles[whichPage]).characteristic = sSeq.defaultCharacteristic;
+    ((EXTMatrix*)boundaries[whichPage]).characteristic = sSeq.defaultCharacteristic;
     
     EXTMatrix *cycleMat = self.cycles[whichPage],
               *boundaryMat = self.boundaries[whichPage];

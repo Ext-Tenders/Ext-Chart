@@ -456,12 +456,9 @@
         // copy over the top of the matrix
         for (int j = 0; j < self.height; j++)
             augmentedData[i*augmentedMatrix.height + j] = data[i*self.height + j];
-        
-        // augment the bottom of it with an identity matrix
-        for (int j = self.height; j < self.height + self.width; j++)
-            if (j - self.height == i)
-                augmentedData[i*augmentedMatrix.height + j] = 1;
     }
+    for (int i = 0; i < self.width; i++)
+        augmentedData[i*augmentedMatrix.height + i + augmentedMatrix.height] = 1;
     
     // column-reduce the augmented matrix
     EXTMatrix *reducedMatrix = [augmentedMatrix columnReduce];
@@ -592,14 +589,14 @@
     
     // augment the matrix by the identity
     EXTMatrix *temp = [self copy];
-    temp.width *= 2;
     [temp.presentation increaseLengthBy:(sizeof(int)*sizeof(height)*sizeof(width))];
     
     int *tempData = temp.presentation.mutableBytes;
     for (int i = 0; i < temp.height; i++)
         tempData[(temp.width + i)*(temp.height) + i] = 1;
+    temp.width *= 2;
     
-    // TODO: is these two calls to copyTranspose wasteful?
+    // TODO: are these two calls to copyTranspose wasteful?
     // perform column reduction
     EXTMatrix *flip = [EXTMatrix copyTranspose:temp];
     [flip columnReduce];
@@ -741,6 +738,8 @@
                                                height:left.width],
               *rightinclusion = [EXTMatrix matrixWidth:nullspace.width
                                                 height:right.width];
+    leftinclusion.characteristic = left.characteristic;
+    rightinclusion.characteristic = right.characteristic;
     
     int *nullData = nullspace.presentation.mutableBytes,
         *leftInclData = leftinclusion.presentation.mutableBytes,
