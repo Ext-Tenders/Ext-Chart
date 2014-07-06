@@ -458,7 +458,7 @@
             augmentedData[i*augmentedMatrix.height + j] = data[i*self.height + j];
     }
     for (int i = 0; i < self.width; i++)
-        augmentedData[i*augmentedMatrix.height + i + augmentedMatrix.height] = 1;
+        augmentedData[i*augmentedMatrix.height + i + self.height] = 1;
     
     // column-reduce the augmented matrix
     EXTMatrix *reducedMatrix = [augmentedMatrix columnReduce];
@@ -720,14 +720,10 @@
     [right modularReduction];
     
     // form the matrix [P, -Q]
+    EXTMatrix *negRight = [right scale:-1];
     EXTMatrix *sum = [left copy];
+    [sum.presentation appendData:negRight.presentation];
     sum.width += right.width;
-    
-    int *sumData = sum.presentation.mutableBytes,
-        *rightData = right.presentation.mutableBytes;
-    for (int i = 0; i < right.width; i++)
-        for (int j = 0; j < right.height; j++)
-            sumData[(i+left.width)*sum.height+j] = (-1) * rightData[i*right.height+j];
     
     // the nullspace of [P, -Q] is a vertical sum [I; J] of the two inclusions
     // we want, since the nullspace of P (+) -Q are the pairs (x; y) such that
@@ -775,7 +771,7 @@
 
 // debug routine to dump the matrix to the console.
 -(NSString*) description {
-    NSString *ret = @"(";
+    NSString *ret = [NSString stringWithFormat:@"%lu x %lu: (", height, width];
     for (int i = 0; i < width; i++) {
         NSString *output = @"";
         
@@ -787,7 +783,7 @@
         ret = [NSString stringWithFormat:@"%@| %@|",ret, output];
     }
     
-    return [NSString stringWithFormat:@"%@]",ret];
+    return [NSString stringWithFormat:@"%@)",ret];
 }
 
 // here we have a pair of inclusions B --> C <-- Z, with the implicit assumption
