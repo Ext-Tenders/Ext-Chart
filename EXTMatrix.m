@@ -448,6 +448,7 @@
 -(EXTMatrix*) kernel {
     // vertically augment the matrix by an identity matrix
     EXTMatrix *augmentedMatrix = [EXTMatrix matrixWidth:self.width height:(self.height + self.width)];
+    augmentedMatrix.characteristic = self.characteristic;
     
     int *data = self.presentation.mutableBytes,
         *augmentedData = augmentedMatrix.presentation.mutableBytes;
