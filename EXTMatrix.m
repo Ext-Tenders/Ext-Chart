@@ -602,7 +602,7 @@
     
     // augment the matrix by the identity
     EXTMatrix *temp = [self copy];
-    [temp.presentation increaseLengthBy:(sizeof(int)*sizeof(height)*sizeof(width))];
+    [temp.presentation increaseLengthBy:(sizeof(int)*height*width)];
     
     int *tempData = temp.presentation.mutableBytes;
     for (int i = 0; i < temp.height; i++)
