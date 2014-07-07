@@ -305,14 +305,8 @@
     BOOL totalRollover = FALSE;
     while (!totalRollover) {
         // search for a term in the location encoded by the counter
-        EXTLocation *workingLoc = [[self indexClass] identityLocation];
-        for (NSDictionary *generator in generators)
-            workingLoc =
-                [[self indexClass] addLocation:workingLoc
-                            to:[[self indexClass]
-                         scale:[generator objectForKey:@"location"]
-                            by:[[tag.tags objectForKey:
-                                  [generator objectForKey:@"name"]] intValue]]];
+        EXTLocation *workingLoc = [[self indexClass] linearCombination:tag.tags ofGenerators:generators];
+        
         if (condition(workingLoc)) {
             EXTTerm *term = [self findTerm:workingLoc];
         
@@ -321,7 +315,7 @@
                 term = [EXTTerm term:workingLoc andNames:[NSMutableArray array]];
                 [self.terms setObject:term forKey:workingLoc];
             }
-        
+            
             // now add the new tag to its names array
             [term.names addObject:[tag copy]];
         
@@ -353,17 +347,14 @@
             
             // there are two kinds of roll-over
             if ((generator == entry) && (value > newBound)) {
-                [tag.tags setObject:@([[generator objectForKey:@"upperBound"]
-                                       intValue] + 1)
-                             forKey:name];
+                tag.tags[name] = @([generator[@"upperBound"] intValue] + 1);
                 continue;
             } else if ((generator != entry) &&
-                  (value > [[generator objectForKey:@"upperBound"] intValue])) {
-                [tag.tags setObject:@0 forKey:[generator objectForKey:@"name"]];
+                  (value > [generator[@"upperBound"] intValue])) {
+                tag.tags[generator[@"name"]] = @0;
                 continue;
             } else {
-                [tag.tags setObject:@(value)
-                             forKey:[generator objectForKey:@"name"]];
+                tag.tags[generator[@"name"]] = @(value);
                 break;
             }
         } // for: counter increment

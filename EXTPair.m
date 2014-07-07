@@ -60,6 +60,21 @@
     return self.b;
 }
 
++ (EXTPair*)linearCombination:(NSMutableDictionary *)coeffs
+                   ofGenerators:(NSMutableArray *)generators {
+    int a = 0, b = 0;
+    
+    for (NSDictionary *generator in generators) {
+        EXTPair *thisGuy = generator[@"location"];
+        int scale = [coeffs[generator[@"name"]] intValue];
+        
+        a += scale*thisGuy.a;
+        b += scale*thisGuy.b;
+    }
+    
+    return [EXTPair pairWithA:a B:b];
+}
+
 /// NSCoder, NSCopying routines ///
 
 -(EXTPair*) copyWithZone:(NSZone*)zone {

@@ -115,6 +115,22 @@
     [aCoder encodeInt:c forKey:@"c"];
 }
 
++ (EXTTriple*)linearCombination:(NSMutableDictionary *)coeffs
+                                ofGenerators:(NSMutableArray *)generators {
+    int a = 0, b = 0, c = 0;
+    
+    for (NSDictionary *generator in generators) {
+        EXTTriple *thisGuy = generator[@"location"];
+        int scale = [coeffs[generator[@"name"]] intValue];
+        
+        a += scale*thisGuy.a;
+        b += scale*thisGuy.b;
+        c += scale*thisGuy.c;
+    }
+    
+    return [EXTTriple tripleWithA:a B:b C:c];
+}
+
 @end
 
 
