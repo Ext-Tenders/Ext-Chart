@@ -11,6 +11,7 @@
 
 
 @class EXTSpectralSequence;
+@class EXTTerm;
 @class EXTGrid;
 
 
@@ -18,8 +19,6 @@
 @property (nonatomic, weak) EXTSpectralSequence *sequence;
 @property (nonatomic, assign) NSInteger currentPage;
 @property (nonatomic, weak) EXTGrid *grid;
-@property (nonatomic, weak) id selectedObject;
-@property (nonatomic, assign) EXTToolboxTag selectedToolTag;
 
 - (void)reloadCurrentPage;
 @end
@@ -30,6 +29,15 @@
 @property (nonatomic, readonly, assign) NSInteger y;
 
 + (instancetype)viewModelPointWithX:(NSInteger)x y:(NSInteger)y;
+@end
+
+
+@interface EXTViewModelTerm : NSObject
+@property (nonatomic, readonly, strong) EXTTerm *modelTerm;
+//@property (nonatomic, readonly, assign) EXTIntPoint gridLocation;
+
++ (instancetype)viewModelTermFromModelTerm:(EXTTerm *)modelTerm;
+//+ (instancetype)viewModelTermFromModelTerm:(EXTTerm *)modelTerm gridLocation:(EXTIntPoint)gridLocation;
 @end
 
 

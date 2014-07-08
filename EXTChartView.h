@@ -60,8 +60,6 @@ typedef NS_ENUM(NSInteger, EXTChartViewInteractionType)
 @protocol EXTChartViewDataSource <NSObject>
 - (NSArray *)chartView:(EXTChartView *)chartView termCountsInGridRect:(EXTIntRect)gridRect; // an array of EXTChartViewTermCountData
 - (NSArray *)chartView:(EXTChartView *)chartView differentialsInGridRect:(EXTIntRect)gridRect; // an array of EXTChartViewDifferentialData
-- (NSArray *)chartViewBackgroundRectsForSelectedObject:(EXTChartView *)chartView; // an array of NSRects
-- (NSBezierPath *)chartView:(EXTChartView *)chartView highlightPathForToolAtGridLocation:(EXTIntPoint)gridLocation;
 @end
 
 

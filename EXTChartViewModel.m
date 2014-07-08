@@ -14,13 +14,19 @@
 
 
 @interface EXTChartViewModel ()
-@property (nonatomic, strong) NSMutableDictionary *termCounts; // indexed by @(page). Each element is a dictionary mapping an EXTViewModelPoint to a term count
-@property (nonatomic, strong) NSMutableDictionary *differentials; // indexed by @(page). Each element is an array (eventually an edge quadtree?) of EXTViewModelDifferential objects
+/// Indexed by @(page). Each element is a dictionary mapping an EXTViewModelPoint to an NSMutableArray of EXTViewModelTerm objects at that grid location.
+@property (nonatomic, strong) NSMutableDictionary *termCounts;
+
+/// Indexed by @(page). Each element is an NSArray (eventually an edge quadtree?) of EXTViewModelDifferential objects.
+@property (nonatomic, strong) NSMutableDictionary *differentials;
 @end
 
 
+#pragma mark - Private functions
+
 static bool lineSegmentOverRect(NSPoint p1, NSPoint p2, NSRect rect);
 static bool lineSegmentIntersectsLineSegment(NSPoint l1p1, NSPoint l1p2, NSPoint l2p1, NSPoint l2p2);
+
 
 @implementation EXTChartViewModel
 
@@ -37,8 +43,7 @@ static bool lineSegmentIntersectsLineSegment(NSPoint l1p1, NSPoint l1p2, NSPoint
 {
     [self.sequence computeGroupsForPage:self.currentPage];
 
-    // --- Term Counts
-    // start by initializing the array of counts
+    // --- Terms
     NSMutableDictionary *counts = [NSMutableDictionary new];
 
     // iterate through the available EXTTerms and count up how many project onto
@@ -51,12 +56,30 @@ static bool lineSegmentIntersectsLineSegment(NSPoint l1p1, NSPoint l1p2, NSPoint
     // Z-mods, since those have lots of interesting quotients which need to
     // represented visually.
     for (EXTTerm *term in self.sequence.terms.allValues) {
-        EXTIntPoint point = [self.sequence.locConvertor gridPoint:term.location];
-        EXTViewModelPoint *viewPoint = [EXTViewModelPoint viewModelPointWithX:point.x y:point.y];
-        NSInteger termCount = ((NSNumber *)counts[viewPoint]).integerValue;
-        termCount += [term dimension:self.currentPage];
-        if (termCount > 0) {
-            counts[viewPoint] = @(termCount);
+        // FIXME: Ask Eric whether dimension can be > 1. If it can, then the number of terms with non-zero dimension
+        //        at that grid location does not represent the term count, so we need to keep both an array of terms
+        //        and a term count based on dimensions. Also, if all terms at a given location have dimension 0 at a
+        //        given page, we do not show them visually. Does that mean they cannot be selected either?
+        //
+        //        The only demo that shows terms with dimension > 1 is the random demo, which cannot really be
+        //        trusted anyway.
+        const NSInteger termDimension = [term dimension:self.currentPage];
+
+//        NSInteger termCount = ((NSNumber *)counts[viewPoint]).integerValue;
+//        termCount += termDimension;
+//        if (termCount > 0) {
+//            counts[viewPoint] = @(termCount);
+//        }
+
+        if (termDimension > 0) {
+            EXTIntPoint gridLocation = [self.sequence.locConvertor gridPoint:term.location];
+            EXTViewModelPoint *viewPoint = [EXTViewModelPoint viewModelPointWithX:gridLocation.x y:gridLocation.y];
+            EXTViewModelTerm *viewModelTerm = [EXTViewModelTerm viewModelTermFromModelTerm:term /*gridLocation:gridLocation*/];
+            
+            NSMutableArray *termsAtGridLocation = counts[viewPoint];
+            if (!termsAtGridLocation) termsAtGridLocation = [NSMutableArray new];
+            [termsAtGridLocation addObject:viewModelTerm];
+            counts[viewPoint] = termsAtGridLocation;
         }
     }
 
@@ -116,12 +139,12 @@ static bool lineSegmentIntersectsLineSegment(NSPoint l1p1, NSPoint l1p2, NSPoint
 - (NSArray *)chartView:(EXTChartView *)chartView termCountsInGridRect:(EXTIntRect)gridRect
 {
     NSMutableArray *result = [NSMutableArray array];
-    [self.termCounts[@(self.currentPage)] enumerateKeysAndObjectsUsingBlock:^(EXTViewModelPoint *point, NSNumber *count, BOOL *stop) {
+    [self.termCounts[@(self.currentPage)] enumerateKeysAndObjectsUsingBlock:^(EXTViewModelPoint *point, NSArray *terms, BOOL *stop) {
         EXTIntPoint gridPoint = (EXTIntPoint){.x = point.x, .y = point.y};
         if (EXTIntPointInRect(gridPoint, gridRect)) {
             EXTChartViewTermCountData *data = [EXTChartViewTermCountData new];
             data.location = (EXTIntPoint){.x = point.x, .y = point.y};
-            data.count = count.integerValue;
+            data.count = terms.count;
             [result addObject:data];
         }
     }];
@@ -144,56 +167,6 @@ static bool lineSegmentIntersectsLineSegment(NSPoint l1p1, NSPoint l1p2, NSPoint
     return result.copy;
 }
 
-- (NSArray *)chartViewBackgroundRectsForSelectedObject:(EXTChartView *)chartView
-{
-    NSRect (^rectForTerm)(EXTTerm *) = ^(EXTTerm *term) {
-        return [self.grid viewBoundingRectForGridPoint:[self.sequence.locConvertor gridPoint:term.location]];
-    };
-
-    NSArray *rects = nil;
-    id selectedObject = self.selectedObject;
-
-    if ([selectedObject isKindOfClass:[EXTTerm class]]) {
-        rects = @[[NSValue valueWithRect:rectForTerm(selectedObject)]];
-    }
-    else if ([self.selectedObject isKindOfClass:[EXTDifferential class]]) {
-        EXTDifferential *diff = selectedObject;
-        rects = @[[NSValue valueWithRect:rectForTerm(diff.start)],
-                  [NSValue valueWithRect:rectForTerm(diff.end)]];
-    }
-
-    return rects;
-}
-
-- (NSBezierPath *)chartView:(EXTChartView *)chartView highlightPathForToolAtGridLocation:(EXTIntPoint)gridLocation
-{
-    NSBezierPath *highlightPath;
-
-    switch (self.selectedToolTag) {
-        case EXTToolTagGenerator: {
-            const NSRect gridSquareInView = [[chartView grid] viewBoundingRectForGridPoint:gridLocation];
-            highlightPath = [NSBezierPath bezierPathWithRect:gridSquareInView];
-            break;
-        }
-
-        case EXTToolTagDifferential: {
-            EXTGrid *grid = chartView.grid;
-            const EXTIntPoint targetGridPoint = [self.sequence.locConvertor followDifflAtGridLocation:gridLocation page:self.currentPage];
-            const NSRect sourceRect = [grid viewBoundingRectForGridPoint:gridLocation];
-            const NSRect targetRect = [grid viewBoundingRectForGridPoint:targetGridPoint];
-
-            highlightPath = [NSBezierPath bezierPathWithRect:sourceRect];
-            [highlightPath appendBezierPathWithRect:targetRect];
-            break;
-        }
-
-        default:
-            highlightPath = nil;
-    }
-    
-    return highlightPath;
-}
-
 @end
 
 
@@ -201,8 +174,10 @@ static bool lineSegmentIntersectsLineSegment(NSPoint l1p1, NSPoint l1p2, NSPoint
 + (instancetype)viewModelPointWithX:(NSInteger)x y:(NSInteger)y
 {
     EXTViewModelPoint *newPoint = [[self class] new];
-    newPoint->_x = x;
-    newPoint->_y = y;
+    if (newPoint) {
+        newPoint->_x = x;
+        newPoint->_y = y;
+    }
     return newPoint;
 }
 
@@ -225,6 +200,19 @@ static bool lineSegmentIntersectsLineSegment(NSPoint l1p1, NSPoint l1p2, NSPoint
 @end
 
 
+@implementation EXTViewModelTerm
++ (instancetype)viewModelTermFromModelTerm:(EXTTerm *)modelTerm /*gridLocation:(EXTIntPoint)gridLocation*/
+{
+    EXTViewModelTerm *newTerm = [[self class] new];
+    if (newTerm) {
+        newTerm->_modelTerm = modelTerm;
+//        newTerm->_gridLocation = gridLocation;
+    }
+    return newTerm;
+}
+@end
+
+
 @implementation EXTViewModelDifferential
 + (instancetype)viewModelDifferentialWithStartLocation:(EXTIntPoint)startLocation
                                             startIndex:(NSInteger)startIndex
@@ -232,10 +220,12 @@ static bool lineSegmentIntersectsLineSegment(NSPoint l1p1, NSPoint l1p2, NSPoint
                                               endIndex:(NSInteger)endIndex
 {
     EXTViewModelDifferential *newDiff = [[self class] new];
-    newDiff->_startLocation = startLocation;
-    newDiff->_startIndex = startIndex;
-    newDiff->_endLocation = endLocation;
-    newDiff->_endIndex = endIndex;
+    if (newDiff) {
+        newDiff->_startLocation = startLocation;
+        newDiff->_startIndex = startIndex;
+        newDiff->_endLocation = endLocation;
+        newDiff->_endIndex = endIndex;
+    }
     return newDiff;
 }
 

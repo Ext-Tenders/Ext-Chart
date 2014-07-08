@@ -52,13 +52,6 @@ static void *_selectedToolTagContext = &_selectedToolTagContext;
 
         _chartViewModel = [EXTChartViewModel new];
         _chartViewModel.sequence = document.sseq;
-        [_chartViewModel bind:@"selectedObject"
-                     toObject:self withKeyPath:@"selectedObject"
-                      options:nil];
-        [_chartViewModel bind:@"selectedToolTag"
-                     toObject:document.mainWindowController
-                  withKeyPath:@"selectedToolTag"
-                      options:nil];
     }
     return self;
 }
@@ -72,9 +65,6 @@ static void *_selectedToolTagContext = &_selectedToolTagContext;
     
     [_document.mainWindowController removeObserver:self
                                         forKeyPath:@"selectedToolTag"];
-
-    [_chartViewModel unbind:@"selectedObject"];
-    [_chartViewModel unbind:@"selectedToolTag"];
 
     self.chartViewModel = nil;
     _document = nil;
@@ -114,17 +104,6 @@ static void *_selectedToolTagContext = &_selectedToolTagContext;
     return (EXTChartView *)[self view];
 }
 
-- (void)setSelectedObject:(id)selectedObject {
-    if (selectedObject == _selectedObject)
-        return;
-
-    [self.chartView setNeedsDisplayInRect:[self _extBoundingRectForObject:_selectedObject]]; // clear the previous selection
-    _selectedObject = selectedObject;
-    [self.chartView setNeedsDisplayInRect:[self _extBoundingRectForObject:selectedObject]]; // draw the new selection
-    
-    return;
-}
-
 - (void)setCurrentPage:(int)currentPage {
     if (currentPage == _currentPage || currentPage < 0)
         return;
@@ -154,8 +133,8 @@ static void *_selectedToolTagContext = &_selectedToolTagContext;
     }
     
     // TODO: lots!
-    switch (self.chartViewModel.selectedToolTag) {
-        case EXTToolTagGenerator: {
+    switch (self.chartView.interactionType) {
+        case EXTChartViewInteractionTypeTerm: {
             NSArray *terms = [_document.sseq findTermsUnderPoint:gridLocation];
             NSUInteger oldIndex = NSNotFound;
             
@@ -194,7 +173,7 @@ static void *_selectedToolTagContext = &_selectedToolTagContext;
             break;
         }
             
-        case EXTToolTagDifferential: {
+        case EXTChartViewInteractionTypeDifferential: {
             NSArray *terms = [_document.sseq findTermsUnderPoint:gridLocation];
             NSUInteger oldIndex = NSNotFound;
 
@@ -251,65 +230,40 @@ static void *_selectedToolTagContext = &_selectedToolTagContext;
             break;
         }
 
-        case EXTToolTagMarquee: {
-            const NSRect gridRectInView = [self.chartView.grid viewBoundingRectForGridPoint:gridLocation];
-            NSIndexSet *marqueesAtPoint = [_document.marquees indexesOfObjectsPassingTest:^BOOL(EXTMarquee *marquee, NSUInteger idx, BOOL *stop) {
-                return NSIntersectsRect(gridRectInView, marquee.frame);
-            }];
-
-            EXTMarquee *newSelectedMarquee = nil;
-
-            if (marqueesAtPoint.count == 0) {
-                newSelectedMarquee = [EXTMarquee new];
-                newSelectedMarquee.string = @"New marquee";
-                newSelectedMarquee.frame = (NSRect){gridRectInView.origin, {100.0, 15.0}};
-                [_document.marquees addObject:newSelectedMarquee];
-            }
-            else {
-                // Cycle through all marquees lying on that grid square
-                const NSInteger previousSelectedMarqueeIndex = ([self.selectedObject isKindOfClass:[EXTMarquee class]] ?
-                                                                [_document.marquees indexOfObject:self.selectedObject] :
-                                                                -1);
-                NSInteger newSelectedMarqueeIndex = [marqueesAtPoint indexGreaterThanIndex:previousSelectedMarqueeIndex];
-                if (newSelectedMarqueeIndex == NSNotFound)
-                    newSelectedMarqueeIndex = [marqueesAtPoint firstIndex];
-
-                newSelectedMarquee = _document.marquees[newSelectedMarqueeIndex];
-            }
-
-            self.selectedObject = newSelectedMarquee;
-
-            break;
-        }
+//        case EXTToolTagMarquee: {
+//            const NSRect gridRectInView = [self.chartView.grid viewBoundingRectForGridPoint:gridLocation];
+//            NSIndexSet *marqueesAtPoint = [_document.marquees indexesOfObjectsPassingTest:^BOOL(EXTMarquee *marquee, NSUInteger idx, BOOL *stop) {
+//                return NSIntersectsRect(gridRectInView, marquee.frame);
+//            }];
+//
+//            EXTMarquee *newSelectedMarquee = nil;
+//
+//            if (marqueesAtPoint.count == 0) {
+//                newSelectedMarquee = [EXTMarquee new];
+//                newSelectedMarquee.string = @"New marquee";
+//                newSelectedMarquee.frame = (NSRect){gridRectInView.origin, {100.0, 15.0}};
+//                [_document.marquees addObject:newSelectedMarquee];
+//            }
+//            else {
+//                // Cycle through all marquees lying on that grid square
+//                const NSInteger previousSelectedMarqueeIndex = ([self.selectedObject isKindOfClass:[EXTMarquee class]] ?
+//                                                                [_document.marquees indexOfObject:self.selectedObject] :
+//                                                                -1);
+//                NSInteger newSelectedMarqueeIndex = [marqueesAtPoint indexGreaterThanIndex:previousSelectedMarqueeIndex];
+//                if (newSelectedMarqueeIndex == NSNotFound)
+//                    newSelectedMarqueeIndex = [marqueesAtPoint firstIndex];
+//
+//                newSelectedMarquee = _document.marquees[newSelectedMarqueeIndex];
+//            }
+//
+//            self.selectedObject = newSelectedMarquee;
+//
+//            break;
+//        }
 
         default:
             break;
     }
-}
-
-#pragma mark - Drawing support
-
-/* Returns the bounding rect of a given object in user coordinate space */
-- (NSRect)_extBoundingRectForObject:(id)object {
-    if ([object isKindOfClass:[EXTTerm class]]) {
-        return [self _extBoundingRectForTerm:object];
-    }
-    else if ([object isKindOfClass:[EXTDifferential class]]) {
-        EXTDifferential *differential = object;
-        return NSUnionRect([self _extBoundingRectForTerm:[differential start]],
-                           [self _extBoundingRectForTerm:[differential end]]);
-    }
-    else if ([object isKindOfClass:[EXTMarquee class]]) {
-        EXTMarquee *marquee = object;
-        return marquee.frame;
-    }
-
-    return NSZeroRect;
-}
-
-- (NSRect)_extBoundingRectForTerm:(EXTTerm *)term {
-    EXTGrid *grid = self.chartView.grid;
-    return [grid viewBoundingRectForGridPoint:[_document.sseq.locConvertor gridPoint:term.location]];
 }
 
 #pragma mark - NSKeyValueObserving
