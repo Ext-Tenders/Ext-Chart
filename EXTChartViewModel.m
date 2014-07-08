@@ -57,7 +57,6 @@ static bool lineSegmentIntersectsLineSegment(NSPoint l1p1, NSPoint l1p2, NSPoint
         termCount += [term dimension:self.currentPage];
         if (termCount > 0) {
             counts[viewPoint] = @(termCount);
-//            [[self class] registerLayerForTermCount:termCount];
         }
     }
 
