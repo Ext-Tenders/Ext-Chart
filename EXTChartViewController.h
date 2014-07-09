@@ -16,7 +16,6 @@
 
 @interface EXTChartViewController : NSViewController
 @property(nonatomic, readonly) EXTChartView *chartView;
-@property(nonatomic, weak) id selectedObject;
 @property(nonatomic, weak) EXTLeibnizWindowController *leibnizWindowController;
 @property(nonatomic, assign) int currentPage;
 

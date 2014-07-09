@@ -28,6 +28,8 @@
 @property (nonatomic, weak) id<EXTChartViewDataSource> dataSource;
 @property (nonatomic, weak) id<EXTChartViewDelegate> delegate;
 
+@property (nonatomic, weak) id selectedObject;
+
 // New chart view
 - (void)adjustContentForRect:(NSRect)rect;
 - (void)reloadCurrentPage;

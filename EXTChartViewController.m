@@ -90,6 +90,7 @@ static void *_selectedToolTagContext = &_selectedToolTagContext;
     self.chartViewModel.grid = self.chartView.grid;
 
     [self.chartView bind:@"interactionType" toObject:self.chartViewModel withKeyPath:@"interactionType" options:nil];
+    [self.chartView bind:@"selectedObject" toObject:self.chartViewModel withKeyPath:@"selectedObject" options:nil];
 
     [self reloadCurrentPage];
 }
@@ -110,6 +111,7 @@ static void *_selectedToolTagContext = &_selectedToolTagContext;
 - (void)dealloc
 {
     [self.chartView unbind:@"interactionType"];
+    [self.chartView unbind:@"selectedObject"];
 }
 
 #pragma mark - Properties
@@ -125,7 +127,7 @@ static void *_selectedToolTagContext = &_selectedToolTagContext;
 
     _currentPage = currentPage;
 
-    self.selectedObject = nil;
+    self.chartViewModel.selectedObject = nil;
     self.chartViewModel.currentPage = currentPage;
     [self reloadCurrentPage]; // FIXME: We should only reload if the model has been changed. Otherwise, we should just redisplay the page.
 }
@@ -155,15 +157,15 @@ static void *_selectedToolTagContext = &_selectedToolTagContext;
             
             // if there's nothing under this click, just quit now.
             if (terms.count == 0) {
-                self.selectedObject = nil;
+                self.chartViewModel.selectedObject = nil;
                 [self.chartView removeTermSelection];
                 return;
             }
             
             // if we used to have something selected, and it was a term at this
             // location, then we should find its position in our list.
-            if ([self.selectedObject isKindOfClass:[EXTTerm class]])
-                oldIndex = [terms indexOfObject:(EXTTerm*)self.selectedObject];
+            if ([self.chartViewModel.selectedObject isKindOfClass:[EXTTerm class]])
+                oldIndex = [terms indexOfObject:(EXTTerm*)self.chartViewModel.selectedObject];
             
             // the new index is one past the old index, unless we have to wrap.
             int newIndex = oldIndex;
@@ -181,7 +183,7 @@ static void *_selectedToolTagContext = &_selectedToolTagContext;
                 
                 // if we've found it, good!  quit!
                 if (term) {
-                    self.selectedObject = term;
+                    self.chartViewModel.selectedObject = term;
                     [self.chartView selectTermAtGridLocation:gridLocation index:newIndex];
                     break;
                 }
@@ -196,16 +198,16 @@ static void *_selectedToolTagContext = &_selectedToolTagContext;
 
             // if there's nothing under this click, just quit now.
             if (terms.count == 0) {
-                self.selectedObject = nil;
+                self.chartViewModel.selectedObject = nil;
                 [self.chartView removeDifferentialSelection];
                 return;
             }
             
             // if we used to have something selected, and it was a differential
             // on this page, then we should find its position in our list.
-            if ([self.selectedObject isKindOfClass:[EXTDifferential class]] &&
-                (((EXTDifferential*)self.selectedObject).page == _currentPage))
-                oldIndex = [terms indexOfObject:((EXTDifferential*)self.selectedObject).start];
+            if ([self.chartViewModel.selectedObject isKindOfClass:[EXTDifferential class]] &&
+                (((EXTDifferential*)self.chartViewModel.selectedObject).page == _currentPage))
+                oldIndex = [terms indexOfObject:((EXTDifferential*)self.chartViewModel.selectedObject).start];
             
             // the new index is one past the old index, unless we have to wrap.
             int newIndex = oldIndex;
@@ -225,7 +227,7 @@ static void *_selectedToolTagContext = &_selectedToolTagContext;
                 
                 // if we've found it, good!  quit!
                 if (diff) {
-                    self.selectedObject = diff;
+                    self.chartViewModel.selectedObject = diff;
                     // FIXME: Need to find a decent way to bind model differentials with chart view differentials.
                     //        Maybe the view model should do this.
                     [self.chartView selectDifferentialAtStartLocation:gridLocation index:newIndex];
@@ -323,7 +325,7 @@ static void *_selectedToolTagContext = &_selectedToolTagContext;
 {
     if (context == _selectedToolTagContext) {
         EXTToolboxTag newTag = [change[NSKeyValueChangeNewKey] integerValue];
-        self.selectedObject = nil;
+        self.chartViewModel.selectedObject = nil;
         [self.chartView.window invalidateCursorRectsForView:self.chartView];
 
         self.chartView.interactionType = [EXTChartViewController interactionTypeFromToolTag:newTag];
