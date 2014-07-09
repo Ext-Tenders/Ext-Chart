@@ -13,7 +13,6 @@
 
 @interface EXTTermLayer : CAShapeLayer <EXTChartViewInteraction>
 @property (nonatomic, strong) EXTChartViewTermCountData *termData;
-@property (nonatomic, assign) CGColorRef highlightColor;
 
 + (instancetype)termLayerWithCount:(NSInteger)count length:(CGFloat)length;
 @end

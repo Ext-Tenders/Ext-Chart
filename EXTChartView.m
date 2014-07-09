@@ -79,6 +79,7 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
     NSArray *_differentialLayers;
 
     NSArray *_highlightedLayers; // an array of CALayer<EXTChartViewInteraction> objects, or nil
+    CALayer<EXTChartViewInteraction> *_selectedLayer;
 }
 
 
@@ -114,6 +115,11 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
         // Highlighting
 		{
             _highlightColor = [[NSUserDefaults standardUserDefaults] extColorForKey:EXTChartViewHighlightColorPreferenceKey];
+        }
+
+        // Selection
+        {
+            _selectionColor = [NSColor orangeColor];
         }
 
         CALayer *rootLayer = [CALayer layer];
@@ -335,6 +341,7 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
             newTermLayer.frame = (CGRect){{countData.location.x * _grid.gridSpacing, countData.location.y * _grid.gridSpacing}, {_grid.gridSpacing, _grid.gridSpacing}};
             newTermLayer.termData = countData;
             newTermLayer.highlightColor = [_highlightColor CGColor];
+            newTermLayer.selectionColor = [_selectionColor CGColor];
             [newTermLayers addObject:newTermLayer];
             [self.layer addSublayer:newTermLayer];
         }
@@ -358,7 +365,8 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
             const CGSize size = {ABS(start.x - end.x), ABS(start.y - end.y)};
             newDifferentialLayer.frame = (CGRect){origin, size};
             newDifferentialLayer.differentialData = diffData;
-            newDifferentialLayer.highlightColor = [self.highlightColor CGColor];
+            newDifferentialLayer.highlightColor = [_highlightColor CGColor];
+            newDifferentialLayer.selectionColor = [_selectionColor CGColor];
             [newDifferentialLayers addObject:newDifferentialLayer];
             [self.layer addSublayer:newDifferentialLayer];
 
@@ -723,6 +731,85 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
     }
 
     [_artBoard setMinimumSize:minimumSize];
+}
+
+#pragma mark - Selection
+
+- (void)selectTermAtGridLocation:(EXTIntPoint)gridLocation index:(NSInteger)index
+{
+    CAShapeLayer<EXTChartViewInteraction> *layerToSelect = nil;
+    for (EXTTermLayer *layer in _termLayers) {
+        if (EXTEqualIntPoints(layer.termData.location, gridLocation)) {
+            layerToSelect = layer;
+            break;
+        }
+    }
+
+    if (_selectedLayer != layerToSelect) {
+        [CATransaction begin];
+        {
+            {
+                [CATransaction setAnimationDuration:_kTermHighlightRemoveAnimationDuration];
+                [CATransaction setAnimationTimingFunction:[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseIn]];
+
+                _selectedLayer.selected = false;
+            }
+            {
+                [CATransaction setAnimationDuration:_kTermHighlightAddAnimationDuration];
+                [CATransaction setAnimationTimingFunction:[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseOut]];
+                
+                layerToSelect.selected = true;
+            }
+        }
+        [CATransaction commit];
+
+        _selectedLayer = layerToSelect;
+    }
+}
+
+- (void)removeTermSelection
+{
+    _selectedLayer.selected = false;
+}
+
+- (void)selectDifferentialAtStartLocation:(EXTIntPoint)startLocation index:(NSInteger)index
+{
+    CAShapeLayer<EXTChartViewInteraction> *layerToSelect = nil;
+    NSInteger currentIndex = -1;
+
+    for (EXTDifferentialLayer *layer in _differentialLayers) {
+        if (EXTEqualIntPoints(layer.differentialData.startLocation, startLocation)) {
+            ++currentIndex;
+            if (currentIndex == index) {
+                layerToSelect = layer;
+                break;
+            }
+        }
+    }
+
+    [CATransaction begin];
+    {
+        [CATransaction setAnimationTimingFunction:[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseOut]];
+
+        {
+            [CATransaction setAnimationDuration:_kDifferentialHighlightRemoveAnimationDuration];
+
+            _selectedLayer.selected = false;
+        }
+        {
+            [CATransaction setAnimationDuration:_kDifferentialHighlightAddAnimationDuration];
+
+            layerToSelect.selected = true;
+        }
+    }
+    [CATransaction commit];
+
+    _selectedLayer = layerToSelect;
+}
+
+- (void)removeDifferentialSelection
+{
+    _selectedLayer.selected = false;
 }
 
 #pragma mark - Resizing

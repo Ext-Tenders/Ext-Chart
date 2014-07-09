@@ -11,6 +11,8 @@
 #pragma mark - Private variables
 
 static void *_highlightedContext = &_highlightedContext;
+static void *_selectedContext = &_selectedContext;
+
 static const CGFloat _kDifferentialLineWidth = 0.25;
 static const CGFloat _kHighlightedDifferentialLineWidth = _kDifferentialLineWidth * 5;
 static CGColorRef _differentialStrokeColor;
@@ -19,6 +21,9 @@ static CGColorRef _differentialStrokeColor;
 @implementation EXTDifferentialLayer
 
 @synthesize highlighted = _highlighted;
+@synthesize highlightColor = _highlightColor;
+@synthesize selected = _selected;
+@synthesize selectionColor = _selectionColor;
 
 
 static void commonInit(EXTDifferentialLayer *self)
@@ -27,7 +32,8 @@ static void commonInit(EXTDifferentialLayer *self)
     self.strokeColor = _differentialStrokeColor;
     self.lineCap = kCALineCapRound;
 
-    [self addObserver:self forKeyPath:@"highlighted" options:NSKeyValueObservingOptionNew context:_highlightedContext];
+    [self addObserver:self forKeyPath:@"highlighted" options:0 context:_highlightedContext];
+    [self addObserver:self forKeyPath:@"selected" options:0 context:_selectedContext];
 }
 
 + (void)initialize
@@ -59,7 +65,10 @@ static void commonInit(EXTDifferentialLayer *self)
 - (void)dealloc
 {
     [self removeObserver:self forKeyPath:@"highlighted" context:_highlightedContext];
+    [self removeObserver:self forKeyPath:@"selected" context:_selectedContext];
+
     CGColorRelease(_highlightColor);
+    CGColorRelease(_selectionColor);
 }
 
 #pragma mark - Properties
@@ -72,23 +81,42 @@ static void commonInit(EXTDifferentialLayer *self)
     }
 }
 
+- (void)setSelectionColor:(CGColorRef)selectionColor
+{
+    if (_selectionColor != selectionColor) {
+        CGColorRelease(_selectionColor);
+        _selectionColor = CGColorCreateCopy(selectionColor);
+    }
+}
+
 #pragma mark - NSKeyValueObserving
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
-    if (context == _highlightedContext) {
-        bool highlighted = [change[NSKeyValueChangeNewKey] boolValue];
-
-        if (highlighted) {
-            self.strokeColor = self.highlightColor;
-            self.lineWidth = _kHighlightedDifferentialLineWidth;
-        }
-        else {
-            self.strokeColor = _differentialStrokeColor;
-            self.lineWidth = _kDifferentialLineWidth;
-        }
-    }
+    if (context == _highlightedContext || context == _selectedContext) [self updateInteractionStatus];
+    else [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
 }
 
+- (void)updateInteractionStatus
+{
+    CGColorRef strokeColor;
+    CGFloat lineWidth;
+
+    if (self.selected) {
+        strokeColor = self.selectionColor;
+        lineWidth = _kHighlightedDifferentialLineWidth;
+    }
+    else if (self.highlighted) {
+        strokeColor = self.highlightColor;
+        lineWidth = _kHighlightedDifferentialLineWidth;
+    }
+    else {
+        strokeColor = _differentialStrokeColor;
+        lineWidth = _kDifferentialLineWidth;
+    }
+
+    self.strokeColor = strokeColor;
+    self.lineWidth = lineWidth;
+}
 
 @end

@@ -11,4 +11,8 @@
 @protocol EXTChartViewInteraction <NSObject>
 @required
 @property (nonatomic, assign, getter = isHighlighted) bool highlighted;
+@property (nonatomic, assign) CGColorRef highlightColor;
+
+@property (nonatomic, assign, getter = isSelected) bool selected;
+@property (nonatomic, assign) CGColorRef selectionColor;
 @end

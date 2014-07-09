@@ -33,6 +33,7 @@ typedef NS_ENUM(NSInteger, EXTChartViewInteractionType)
 
 @property (nonatomic, assign) EXTChartViewInteractionType interactionType; // FIXME: should encompass editingArtBoard, too
 @property (nonatomic, strong) NSColor *highlightColor;
+@property (nonatomic, strong) NSColor *selectionColor;
 
 @property (nonatomic, weak) id<EXTChartViewDataSource> dataSource;
 @property (nonatomic, weak) id<EXTChartViewDelegate> delegate;
@@ -43,6 +44,13 @@ typedef NS_ENUM(NSInteger, EXTChartViewInteractionType)
 
 // Actions
 - (IBAction)zoomToFit:(id)sender;
+
+// Selection
+- (void)selectTermAtGridLocation:(EXTIntPoint)gridLocation index:(NSInteger)index;
+- (void)removeTermSelection;
+
+- (void)selectDifferentialAtStartLocation:(EXTIntPoint)startLocation index:(NSInteger)index;
+- (void)removeDifferentialSelection;
 
 // Util
 + (CGRect)dotBoundingBoxForTermCount:(NSInteger)termCount

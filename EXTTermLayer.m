@@ -12,6 +12,8 @@
 #pragma mark - Private variables
 
 static void *_highlightedContext = &_highlightedContext;
+static void *_selectedContext = &_selectedContext;
+
 static CFMutableDictionaryRef _glyphPathCache;
 static CGColorRef _termCountFillColor;
 static CGColorRef _termCountStrokeColor;
@@ -24,10 +26,14 @@ static NSString * const _kTermCountFontName = @"Palatino-Roman";
 @implementation EXTTermLayer
 
 @synthesize highlighted = _highlighted;
+@synthesize highlightColor = _highlightColor;
+@synthesize selected = _selected;
+@synthesize selectionColor = _selectionColor;
 
 static void commonInit(EXTTermLayer *self)
 {
-    [self addObserver:self forKeyPath:@"highlighted" options:NSKeyValueObservingOptionNew context:_highlightedContext];
+    [self addObserver:self forKeyPath:@"highlighted" options:0 context:_highlightedContext];
+    [self addObserver:self forKeyPath:@"selected" options:0 context:_selectedContext];
 }
 
 + (void)initialize
@@ -62,7 +68,10 @@ static void commonInit(EXTTermLayer *self)
 - (void)dealloc
 {
     [self removeObserver:self forKeyPath:@"highlighted" context:_highlightedContext];
+    [self removeObserver:self forKeyPath:@"selected" context:_selectedContext];
+
     CGColorRelease(_highlightColor);
+    CGColorRelease(_selectionColor);
 }
 
 + (instancetype)termLayerWithCount:(NSInteger)count length:(CGFloat)length
@@ -204,34 +213,44 @@ static void commonInit(EXTTermLayer *self)
     }
 }
 
+- (void)setSelectionColor:(CGColorRef)selectionColor
+{
+    if (_selectionColor != selectionColor) {
+        CGColorRelease(_selectionColor);
+        _selectionColor = CGColorCreateCopy(selectionColor);
+    }
+}
+
 #pragma mark - NSKeyValueObserving
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
-    if (context == _highlightedContext) {
-        bool highlighted = [change[NSKeyValueChangeNewKey] boolValue];
+    if (context == _highlightedContext || context == _selectedContext) [self updateInteractionStatus];
+    else [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
+}
 
-        if (highlighted) {
-            if (self.termData.count <= 3) {
-                self.fillColor = self.highlightColor;
-            }
-            else {
-                self.strokeColor = self.highlightColor;
-                for (CAShapeLayer *sublayer in self.sublayers) {
-                    sublayer.fillColor = self.highlightColor;
-                }
-            }
-        }
-        else {
-            if (self.termData.count <= 3) {
-                self.fillColor = _termCountFillColor;
-            }
-            else {
-                self.strokeColor = _termCountStrokeColor;
-                for (CAShapeLayer *sublayer in self.sublayers) {
-                    sublayer.fillColor = _termCountStrokeColor;
-                }
-            }
+- (void)updateInteractionStatus
+{
+    CGColorRef fillColor, strokeColor;
+
+    if (self.selected) {
+        fillColor = strokeColor = self.selectionColor;
+    }
+    else if (self.highlighted) {
+        fillColor = strokeColor = self.highlightColor;
+    }
+    else {
+        fillColor = _termCountFillColor;
+        strokeColor = _termCountStrokeColor;
+    }
+
+    if (self.termData.count <= 3) {
+        self.fillColor = fillColor;
+    }
+    else {
+        self.strokeColor = strokeColor;
+        for (CAShapeLayer *sublayer in self.sublayers) {
+            sublayer.fillColor = strokeColor;
         }
     }
 }

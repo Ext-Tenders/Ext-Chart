@@ -141,6 +141,7 @@ static void *_selectedToolTagContext = &_selectedToolTagContext;
             // if there's nothing under this click, just quit now.
             if (terms.count == 0) {
                 self.selectedObject = nil;
+                [self.chartView removeTermSelection];
                 return;
             }
             
@@ -166,6 +167,7 @@ static void *_selectedToolTagContext = &_selectedToolTagContext;
                 // if we've found it, good!  quit!
                 if (term) {
                     self.selectedObject = term;
+                    [self.chartView selectTermAtGridLocation:gridLocation index:newIndex];
                     break;
                 }
             } while (newIndex != oldIndex);
@@ -180,6 +182,7 @@ static void *_selectedToolTagContext = &_selectedToolTagContext;
             // if there's nothing under this click, just quit now.
             if (terms.count == 0) {
                 self.selectedObject = nil;
+                [self.chartView removeDifferentialSelection];
                 return;
             }
             
@@ -191,7 +194,7 @@ static void *_selectedToolTagContext = &_selectedToolTagContext;
             
             // the new index is one past the old index, unless we have to wrap.
             int newIndex = oldIndex;
-            EXTTerm *source = nil, *end = nil;
+            EXTTerm *source = nil/*, *end = nil*/;
             EXTDifferential *diff = nil;
             if (oldIndex == NSNotFound) {
                 oldIndex = 0;
@@ -208,21 +211,26 @@ static void *_selectedToolTagContext = &_selectedToolTagContext;
                 // if we've found it, good!  quit!
                 if (diff) {
                     self.selectedObject = diff;
+                    // FIXME: Need to find a decent way to bind model differentials with chart view differentials.
+                    //        Maybe the view model should do this.
+                    [self.chartView selectDifferentialAtStartLocation:gridLocation index:newIndex];
                     break;
                 }
-                
-                // if there's no differential, then let's try to build it.
-                EXTLocation *endLoc = [[source.location class] followDiffl:source.location page:_currentPage];
-                end = [_document.sseq findTerm:endLoc];
-                
-                if (end) {
-                    // but if there is, let's build it and set it up.
-                    diff = [EXTDifferential newDifferential:source end:end page:_currentPage];
-                    [_document.sseq addDifferential:diff];
-                    self.selectedObject = diff;
-                    break;
-                }
-                
+
+                // FIXME: Ask Eric whether this still makes sense. If it does, we'll need to refresh the view model
+                //        and the chart view, it seems.
+//                // if there's no differential, then let's try to build it.
+//                EXTLocation *endLoc = [[source.location class] followDiffl:source.location page:_currentPage];
+//                end = [_document.sseq findTerm:endLoc];
+//                
+//                if (end) {
+//                    // but if there is, let's build it and set it up.
+//                    diff = [EXTDifferential newDifferential:source end:end page:_currentPage];
+//                    [_document.sseq addDifferential:diff];
+//                    self.selectedObject = diff;
+//                    break;
+//                }
+
                 // if there's no target term, then this won't work, and we
                 // should cycle.
             } while (newIndex != oldIndex);
