@@ -630,17 +630,17 @@
     if (locations.count == 0)
         return;
     
-    NSMutableArray *maxes = [NSMutableArray arrayWithCapacity:locations.count];
+    CFMutableArrayRef maxes = CFArrayCreateMutable(kCFAllocatorDefault, locations.count, NULL);
     Class<EXTLocation> locClass = [(EXTLocation*)locations[0] class];
     
     // build the array of maximums
     for (int i = 0; i < locations.count; i++) {
         EXTLocation *loc = locations[i];
-        for (int j = 1; true; j++) {
+        for (NSInteger j = 1; true; j++) {
             EXTTerm *t = [self findTerm:loc];
             
             if (!t) {
-                maxes[i] = @(j);
+                CFArraySetValueAtIndex(maxes, i, (void*)j);
                 break;
             }
             
@@ -651,19 +651,21 @@
     // loop through the available differentials by incrementing an array of
     // counters.  the idea is that the counter [n0, n1, ..., nm, 0, ..., 0]
     // corresponds to the product [n0, ..., nm-1, 0, ..., 0] * em.
-    NSMutableArray *counter = [NSMutableArray arrayWithCapacity:locations.count];
+    CFMutableArrayRef counter = CFArrayCreateMutable(kCFAllocatorDefault, locations.count, NULL);
     for (int i = 0; i < locations.count; i++)
-        counter[i] = @0;
-    counter[0] = @1;
+        CFArraySetValueAtIndex(counter, i, (void*)0);
+    CFArraySetValueAtIndex(counter, 0, (void*)1);
+    
     int digitalSum = 1;
     while (true) {
         // increment the counter array
         for (int i = 0; i < locations.count; i++) {
-            counter[i] = @([counter[i] intValue] + 1);
+            CFArraySetValueAtIndex(counter, i, (void*)((NSInteger)CFArrayGetValueAtIndex(counter, i)+1));
             
             // check if we should perform a carry
-            if ([counter[i] isEqual:maxes[i]]) {
-                counter[i] = @0;
+            if (CFArrayGetValueAtIndex(counter, i) ==
+                                            CFArrayGetValueAtIndex(maxes, i)) {
+                CFArraySetValueAtIndex(counter, i, (void*)0);
                 // and then the for(i) loop will handle the actual carry
             } else
                 break;
@@ -672,7 +674,7 @@
         // calculate the digital sum
         digitalSum = 0;
         for (int i = 0; i < locations.count; i++)
-            digitalSum += [counter[i] intValue];
+            digitalSum += (NSInteger)CFArrayGetValueAtIndex(counter, i);
         
         // this dictates the two edge cases.  if the counter array has only one
         // thing in it, then we don't have enough to perform a leibniz
@@ -687,14 +689,14 @@
         // nonzero entry, and think of this as what we're propagating against.
         int topEntry = locations.count-1;
         for (; topEntry >= 0; topEntry--)
-            if ([counter[topEntry] intValue] != 0)
+            if (CFArrayGetValueAtIndex(counter, topEntry) != 0)
                 break;
         
         // build the EXTLocation sum corresponding to the vector coordinate
         EXTLocation *leftLoc = [locClass identityLocation];
         for (int i = 0; i < topEntry; i++)
-            leftLoc = [locClass addLocation:leftLoc to:[locClass scale:locations[i] by:[counter[i] intValue]]];
-        leftLoc = [locClass addLocation:leftLoc to:[locClass scale:locations[topEntry] by:([counter[topEntry] intValue]-1)]];
+            leftLoc = [locClass addLocation:leftLoc to:[locClass scale:locations[i] by:(NSInteger)CFArrayGetValueAtIndex(counter, i)]];
+        leftLoc = [locClass addLocation:leftLoc to:[locClass scale:locations[topEntry] by:((NSInteger)CFArrayGetValueAtIndex(counter, topEntry) - 1)]];
         
         // probably something more dramatic could happen here in the interest
         // of speed, like forcing a carry.  this will do for now, though.
@@ -704,6 +706,9 @@
         // call -computeLeibniz on (the previous sum + the shifted coordinate)
         [self computeLeibniz:leftLoc with:locations[topEntry] onPage:page];
     }
+    
+    // release the stuff ARC is not in charge of.
+    CFRelease(maxes); CFRelease(counter);
     
     return;
 }
