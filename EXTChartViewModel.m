@@ -13,14 +13,34 @@
 #import "EXTDifferential.h"
 
 
-@interface EXTChartViewModel ()
-/// Indexed by @(page). Each element is a dictionary mapping an EXTViewModelPoint to an NSMutableArray of EXTViewModelTerm objects at that grid location.
-@property (nonatomic, strong) NSMutableDictionary *termCounts;
+#pragma mark - Private classes & extensions
 
-/// Indexed by @(page). Each element is an NSArray (eventually an edge quadtree?) of EXTViewModelDifferential objects.
-@property (nonatomic, strong) NSMutableDictionary *differentials;
+@interface EXTChartViewModel ()
+/// Indexed by @(page). Each element is a dictionary mapping an EXTViewModelPoint to an NSMutableArray of EXTChartViewModelTermCell objects at that grid location.
+@property (nonatomic, strong) NSMutableDictionary *privateTermCells;
+
+/// Indexed by @(page). Each element is an NSMutableArray of EXTChartViewModelDifferential objects.
+@property (nonatomic, strong) NSMutableDictionary *privateDifferentials;
+
+/// Indexed by @(page). Each element is an NSMapTable mapping model terms to view model terms.
+@property (nonatomic, strong) NSMutableDictionary *modelToViewModelTermMap;
 @end
 
+
+@interface EXTChartViewModelTermCell ()
+@property (nonatomic, readwrite, assign) NSInteger totalRank;
+@property (nonatomic, strong) NSMutableArray *privateTerms;
++ (instancetype)termCellAtGridLocation:(EXTIntPoint)gridLocation;
+- (void)addTerm:(EXTChartViewModelTerm *)term withDimension:(NSInteger)dimension;
+@end
+
+
+@interface EXTViewModelPoint : NSObject <NSCopying> // FIXME: NSValue with (floating-point) NSPoint? NSValue category?
+@property (nonatomic, readonly, assign) NSInteger x;
+@property (nonatomic, readonly, assign) NSInteger y;
+
++ (instancetype)viewModelPointWithX:(NSInteger)x y:(NSInteger)y;
+@end
 
 #pragma mark - Private functions
 
@@ -30,11 +50,14 @@ static bool lineSegmentIntersectsLineSegment(NSPoint l1p1, NSPoint l1p2, NSPoint
 
 @implementation EXTChartViewModel
 
+@dynamic termCells, differentials;
+
 - (instancetype)init {
     self = [super init];
     if (self) {
-        _termCounts = [NSMutableDictionary new];
-        _differentials = [NSMutableDictionary new];
+        _privateTermCells = [NSMutableDictionary new];
+        _privateDifferentials = [NSMutableDictionary new];
+        _modelToViewModelTermMap = [NSMutableDictionary new];
     }
     return self;
 }
@@ -44,7 +67,9 @@ static bool lineSegmentIntersectsLineSegment(NSPoint l1p1, NSPoint l1p2, NSPoint
     [self.sequence computeGroupsForPage:self.currentPage];
 
     // --- Terms
-    NSMutableDictionary *counts = [NSMutableDictionary new];
+    NSMutableDictionary *termCells = [NSMutableDictionary new];
+    NSMapTable *modelToViewModelTermMap = [NSMapTable mapTableWithKeyOptions:NSPointerFunctionsObjectPointerPersonality
+                                                                valueOptions:NSPointerFunctionsObjectPersonality];
 
     // iterate through the available EXTTerms and count up how many project onto
     // a given grid location.  (this is a necessary step for, e.g., EXTTriple-
@@ -56,36 +81,25 @@ static bool lineSegmentIntersectsLineSegment(NSPoint l1p1, NSPoint l1p2, NSPoint
     // Z-mods, since those have lots of interesting quotients which need to
     // represented visually.
     for (EXTTerm *term in self.sequence.terms.allValues) {
-        // FIXME: Ask Eric whether dimension can be > 1. If it can, then the number of terms with non-zero dimension
-        //        at that grid location does not represent the term count, so we need to keep both an array of terms
-        //        and a term count based on dimensions. Also, if all terms at a given location have dimension 0 at a
-        //        given page, we do not show them visually. Does that mean they cannot be selected either?
-        //
-        //        The only demo that shows terms with dimension > 1 is the random demo, which cannot really be
-        //        trusted anyway.
         const NSInteger termDimension = [term dimension:self.currentPage];
+        if (termDimension == 0) continue;
 
-//        NSInteger termCount = ((NSNumber *)counts[viewPoint]).integerValue;
-//        termCount += termDimension;
-//        if (termCount > 0) {
-//            counts[viewPoint] = @(termCount);
-//        }
-
-        if (termDimension > 0) {
-            EXTIntPoint gridLocation = [self.sequence.locConvertor gridPoint:term.location];
-            EXTViewModelPoint *viewPoint = [EXTViewModelPoint viewModelPointWithX:gridLocation.x y:gridLocation.y];
-            EXTViewModelTerm *viewModelTerm = [EXTViewModelTerm viewModelTermFromModelTerm:term /*gridLocation:gridLocation*/];
-            
-            NSMutableArray *termsAtGridLocation = counts[viewPoint];
-            if (!termsAtGridLocation) termsAtGridLocation = [NSMutableArray new];
-            [termsAtGridLocation addObject:viewModelTerm];
-            counts[viewPoint] = termsAtGridLocation;
+        EXTIntPoint gridLocation = [self.sequence.locConvertor gridPoint:term.location];
+        EXTViewModelPoint *viewPoint = [EXTViewModelPoint viewModelPointWithX:gridLocation.x y:gridLocation.y];
+        EXTChartViewModelTerm *viewModelTerm = [EXTChartViewModelTerm viewModelTermFromModelTerm:term gridLocation:gridLocation];
+        EXTChartViewModelTermCell *termCell = termCells[viewPoint];
+        if (!termCell) {
+            termCell = [EXTChartViewModelTermCell termCellAtGridLocation:gridLocation];
+            termCells[viewPoint] = termCell;
         }
+
+        [termCell addTerm:viewModelTerm withDimension:termDimension];
+        [modelToViewModelTermMap setObject:viewModelTerm forKey:term];
     }
 
     // --- Differentials
     NSMutableArray *differentials = [NSMutableArray new];
-    NSMutableDictionary *termCountOffsets = [NSMutableDictionary new];
+    NSMutableDictionary *termCellOffsets = [NSMutableDictionary new];
 
     if (self.currentPage < self.sequence.differentials.count) {
         for (EXTDifferential *differential in ((NSDictionary*)self.sequence.differentials[self.currentPage]).allValues) {
@@ -118,53 +132,35 @@ static bool lineSegmentIntersectsLineSegment(NSPoint l1p1, NSPoint l1p2, NSPoint
             EXTViewModelPoint *modelEndPoint = [EXTViewModelPoint viewModelPointWithX:endPoint.x y:endPoint.y];
 
             for (NSInteger i = 0; i < imageSize; ++i) {
-                NSInteger startOffset = [termCountOffsets[modelStartPoint] integerValue];
-                NSInteger endOffset = [termCountOffsets[modelEndPoint] integerValue];
-                termCountOffsets[modelStartPoint] = @(startOffset + 1);
-                termCountOffsets[modelEndPoint] = @(endOffset + 1);
+                NSInteger startOffset = [termCellOffsets[modelStartPoint] integerValue];
+                NSInteger endOffset = [termCellOffsets[modelEndPoint] integerValue];
+                termCellOffsets[modelStartPoint] = @(startOffset + 1);
+                termCellOffsets[modelEndPoint] = @(endOffset + 1);
 
-                EXTViewModelDifferential *diff = [EXTViewModelDifferential viewModelDifferentialWithStartLocation:startPoint
-                                                                                                       startIndex:startOffset
-                                                                                                      endLocation:endPoint
-                                                                                                         endIndex:endOffset];
+                EXTChartViewModelDifferential *diff = [EXTChartViewModelDifferential viewModelDifferentialWithStartTerm:[modelToViewModelTermMap objectForKey:diff.startTerm]
+                                                                                                             startIndex:startOffset
+                                                                                                                endTerm:[modelToViewModelTermMap objectForKey:diff.endTerm]
+                                                                                                               endIndex:endOffset];
                 [differentials addObject:diff];
             }
         }
     }
 
-    self.termCounts[@(self.currentPage)] = counts;
-    self.differentials[@(self.currentPage)] = differentials;
+    self.privateTermCells[@(self.currentPage)] = termCells;
+    self.privateDifferentials[@(self.currentPage)] = differentials;
+    self.modelToViewModelTermMap[@(self.currentPage)] = modelToViewModelTermMap; // FIXME: Do we need to keep this?
 }
 
-- (NSArray *)chartView:(EXTChartView *)chartView termCountsInGridRect:(EXTIntRect)gridRect
-{
-    NSMutableArray *result = [NSMutableArray array];
-    [self.termCounts[@(self.currentPage)] enumerateKeysAndObjectsUsingBlock:^(EXTViewModelPoint *point, NSArray *terms, BOOL *stop) {
-        EXTIntPoint gridPoint = (EXTIntPoint){.x = point.x, .y = point.y};
-        if (EXTIntPointInRect(gridPoint, gridRect)) {
-            EXTChartViewTermCountData *data = [EXTChartViewTermCountData new];
-            data.location = (EXTIntPoint){.x = point.x, .y = point.y};
-            data.count = terms.count;
-            [result addObject:data];
-        }
-    }];
+#pragma mark - Computed properties
 
-    return result.copy;
+- (NSArray *)termCells
+{
+    return [self.privateTermCells[@(self.currentPage)] copy];
 }
 
-- (NSArray *)chartView:(EXTChartView *)chartView differentialsInGridRect:(EXTIntRect)gridRect
+- (NSArray *)differentials
 {
-    const NSRect rect = [self.grid convertRectToView:gridRect];
-
-    NSMutableArray *result = [NSMutableArray array];
-    for (EXTViewModelDifferential *diff in self.differentials[@(self.currentPage)]) {
-        const NSPoint start = [self.grid convertPointToView:diff.startLocation];
-        const NSPoint end = [self.grid convertPointToView:diff.endLocation];
-        if (lineSegmentOverRect(start, end, rect)) {
-            [result addObject:[diff chartViewDifferentialData]];
-        }
-    }
-    return result.copy;
+    return [self.privateDifferentials[@(self.currentPage)] copy];
 }
 
 @end
@@ -200,41 +196,64 @@ static bool lineSegmentIntersectsLineSegment(NSPoint l1p1, NSPoint l1p2, NSPoint
 @end
 
 
-@implementation EXTViewModelTerm
-+ (instancetype)viewModelTermFromModelTerm:(EXTTerm *)modelTerm /*gridLocation:(EXTIntPoint)gridLocation*/
+@implementation EXTChartViewModelTerm
++ (instancetype)viewModelTermFromModelTerm:(EXTTerm *)modelTerm gridLocation:(EXTIntPoint)gridLocation
 {
-    EXTViewModelTerm *newTerm = [[self class] new];
+    EXTChartViewModelTerm *newTerm = [[self class] new];
     if (newTerm) {
+        newTerm->_gridLocation = gridLocation;
         newTerm->_modelTerm = modelTerm;
-//        newTerm->_gridLocation = gridLocation;
     }
     return newTerm;
 }
 @end
 
 
-@implementation EXTViewModelDifferential
-+ (instancetype)viewModelDifferentialWithStartLocation:(EXTIntPoint)startLocation
-                                            startIndex:(NSInteger)startIndex
-                                           endLocation:(EXTIntPoint)endLocation
-                                              endIndex:(NSInteger)endIndex
+@implementation EXTChartViewModelTermCell
+@dynamic terms;
+
+- (instancetype)init
 {
-    EXTViewModelDifferential *newDiff = [[self class] new];
+    self = [super init];
+    if (self) {
+        _privateTerms = [NSMutableArray new];
+    }
+    return self;
+}
++ (instancetype)termCellAtGridLocation:(EXTIntPoint)gridLocation
+{
+    EXTChartViewModelTermCell *newTermCell = [[self class] new];
+    if (newTermCell) {
+        newTermCell->_gridLocation = gridLocation;
+    }
+    return newTermCell;
+}
+
+- (void)addTerm:(EXTChartViewModelTerm *)term withDimension:(NSInteger)dimension
+{
+    [self.privateTerms addObject:term];
+    self.totalRank += dimension;
+}
+- (NSArray *)terms
+{
+    return [self.privateTerms copy];
+}
+@end
+
+@implementation EXTChartViewModelDifferential
++ (instancetype)viewModelDifferentialWithStartTerm:(EXTChartViewModelTerm *)startTerm
+                                        startIndex:(NSInteger)startIndex
+                                           endTerm:(EXTChartViewModelTerm *)endTerm
+                                          endIndex:(NSInteger)endIndex
+{
+    EXTChartViewModelDifferential *newDiff = [[self class] new];
     if (newDiff) {
-        newDiff->_startLocation = startLocation;
+        newDiff->_startTerm = startTerm;
         newDiff->_startIndex = startIndex;
-        newDiff->_endLocation = endLocation;
+        newDiff->_endTerm = endTerm;
         newDiff->_endIndex = endIndex;
     }
     return newDiff;
-}
-
-- (EXTChartViewDifferentialData *)chartViewDifferentialData
-{
-   return [EXTChartViewDifferentialData chartViewDifferentialDataWithStartLocation:_startLocation
-                                                                        startIndex:_startIndex
-                                                                       endLocation:_endLocation
-                                                                          endIndex:_endIndex];
 }
 @end
 
