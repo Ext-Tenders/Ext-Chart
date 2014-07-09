@@ -9,10 +9,10 @@
 #import <QuartzCore/QuartzCore.h>
 #import "EXTChartViewInteraction.h"
 
-@class EXTChartViewTermCountData;
+@class EXTChartViewModelTermCell;
 
 @interface EXTTermLayer : CAShapeLayer <EXTChartViewInteraction>
-@property (nonatomic, strong) EXTChartViewTermCountData *termData;
+@property (nonatomic, strong) EXTChartViewModelTermCell *termCell;
 
-+ (instancetype)termLayerWithCount:(NSInteger)count length:(CGFloat)length;
++ (instancetype)termLayerWithTotalRank:(NSInteger)totalRank length:(CGFloat)length;
 @end

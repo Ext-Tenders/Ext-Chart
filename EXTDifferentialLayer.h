@@ -9,8 +9,8 @@
 #import <QuartzCore/QuartzCore.h>
 #import "EXTChartViewInteraction.h"
 
-@class EXTChartViewDifferentialData;
+@class EXTChartViewModelDifferential;
 
 @interface EXTDifferentialLayer : CAShapeLayer <EXTChartViewInteraction>
-@property (nonatomic, strong) EXTChartViewDifferentialData *differentialData;
+@property (nonatomic, strong) EXTChartViewModelDifferential *differential;
 @end

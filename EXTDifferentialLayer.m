@@ -55,7 +55,7 @@ static void commonInit(EXTDifferentialLayer *self)
     self = [super init];
     if (self && [layer isKindOfClass:[EXTDifferentialLayer class]]) {
         EXTDifferentialLayer *otherLayer = layer;
-        _differentialData = otherLayer.differentialData;
+        _differential = otherLayer.differential;
 
         commonInit(self);
     }

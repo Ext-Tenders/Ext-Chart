@@ -137,9 +137,9 @@ static bool lineSegmentIntersectsLineSegment(NSPoint l1p1, NSPoint l1p2, NSPoint
                 termCellOffsets[modelStartPoint] = @(startOffset + 1);
                 termCellOffsets[modelEndPoint] = @(endOffset + 1);
 
-                EXTChartViewModelDifferential *diff = [EXTChartViewModelDifferential viewModelDifferentialWithStartTerm:[modelToViewModelTermMap objectForKey:diff.startTerm]
+                EXTChartViewModelDifferential *diff = [EXTChartViewModelDifferential viewModelDifferentialWithStartTerm:[modelToViewModelTermMap objectForKey:differential.start]
                                                                                                              startIndex:startOffset
-                                                                                                                endTerm:[modelToViewModelTermMap objectForKey:diff.endTerm]
+                                                                                                                endTerm:[modelToViewModelTermMap objectForKey:differential.end]
                                                                                                                endIndex:endOffset];
                 [differentials addObject:diff];
             }
@@ -155,7 +155,7 @@ static bool lineSegmentIntersectsLineSegment(NSPoint l1p1, NSPoint l1p2, NSPoint
 
 - (NSArray *)termCells
 {
-    return [self.privateTermCells[@(self.currentPage)] copy];
+    return [[self.privateTermCells[@(self.currentPage)] allValues] copy];
 }
 
 - (NSArray *)differentials

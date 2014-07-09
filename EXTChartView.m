@@ -12,6 +12,7 @@
 #import "EXTScrollView.h"
 #import "EXTGrid.h"
 #import "EXTArtBoard.h"
+#import "EXTChartViewModel.h"
 #import "EXTTermLayer.h"
 #import "EXTDifferentialLayer.h"
 #import "EXTChartViewInteraction.h"
@@ -335,11 +336,11 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
         
         NSMutableArray *newTermLayers = [NSMutableArray new];
         
-        NSArray *counts = [self.dataSource chartView:self termCountsInGridRect:reloadGridRect];
-        for (EXTChartViewTermCountData *countData in counts) {
-            EXTTermLayer *newTermLayer = [EXTTermLayer termLayerWithCount:countData.count length:_grid.gridSpacing];
-            newTermLayer.frame = (CGRect){{countData.location.x * _grid.gridSpacing, countData.location.y * _grid.gridSpacing}, {_grid.gridSpacing, _grid.gridSpacing}};
-            newTermLayer.termData = countData;
+        NSArray *termCells = [self.dataSource chartView:self termCellsInGridRect:reloadGridRect];
+        for (EXTChartViewModelTermCell *termCell in termCells) {
+            EXTTermLayer *newTermLayer = [EXTTermLayer termLayerWithTotalRank:termCell.totalRank length:_grid.gridSpacing];
+            newTermLayer.frame = (CGRect){{termCell.gridLocation.x * _grid.gridSpacing, termCell.gridLocation.y * _grid.gridSpacing}, {_grid.gridSpacing, _grid.gridSpacing}};
+            newTermLayer.termCell = termCell;
             newTermLayer.highlightColor = [_highlightColor CGColor];
             newTermLayer.selectionColor = [_selectionColor CGColor];
             [newTermLayers addObject:newTermLayer];
@@ -357,49 +358,50 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
         NSMutableArray *newDifferentialLayers = [NSMutableArray new];
 
         NSArray *differentials = [self.dataSource chartView:self differentialsInGridRect:reloadGridRect];
-        for (EXTChartViewDifferentialData *diffData in differentials) {
+        for (EXTChartViewModelDifferential *diff in differentials) {
             EXTDifferentialLayer *newDifferentialLayer = [EXTDifferentialLayer layer];
-            const CGPoint start = [_grid convertPointToView:diffData.startLocation];
-            const CGPoint end = [_grid convertPointToView:diffData.endLocation];
+            const CGPoint start = [_grid convertPointToView:diff.startTerm.gridLocation];
+            const CGPoint end = [_grid convertPointToView:diff.endTerm.gridLocation];
             const CGPoint origin = {MIN(start.x, end.x), MIN(start.y, end.y)};
             const CGSize size = {ABS(start.x - end.x), ABS(start.y - end.y)};
             newDifferentialLayer.frame = (CGRect){origin, size};
-            newDifferentialLayer.differentialData = diffData;
+            newDifferentialLayer.differential = diff;
             newDifferentialLayer.highlightColor = [_highlightColor CGColor];
             newDifferentialLayer.selectionColor = [_selectionColor CGColor];
             [newDifferentialLayers addObject:newDifferentialLayer];
             [self.layer addSublayer:newDifferentialLayer];
 
             // FIXME: This is ugly, oh so ugly
-            NSInteger startCount = 0;
+            NSInteger startTotalRank = 0;
             for (EXTTermLayer *layer in _termLayers) {
-                if (EXTEqualIntPoints(layer.termData.location, diffData.startLocation)) {
-                    startCount = layer.termData.count;
+                if ([layer.termCell.terms containsObject:diff.startTerm]) {
+                    startTotalRank = layer.termCell.totalRank;
                     break;
                 }
             }
 
-            NSInteger endCount = 0;
+            NSInteger endTotalRank = 0;
             for (EXTTermLayer *layer in _termLayers) {
-                if (EXTEqualIntPoints(layer.termData.location, diffData.endLocation)) {
-                    endCount = layer.termData.count;
+                if ([layer.termCell.terms containsObject:diff.endTerm]) {
+                    endTotalRank = layer.termCell.totalRank;
                     break;
                 }
             }
 
-            const NSRect startDotRect = [EXTChartView dotBoundingBoxForTermCount:startCount
-                                                                       termIndex:diffData.startIndex
-                                                                    gridLocation:diffData.startLocation
+
+            const NSRect startDotRect = [EXTChartView dotBoundingBoxForTermCount:startTotalRank
+                                                                       termIndex:diff.startIndex
+                                                                    gridLocation:diff.startTerm.gridLocation
                                                                      gridSpacing:_grid.gridSpacing];
-            const NSRect endDotRect = [EXTChartView dotBoundingBoxForTermCount:endCount
-                                                                     termIndex:diffData.endIndex
-                                                                  gridLocation:diffData.endLocation
+            const NSRect endDotRect = [EXTChartView dotBoundingBoxForTermCount:endTotalRank
+                                                                     termIndex:diff.endIndex
+                                                                  gridLocation:diff.endTerm.gridLocation
                                                                    gridSpacing:_grid.gridSpacing];
 
-            const CGPoint startDotConnectionPoint = (startCount <= 3 ?
+            const CGPoint startDotConnectionPoint = (startTotalRank <= 3 ?
                                                      (CGPoint){NSMidX(startDotRect), NSMidY(startDotRect)} :
                                                      (CGPoint){NSMinX(startDotRect), NSMidY(startDotRect)});
-            const CGPoint endDotConnectionPoint = (endCount <= 3 ?
+            const CGPoint endDotConnectionPoint = (endTotalRank <= 3 ?
                                                    (CGPoint){NSMidX(endDotRect), NSMidY(endDotRect)} :
                                                    (CGPoint){NSMaxX(endDotRect), NSMidY(endDotRect)});
             const CGPoint startInLayer = [newDifferentialLayer convertPoint:startDotConnectionPoint fromLayer:self.layer];
@@ -450,7 +452,7 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
     if (NSPointInRect(currentMouseLocation, dataRect)) {
         const EXTIntPoint mouseLocationInGrid = [_grid convertPointFromView:currentMouseLocation];
         for (EXTTermLayer *layer in _termLayers) {
-            if (EXTEqualIntPoints(layer.termData.location, mouseLocationInGrid)) {
+            if (EXTEqualIntPoints(layer.termCell.gridLocation, mouseLocationInGrid)) {
                 layerToHighlight = layer;
                 break;
             }
@@ -489,7 +491,7 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
     if (NSPointInRect(currentMouseLocation, dataRect)) {
         const EXTIntPoint mouseLocationInGrid = [_grid convertPointFromView:currentMouseLocation];
         for (EXTDifferentialLayer *layer in _differentialLayers) {
-            if (EXTEqualIntPoints(layer.differentialData.startLocation, mouseLocationInGrid)) {
+            if (EXTEqualIntPoints(layer.differential.startTerm.gridLocation, mouseLocationInGrid)) {
                 [layersToHighlight addObject:layer];
             }
         }
@@ -739,7 +741,7 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
 {
     CAShapeLayer<EXTChartViewInteraction> *layerToSelect = nil;
     for (EXTTermLayer *layer in _termLayers) {
-        if (EXTEqualIntPoints(layer.termData.location, gridLocation)) {
+        if (EXTEqualIntPoints(layer.termCell.gridLocation, gridLocation)) {
             layerToSelect = layer;
             break;
         }
@@ -778,7 +780,7 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
     NSInteger currentIndex = -1;
 
     for (EXTDifferentialLayer *layer in _differentialLayers) {
-        if (EXTEqualIntPoints(layer.differentialData.startLocation, startLocation)) {
+        if (EXTEqualIntPoints(layer.differential.startTerm.gridLocation, startLocation)) {
             ++currentIndex;
             if (currentIndex == index) {
                 layerToSelect = layer;
@@ -885,76 +887,4 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
     return CGRectZero;
 }
 
-@end
-
-
-@implementation EXTChartViewTermCountData
-+ (instancetype)chartViewTermCountDataWithCount:(NSInteger)count location:(EXTIntPoint)location
-{
-    EXTChartViewTermCountData *result = [self new];
-    result.count = count;
-    result.location = location;
-    return result;
-}
-
-- (NSString *)description
-{
-    return [NSString stringWithFormat:@"Term count %ld at (%ld, %ld)", self.count, self.location.x, self.location.y];
-}
-
-- (BOOL)isEqual:(id)object
-{
-    EXTChartViewTermCountData *other = object;
-    return ([other isKindOfClass:[EXTChartViewTermCountData class]] &&
-            other.count == _count &&
-            other.location.x == _location.x &&
-            other.location.y == _location.y);
-
-}
-
-- (NSUInteger)hash
-{
-    return NSUINTROTATE(((NSUInteger)_location.x), NSUINT_BIT / 2) ^ _location.y ^ _count;
-}
-@end
-
-
-@implementation EXTChartViewDifferentialData
-+ (instancetype)chartViewDifferentialDataWithStartLocation:(EXTIntPoint)startLocation
-                                                startIndex:(NSInteger)startIndex
-                                               endLocation:(EXTIntPoint)endLocation
-                                                  endIndex:(NSInteger)endIndex
-{
-    EXTChartViewDifferentialData *result = [self new];
-    result.startLocation = startLocation;
-    result.startIndex = startIndex;
-    result.endLocation = endLocation;
-    result.endIndex = endIndex;
-    return result;
-}
-
-- (NSString *)description
-{
-    return [NSString stringWithFormat:@"Differential from (%ld,%ld _ %ld) to (%ld,%ld _ %ld)",
-            self.startLocation.x, self.startLocation.y, self.startIndex,
-            self.endLocation.x, self.endLocation.y, self.endIndex];
-}
-
-- (BOOL)isEqual:(id)object
-{
-    EXTChartViewDifferentialData *other = object;
-    return ([other isKindOfClass:[EXTChartViewDifferentialData class]] &&
-            EXTEqualIntPoints(other.startLocation, _startLocation) &&
-            other.startIndex == _startIndex &&
-            EXTEqualIntPoints(other.endLocation, _endLocation) &&
-            other.endIndex == _endIndex);
-}
-
-- (NSUInteger)hash
-{
-    return (NSUINTROTATE(((NSUInteger)_startLocation.x), NSUINT_BIT / 2) ^ (NSUInteger)_startLocation.y ^
-            NSUINTROTATE(((NSUInteger)_endLocation.y), NSUINT_BIT / 2) ^ (NSUInteger)_endLocation.x ^
-            (NSUInteger)_startIndex ^
-            (NSUInteger)_endIndex);
-}
 @end

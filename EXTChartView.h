@@ -66,40 +66,10 @@ typedef NS_ENUM(NSInteger, EXTChartViewInteractionType)
 
 
 @protocol EXTChartViewDataSource <NSObject>
-- (NSArray *)chartView:(EXTChartView *)chartView termCountsInGridRect:(EXTIntRect)gridRect; // an array of EXTChartViewTermCountData
-- (NSArray *)chartView:(EXTChartView *)chartView differentialsInGridRect:(EXTIntRect)gridRect; // an array of EXTChartViewDifferentialData
+- (NSArray *)chartView:(EXTChartView *)chartView termCellsInGridRect:(EXTIntRect)gridRect; // an array of EXTChartViewModelTermCell
+- (NSArray *)chartView:(EXTChartView *)chartView differentialsInGridRect:(EXTIntRect)gridRect; // an array of EXTChartViewModelDifferential
 @end
 
-
-@interface EXTChartViewTermCountData : NSObject
-/// Location in grid coordinates.
-@property (nonatomic, assign) EXTIntPoint location;
-
-/// Number of terms in a given grid location.
-@property (nonatomic, assign) NSInteger count;
-
-+ (instancetype)chartViewTermCountDataWithCount:(NSInteger)count location:(EXTIntPoint)location;
-@end
-
-
-@interface EXTChartViewDifferentialData : NSObject
-/// Start endpoint in grid coordinates.
-@property (nonatomic, assign) EXTIntPoint startLocation;
-
-/// If several terms are present in startLocation, 0-based index of which of those terms this differential refers to.
-@property (nonatomic, assign) NSInteger startIndex;
-
-/// End endpoint in grid coordinates.
-@property (nonatomic, assign) EXTIntPoint endLocation;
-
-/// If several terms are present in startLocation, 0-based index of which of those terms this differential refers to.
-@property (nonatomic, assign) NSInteger endIndex;
-
-+ (instancetype)chartViewDifferentialDataWithStartLocation:(EXTIntPoint)startLocation
-                                                startIndex:(NSInteger)startIndex
-                                               endLocation:(EXTIntPoint)endLocation
-                                                  endIndex:(NSInteger)endIndex;
-@end
 
 #pragma mark - Exported variables
 

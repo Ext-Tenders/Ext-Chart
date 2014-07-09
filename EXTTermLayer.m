@@ -7,6 +7,7 @@
 //
 
 #import "EXTTermLayer.h"
+#import "EXTChartViewModel.h"
 #import "EXTChartView.h"
 
 #pragma mark - Private variables
@@ -58,7 +59,7 @@ static void commonInit(EXTTermLayer *self)
     self = [super initWithLayer:layer];
     if (self && [layer isKindOfClass:[EXTTermLayer class]]) {
         EXTTermLayer *otherLayer = layer;
-        _termData = otherLayer.termData;
+        _termCell = otherLayer.termCell;
 
         commonInit(self);
     }
@@ -74,18 +75,18 @@ static void commonInit(EXTTermLayer *self)
     CGColorRelease(_selectionColor);
 }
 
-+ (instancetype)termLayerWithCount:(NSInteger)count length:(CGFloat)length
++ (instancetype)termLayerWithTotalRank:(NSInteger)totalRank length:(CGFloat)length
 {
     EXTTermLayer *layer = [EXTTermLayer layer];
     CGMutablePathRef path = CGPathCreateMutable();
     CGPathMoveToPoint(path, NULL, 0.0, 0.0);
 
-    for (NSInteger i = 0; i < count; ++i) {
-        const CGRect box = [EXTChartView dotBoundingBoxForTermCount:count termIndex:i gridLocation:(EXTIntPoint){0} gridSpacing:length];
+    for (NSInteger i = 0; i < totalRank; ++i) {
+        const CGRect box = [EXTChartView dotBoundingBoxForTermCount:totalRank termIndex:i gridLocation:(EXTIntPoint){0} gridSpacing:length];
         CGPathAddEllipseInRect(path, NULL, box);
     }
 
-    if (count <= 3) {
+    if (totalRank <= 3) {
         layer.fillColor = _termCountFillColor;
         layer.lineWidth = 0.0;
     }
@@ -94,8 +95,8 @@ static void commonInit(EXTTermLayer *self)
         layer.strokeColor = _termCountStrokeColor;
         layer.lineWidth = _kTermCountLineWidth;
 
-        NSString *label = [NSString stringWithFormat:@"%ld", (long)count];
-        CGFloat fontSize = round((count < 10 ?
+        NSString *label = [NSString stringWithFormat:@"%ld", (long)totalRank];
+        CGFloat fontSize = round((totalRank < 10 ?
                                   length * _kTermCountSingleDigitFontSizeFactor :
                                   length * _kTermCountDoubleDigitFontSizeFactor));
         CGSize textSize;
@@ -244,7 +245,7 @@ static void commonInit(EXTTermLayer *self)
         strokeColor = _termCountStrokeColor;
     }
 
-    if (self.termData.count <= 3) {
+    if (self.termCell.totalRank <= 3) {
         self.fillColor = fillColor;
     }
     else {

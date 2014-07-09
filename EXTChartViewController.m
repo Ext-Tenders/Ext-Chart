@@ -18,12 +18,19 @@
 #import "EXTDifferential.h"
 
 
-@interface EXTChartViewController () <EXTChartViewDelegate>
+@interface EXTChartViewController () <EXTChartViewDataSource, EXTChartViewDelegate>
 @property (nonatomic, strong) EXTChartViewModel *chartViewModel;
 @end
 
 
-@implementation EXTChartViewController {
+#pragma mark - Private functions
+
+static bool lineSegmentOverRect(NSPoint p1, NSPoint p2, NSRect rect);
+static bool lineSegmentIntersectsLineSegment(NSPoint l1p1, NSPoint l1p2, NSPoint l2p1, NSPoint l2p2);
+
+
+@implementation EXTChartViewController
+{
     EXTDocument *_document;
 }
 
@@ -78,7 +85,7 @@ static void *_selectedToolTagContext = &_selectedToolTagContext;
     [super setView:view];
 
     self.chartView.delegate = self;
-    self.chartView.dataSource = self.chartViewModel;
+    self.chartView.dataSource = self;
     self.chartView.interactionType = [EXTChartViewController interactionTypeFromToolTag:_document.mainWindowController.selectedToolTag];
     self.chartViewModel.grid = self.chartView.grid;
 
@@ -106,6 +113,7 @@ static void *_selectedToolTagContext = &_selectedToolTagContext;
 
 - (void)setCurrentPage:(int)currentPage {
     if (currentPage == _currentPage || currentPage < 0)
+        
         return;
 
     _currentPage = currentPage;
@@ -274,6 +282,34 @@ static void *_selectedToolTagContext = &_selectedToolTagContext;
     }
 }
 
+#pragma mark - EXTChartViewDataSource
+
+- (NSArray *)chartView:(EXTChartView *)chartView termCellsInGridRect:(EXTIntRect)gridRect
+{
+    NSMutableArray *result = [NSMutableArray new];
+    for (EXTChartViewModelTermCell *termCell in self.chartViewModel.termCells) {
+        if (EXTIntPointInRect(termCell.gridLocation, gridRect)) {
+            [result addObject:termCell];
+        }
+    }
+    return [result copy];
+}
+
+- (NSArray *)chartView:(EXTChartView *)chartView differentialsInGridRect:(EXTIntRect)gridRect
+{
+    const NSRect rect = [self.chartView.grid convertRectToView:gridRect];
+
+    NSMutableArray *result = [NSMutableArray array];
+    for (EXTChartViewModelDifferential *diff in self.chartViewModel.differentials) {
+        const NSPoint start = [self.chartView.grid convertPointToView:diff.startTerm.gridLocation];
+        const NSPoint end = [self.chartView.grid convertPointToView:diff.endTerm.gridLocation];
+        if (lineSegmentOverRect(start, end, rect)) {
+            [result addObject:diff];
+        }
+    }
+    return [result copy];
+}
+
 #pragma mark - NSKeyValueObserving
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
@@ -318,3 +354,38 @@ static void *_selectedToolTagContext = &_selectedToolTagContext;
 }
 
 @end
+
+#pragma mark - Util
+
+static bool lineSegmentOverRect(NSPoint p1, NSPoint p2, NSRect rect)
+{
+#define LEFT (NSPoint){(rect.origin.x), (rect.origin.y)}, (NSPoint){(rect.origin.x), (rect.origin.y + rect.size.height)}
+#define RIGHT (NSPoint){(rect.origin.x + rect.size.width), (rect.origin.y)}, (NSPoint){(rect.origin.x + rect.size.width), (rect.origin.y + rect.size.height)}
+#define TOP (NSPoint){(rect.origin.x), (rect.origin.y + rect.size.height)}, (NSPoint){(rect.origin.x + rect.size.width), (rect.origin.y + rect.size.height)}
+#define BOTTOM (NSPoint){(rect.origin.x), (rect.origin.y)}, (NSPoint){(rect.origin.x + rect.size.width), (rect.origin.y)}
+    return (lineSegmentIntersectsLineSegment(p1, p2, LEFT) ||
+            lineSegmentIntersectsLineSegment(p1, p2, RIGHT) ||
+            lineSegmentIntersectsLineSegment(p1, p2, TOP) ||
+            lineSegmentIntersectsLineSegment(p1, p2, BOTTOM) ||
+            NSPointInRect(p1, rect) ||
+            NSPointInRect(p2, rect));
+#undef LEFT
+#undef RIGHT
+#undef TOP
+#undef BOTTOM
+}
+
+static bool lineSegmentIntersectsLineSegment(NSPoint l1p1, NSPoint l1p2, NSPoint l2p1, NSPoint l2p2)
+{
+    CGFloat q = (l1p1.y - l2p1.y) * (l2p2.x - l2p1.x) - (l1p1.x - l2p1.x) * (l2p2.y - l2p1.y);
+    CGFloat d = (l1p2.x - l1p1.x) * (l2p2.y - l2p1.y) - (l1p2.y - l1p1.y) * (l2p2.x - l2p1.x);
+
+    if (d == 0.0) return false;
+
+    CGFloat r = q / d;
+
+    q = (l1p1.y - l2p1.y) * (l1p2.x - l1p1.x) - (l1p1.x - l2p1.x) * (l1p2.y - l1p1.y);
+    CGFloat s = q / d;
+
+    return !(r < 0 || r > 1 || s < 0 || s > 1);
+}
