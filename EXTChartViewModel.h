@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-
+#import "EXTChartInteractionType.h"
 
 @class EXTSpectralSequence;
 @class EXTTerm;
@@ -26,6 +26,7 @@
 
 @property (nonatomic, assign) NSInteger currentPage;
 @property (nonatomic, weak) EXTGrid *grid;
+@property (nonatomic, assign) EXTChartInteractionType interactionType;
 
 @property (nonatomic, weak) id selectedObject;
 

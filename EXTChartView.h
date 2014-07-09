@@ -8,21 +8,11 @@
 
 
 #import <Cocoa/Cocoa.h>
-#import "EXTToolboxTag.h"
+#import "EXTChartInteractionType.h"
+
 
 @class EXTChartView, EXTArtBoard, EXTGrid;
 @protocol EXTChartViewDataSource, EXTChartViewDelegate;
-
-
-// Objects in the chart view that can be highlighted or selected
-typedef NS_ENUM(NSInteger, EXTChartViewInteractionType)
-{
-    EXTChartViewInteractionTypeNone = 0,
-    EXTChartViewInteractionTypeTerm = 1,
-    EXTChartViewInteractionTypeDifferential = 2,
-    EXTChartViewInteractionTypeMultiplicativeStructure = 3,
-    EXTChartViewInteractionTypeArtBoard = 4,
-};
 
 
 @interface EXTChartView : NSView <NSUserInterfaceValidations>
@@ -31,7 +21,7 @@ typedef NS_ENUM(NSInteger, EXTChartViewInteractionType)
 @property (nonatomic, readonly) EXTGrid *grid;
 @property (nonatomic, assign) EXTIntRect artBoardGridFrame; // the art board frame in grid coordinate space
 
-@property (nonatomic, assign) EXTChartViewInteractionType interactionType; // FIXME: should encompass editingArtBoard, too
+@property (nonatomic, assign) EXTChartInteractionType interactionType;
 @property (nonatomic, strong) NSColor *highlightColor;
 @property (nonatomic, strong) NSColor *selectionColor;
 

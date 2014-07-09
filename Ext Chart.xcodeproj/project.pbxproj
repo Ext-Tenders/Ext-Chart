@@ -143,6 +143,7 @@
 		14AA9E4119668A2200A709F1 /* EXTTermLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTTermLayer.m; sourceTree = "<group>"; };
 		14AA9E4419668D8900A709F1 /* EXTDifferentialLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTDifferentialLayer.h; sourceTree = "<group>"; };
 		14AA9E4519668D8900A709F1 /* EXTDifferentialLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTDifferentialLayer.m; sourceTree = "<group>"; };
+		14AAADA0196DC85E00ED8FEA /* EXTChartInteractionType.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EXTChartInteractionType.h; sourceTree = "<group>"; };
 		14BCCBAB1961489E0019FEC3 /* EXTChartClipView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTChartClipView.h; sourceTree = "<group>"; usesTabs = 0; };
 		14BCCBAC1961489E0019FEC3 /* EXTChartClipView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTChartClipView.m; sourceTree = "<group>"; usesTabs = 0; };
 		14CCA3891794F21D002EF861 /* ArtBoardTool.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = ArtBoardTool.pdf; path = Images/ArtBoardTool.pdf; sourceTree = "<group>"; };
@@ -382,6 +383,7 @@
 				14AA9E4419668D8900A709F1 /* EXTDifferentialLayer.h */,
 				14AA9E4519668D8900A709F1 /* EXTDifferentialLayer.m */,
 				143976851966A47000D8FE87 /* EXTChartViewInteraction.h */,
+				14AAADA0196DC85E00ED8FEA /* EXTChartInteractionType.h */,
 			);
 			name = Views;
 			sourceTree = "<group>";

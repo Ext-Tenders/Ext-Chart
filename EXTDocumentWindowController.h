@@ -8,6 +8,7 @@
 
 #import <Cocoa/Cocoa.h>
 #import "EXTChartView.h"
+#import "EXTToolboxTag.h"
 
 
 @class EXTDocument;

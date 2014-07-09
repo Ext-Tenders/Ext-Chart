@@ -421,23 +421,23 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
 
 - (void)resetCursorRects
 {
-	if (self.interactionType == EXTChartViewInteractionTypeArtBoard) [_artBoard buildCursorRectsInView:self];
+	if (self.interactionType == EXTChartInteractionTypeArtBoard) [_artBoard buildCursorRectsInView:self];
 }
 
 - (void)updateHighlight
 {
     switch (self.interactionType) {
-        case EXTChartViewInteractionTypeTerm:
+        case EXTChartInteractionTypeTerm:
             [self updateTermHighlight];
             break;
 
-        case EXTChartViewInteractionTypeDifferential:
+        case EXTChartInteractionTypeDifferential:
             [self updateDifferentialHighlight];
             break;
 
-        case EXTChartViewInteractionTypeMultiplicativeStructure:
-        case EXTChartViewInteractionTypeArtBoard:
-        case EXTChartViewInteractionTypeNone:
+        case EXTChartInteractionTypeMultiplicativeStructure:
+        case EXTChartInteractionTypeArtBoard:
+        case EXTChartInteractionTypeNone:
         default:
             break;
     }
@@ -567,7 +567,7 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
 	if (context == _EXTChartViewArtBoardDrawingRectContext) {
         [self setNeedsDisplayInRect:NSUnionRect([change[NSKeyValueChangeOldKey] rectValue], [_artBoard drawingRect])];
-        if (self.interactionType == EXTChartViewInteractionTypeArtBoard)
+        if (self.interactionType == EXTChartInteractionTypeArtBoard)
             [[self window] invalidateCursorRectsForView:self];
 	}
 	else if (context == _EXTChartViewGridAnyKeyContext) {
@@ -653,7 +653,7 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
 - (void)mouseDown:(NSEvent *)event {
 	const NSPoint location = [self convertPoint:[event locationInWindow] fromView:nil];
 
-    if (self.interactionType == EXTChartViewInteractionTypeArtBoard) {
+    if (self.interactionType == EXTChartInteractionTypeArtBoard) {
         const EXTArtBoardMouseDragOperation artBoardDragOperation = [_artBoard mouseDragOperationAtPoint:location];
         if (artBoardDragOperation != EXTArtBoardMouseDragOperationNone) {
             [self _extDragArtBoardWithEvent:event];

@@ -86,8 +86,10 @@ static void *_selectedToolTagContext = &_selectedToolTagContext;
 
     self.chartView.delegate = self;
     self.chartView.dataSource = self;
-    self.chartView.interactionType = [EXTChartViewController interactionTypeFromToolTag:_document.mainWindowController.selectedToolTag];
+    self.chartViewModel.interactionType = [EXTChartViewController interactionTypeFromToolTag:_document.mainWindowController.selectedToolTag];
     self.chartViewModel.grid = self.chartView.grid;
+
+    [self.chartView bind:@"interactionType" toObject:self.chartViewModel withKeyPath:@"interactionType" options:nil];
 
     [self reloadCurrentPage];
 }
@@ -103,6 +105,11 @@ static void *_selectedToolTagContext = &_selectedToolTagContext;
 - (instancetype)initWithNibName:(NSString *)nibNameOrNil
                          bundle:(NSBundle *)nibBundleOrNil {
     return [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
+}
+
+- (void)dealloc
+{
+    [self.chartView unbind:@"interactionType"];
 }
 
 #pragma mark - Properties
@@ -142,7 +149,7 @@ static void *_selectedToolTagContext = &_selectedToolTagContext;
     
     // TODO: lots!
     switch (self.chartView.interactionType) {
-        case EXTChartViewInteractionTypeTerm: {
+        case EXTChartInteractionTypeTerm: {
             NSArray *terms = [_document.sseq findTermsUnderPoint:gridLocation];
             NSUInteger oldIndex = NSNotFound;
             
@@ -183,7 +190,7 @@ static void *_selectedToolTagContext = &_selectedToolTagContext;
             break;
         }
             
-        case EXTChartViewInteractionTypeDifferential: {
+        case EXTChartInteractionTypeDifferential: {
             NSArray *terms = [_document.sseq findTermsUnderPoint:gridLocation];
             NSUInteger oldIndex = NSNotFound;
 
@@ -336,18 +343,29 @@ static void *_selectedToolTagContext = &_selectedToolTagContext;
 
 #pragma mark - Support
 
-+ (EXTChartViewInteractionType)interactionTypeFromToolTag:(EXTToolboxTag)tag
++ (EXTChartInteractionType)interactionTypeFromToolTag:(EXTToolboxTag)tag
 {
-    EXTChartViewInteractionType type;
+    EXTChartInteractionType type;
     switch (tag) {
-        case EXTToolTagArtboard: type = EXTChartViewInteractionTypeArtBoard; break;
-        case EXTToolTagGenerator: type = EXTChartViewInteractionTypeTerm; break;
-        case EXTToolTagDifferential: type = EXTChartViewInteractionTypeDifferential; break;
-        case EXTToolTagMultiplicativeStructure: type = EXTChartViewInteractionTypeMultiplicativeStructure; break;
+        case EXTToolTagArtboard:
+            type = EXTChartInteractionTypeArtBoard;
+            break;
+
+        case EXTToolTagGenerator:
+            type = EXTChartInteractionTypeTerm;
+            break;
+
+        case EXTToolTagDifferential:
+            type = EXTChartInteractionTypeDifferential;
+            break;
+
+        case EXTToolTagMultiplicativeStructure:
+            type = EXTChartInteractionTypeMultiplicativeStructure; break;
+
         case EXTToolTagMarquee:
         case EXTToolTagLastSentinel:
         default:
-            type = EXTChartViewInteractionTypeNone;
+            type = EXTChartInteractionTypeNone;
     }
     
     return type;
