@@ -28,9 +28,10 @@
 @property (nonatomic, weak) EXTGrid *grid;
 @property (nonatomic, assign) EXTChartInteractionType interactionType;
 
-@property (nonatomic, weak) id selectedObject;
+@property (nonatomic, weak) id selectedObject; // TODO: Should this really be readwrite?
 
 - (void)reloadCurrentPage;
+- (void)selectObjectAtGridLocation:(EXTIntPoint)gridLocation;
 @end
 
 
@@ -40,6 +41,9 @@
 
 /// An array of EXTChartViewModelTerm objects.
 @property (nonatomic, readonly, strong) NSArray *terms;
+
+/// An array of EXTChartViewModelDifferential objects whose start terms are located in this cell.
+@property (nonatomic, readonly, strong) NSArray *differentials;
 @end
 
 
@@ -48,18 +52,15 @@
 @property (nonatomic, readonly, strong) EXTTerm *modelTerm;
 @property (nonatomic, readonly, assign) NSInteger dimension;
 
-+ (instancetype)viewModelTermFromModelTerm:(EXTTerm *)modelTerm gridLocation:(EXTIntPoint)gridLocation;
+/// An array of EXTChartViewModelDifferential objects that start at this term.
+@property (nonatomic, readonly) NSArray *differentials;
 @end
 
 
 @interface EXTChartViewModelDifferential : NSObject
+@property (nonatomic, readonly, strong) EXTDifferential *modelDifferential;
 @property (nonatomic, readonly, strong) EXTChartViewModelTerm *startTerm;
 @property (nonatomic, readonly, assign) NSInteger startIndex;
 @property (nonatomic, readonly, strong) EXTChartViewModelTerm *endTerm;
 @property (nonatomic, readonly, assign) NSInteger endIndex;
-
-+ (instancetype)viewModelDifferentialWithStartTerm:(EXTChartViewModelTerm *)startTerm
-                                        startIndex:(NSInteger)startIndex
-                                           endTerm:(EXTChartViewModelTerm *)endTerm
-                                        endIndex:(NSInteger)endIndex;
 @end

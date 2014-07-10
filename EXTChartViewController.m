@@ -148,150 +148,8 @@ static void *_selectedToolTagContext = &_selectedToolTagContext;
         [self.leibnizWindowController mouseDownAtGridLocation:gridLocation];
         return;
     }
-    
-    // TODO: lots!
-    switch (self.chartView.interactionType) {
-        case EXTChartInteractionTypeTerm: {
-            EXTChartViewModelTermCell *clickedTermCell = nil;
-            for (EXTChartViewModelTermCell *termCell in self.chartViewModel.termCells) {
-                if (EXTEqualIntPoints(termCell.gridLocation, gridLocation)) {
-                    clickedTermCell = termCell;
-                    break;
-                }
-            }
 
-            // if there's nothing under this click, just quit now.
-            if (clickedTermCell.terms.count == 0) {
-                self.chartViewModel.selectedObject = nil;
-                break;;
-            }
-
-            // if we used to have something selected, and it was a term at this
-            // location, then we should find its position in our list.
-            NSUInteger oldIndex = NSNotFound;
-
-            if ([self.chartViewModel.selectedObject isKindOfClass:[EXTTerm class]])
-                oldIndex = [clickedTermCell.terms indexOfObject:(EXTTerm*)self.chartViewModel.selectedObject];
-            
-            // the new index is one past the old index, unless we have to wrap.
-            int newIndex = oldIndex;
-            EXTChartViewModelTerm *term = nil;
-            if (oldIndex == NSNotFound) {
-                oldIndex = 0;
-                newIndex = 0;
-            }
-            do {
-                if (newIndex == (clickedTermCell.terms.count - 1))
-                    newIndex = 0;
-                else
-                    newIndex = newIndex + 1;
-                term = clickedTermCell.terms[newIndex];
-                
-                // if we've found it, good!  quit!
-                if (term) {
-                    self.chartViewModel.selectedObject = term;
-                    break;
-                }
-            } while (newIndex != oldIndex);
-            
-            break;
-        }
-            
-        case EXTChartInteractionTypeDifferential: {
-            NSArray *terms = [_document.sseq findTermsUnderPoint:gridLocation];
-            NSUInteger oldIndex = NSNotFound;
-
-            // if there's nothing under this click, just quit now.
-            if (terms.count == 0) {
-                self.chartViewModel.selectedObject = nil;
-                return;
-            }
-            
-            // if we used to have something selected, and it was a differential
-            // on this page, then we should find its position in our list.
-            if ([self.chartViewModel.selectedObject isKindOfClass:[EXTDifferential class]] &&
-                (((EXTDifferential*)self.chartViewModel.selectedObject).page == _currentPage))
-                oldIndex = [terms indexOfObject:((EXTDifferential*)self.chartViewModel.selectedObject).start];
-            
-            // the new index is one past the old index, unless we have to wrap.
-            int newIndex = oldIndex;
-            EXTTerm *source = nil/*, *end = nil*/;
-            EXTDifferential *diff = nil;
-            if (oldIndex == NSNotFound) {
-                oldIndex = 0;
-                newIndex = 0;
-            }
-            do {
-                if (newIndex == (terms.count - 1))
-                    newIndex = 0;
-                else
-                    newIndex = newIndex + 1;
-                source = terms[newIndex];
-                diff = [_document.sseq findDifflWithSource:source.location onPage:_currentPage];
-                
-                // if we've found it, good!  quit!
-                if (diff) {
-                    self.chartViewModel.selectedObject = diff;
-                    // FIXME: Need to find a decent way to bind model differentials with chart view differentials.
-                    //        Maybe the view model should do this.
-                    break;
-                }
-
-                // FIXME: Ask Eric whether this still makes sense. If it does, we'll need to refresh the view model
-                //        and the chart view, it seems.
-//                // if there's no differential, then let's try to build it.
-//                EXTLocation *endLoc = [[source.location class] followDiffl:source.location page:_currentPage];
-//                end = [_document.sseq findTerm:endLoc];
-//                
-//                if (end) {
-//                    // but if there is, let's build it and set it up.
-//                    diff = [EXTDifferential newDifferential:source end:end page:_currentPage];
-//                    [_document.sseq addDifferential:diff];
-//                    self.selectedObject = diff;
-//                    break;
-//                }
-
-                // if there's no target term, then this won't work, and we
-                // should cycle.
-            } while (newIndex != oldIndex);
-            
-            break;
-        }
-
-//        case EXTToolTagMarquee: {
-//            const NSRect gridRectInView = [self.chartView.grid viewBoundingRectForGridPoint:gridLocation];
-//            NSIndexSet *marqueesAtPoint = [_document.marquees indexesOfObjectsPassingTest:^BOOL(EXTMarquee *marquee, NSUInteger idx, BOOL *stop) {
-//                return NSIntersectsRect(gridRectInView, marquee.frame);
-//            }];
-//
-//            EXTMarquee *newSelectedMarquee = nil;
-//
-//            if (marqueesAtPoint.count == 0) {
-//                newSelectedMarquee = [EXTMarquee new];
-//                newSelectedMarquee.string = @"New marquee";
-//                newSelectedMarquee.frame = (NSRect){gridRectInView.origin, {100.0, 15.0}};
-//                [_document.marquees addObject:newSelectedMarquee];
-//            }
-//            else {
-//                // Cycle through all marquees lying on that grid square
-//                const NSInteger previousSelectedMarqueeIndex = ([self.selectedObject isKindOfClass:[EXTMarquee class]] ?
-//                                                                [_document.marquees indexOfObject:self.selectedObject] :
-//                                                                -1);
-//                NSInteger newSelectedMarqueeIndex = [marqueesAtPoint indexGreaterThanIndex:previousSelectedMarqueeIndex];
-//                if (newSelectedMarqueeIndex == NSNotFound)
-//                    newSelectedMarqueeIndex = [marqueesAtPoint firstIndex];
-//
-//                newSelectedMarquee = _document.marquees[newSelectedMarqueeIndex];
-//            }
-//
-//            self.selectedObject = newSelectedMarquee;
-//
-//            break;
-//        }
-
-        default:
-            break;
-    }
+    [self.chartViewModel selectObjectAtGridLocation:gridLocation];
 }
 
 #pragma mark - EXTChartViewDataSource
@@ -331,7 +189,7 @@ static void *_selectedToolTagContext = &_selectedToolTagContext;
         self.chartViewModel.selectedObject = nil;
         [self.chartView.window invalidateCursorRectsForView:self.chartView];
 
-        self.chartView.interactionType = [EXTChartViewController interactionTypeFromToolTag:newTag];
+        self.chartViewModel.interactionType = [EXTChartViewController interactionTypeFromToolTag:newTag];
     }
     else [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
 }

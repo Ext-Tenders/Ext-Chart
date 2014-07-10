@@ -30,8 +30,27 @@
 @interface EXTChartViewModelTermCell ()
 @property (nonatomic, readwrite, assign) NSInteger totalRank;
 @property (nonatomic, strong) NSMutableArray *privateTerms;
+@property (nonatomic, strong) NSMutableArray *privateDifferentials;
 + (instancetype)termCellAtGridLocation:(EXTIntPoint)gridLocation;
 - (void)addTerm:(EXTChartViewModelTerm *)term withDimension:(NSInteger)dimension;
+- (void)addDifferential:(EXTChartViewModelDifferential *)differential;
+@end
+
+
+@interface EXTChartViewModelTerm ()
+@property (nonatomic, weak) EXTChartViewModelTermCell *termCell;
+@property (nonatomic, strong) NSMutableArray *privateDifferentials;
++ (instancetype)viewModelTermWithModelTerm:(EXTTerm *)modelTerm gridLocation:(EXTIntPoint)gridLocation;
+- (void)addDifferential:(EXTChartViewModelDifferential *)differential;
+@end
+
+
+@interface EXTChartViewModelDifferential ()
++ (instancetype)viewModelDifferentialWithModelDifferential:(EXTDifferential *)modelDifferential
+                                                 startTerm:(EXTChartViewModelTerm *)startTerm
+                                                startIndex:(NSInteger)startIndex
+                                                   endTerm:(EXTChartViewModelTerm *)endTerm
+                                                  endIndex:(NSInteger)endIndex;
 @end
 
 
@@ -41,6 +60,7 @@
 
 + (instancetype)viewModelPointWithX:(NSInteger)x y:(NSInteger)y;
 @end
+
 
 #pragma mark - Private functions
 
@@ -86,7 +106,7 @@ static bool lineSegmentIntersectsLineSegment(NSPoint l1p1, NSPoint l1p2, NSPoint
 
         EXTIntPoint gridLocation = [self.sequence.locConvertor gridPoint:term.location];
         EXTViewModelPoint *viewPoint = [EXTViewModelPoint viewModelPointWithX:gridLocation.x y:gridLocation.y];
-        EXTChartViewModelTerm *viewModelTerm = [EXTChartViewModelTerm viewModelTermFromModelTerm:term gridLocation:gridLocation];
+        EXTChartViewModelTerm *viewModelTerm = [EXTChartViewModelTerm viewModelTermWithModelTerm:term gridLocation:gridLocation];
         EXTChartViewModelTermCell *termCell = termCells[viewPoint];
         if (!termCell) {
             termCell = [EXTChartViewModelTermCell termCellAtGridLocation:gridLocation];
@@ -94,6 +114,8 @@ static bool lineSegmentIntersectsLineSegment(NSPoint l1p1, NSPoint l1p2, NSPoint
         }
 
         [termCell addTerm:viewModelTerm withDimension:termDimension];
+        viewModelTerm.termCell = termCell;
+
         [modelToViewModelTermMap setObject:viewModelTerm forKey:term];
     }
 
@@ -137,11 +159,19 @@ static bool lineSegmentIntersectsLineSegment(NSPoint l1p1, NSPoint l1p2, NSPoint
                 termCellOffsets[modelStartPoint] = @(startOffset + 1);
                 termCellOffsets[modelEndPoint] = @(endOffset + 1);
 
-                EXTChartViewModelDifferential *diff = [EXTChartViewModelDifferential viewModelDifferentialWithStartTerm:[modelToViewModelTermMap objectForKey:differential.start]
-                                                                                                             startIndex:startOffset
-                                                                                                                endTerm:[modelToViewModelTermMap objectForKey:differential.end]
-                                                                                                               endIndex:endOffset];
+                EXTChartViewModelTerm *startTerm = [modelToViewModelTermMap objectForKey:differential.start];
+                EXTChartViewModelTerm *endTerm = [modelToViewModelTermMap objectForKey:differential.end];
+
+                NSAssert(startTerm, @"Differential should have non nil start term");
+                NSAssert(endTerm, @"Differential should have non nil end term");
+
+                EXTChartViewModelDifferential *diff = [EXTChartViewModelDifferential viewModelDifferentialWithModelDifferential:differential
+                                                                                                                      startTerm:startTerm
+                                                                                                                     startIndex:startOffset
+                                                                                                                        endTerm:endTerm
+                                                                                                                       endIndex:endOffset];
                 [differentials addObject:diff];
+                [startTerm addDifferential:diff];
             }
         }
     }
@@ -149,6 +179,115 @@ static bool lineSegmentIntersectsLineSegment(NSPoint l1p1, NSPoint l1p2, NSPoint
     self.privateTermCells[@(self.currentPage)] = termCells;
     self.privateDifferentials[@(self.currentPage)] = differentials;
     self.modelToViewModelTermMap[@(self.currentPage)] = modelToViewModelTermMap; // FIXME: Do we need to keep this?
+}
+
+- (void)selectObjectAtGridLocation:(EXTIntPoint)gridLocation
+{
+    switch (self.interactionType) {
+        case EXTChartInteractionTypeTerm: {
+            EXTChartViewModelTermCell *termCell = [self termCellAtGridLocation:gridLocation];
+            if (termCell.terms.count == 0) {
+                self.selectedObject = nil;
+                break;
+            }
+
+            NSUInteger newSelectionIndex = [self indexOfObjectInArray:termCell.terms afterObjectIdenticalTo:self.selectedObject];
+            self.selectedObject = (newSelectionIndex == NSNotFound ? nil : termCell.terms[newSelectionIndex]);
+
+            break;
+        }
+
+        case EXTChartInteractionTypeDifferential: {
+            EXTChartViewModelTermCell *termCell = [self termCellAtGridLocation:gridLocation];
+            if (termCell.terms.count == 0) {
+                self.selectedObject = nil;
+                break;
+            }
+
+            NSUInteger newSelectionIndex = [self indexOfObjectInArray:termCell.differentials afterObjectIdenticalTo:self.selectedObject];
+            self.selectedObject = (newSelectionIndex == NSNotFound ? nil : termCell.differentials[newSelectionIndex]);
+
+// FIXME: Ask Eric whether this still makes sense. If it does, we'll need to refresh the view model
+//        and the chart view, it seems.
+//                // if there's no differential, then let's try to build it.
+//                EXTLocation *endLoc = [[source.location class] followDiffl:source.location page:_currentPage];
+//                end = [_document.sseq findTerm:endLoc];
+//
+//                if (end) {
+//                    // but if there is, let's build it and set it up.
+//                    diff = [EXTDifferential newDifferential:source end:end page:_currentPage];
+//                    [_document.sseq addDifferential:diff];
+//                    self.selectedObject = diff;
+//                    break;
+//                }
+
+// if there's no target term, then this won't work, and we
+// should cycle.
+
+            break;
+        }
+
+//        case EXTToolTagMarquee: {
+//            const NSRect gridRectInView = [self.chartView.grid viewBoundingRectForGridPoint:gridLocation];
+//            NSIndexSet *marqueesAtPoint = [_document.marquees indexesOfObjectsPassingTest:^BOOL(EXTMarquee *marquee, NSUInteger idx, BOOL *stop) {
+//                return NSIntersectsRect(gridRectInView, marquee.frame);
+//            }];
+//
+//            EXTMarquee *newSelectedMarquee = nil;
+//
+//            if (marqueesAtPoint.count == 0) {
+//                newSelectedMarquee = [EXTMarquee new];
+//                newSelectedMarquee.string = @"New marquee";
+//                newSelectedMarquee.frame = (NSRect){gridRectInView.origin, {100.0, 15.0}};
+//                [_document.marquees addObject:newSelectedMarquee];
+//            }
+//            else {
+//                // Cycle through all marquees lying on that grid square
+//                const NSInteger previousSelectedMarqueeIndex = ([self.selectedObject isKindOfClass:[EXTMarquee class]] ?
+//                                                                [_document.marquees indexOfObject:self.selectedObject] :
+//                                                                -1);
+//                NSInteger newSelectedMarqueeIndex = [marqueesAtPoint indexGreaterThanIndex:previousSelectedMarqueeIndex];
+//                if (newSelectedMarqueeIndex == NSNotFound)
+//                    newSelectedMarqueeIndex = [marqueesAtPoint firstIndex];
+//
+//                newSelectedMarquee = _document.marquees[newSelectedMarqueeIndex];
+//            }
+//
+//            self.selectedObject = newSelectedMarquee;
+//
+//            break;
+//        }
+
+        case EXTChartInteractionTypeArtBoard:
+        case EXTChartInteractionTypeMultiplicativeStructure:
+        default:
+            break;
+    }
+
+}
+
+- (EXTChartViewModelTermCell *)termCellAtGridLocation:(EXTIntPoint)gridLocation
+{
+    EXTChartViewModelTermCell *result = nil;
+    for (EXTChartViewModelTermCell *termCell in [self.privateTermCells[@(self.currentPage)] allValues]) {
+        if (EXTEqualIntPoints(termCell.gridLocation, gridLocation)) {
+            result = termCell;
+            break;
+        }
+    }
+    return result;
+}
+
+- (NSUInteger)indexOfObjectInArray:(NSArray *)array afterObjectIdenticalTo:(id)object
+{
+    if (array.count == 0) return NSNotFound;
+
+    const NSUInteger currentIndex = [array indexOfObjectIdenticalTo:object];
+    if (currentIndex == NSNotFound) return 0;
+    if (array.count == 1) return NSNotFound;
+    if (currentIndex + 1 == array.count) return 0;
+
+    return currentIndex + 1;
 }
 
 #pragma mark - Computed properties
@@ -197,7 +336,18 @@ static bool lineSegmentIntersectsLineSegment(NSPoint l1p1, NSPoint l1p2, NSPoint
 
 
 @implementation EXTChartViewModelTerm
-+ (instancetype)viewModelTermFromModelTerm:(EXTTerm *)modelTerm gridLocation:(EXTIntPoint)gridLocation
+@dynamic differentials;
+
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        _privateDifferentials = [NSMutableArray new];
+    }
+    return self;
+}
+
++ (instancetype)viewModelTermWithModelTerm:(EXTTerm *)modelTerm gridLocation:(EXTIntPoint)gridLocation
 {
     EXTChartViewModelTerm *newTerm = [[self class] new];
     if (newTerm) {
@@ -206,20 +356,34 @@ static bool lineSegmentIntersectsLineSegment(NSPoint l1p1, NSPoint l1p2, NSPoint
     }
     return newTerm;
 }
+
+- (void)addDifferential:(EXTChartViewModelDifferential *)differential
+{
+    [self.privateDifferentials addObject:differential];
+    [self.termCell addDifferential:differential];
+}
+
+- (NSArray *)differentials
+{
+    return [self.privateDifferentials copy];
+}
 @end
 
 
 @implementation EXTChartViewModelTermCell
 @dynamic terms;
+@dynamic differentials;
 
 - (instancetype)init
 {
     self = [super init];
     if (self) {
         _privateTerms = [NSMutableArray new];
+        _privateDifferentials = [NSMutableArray new];
     }
     return self;
 }
+
 + (instancetype)termCellAtGridLocation:(EXTIntPoint)gridLocation
 {
     EXTChartViewModelTermCell *newTermCell = [[self class] new];
@@ -234,20 +398,33 @@ static bool lineSegmentIntersectsLineSegment(NSPoint l1p1, NSPoint l1p2, NSPoint
     [self.privateTerms addObject:term];
     self.totalRank += dimension;
 }
+
+- (void)addDifferential:(EXTChartViewModelDifferential *)differential
+{
+    [self.privateDifferentials addObject:differential];
+}
+
 - (NSArray *)terms
 {
     return [self.privateTerms copy];
 }
+
+- (NSArray *)differentials
+{
+    return [self.privateDifferentials copy];
+}
 @end
 
 @implementation EXTChartViewModelDifferential
-+ (instancetype)viewModelDifferentialWithStartTerm:(EXTChartViewModelTerm *)startTerm
++ (instancetype)viewModelDifferentialWithModelDifferential:(EXTDifferential *)modelDifferential
+                                                 startTerm:(EXTChartViewModelTerm *)startTerm
                                         startIndex:(NSInteger)startIndex
                                            endTerm:(EXTChartViewModelTerm *)endTerm
                                           endIndex:(NSInteger)endIndex
 {
     EXTChartViewModelDifferential *newDiff = [[self class] new];
     if (newDiff) {
+        newDiff->_modelDifferential = modelDifferential;
         newDiff->_startTerm = startTerm;
         newDiff->_startIndex = startIndex;
         newDiff->_endTerm = endTerm;
