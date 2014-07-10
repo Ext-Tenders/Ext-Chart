@@ -12,9 +12,6 @@
 
 #pragma mark - Private variables
 
-static void *_highlightedContext = &_highlightedContext;
-static void *_selectedContext = &_selectedContext;
-
 static CFMutableDictionaryRef _glyphPathCache;
 static CGColorRef _termCountFillColor;
 static CGColorRef _termCountStrokeColor;
@@ -31,12 +28,6 @@ static NSString * const _kTermCountFontName = @"Palatino-Roman";
 @synthesize selected = _selected;
 @synthesize selectionColor = _selectionColor;
 
-static void commonInit(EXTTermLayer *self)
-{
-    [self addObserver:self forKeyPath:@"highlighted" options:0 context:_highlightedContext];
-    [self addObserver:self forKeyPath:@"selected" options:0 context:_selectedContext];
-}
-
 + (void)initialize
 {
     if (self == [EXTTermLayer class]) {
@@ -47,30 +38,18 @@ static void commonInit(EXTTermLayer *self)
     }
 }
 
-- (instancetype)init
-{
-    self = [super init];
-    commonInit(self);
-    return self;
-}
-
 - (instancetype)initWithLayer:(id)layer
 {
     self = [super initWithLayer:layer];
     if (self && [layer isKindOfClass:[EXTTermLayer class]]) {
         EXTTermLayer *otherLayer = layer;
         _termCell = otherLayer.termCell;
-
-        commonInit(self);
     }
     return self;
 }
 
 - (void)dealloc
 {
-    [self removeObserver:self forKeyPath:@"highlighted" context:_highlightedContext];
-    [self removeObserver:self forKeyPath:@"selected" context:_selectedContext];
-
     CGColorRelease(_highlightColor);
     CGColorRelease(_selectionColor);
 }
@@ -222,12 +201,34 @@ static void commonInit(EXTTermLayer *self)
     }
 }
 
-#pragma mark - NSKeyValueObserving
-
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
+- (void)setHighlighted:(bool)highlighted
 {
-    if (context == _highlightedContext || context == _selectedContext) [self updateInteractionStatus];
-    else [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
+    if (highlighted != _highlighted) {
+        _highlighted = highlighted;
+        [self updateInteractionStatus];
+    }
+}
+
+- (void)setSelected:(bool)selected
+{
+    if (selected != _selected) {
+        _selected = selected;
+        [self updateInteractionStatus];
+    }
+
+    if (selected) {
+        CAKeyframeAnimation *animation = CAKeyframeAnimation.animation;
+        animation.keyPath = @"transform";
+        animation.values = @[[NSValue valueWithCATransform3D:CATransform3DIdentity],
+                             [NSValue valueWithCATransform3D:CATransform3DMakeScale(0.75, 0.75, 1.0)],
+                             [NSValue valueWithCATransform3D:CATransform3DMakeScale(1.5, 1.5, 1.0)],
+                             [NSValue valueWithCATransform3D:CATransform3DIdentity]];
+        animation.keyTimes = @[@0.0, @0.3, @0.8, @1.0];
+        animation.duration = 0.2;
+        animation.removedOnCompletion = YES;
+
+        [self addAnimation:animation forKey:@"setSelectedTrue"];
+    }
 }
 
 - (void)updateInteractionStatus

@@ -774,14 +774,18 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
         }
     }
 
-    if (_selectedLayer != layerToSelect) {
+    // FIXME: Need to think about this. We can click a term cell multiple times and the selection *changes* if there
+    //        are multiple terms located on that cell, and we may want to distinguish this visually
+//    if (_selectedLayer != layerToSelect) {
         [CATransaction begin];
         {
+            if (_selectedLayer != layerToSelect) {
             {
                 [CATransaction setAnimationDuration:_kTermHighlightRemoveAnimationDuration];
                 [CATransaction setAnimationTimingFunction:[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseIn]];
 
                 _selectedLayer.selected = false;
+            }
             }
             {
                 [CATransaction setAnimationDuration:_kTermHighlightAddAnimationDuration];
@@ -793,7 +797,7 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
         [CATransaction commit];
 
         _selectedLayer = layerToSelect;
-    }
+//    }
 }
 
 - (void)reflectSelectedDifferential
