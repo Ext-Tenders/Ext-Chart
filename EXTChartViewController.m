@@ -19,9 +19,13 @@
 
 
 @interface EXTChartViewController () <EXTChartViewDataSource, EXTChartViewDelegate>
+@property (nonatomic, weak) id selectedObject;
 @property (nonatomic, strong) EXTChartViewModel *chartViewModel;
 @end
 
+#pragma mark - Private variables
+
+static void *_selectedObjectContext = &_selectedObjectContext;
 
 #pragma mark - Private functions
 
@@ -59,6 +63,8 @@ static void *_selectedToolTagContext = &_selectedToolTagContext;
 
         _chartViewModel = [EXTChartViewModel new];
         _chartViewModel.sequence = document.sseq;
+
+        [_chartViewModel addObserver:self forKeyPath:@"selectedObject" options:0 context:_selectedObjectContext];
     }
     return self;
 }
@@ -72,6 +78,8 @@ static void *_selectedToolTagContext = &_selectedToolTagContext;
     
     [_document.mainWindowController removeObserver:self
                                         forKeyPath:@"selectedToolTag"];
+
+    [self.chartViewModel removeObserver:self forKeyPath:@"selectedObject" context:_selectedObjectContext];
 
     self.chartViewModel = nil;
     _document = nil;
@@ -191,7 +199,20 @@ static void *_selectedToolTagContext = &_selectedToolTagContext;
 
         self.chartViewModel.interactionType = [EXTChartViewController interactionTypeFromToolTag:newTag];
     }
-    else [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
+    else if (context == _selectedObjectContext) {
+        if ([self.chartViewModel.selectedObject isKindOfClass:[EXTChartViewModelTerm class]]) {
+            self.selectedObject = ((EXTChartViewModelTerm *)self.chartViewModel.selectedObject).modelTerm;
+        }
+        else if ([self.chartViewModel.selectedObject isKindOfClass:[EXTChartViewModelDifferential class]]) {
+            self.selectedObject = ((EXTChartViewModelDifferential *)self.chartViewModel.selectedObject).modelDifferential;
+        }
+        else {
+            self.selectedObject = nil;
+        }
+    }
+    else {
+        [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
+    }
 }
 
 #pragma mark - Key-Value Coding
