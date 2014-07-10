@@ -205,10 +205,28 @@ static bool lineSegmentIntersectsLineSegment(NSPoint l1p1, NSPoint l1p2, NSPoint
             }
 
             NSUInteger newSelectionIndex = [self indexOfObjectInArray:termCell.differentials afterObjectIdenticalTo:self.selectedObject];
-            self.selectedObject = (newSelectionIndex == NSNotFound ? nil : termCell.differentials[newSelectionIndex]);
+            if (newSelectionIndex != NSNotFound) {
+                self.selectedObject = termCell.differentials[newSelectionIndex];
+                break;
+            }
 
-// FIXME: Ask Eric whether this still makes sense. If it does, we'll need to refresh the view model
-//        and the chart view, it seems.
+            self.selectedObject = nil;
+            break;
+
+//            EXTTerm *modelStartTerm = ((EXTChartViewModelTerm *)termCell.terms.firstObject).modelTerm;
+//            EXTLocation *sourceLoc = modelStartTerm.location;
+//            EXTLocation *endLoc = [[sourceLoc class] followDiffl:sourceLoc page:self.currentPage];
+//            EXTTerm *modelEndTerm = [self.sequence findTerm:endLoc];
+//            if (!modelEndTerm) {
+//                self.selectedObject = nil;
+//                break;
+//            }
+//
+//            EXTDifferential *newModelDiff = [EXTDifferential newDifferential:modelStartTerm end:modelEndTerm page:self.currentPage];
+//            [self.sequence addDifferential:newModelDiff];
+//            self.selectedObject = nil;
+//            [self reloadCurrentPage];
+
 //                // if there's no differential, then let's try to build it.
 //                EXTLocation *endLoc = [[source.location class] followDiffl:source.location page:_currentPage];
 //                end = [_document.sseq findTerm:endLoc];
