@@ -151,15 +151,14 @@ static bool lineSegmentIntersectsLineSegment(NSPoint l1p1, NSPoint l1p2, NSPoint
             EXTChartViewModelTerm *startTerm = [modelToViewModelTermMap objectForKey:differential.start];
             EXTChartViewModelTerm *endTerm = [modelToViewModelTermMap objectForKey:differential.end];
 
+            NSAssert(startTerm, @"Differential should have non nil start term");
+            NSAssert(endTerm, @"Differential should have non nil end term");
+
             for (NSInteger i = 0; i < imageSize; ++i) {
-
-                NSAssert(startTerm, @"Differential should have non nil start term");
-                NSAssert(endTerm, @"Differential should have non nil end term");
-
                 NSInteger startOffset = startTerm.termCell.numberOfReferencedTerms;
                 NSInteger endOffset = endTerm.termCell.numberOfReferencedTerms;
-                ++startTerm.termCell.numberOfReferencedTerms;
-                ++endTerm.termCell.numberOfReferencedTerms;
+                startTerm.termCell.numberOfReferencedTerms += 1;
+                endTerm.termCell.numberOfReferencedTerms += 1;
 
                 EXTChartViewModelDifferential *diff = [EXTChartViewModelDifferential viewModelDifferentialWithModelDifferential:differential
                                                                                                                       startTerm:startTerm
