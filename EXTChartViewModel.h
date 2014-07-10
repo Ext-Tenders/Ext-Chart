@@ -13,6 +13,7 @@
 @class EXTTerm;
 @class EXTDifferential;
 @class EXTGrid;
+@class EXTChartViewModelTermCell;
 
 
 @interface EXTChartViewModel : NSObject
@@ -32,6 +33,7 @@
 
 - (void)reloadCurrentPage;
 - (void)selectObjectAtGridLocation:(EXTIntPoint)gridLocation;
+- (EXTChartViewModelTermCell *)termCellAtGridLocation:(EXTIntPoint)gridLocation;
 @end
 
 

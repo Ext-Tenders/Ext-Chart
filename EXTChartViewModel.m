@@ -31,6 +31,7 @@
 @property (nonatomic, readwrite, assign) NSInteger totalRank;
 @property (nonatomic, strong) NSMutableArray *privateTerms;
 @property (nonatomic, strong) NSMutableArray *privateDifferentials;
+@property (nonatomic, assign) NSInteger numberOfReferencedTerms;
 + (instancetype)termCellAtGridLocation:(EXTIntPoint)gridLocation;
 - (void)addTerm:(EXTChartViewModelTerm *)term withDimension:(NSInteger)dimension;
 - (void)addDifferential:(EXTChartViewModelDifferential *)differential;
@@ -121,7 +122,6 @@ static bool lineSegmentIntersectsLineSegment(NSPoint l1p1, NSPoint l1p2, NSPoint
 
     // --- Differentials
     NSMutableArray *differentials = [NSMutableArray new];
-    NSMutableDictionary *termCellOffsets = [NSMutableDictionary new];
 
     if (self.currentPage < self.sequence.differentials.count) {
         for (EXTDifferential *differential in ((NSDictionary*)self.sequence.differentials[self.currentPage]).allValues) {
@@ -148,22 +148,18 @@ static bool lineSegmentIntersectsLineSegment(NSPoint l1p1, NSPoint l1p2, NSPoint
                 ([differential.end dimension:differential.page] == 0))
                 continue;
 
-            const EXTIntPoint startPoint = [self.sequence.locConvertor gridPoint:differential.start.location];
-            const EXTIntPoint endPoint = [self.sequence.locConvertor gridPoint:differential.end.location];
-            EXTViewModelPoint *modelStartPoint = [EXTViewModelPoint viewModelPointWithX:startPoint.x y:startPoint.y];
-            EXTViewModelPoint *modelEndPoint = [EXTViewModelPoint viewModelPointWithX:endPoint.x y:endPoint.y];
+            EXTChartViewModelTerm *startTerm = [modelToViewModelTermMap objectForKey:differential.start];
+            EXTChartViewModelTerm *endTerm = [modelToViewModelTermMap objectForKey:differential.end];
 
             for (NSInteger i = 0; i < imageSize; ++i) {
-                NSInteger startOffset = [termCellOffsets[modelStartPoint] integerValue];
-                NSInteger endOffset = [termCellOffsets[modelEndPoint] integerValue];
-                termCellOffsets[modelStartPoint] = @(startOffset + 1);
-                termCellOffsets[modelEndPoint] = @(endOffset + 1);
-
-                EXTChartViewModelTerm *startTerm = [modelToViewModelTermMap objectForKey:differential.start];
-                EXTChartViewModelTerm *endTerm = [modelToViewModelTermMap objectForKey:differential.end];
 
                 NSAssert(startTerm, @"Differential should have non nil start term");
                 NSAssert(endTerm, @"Differential should have non nil end term");
+
+                NSInteger startOffset = startTerm.termCell.numberOfReferencedTerms;
+                NSInteger endOffset = endTerm.termCell.numberOfReferencedTerms;
+                ++startTerm.termCell.numberOfReferencedTerms;
+                ++endTerm.termCell.numberOfReferencedTerms;
 
                 EXTChartViewModelDifferential *diff = [EXTChartViewModelDifferential viewModelDifferentialWithModelDifferential:differential
                                                                                                                       startTerm:startTerm
@@ -212,37 +208,6 @@ static bool lineSegmentIntersectsLineSegment(NSPoint l1p1, NSPoint l1p2, NSPoint
 
             self.selectedObject = nil;
             break;
-
-//            EXTTerm *modelStartTerm = ((EXTChartViewModelTerm *)termCell.terms.firstObject).modelTerm;
-//            EXTLocation *sourceLoc = modelStartTerm.location;
-//            EXTLocation *endLoc = [[sourceLoc class] followDiffl:sourceLoc page:self.currentPage];
-//            EXTTerm *modelEndTerm = [self.sequence findTerm:endLoc];
-//            if (!modelEndTerm) {
-//                self.selectedObject = nil;
-//                break;
-//            }
-//
-//            EXTDifferential *newModelDiff = [EXTDifferential newDifferential:modelStartTerm end:modelEndTerm page:self.currentPage];
-//            [self.sequence addDifferential:newModelDiff];
-//            self.selectedObject = nil;
-//            [self reloadCurrentPage];
-
-//                // if there's no differential, then let's try to build it.
-//                EXTLocation *endLoc = [[source.location class] followDiffl:source.location page:_currentPage];
-//                end = [_document.sseq findTerm:endLoc];
-//
-//                if (end) {
-//                    // but if there is, let's build it and set it up.
-//                    diff = [EXTDifferential newDifferential:source end:end page:_currentPage];
-//                    [_document.sseq addDifferential:diff];
-//                    self.selectedObject = diff;
-//                    break;
-//                }
-
-// if there's no target term, then this won't work, and we
-// should cycle.
-
-            break;
         }
 
 //        case EXTToolTagMarquee: {
@@ -281,7 +246,6 @@ static bool lineSegmentIntersectsLineSegment(NSPoint l1p1, NSPoint l1p2, NSPoint
         default:
             break;
     }
-
 }
 
 - (EXTChartViewModelTermCell *)termCellAtGridLocation:(EXTIntPoint)gridLocation

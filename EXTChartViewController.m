@@ -158,6 +158,24 @@ static void *_selectedToolTagContext = &_selectedToolTagContext;
     }
 
     [self.chartViewModel selectObjectAtGridLocation:gridLocation];
+
+    // If we couldn’t select a differential, try to build one
+    if (!self.selectedObject && self.chartViewModel.interactionType == EXTChartInteractionTypeDifferential) {
+        EXTChartViewModelTermCell *termCell = [self.chartViewModel termCellAtGridLocation:gridLocation];
+        for (EXTChartViewModelTerm *term in termCell.terms) {
+            if (term.differentials.count > 0) continue;
+
+            EXTLocation *sourceLoc = term.modelTerm.location;
+            EXTLocation *endLoc = [[sourceLoc class] followDiffl:sourceLoc page:self.currentPage];
+            EXTTerm *modelEndTerm = [_document.sseq findTerm:endLoc];
+            if (!modelEndTerm) continue;
+
+            EXTDifferential *newModelDiff = [EXTDifferential newDifferential:term.modelTerm end:modelEndTerm page:self.currentPage];
+            [_document.sseq addDifferential:newModelDiff];
+            self.selectedObject = newModelDiff;
+            break;
+        }
+    }
 }
 
 #pragma mark - EXTChartViewDataSource
