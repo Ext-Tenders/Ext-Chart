@@ -41,8 +41,8 @@ enum EXTLocationKinds {
 +(NSObject<EXTLocation>*) negate:(NSObject<EXTLocation>*)loc;
 +(NSObject<EXTLocation>*) scale:(NSObject<EXTLocation>*)loc
                              by:(int)scale;
-+(NSObject<EXTLocation>*) linearCombination:(NSMutableDictionary*)coeffs
-                               ofGenerators:(NSMutableArray*)generators;
++(NSObject<EXTLocation>*) linearCombination:(CFArrayRef)coeffs
+                                ofLocations:(CFArrayRef)generators;
 
 // for use in e.g. sign rules, for commuting differentials in the leibniz rule
 -(int) koszulDegree;

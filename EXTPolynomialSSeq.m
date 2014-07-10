@@ -282,30 +282,39 @@
 -(void) resizePolyClass:(NSObject<NSCopying>*)name
                    upTo:(int)newBound
             onCondition:(bool (^)(EXTLocation*))condition {
-    NSMutableDictionary *entry = nil;
-    for (NSMutableDictionary *workingEntry in generators)
-        if ([[workingEntry objectForKey:@"name"] isEqual:name]) {
-            entry = workingEntry;
-            break;
+    CFMutableArrayRef counter = CFArrayCreateMutable(kCFAllocatorDefault, generators.count, NULL);
+    CFMutableArrayRef upperBounds = CFArrayCreateMutable(kCFAllocatorDefault, generators.count, NULL);
+    CFMutableArrayRef locations = CFArrayCreateMutable(kCFAllocatorDefault, generators.count, NULL);
+    CFMutableArrayRef names = CFArrayCreateMutable(kCFAllocatorDefault, generators.count, NULL);
+    
+    // set up all the arrays
+    NSInteger ourIndex = -1, oldBound = -1;
+    for (int i = 0; i < generators.count; i++) {
+        NSDictionary *workingEntry = generators[i];
+        
+        CFArraySetValueAtIndex(names, i, (__bridge const void *)(workingEntry[@"name"]));
+        CFArraySetValueAtIndex(locations, i, (__bridge const void *)(workingEntry[@"location"]));
+        
+        if (![workingEntry[@"name"] isEqual:name]) {
+            CFArraySetValueAtIndex(counter, i, 0);
+            CFArraySetValueAtIndex(upperBounds, i, (void*)[workingEntry[@"upperBound"] integerValue]);
+        } else {
+            CFArraySetValueAtIndex(counter, i, (void*)([workingEntry[@"upperBound"] integerValue]+1));
+            CFArraySetValueAtIndex(upperBounds, i, (void*)(NSInteger)newBound);
+            oldBound = [workingEntry[@"upperBound"] integerValue];
+            ourIndex = i;
         }
+    }
     
     // TODO: we can only resize to be larger.  not sure if this is desirable, or
     // if i'll want to come back and allow for shrinking too.
-    if ([[entry objectForKey:@"upperBound"] intValue] > newBound)
+    if (oldBound >= newBound)
         return;
-    
-    // set up the array of counters
-    EXTPolynomialTag *tag = [EXTPolynomialTag new];
-    tag.tags = [NSMutableDictionary dictionaryWithCapacity:generators.count];
-    for (NSMutableDictionary *generator in generators)
-        [tag.tags setObject:@0 forKey:[generator objectForKey:@"name"]];
-    [tag.tags setObject:@([[entry objectForKey:@"upperBound"] intValue]+1)
-                 forKey:name];
     
     BOOL totalRollover = FALSE;
     while (!totalRollover) {
         // search for a term in the location encoded by the counter
-        EXTLocation *workingLoc = [[self indexClass] linearCombination:tag.tags ofGenerators:generators];
+        EXTLocation *workingLoc = [[self indexClass] linearCombination:counter ofLocations:locations];
         
         if (condition(workingLoc)) {
             EXTTerm *term = [self findTerm:workingLoc];
@@ -317,6 +326,12 @@
             }
             
             // now add the new tag to its names array
+            EXTPolynomialTag *tag = [EXTPolynomialTag new];
+            tag.tags = [NSMutableDictionary dictionaryWithCapacity:generators.count];
+            for (int i = 0; i < generators.count; i++) {
+                [tag.tags setObject:@((NSInteger)CFArrayGetValueAtIndex(counter, i))
+                             forKey:CFArrayGetValueAtIndex(names, i)];
+            }
             [term.names addObject:[tag copy]];
         
             // also need to modify all incoming and outgoing differentials.
@@ -342,26 +357,30 @@
         for (int i = 0;
              i < generators.count ? TRUE : !(totalRollover = TRUE);
              i++) {
-            NSDictionary *generator = generators[i];
-            int value = [tag.tags[generator[@"name"]] intValue] + 1;
+            NSInteger value = (NSInteger)CFArrayGetValueAtIndex(counter, i) + 1;
             
             // there are two kinds of roll-over
-            if ((generator == entry) && (value > newBound)) {
-                tag.tags[name] = @([generator[@"upperBound"] intValue] + 1);
+            if ((i == ourIndex) && (value > newBound)) {
+                CFArraySetValueAtIndex(counter, i, (void*)(oldBound+1));
                 continue;
-            } else if ((generator != entry) &&
-                  (value > [generator[@"upperBound"] intValue])) {
-                tag.tags[generator[@"name"]] = @0;
+            } else if ((i != ourIndex) &&
+                  (value > (NSInteger)CFArrayGetValueAtIndex(upperBounds, i))) {
+                CFArraySetValueAtIndex(counter, i, 0);
                 continue;
             } else {
-                tag.tags[generator[@"name"]] = @(value);
+                CFArraySetValueAtIndex(counter, i, (void*)value);
                 break;
             }
         } // for: counter increment
     } // while
     
     // store newBound as the new bound
-    [entry setObject:@(newBound) forKey:@"upperBound"];
+    ((NSMutableDictionary*)generators[ourIndex])[@"upperBound"] = @(newBound);
+    
+    CFRelease(counter);
+    CFRelease(locations);
+    CFRelease(upperBounds);
+    CFRelease(names);
     
     return;
 }

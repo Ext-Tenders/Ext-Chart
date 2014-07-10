@@ -115,13 +115,13 @@
     [aCoder encodeInt:c forKey:@"c"];
 }
 
-+ (EXTTriple*)linearCombination:(NSMutableDictionary *)coeffs
-                                ofGenerators:(NSMutableArray *)generators {
++(EXTTriple*) linearCombination:(CFArrayRef)coeffs
+                  ofLocations:(CFArrayRef)generators {
     int a = 0, b = 0, c = 0;
     
-    for (NSDictionary *generator in generators) {
-        EXTTriple *thisGuy = generator[@"location"];
-        int scale = [coeffs[generator[@"name"]] intValue];
+    for (int i = 0; i < CFArrayGetCount(coeffs); i++) {
+        EXTTriple *thisGuy = CFArrayGetValueAtIndex(generators, i);
+        NSInteger scale = (NSInteger)CFArrayGetValueAtIndex(coeffs, i);
         
         a += scale*thisGuy.a;
         b += scale*thisGuy.b;

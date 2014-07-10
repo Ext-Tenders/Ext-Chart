@@ -60,13 +60,13 @@
     return self.b;
 }
 
-+ (EXTPair*)linearCombination:(NSMutableDictionary *)coeffs
-                   ofGenerators:(NSMutableArray *)generators {
++(EXTPair*) linearCombination:(CFArrayRef)coeffs
+                  ofLocations:(CFArrayRef)generators {
     int a = 0, b = 0;
     
-    for (NSDictionary *generator in generators) {
-        EXTPair *thisGuy = generator[@"location"];
-        int scale = [coeffs[generator[@"name"]] intValue];
+    for (int i = 0; i < CFArrayGetCount(coeffs); i++) {
+        EXTPair *thisGuy = CFArrayGetValueAtIndex(generators, i);
+        NSInteger scale = (NSInteger)CFArrayGetValueAtIndex(coeffs, i);
         
         a += scale*thisGuy.a;
         b += scale*thisGuy.b;
