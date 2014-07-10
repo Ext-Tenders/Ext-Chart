@@ -200,9 +200,19 @@ static bool lineSegmentIntersectsLineSegment(NSPoint l1p1, NSPoint l1p2, NSPoint
                 break;
             }
 
-            NSUInteger newSelectionIndex = [self indexOfObjectInArray:termCell.differentials afterObjectIdenticalTo:self.selectedObject];
+            EXTChartViewModelTerm *currentTerm = ([self.selectedObject isKindOfClass:[EXTChartViewModelDifferential class]] ?
+                                                  ((EXTChartViewModelDifferential *)self.selectedObject).startTerm :
+                                                  nil);
+            NSUInteger newSelectionIndex = [self indexOfObjectInArray:currentTerm.differentials afterObjectIdenticalTo:self.selectedObject];
             if (newSelectionIndex != NSNotFound) {
-                self.selectedObject = termCell.differentials[newSelectionIndex];
+                self.selectedObject = currentTerm.differentials[newSelectionIndex];
+                break;
+            }
+
+            const NSUInteger nextTermIndex = [self indexOfObjectInArray:termCell.terms afterObjectIdenticalTo:currentTerm];
+            if (nextTermIndex != NSNotFound) {
+                EXTChartViewModelTerm *nextTerm = termCell.terms[nextTermIndex];
+                self.selectedObject = nextTerm.differentials.firstObject;
                 break;
             }
 
@@ -266,8 +276,7 @@ static bool lineSegmentIntersectsLineSegment(NSPoint l1p1, NSPoint l1p2, NSPoint
 
     const NSUInteger currentIndex = [array indexOfObjectIdenticalTo:object];
     if (currentIndex == NSNotFound) return 0;
-    if (array.count == 1) return NSNotFound;
-    if (currentIndex + 1 == array.count) return 0;
+    if (currentIndex + 1 == array.count) return NSNotFound;
 
     return currentIndex + 1;
 }
