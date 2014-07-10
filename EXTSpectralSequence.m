@@ -693,8 +693,10 @@
                 break;
         
         // build the EXTLocation sum corresponding to the vector coordinate
+        CFArraySetValueAtIndex(counter, topEntry, (void*)((NSInteger)CFArrayGetValueAtIndex(counter, topEntry)-1));
         EXTLocation *leftLoc = [locClass linearCombination:counter
                                                ofLocations:(__bridge CFArrayRef)(locations)];
+        CFArraySetValueAtIndex(counter, topEntry, (void*)((NSInteger)CFArrayGetValueAtIndex(counter, topEntry)+1));
         
         // probably something more dramatic could happen here in the interest
         // of speed, like forcing a carry.  this will do for now, though.
