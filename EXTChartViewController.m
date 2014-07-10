@@ -152,39 +152,44 @@ static void *_selectedToolTagContext = &_selectedToolTagContext;
     // TODO: lots!
     switch (self.chartView.interactionType) {
         case EXTChartInteractionTypeTerm: {
-            NSArray *terms = [_document.sseq findTermsUnderPoint:gridLocation];
-            NSUInteger oldIndex = NSNotFound;
-            
-            // if there's nothing under this click, just quit now.
-            if (terms.count == 0) {
-                self.chartViewModel.selectedObject = nil;
-                [self.chartView removeTermSelection];
-                return;
+            EXTChartViewModelTermCell *clickedTermCell = nil;
+            for (EXTChartViewModelTermCell *termCell in self.chartViewModel.termCells) {
+                if (EXTEqualIntPoints(termCell.gridLocation, gridLocation)) {
+                    clickedTermCell = termCell;
+                    break;
+                }
             }
-            
+
+            // if there's nothing under this click, just quit now.
+            if (clickedTermCell.terms.count == 0) {
+                self.chartViewModel.selectedObject = nil;
+                break;;
+            }
+
             // if we used to have something selected, and it was a term at this
             // location, then we should find its position in our list.
+            NSUInteger oldIndex = NSNotFound;
+
             if ([self.chartViewModel.selectedObject isKindOfClass:[EXTTerm class]])
-                oldIndex = [terms indexOfObject:(EXTTerm*)self.chartViewModel.selectedObject];
+                oldIndex = [clickedTermCell.terms indexOfObject:(EXTTerm*)self.chartViewModel.selectedObject];
             
             // the new index is one past the old index, unless we have to wrap.
             int newIndex = oldIndex;
-            EXTTerm *term = nil;
+            EXTChartViewModelTerm *term = nil;
             if (oldIndex == NSNotFound) {
                 oldIndex = 0;
                 newIndex = 0;
             }
             do {
-                if (newIndex == (terms.count - 1))
+                if (newIndex == (clickedTermCell.terms.count - 1))
                     newIndex = 0;
                 else
                     newIndex = newIndex + 1;
-                term = terms[newIndex];
+                term = clickedTermCell.terms[newIndex];
                 
                 // if we've found it, good!  quit!
                 if (term) {
                     self.chartViewModel.selectedObject = term;
-                    [self.chartView selectTermAtGridLocation:gridLocation index:newIndex];
                     break;
                 }
             } while (newIndex != oldIndex);
@@ -199,7 +204,6 @@ static void *_selectedToolTagContext = &_selectedToolTagContext;
             // if there's nothing under this click, just quit now.
             if (terms.count == 0) {
                 self.chartViewModel.selectedObject = nil;
-                [self.chartView removeDifferentialSelection];
                 return;
             }
             
@@ -230,7 +234,6 @@ static void *_selectedToolTagContext = &_selectedToolTagContext;
                     self.chartViewModel.selectedObject = diff;
                     // FIXME: Need to find a decent way to bind model differentials with chart view differentials.
                     //        Maybe the view model should do this.
-                    [self.chartView selectDifferentialAtStartLocation:gridLocation index:newIndex];
                     break;
                 }
 

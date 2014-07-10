@@ -31,6 +31,7 @@ static void *_EXTChartViewGridAnyKeyContext = &_EXTChartViewGridAnyKeyContext;
 static void *_EXTChartViewGridSpacingContext = &_EXTChartViewGridSpacingContext;
 static void *_interactionTypeContext = &_interactionTypeContext;
 static void *_showsGridContext = &_showsGridContext;
+static void *_selectedObjectContext = &_selectedObjectContext;
 
 static const CGFloat _kBelowGridLevel = -3.0;
 static const CGFloat _kGridLevel = -2.0;
@@ -160,6 +161,7 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
             [_gridLayer addSublayer:_axesGridLayer];
 
             [self addObserver:self forKeyPath:@"showsGrid" options:NSKeyValueObservingOptionNew context:_showsGridContext];
+            [self addObserver:self forKeyPath:@"selectedObject" options:NSKeyValueObservingOptionNew context:_selectedObjectContext];
         }
 
         // Art board
@@ -231,6 +233,7 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
 
     [self removeObserver:self forKeyPath:@"showsGrid" context:_showsGridContext];
     [self removeObserver:self forKeyPath:@"interactionType" context:_interactionTypeContext];
+    [self removeObserver:self forKeyPath:@"selectedObject" context:_selectedObjectContext];
     
     [_artBoard removeObserver:self forKeyPath:@"drawingRect" context:_EXTChartViewArtBoardDrawingRectContext];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
@@ -597,6 +600,9 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
             [_gridLayer removeFromSuperlayer];
         }
     }
+    else if (context == _selectedObjectContext) {
+        [self reflectSelection];
+    }
 	else {
 		[super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
 	}
@@ -737,11 +743,26 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
 
 #pragma mark - Selection
 
-- (void)selectTermAtGridLocation:(EXTIntPoint)gridLocation index:(NSInteger)index
+- (void)reflectSelection
 {
+    if ([self.selectedObject isKindOfClass:[EXTChartViewModelTerm class]]) {
+        [self reflectSelectedTerm];
+    }
+    else if ([self.selectedObject isKindOfClass:[EXTChartViewModelDifferential class]]) {
+        [self reflectSelectedDifferential];
+    }
+    else {
+        [self reflectNoSelection];
+    }
+}
+
+- (void)reflectSelectedTerm
+{
+    NSAssert([self.selectedObject isKindOfClass:[EXTChartViewModelTerm class]], @"Mismatched selected object");
+
     CAShapeLayer<EXTChartViewInteraction> *layerToSelect = nil;
     for (EXTTermLayer *layer in _termLayers) {
-        if (EXTEqualIntPoints(layer.termCell.gridLocation, gridLocation)) {
+        if ([layer.termCell.terms containsObject:self.selectedObject]) {
             layerToSelect = layer;
             break;
         }
@@ -759,7 +780,7 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
             {
                 [CATransaction setAnimationDuration:_kTermHighlightAddAnimationDuration];
                 [CATransaction setAnimationTimingFunction:[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseOut]];
-                
+
                 layerToSelect.selected = true;
             }
         }
@@ -769,23 +790,15 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
     }
 }
 
-- (void)removeTermSelection
+- (void)reflectSelectedDifferential
 {
-    _selectedLayer.selected = false;
-}
+    NSAssert([self.selectedObject isKindOfClass:[EXTChartViewModelDifferential class]], @"Mismatched selected object");
 
-- (void)selectDifferentialAtStartLocation:(EXTIntPoint)startLocation index:(NSInteger)index
-{
     CAShapeLayer<EXTChartViewInteraction> *layerToSelect = nil;
-    NSInteger currentIndex = -1;
 
     for (EXTDifferentialLayer *layer in _differentialLayers) {
-        if (EXTEqualIntPoints(layer.differential.startTerm.gridLocation, startLocation)) {
-            ++currentIndex;
-            if (currentIndex == index) {
-                layerToSelect = layer;
-                break;
-            }
+        if (layer.differential == self.selectedObject) {
+            layerToSelect = layer;
         }
     }
 
@@ -809,7 +822,7 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
     _selectedLayer = layerToSelect;
 }
 
-- (void)removeDifferentialSelection
+- (void)reflectNoSelection
 {
     _selectedLayer.selected = false;
 }

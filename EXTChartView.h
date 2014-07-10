@@ -37,13 +37,6 @@
 // Actions
 - (IBAction)zoomToFit:(id)sender;
 
-// Selection
-- (void)selectTermAtGridLocation:(EXTIntPoint)gridLocation index:(NSInteger)index;
-- (void)removeTermSelection;
-
-- (void)selectDifferentialAtStartLocation:(EXTIntPoint)startLocation index:(NSInteger)index;
-- (void)removeDifferentialSelection;
-
 // Util
 + (CGRect)dotBoundingBoxForTermCount:(NSInteger)termCount
                            termIndex:(NSInteger)termIndex
