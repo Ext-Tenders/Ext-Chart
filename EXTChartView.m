@@ -33,13 +33,16 @@ static void *_interactionTypeContext = &_interactionTypeContext;
 static void *_showsGridContext = &_showsGridContext;
 static void *_selectedObjectContext = &_selectedObjectContext;
 
-static const CGFloat _kBelowGridLevel = -3.0;
-static const CGFloat _kGridLevel = -2.0;
-static const CGFloat _kAboveGridLevel = -1.0;
+static const CGFloat _kBelowGridZPosition = -3.0;
+static const CGFloat _kGridZPosition = -2.0;
+static const CGFloat _kAboveGridZPosition = -1.0;
+static const CGFloat _kDifferentialZPosition = 1.0;
+static const CGFloat _kSelectedDifferentialZPosition = 2.0;
+static const CGFloat _kTermCellZPosition = 10.0;
 
-static const CGFloat _kBaseGridLevel = 0.0;
-static const CGFloat _kEmphasisGridLevel = 1.0;
-static const CGFloat _kAxesGridLevel = 2.0;
+static const CGFloat _kBaseGridZPosition = 0.0;
+static const CGFloat _kEmphasisGridZPosition = 1.0;
+static const CGFloat _kAxesGridZPosition = 2.0;
 
 static const CGFloat _kBaseGridLineWidth = 0.2;
 static const CGFloat _kEmphasisGridLineWidth = 0.2;
@@ -140,7 +143,7 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
             
             _gridLayer = [CAShapeLayer layer];
             _gridLayer.frame = (CGRect){CGPointZero, frame.size};
-            _gridLayer.zPosition = _kGridLevel;
+            _gridLayer.zPosition = _kGridZPosition;
             [rootLayer addSublayer:_gridLayer];
             
             CAShapeLayer *(^gridSublayer)(CGRect, CGFloat, CGColorRef, CGFloat) = ^(CGRect frame, CGFloat zPosition, CGColorRef strokeColor, CGFloat lineWidth){
@@ -152,9 +155,9 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
                 return layer;
             };
             
-            _baseGridLayer = gridSublayer(_gridLayer.frame, _kBaseGridLevel, _baseGridStrokeColor, _kBaseGridLineWidth);
-            _emphasisGridLayer = gridSublayer(_gridLayer.frame, _kEmphasisGridLevel, _emphasisGridStrokeColor, _kEmphasisGridLineWidth);
-            _axesGridLayer = gridSublayer(_gridLayer.frame, _kAxesGridLevel, _axesGridStrokeColor, _kAxesGridLineWidth);
+            _baseGridLayer = gridSublayer(_gridLayer.frame, _kBaseGridZPosition, _baseGridStrokeColor, _kBaseGridLineWidth);
+            _emphasisGridLayer = gridSublayer(_gridLayer.frame, _kEmphasisGridZPosition, _emphasisGridStrokeColor, _kEmphasisGridLineWidth);
+            _axesGridLayer = gridSublayer(_gridLayer.frame, _kAxesGridZPosition, _axesGridStrokeColor, _kAxesGridLineWidth);
             
             [_gridLayer addSublayer:_baseGridLayer];
             [_gridLayer addSublayer:_emphasisGridLayer];
@@ -172,9 +175,9 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
             _artBoardBorderLayer = [CALayer layer];
 
             _artBoardBackgroundLayer.backgroundColor = _artBoardBackgroundColor;
-            _artBoardBackgroundLayer.zPosition = _kBelowGridLevel;
+            _artBoardBackgroundLayer.zPosition = _kBelowGridZPosition;
 
-            _artBoardBorderLayer.zPosition = _kAboveGridLevel;
+            _artBoardBorderLayer.zPosition = _kAboveGridZPosition;
             _artBoardBorderLayer.borderWidth = _kArtBoardBorderWidth;
             _artBoardBorderLayer.borderColor = _artBoardBorderColor;
 
@@ -346,6 +349,7 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
             newTermLayer.termCell = termCell;
             newTermLayer.highlightColor = [_highlightColor CGColor];
             newTermLayer.selectionColor = [_selectionColor CGColor];
+            newTermLayer.zPosition = _kTermCellZPosition;
             [newTermLayers addObject:newTermLayer];
             [self.layer addSublayer:newTermLayer];
         }
@@ -371,6 +375,8 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
             newDifferentialLayer.differential = diff;
             newDifferentialLayer.highlightColor = [_highlightColor CGColor];
             newDifferentialLayer.selectionColor = [_selectionColor CGColor];
+            newDifferentialLayer.defaultZPosition = _kDifferentialZPosition;
+            newDifferentialLayer.selectedZPosition = _kSelectedDifferentialZPosition;
             [newDifferentialLayers addObject:newDifferentialLayer];
             [self.layer addSublayer:newDifferentialLayer];
 

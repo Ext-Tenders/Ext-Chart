@@ -13,4 +13,7 @@
 
 @interface EXTDifferentialLayer : CAShapeLayer <EXTChartViewInteraction>
 @property (nonatomic, strong) EXTChartViewModelDifferential *differential;
+
+@property (nonatomic, assign) CGFloat defaultZPosition;
+@property (nonatomic, assign) CGFloat selectedZPosition;
 @end

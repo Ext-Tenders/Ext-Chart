@@ -99,24 +99,21 @@ static void commonInit(EXTDifferentialLayer *self)
 
 - (void)updateInteractionStatus
 {
-    CGColorRef strokeColor;
-    CGFloat lineWidth;
-
     if (self.selected) {
-        strokeColor = self.selectionColor;
-        lineWidth = _kHighlightedDifferentialLineWidth;
+        self.strokeColor = self.selectionColor;
+        self.lineWidth = _kHighlightedDifferentialLineWidth;
+        self.zPosition = self.selectedZPosition;
     }
     else if (self.highlighted) {
-        strokeColor = self.highlightColor;
-        lineWidth = _kHighlightedDifferentialLineWidth;
+        self.strokeColor = self.highlightColor;
+        self.lineWidth = _kHighlightedDifferentialLineWidth;
+        self.zPosition = self.defaultZPosition;
     }
     else {
-        strokeColor = _differentialStrokeColor;
-        lineWidth = _kDifferentialLineWidth;
+        self.strokeColor = _differentialStrokeColor;
+        self.lineWidth = _kDifferentialLineWidth;
+        self.zPosition = self.defaultZPosition;
     }
-
-    self.strokeColor = strokeColor;
-    self.lineWidth = lineWidth;
 }
 
 @end
