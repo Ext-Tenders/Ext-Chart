@@ -144,7 +144,6 @@ static void *_selectedToolTagContext = &_selectedToolTagContext;
 
 - (void)reloadCurrentPage {
     [self.chartViewModel reloadCurrentPage];
-    [self.chartView setNeedsDisplay:YES];
     [self.chartView reloadCurrentPage];
 }
 
