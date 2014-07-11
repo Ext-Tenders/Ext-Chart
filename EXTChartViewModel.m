@@ -39,7 +39,6 @@
 
 @interface EXTChartViewModelTerm ()
 @property (nonatomic, readwrite, weak) EXTChartViewModelDifferential *differential;
-@property (nonatomic, weak) EXTChartViewModelTermCell *termCell;
 + (instancetype)viewModelTermWithModelTerm:(EXTTerm *)modelTerm gridLocation:(EXTIntPoint)gridLocation;
 @end
 

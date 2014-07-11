@@ -50,6 +50,7 @@
 @interface EXTChartViewModelTerm : NSObject
 @property (nonatomic, readonly, assign) EXTIntPoint gridLocation;
 @property (nonatomic, readonly, strong) EXTTerm *modelTerm;
+@property (nonatomic, weak) EXTChartViewModelTermCell *termCell;
 @property (nonatomic, readonly, assign) NSInteger dimension;
 
 /// There’s at most one differential per (term, page).

@@ -365,22 +365,8 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
             const CGPoint origin = {MIN(start.x, end.x), MIN(start.y, end.y)};
             const CGSize size = {ABS(start.x - end.x), ABS(start.y - end.y)};
 
-            // FIXME: This is ugly, oh so ugly
-            NSInteger startTotalRank = 0;
-            for (EXTTermLayer *layer in _termLayers) {
-                if ([layer.termCell.terms containsObject:diff.startTerm]) {
-                    startTotalRank = layer.termCell.totalRank;
-                    break;
-                }
-            }
-
-            NSInteger endTotalRank = 0;
-            for (EXTTermLayer *layer in _termLayers) {
-                if ([layer.termCell.terms containsObject:diff.endTerm]) {
-                    endTotalRank = layer.termCell.totalRank;
-                    break;
-                }
-            }
+            const NSInteger startTotalRank = diff.startTerm.termCell.totalRank;
+            const NSInteger endTotalRank = diff.endTerm.termCell.totalRank;
 
             for (EXTChartViewModelDifferentialLine *line in diff.lines) {
                 EXTDifferentialLineLayer *newDifferentialLineLayer = [EXTDifferentialLineLayer layer];
