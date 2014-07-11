@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		093AEADD13E10759003E9F58 /* EXTPair.m in Sources */ = {isa = PBXBuildFile; fileRef = 093AEADC13E10759003E9F58 /* EXTPair.m */; };
+		141C8D3A196FCDAB0037A716 /* NSValue+EXTIntPoint.m in Sources */ = {isa = PBXBuildFile; fileRef = 141C8D39196FCDAB0037A716 /* NSValue+EXTIntPoint.m */; };
 		1435D32F194C10FA00863A90 /* EXTChartRulerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1435D32E194C10FA00863A90 /* EXTChartRulerView.m */; };
 		143F3DFE176D615100FB92B3 /* EXTUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 143F3DFD176D615100FB92B3 /* EXTUtilities.m */; };
 		144709A51946CDF8009C6958 /* EXTChartViewModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 144709A41946CDF8009C6958 /* EXTChartViewModel.m */; };
@@ -107,6 +108,8 @@
 		093AEADC13E10759003E9F58 /* EXTPair.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTPair.m; sourceTree = "<group>"; };
 		1058C7A7FEA54F5311CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		13E42FBA07B3F13500E4EEF1 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
+		141C8D38196FCDAB0037A716 /* NSValue+EXTIntPoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSValue+EXTIntPoint.h"; sourceTree = "<group>"; };
+		141C8D39196FCDAB0037A716 /* NSValue+EXTIntPoint.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSValue+EXTIntPoint.m"; sourceTree = "<group>"; };
 		1435D32D194C10FA00863A90 /* EXTChartRulerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTChartRulerView.h; sourceTree = "<group>"; };
 		1435D32E194C10FA00863A90 /* EXTChartRulerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTChartRulerView.m; sourceTree = "<group>"; };
 		143976851966A47000D8FE87 /* EXTChartViewInteraction.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EXTChartViewInteraction.h; sourceTree = "<group>"; };
@@ -328,6 +331,8 @@
 				14741D7117B7535A00AF73D9 /* NSUserDefaults+EXTAdditions.m */,
 				14F16A1417D34EE5002EACD3 /* NSKeyedArchiver+EXTAdditions.h */,
 				14F16A1517D34EE5002EACD3 /* NSKeyedArchiver+EXTAdditions.m */,
+				141C8D38196FCDAB0037A716 /* NSValue+EXTIntPoint.h */,
+				141C8D39196FCDAB0037A716 /* NSValue+EXTIntPoint.m */,
 			);
 			name = "System Categories";
 			sourceTree = "<group>";
@@ -708,6 +713,7 @@
 				14E757CD17BF128F008BED48 /* EXTGridInspectorViewController.m in Sources */,
 				3897740517F78B5800C6AD2F /* EXTZeroRangesInspector.m in Sources */,
 				3804BF6E17C07D7300A74325 /* EXTMatrixEditor.m in Sources */,
+				141C8D3A196FCDAB0037A716 /* NSValue+EXTIntPoint.m in Sources */,
 				38F707B817CDCD9D002273B1 /* EXTLeibnizWindowController.m in Sources */,
 				14F16A1617D34EE5002EACD3 /* NSKeyedArchiver+EXTAdditions.m in Sources */,
 			);

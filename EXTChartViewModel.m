@@ -11,18 +11,19 @@
 #import "EXTGrid.h"
 #import "EXTTerm.h"
 #import "EXTDifferential.h"
+#import "NSValue+EXTIntPoint.h"
 
 
 #pragma mark - Private classes & extensions
 
 @interface EXTChartViewModel ()
-/// Indexed by @(page). Each element is a dictionary mapping an EXTViewModelPoint to an NSMutableArray of EXTChartViewModelTermCell objects at that grid location.
+/// Indexed by @(page). Each element is a dictionary mapping an NSValue-wrapped EXTIntPoint to an EXTChartViewModelTermCell object at that grid location.
 @property (nonatomic, strong) NSMutableDictionary *privateTermCells;
 
 /// Indexed by @(page). Each element is an NSMutableArray of EXTChartViewModelDifferential objects.
 @property (nonatomic, strong) NSMutableDictionary *privateDifferentials;
 
-/// Indexed by @(page). Each element is an NSMapTable mapping model terms to view model terms.
+/// Indexed by @(page). Each element is an NSMapTable mapping EXTTerm objects to EXTChartViewModelTerm objects.
 @property (nonatomic, strong) NSMutableDictionary *modelToViewModelTermMap;
 @end
 
@@ -54,14 +55,6 @@
 
 @interface EXTChartViewModelDifferentialLine ()
 + (instancetype)viewModelDifferentialLineWithStartIndex:(NSInteger)startIndex endIndex:(NSInteger)endIndex;
-@end
-
-
-@interface EXTViewModelPoint : NSObject <NSCopying> // FIXME: NSValue with (floating-point) NSPoint? NSValue category?
-@property (nonatomic, readonly, assign) NSInteger x;
-@property (nonatomic, readonly, assign) NSInteger y;
-
-+ (instancetype)viewModelPointWithX:(NSInteger)x y:(NSInteger)y;
 @end
 
 
@@ -107,13 +100,13 @@ static bool lineSegmentIntersectsLineSegment(NSPoint l1p1, NSPoint l1p2, NSPoint
         const NSInteger termDimension = [term dimension:self.currentPage];
         if (termDimension == 0) continue;
 
-        EXTIntPoint gridLocation = [self.sequence.locConvertor gridPoint:term.location];
-        EXTViewModelPoint *viewPoint = [EXTViewModelPoint viewModelPointWithX:gridLocation.x y:gridLocation.y];
+        const EXTIntPoint gridLocation = [self.sequence.locConvertor gridPoint:term.location];
+        NSValue *gridLocationValue = [NSValue extValueWithIntPoint:gridLocation];
         EXTChartViewModelTerm *viewModelTerm = [EXTChartViewModelTerm viewModelTermWithModelTerm:term gridLocation:gridLocation];
-        EXTChartViewModelTermCell *termCell = termCells[viewPoint];
+        EXTChartViewModelTermCell *termCell = termCells[gridLocationValue];
         if (!termCell) {
             termCell = [EXTChartViewModelTermCell termCellAtGridLocation:gridLocation];
-            termCells[viewPoint] = termCell;
+            termCells[gridLocationValue] = termCell;
         }
 
         [termCell addTerm:viewModelTerm withDimension:termDimension];
@@ -307,36 +300,6 @@ static bool lineSegmentIntersectsLineSegment(NSPoint l1p1, NSPoint l1p2, NSPoint
     return [self.privateDifferentials[@(self.currentPage)] copy];
 }
 
-@end
-
-
-@implementation EXTViewModelPoint
-+ (instancetype)viewModelPointWithX:(NSInteger)x y:(NSInteger)y
-{
-    EXTViewModelPoint *newPoint = [[self class] new];
-    if (newPoint) {
-        newPoint->_x = x;
-        newPoint->_y = y;
-    }
-    return newPoint;
-}
-
-- (instancetype)copyWithZone:(NSZone *)zone
-{
-    return [[self class] viewModelPointWithX:_x y:_y];
-}
-
-- (NSUInteger)hash {
-    return NSUINTROTATE(((NSUInteger)_x), NSUINT_BIT / 2) ^ _y;
-}
-
-- (BOOL)isEqual:(id)object
-{
-    EXTViewModelPoint *point = object;
-    return ([point isKindOfClass:[EXTViewModelPoint class]] &&
-            point.x == _x &&
-            point.y == _y);
-}
 @end
 
 
