@@ -12,114 +12,75 @@
 #import "EXTTerm.h"
 #import "EXTDifferential.h"
 #import "EXTPolynomialSSeq.h"
+#import "NSValue+EXTIntPoint.h"
 
+
+#pragma mark - Private classes & extensions
 
 @interface EXTChartViewModel ()
-@property (nonatomic, strong) NSMutableDictionary *termCounts; // indexed by @(page). Each element is a dictionary mapping an EXTViewModelPoint to a term count
-@property (nonatomic, strong) NSMutableDictionary *differentials; // indexed by @(page). Each element is an array (edge quadtree?) of EXTViewModelDifferential objects
-@property (nonatomic, strong) NSMutableDictionary *multAnnotations; // indexed by @(page). Each element is a mutable dictionary of a style, keyed on @"style", and an array, keyed on @"annotations", of EXTViewModelMultAnnotation objects
+/// Indexed by @(page). Each element is a dictionary mapping an NSValue-wrapped EXTIntPoint to an EXTChartViewModelTermCell object at that grid location.
+@property (nonatomic, strong) NSMutableDictionary *privateTermCells;
+
+/// Indexed by @(page). Each element is an NSMutableArray of EXTChartViewModelDifferential objects.
+@property (nonatomic, strong) NSMutableDictionary *privateDifferentials;
+
+// MERGE
+// indexed by @(page). Each element is a mutable dictionary of a style, keyed on @"style", and an array, keyed on @"annotations", of EXTViewModelMultAnnotation objects
+// @property (nonatomic, strong) NSMutableDictionary *privateMultAnnotations;
+
+/// Indexed by @(page). Each element is an NSMapTable mapping EXTTerm objects to EXTChartViewModelTerm objects.
+@property (nonatomic, strong) NSMutableDictionary *modelToViewModelTermMap;
 @end
 
 
-static NSArray *dotPositions(NSInteger count, EXTIntPoint gridPoint, CGFloat gridSpacing);
+@interface EXTChartViewModelTermCell ()
+@property (nonatomic, readwrite, assign) NSInteger totalRank;
+@property (nonatomic, strong) NSMutableArray *privateTerms;
+@property (nonatomic, assign) NSInteger numberOfReferencedTerms;
++ (instancetype)termCellAtGridLocation:(EXTIntPoint)gridLocation;
+- (void)addTerm:(EXTChartViewModelTerm *)term withDimension:(NSInteger)dimension;
+@end
+
+
+@interface EXTChartViewModelTerm ()
+@property (nonatomic, readwrite, weak) EXTChartViewModelTermCell *termCell;
+@property (nonatomic, readwrite, weak) EXTChartViewModelDifferential *differential;
++ (instancetype)viewModelTermWithModelTerm:(EXTTerm *)modelTerm gridLocation:(EXTIntPoint)gridLocation;
+@end
+
+
+@interface EXTChartViewModelDifferential ()
+@property (nonatomic, strong) NSMutableArray *privateLines;
++ (instancetype)viewModelDifferentialWithModelDifferential:(EXTDifferential *)modelDifferential
+                                                 startTerm:(EXTChartViewModelTerm *)startTerm
+                                                   endTerm:(EXTChartViewModelTerm *)endTerm;
+- (void)addLine:(EXTChartViewModelDifferentialLine *)line;
+@end
+
+
+@interface EXTChartViewModelDifferentialLine ()
++ (instancetype)viewModelDifferentialLineWithStartIndex:(NSInteger)startIndex endIndex:(NSInteger)endIndex;
+@end
+
+
+#pragma mark - Private functions
+
 static bool lineSegmentOverRect(NSPoint p1, NSPoint p2, NSRect rect);
 static bool lineSegmentIntersectsLineSegment(NSPoint l1p1, NSPoint l1p2, NSPoint l2p1, NSPoint l2p2);
 
+
 @implementation EXTChartViewModel
 
-static NSMutableDictionary *_dotLayers;
-static dispatch_queue_t _dotLayersQueue;
-
-+ (void)initialize
-{
-    if (self != [EXTChartViewModel class]) return;
-
-    _dotLayers = [NSMutableDictionary new];
-    _dotLayersQueue = dispatch_queue_create("edu.harvard.math.Ext-Chart.EXTChartViewState.dotLayersQueue", DISPATCH_QUEUE_SERIAL);
-}
-
-// Whenever we reload a page/gridSpacing, we register all term counts that appear during reloading.
-// This makes sure that, by the time the view needs to draw dots, all dot layers have already been created.
-+ (void)registerLayerForTermCount:(NSInteger)count
-{
-    static dispatch_once_t labelAttributesOnceToken;
-    static NSDictionary *singleDigitAttributes, *multiDigitAttributes;
-    dispatch_once(&labelAttributesOnceToken, ^{
-        NSMutableParagraphStyle *paragraphStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
-        [paragraphStyle setAlignment:NSCenterTextAlignment];
-
-        NSFont *singleDigitFont = [NSFont fontWithName:@"Palatino-Roman" size:5.0];
-        NSFont *multiDigitFont = [NSFont fontWithName:@"Palatino-Roman" size:4.5];
-
-        singleDigitAttributes = @{NSFontAttributeName : singleDigitFont,
-                                  NSParagraphStyleAttributeName : paragraphStyle};
-        multiDigitAttributes = @{NSFontAttributeName : multiDigitFont,
-                                 NSParagraphStyleAttributeName : paragraphStyle};
-    });
-
-    dispatch_sync(_dotLayersQueue, ^{
-        if (_dotLayers[@(count)]) return;
-
-        // Since dot layers contain vectors only, we can draw them with fixed size and let Quartz
-        // scale layers when needed
-        const CGFloat spacing = 9.0;
-        const CGSize size = {spacing, spacing};
-        const CGRect frame = {.size = size};
-
-        NSMutableData *PDFData = [NSMutableData data];
-        CGDataConsumerRef dataConsumer = CGDataConsumerCreateWithCFData((__bridge CFMutableDataRef)PDFData);
-        CGContextRef PDFContext = CGPDFContextCreate(dataConsumer, &frame, NULL);
-
-        CGLayerRef layer = CGLayerCreateWithContext(PDFContext, size, NULL);
-        CGContextRef layerContext = CGLayerGetContext(layer);
-
-        NSGraphicsContext *drawingContext = [NSGraphicsContext graphicsContextWithGraphicsPort:layerContext flipped:NO];
-        [NSGraphicsContext saveGraphicsState];
-        [NSGraphicsContext setCurrentContext:drawingContext];
-        CGContextBeginPage(PDFContext, &frame);
-        {
-            NSArray *dots = dotPositions(count, (EXTIntPoint){0}, spacing);
-
-            if (count <= 3) {
-                NSBezierPath *path = [NSBezierPath bezierPath];
-                for (NSValue *rectObject in dots)
-                    [path appendBezierPathWithOvalInRect:[rectObject rectValue]];
-                [path fill];
-            }
-            else {
-                const NSRect drawingFrame = [dots[0] rectValue];
-                [[NSBezierPath bezierPathWithOvalInRect:drawingFrame] stroke];
-
-                NSRect textFrame = drawingFrame;
-                textFrame.origin.y += 0.05 * spacing;
-                NSString *label = [NSString stringWithFormat:@"%ld", count];
-                [label drawInRect:textFrame withAttributes:(label.length == 1 ? singleDigitAttributes : multiDigitAttributes)];
-            }
-        }
-        CGContextEndPage(PDFContext);
-        CGPDFContextClose(PDFContext);
-        CGContextRelease(PDFContext);
-        CGDataConsumerRelease(dataConsumer);
-        [NSGraphicsContext restoreGraphicsState];
-        
-        _dotLayers[@(count)] = (__bridge id)layer;
-        CGLayerRelease(layer);
-    });
-}
-
-- (CGLayerRef)chartView:(EXTChartView *)chartView layerForTermCount:(NSInteger)count
-{
-    NSAssert(_dotLayers[@(count)], @"Dot layers should have been created for all used term counts");
-    
-    return (__bridge CGLayerRef)_dotLayers[@(count)];
-}
+@dynamic termCells, differentials;
 
 - (instancetype)init {
     self = [super init];
     if (self) {
-        _termCounts = [NSMutableDictionary new];
-        _differentials = [NSMutableDictionary new];
-        _multAnnotations = [NSMutableDictionary new];
+        _privateTermCells = [NSMutableDictionary new];
+        _privateDifferentials = [NSMutableDictionary new];
+        // MERGE
+        //_privateMultAnnotations = [NSMutableDictionary new];
+        _modelToViewModelTermMap = [NSMutableDictionary new];
     }
     return self;
 }
@@ -128,9 +89,10 @@ static dispatch_queue_t _dotLayersQueue;
 {
     [self.sequence computeGroupsForPage:self.currentPage];
 
-    // --- Term Counts
-    // start by initializing the array of counts
-    NSMutableDictionary *counts = [NSMutableDictionary new];
+    // --- Terms
+    NSMutableDictionary *termCells = [NSMutableDictionary new];
+    NSMapTable *modelToViewModelTermMap = [NSMapTable mapTableWithKeyOptions:NSPointerFunctionsObjectPointerPersonality
+                                                                valueOptions:NSPointerFunctionsObjectPersonality];
 
     // iterate through the available EXTTerms and count up how many project onto
     // a given grid location.  (this is a necessary step for, e.g., EXTTriple-
@@ -142,19 +104,26 @@ static dispatch_queue_t _dotLayersQueue;
     // Z-mods, since those have lots of interesting quotients which need to
     // represented visually.
     for (EXTTerm *term in self.sequence.terms.allValues) {
-        EXTIntPoint point = [self.sequence.locConvertor gridPoint:term.location];
-        EXTViewModelPoint *viewPoint = [EXTViewModelPoint newViewModelPointWithX:point.x y:point.y];
-        NSInteger termCount = ((NSNumber *)counts[viewPoint]).integerValue;
-        termCount += [term dimension:self.currentPage];
-        if (termCount > 0) {
-            counts[viewPoint] = @(termCount);
-            [[self class] registerLayerForTermCount:termCount];
+        const NSInteger termDimension = [term dimension:self.currentPage];
+        if (termDimension == 0) continue;
+
+        const EXTIntPoint gridLocation = [self.sequence.locConvertor gridPoint:term.location];
+        NSValue *gridLocationValue = [NSValue extValueWithIntPoint:gridLocation];
+        EXTChartViewModelTerm *viewModelTerm = [EXTChartViewModelTerm viewModelTermWithModelTerm:term gridLocation:gridLocation];
+        EXTChartViewModelTermCell *termCell = termCells[gridLocationValue];
+        if (!termCell) {
+            termCell = [EXTChartViewModelTermCell termCellAtGridLocation:gridLocation];
+            termCells[gridLocationValue] = termCell;
         }
+
+        [termCell addTerm:viewModelTerm withDimension:termDimension];
+        viewModelTerm.termCell = termCell;
+
+        [modelToViewModelTermMap setObject:viewModelTerm forKey:term];
     }
 
     // --- Differentials
     NSMutableArray *differentials = [NSMutableArray new];
-    NSMutableDictionary *termCountOffsets = [NSMutableDictionary new];
 
     if (self.currentPage < self.sequence.differentials.count) {
         for (EXTDifferential *differential in ((NSDictionary*)self.sequence.differentials[self.currentPage]).allValues) {
@@ -171,41 +140,32 @@ static dispatch_queue_t _dotLayersQueue;
                 ([differential.end dimension:differential.page] == 0))
                 continue;
 
-            const EXTIntPoint startPoint = [self.sequence.locConvertor gridPoint:differential.start.location];
-            const EXTIntPoint endPoint = [self.sequence.locConvertor gridPoint:differential.end.location];
-            EXTViewModelPoint *modelStartPoint = [EXTViewModelPoint newViewModelPointWithX:startPoint.x y:startPoint.y];
-            EXTViewModelPoint *modelEndPoint = [EXTViewModelPoint newViewModelPointWithX:endPoint.x y:endPoint.y];
-            const NSInteger startCount = [counts[modelStartPoint] integerValue];
-            const NSInteger endCount = [counts[modelEndPoint] integerValue];
-            NSArray *startRects = dotPositions(startCount, startPoint, self.grid.gridSpacing);
-            NSArray *endRects = dotPositions(endCount, endPoint, self.grid.gridSpacing);
+            EXTChartViewModelTerm *startTerm = [modelToViewModelTermMap objectForKey:differential.start];
+            EXTChartViewModelTerm *endTerm = [modelToViewModelTermMap objectForKey:differential.end];
+
+            NSAssert(startTerm, @"Differential should have non nil start term");
+            NSAssert(endTerm, @"Differential should have non nil end term");
+
+            EXTChartViewModelDifferential *diff = [EXTChartViewModelDifferential viewModelDifferentialWithModelDifferential:differential
+                                                                                                                  startTerm:startTerm
+                                                                                                                    endTerm:endTerm];
+            [differentials addObject:diff];
+            startTerm.differential = diff;
 
             for (NSInteger i = 0; i < imageSize; ++i) {
-                NSInteger startOffset = [termCountOffsets[modelStartPoint] integerValue];
-                NSInteger endOffset = [termCountOffsets[modelEndPoint] integerValue];
-                termCountOffsets[modelStartPoint] = @(startOffset + 1);
-                termCountOffsets[modelEndPoint] = @(endOffset + 1);
+                NSInteger startOffset = startTerm.termCell.numberOfReferencedTerms;
+                NSInteger endOffset = endTerm.termCell.numberOfReferencedTerms;
+                startTerm.termCell.numberOfReferencedTerms += 1;
+                endTerm.termCell.numberOfReferencedTerms += 1;
 
-                // if they're out of bounds, which will happen in the >=4 case,
-                // just use the bottom one.
-                if (startOffset >= startRects.count)
-                    startOffset = 0;
-                if (endOffset >= endRects.count)
-                    endOffset = 0;
-
-                NSRect startRect = [startRects[startOffset] rectValue];
-                NSRect endRect = [endRects[endOffset] rectValue];
-                NSPoint viewStartPoint = (NSPoint){startRect.origin.x, startRect.origin.y + startRect.size.height / 2};
-                NSPoint viewEndPoint = (NSPoint){
-                    endRect.origin.x + endRect.size.width - 0.1 * self.grid.gridSpacing,
-                    endRect.origin.y + endRect.size.height / 2
-                };
-                EXTViewModelDifferential *diff = [EXTViewModelDifferential newViewModelDifferentialWithStart:viewStartPoint end:viewEndPoint];
-                [differentials addObject:diff];
+                EXTChartViewModelDifferentialLine *line = [EXTChartViewModelDifferentialLine viewModelDifferentialLineWithStartIndex:startOffset endIndex:endOffset];
+                [diff addLine:line];
             }
         }
     }
     
+    // MERGE
+    /*
     // --- Multiplicative annotations
     NSMutableArray *annotationPairs = [NSMutableArray new];
     for (NSMutableDictionary *rule in self.multiplicationAnnotationRules) {
@@ -255,42 +215,122 @@ static dispatch_queue_t _dotLayersQueue;
             entry[@"style"] = rule[@"style"];
         [annotationPairs addObject:entry];
     }
+    */
 
-    self.termCounts[@(self.currentPage)] = counts;
-    self.differentials[@(self.currentPage)] = differentials;
-    self.multAnnotations[@(self.currentPage)] = annotationPairs;
+    self.privateTermCells[@(self.currentPage)] = termCells;
+    self.privateDifferentials[@(self.currentPage)] = differentials;
+    // MERGE
+    //self.multAnnotations[@(self.currentPage)] = annotationPairs;
+    self.modelToViewModelTermMap[@(self.currentPage)] = modelToViewModelTermMap; // FIXME: Do we need to keep this?
 }
 
-- (NSArray *)chartView:(EXTChartView *)chartView termCountsInGridRect:(EXTIntRect)gridRect
+- (void)selectObjectAtGridLocation:(EXTIntPoint)gridLocation
 {
-    NSMutableArray *result = [NSMutableArray array];
-    [self.termCounts[@(self.currentPage)] enumerateKeysAndObjectsUsingBlock:^(EXTViewModelPoint *point, NSNumber *count, BOOL *stop) {
-        EXTIntPoint gridPoint = (EXTIntPoint){.x = point.x, .y = point.y};
-        if (EXTIntPointInRect(gridPoint, gridRect)) {
-            EXTChartViewTermCountData *data = [EXTChartViewTermCountData new];
-            data.point = (EXTIntPoint){.x = point.x, .y = point.y};
-            data.count = count.integerValue;
-            [result addObject:data];
+    switch (self.interactionType) {
+        case EXTChartInteractionTypeTerm: {
+            EXTChartViewModelTermCell *termCell = [self termCellAtGridLocation:gridLocation];
+            if (termCell.terms.count == 0) {
+                self.selectedObject = nil;
+                break;
+            }
+
+            NSUInteger newSelectionIndex = [self indexOfObjectInArray:termCell.terms afterObjectIdenticalTo:self.selectedObject];
+            self.selectedObject = (newSelectionIndex == NSNotFound ? nil : termCell.terms[newSelectionIndex]);
+
+            break;
         }
-    }];
 
-    return result.copy;
+        case EXTChartInteractionTypeDifferential: {
+            EXTChartViewModelTermCell *termCell = [self termCellAtGridLocation:gridLocation];
+            if (termCell.terms.count == 0) {
+                self.selectedObject = nil;
+                break;
+            }
+
+            // First, let’s check if the currently selected object is a differential whose start term is located at
+            // the selected grid cell
+            EXTChartViewModelTerm *selectedTermInCell = nil;
+            if ([self.selectedObject isKindOfClass:[EXTChartViewModelDifferential class]]) {
+                EXTChartViewModelTerm *selectedTerm = ((EXTChartViewModelDifferential *)self.selectedObject).startTerm;
+                if (selectedTerm.termCell == termCell) selectedTermInCell = selectedTerm;
+            }
+
+            NSUInteger nextTermIndex;
+
+            // If the selected term is located in this cell, try to select the differential for the next term in that cell
+            if (selectedTermInCell) {
+                nextTermIndex = [self indexOfObjectInArray:termCell.terms afterObjectIdenticalTo:selectedTermInCell];
+            }
+            // Otherwise, try to select the first differential--the first term that has a differential
+            else {
+                nextTermIndex = [termCell.terms indexOfObjectPassingTest:^BOOL(EXTChartViewModelTerm *term, NSUInteger idx, BOOL *stop) {
+                    return term.differential != nil;
+                }];
+            }
+
+            if (nextTermIndex != NSNotFound) {
+                EXTChartViewModelTerm *newTerm = termCell.terms[nextTermIndex];
+                self.selectedObject = newTerm.differential;
+            }
+            else {
+                self.selectedObject = nil;
+            }
+
+            break;
+        }
+
+//        case EXTToolTagMarquee: {
+//            const NSRect gridRectInView = [self.chartView.grid viewBoundingRectForGridPoint:gridLocation];
+//            NSIndexSet *marqueesAtPoint = [_document.marquees indexesOfObjectsPassingTest:^BOOL(EXTMarquee *marquee, NSUInteger idx, BOOL *stop) {
+//                return NSIntersectsRect(gridRectInView, marquee.frame);
+//            }];
+//
+//            EXTMarquee *newSelectedMarquee = nil;
+//
+//            if (marqueesAtPoint.count == 0) {
+//                newSelectedMarquee = [EXTMarquee new];
+//                newSelectedMarquee.string = @"New marquee";
+//                newSelectedMarquee.frame = (NSRect){gridRectInView.origin, {100.0, 15.0}};
+//                [_document.marquees addObject:newSelectedMarquee];
+//            }
+//            else {
+//                // Cycle through all marquees lying on that grid square
+//                const NSInteger previousSelectedMarqueeIndex = ([self.selectedObject isKindOfClass:[EXTMarquee class]] ?
+//                                                                [_document.marquees indexOfObject:self.selectedObject] :
+//                                                                -1);
+//                NSInteger newSelectedMarqueeIndex = [marqueesAtPoint indexGreaterThanIndex:previousSelectedMarqueeIndex];
+//                if (newSelectedMarqueeIndex == NSNotFound)
+//                    newSelectedMarqueeIndex = [marqueesAtPoint firstIndex];
+//
+//                newSelectedMarquee = _document.marquees[newSelectedMarqueeIndex];
+//            }
+//
+//            self.selectedObject = newSelectedMarquee;
+//
+//            break;
+//        }
+
+        case EXTChartInteractionTypeArtBoard:
+        case EXTChartInteractionTypeMultiplicativeStructure:
+        default:
+            break;
+    }
 }
 
-- (NSArray *)chartView:(EXTChartView *)chartView differentialsInRect:(NSRect)rect
+- (EXTChartViewModelTermCell *)termCellAtGridLocation:(EXTIntPoint)gridLocation
 {
-    NSMutableArray *result = [NSMutableArray array];
-    for (EXTViewModelDifferential *diff in self.differentials[@(self.currentPage)]) {
-        if (lineSegmentOverRect(diff.start, diff.end, rect)) {
-            EXTChartViewDifferentialData *data = [EXTChartViewDifferentialData new];
-            data.start = diff.start;
-            data.end = diff.end;
-            [result addObject:data];
+    EXTChartViewModelTermCell *result = nil;
+    for (EXTChartViewModelTermCell *termCell in [self.privateTermCells[@(self.currentPage)] allValues]) {
+        if (EXTEqualIntPoints(termCell.gridLocation, gridLocation)) {
+            result = termCell;
+            break;
         }
     }
-    return result.copy;
+    return result;
 }
 
+// MERGE
+/*
 - (NSArray *)chartView:(EXTChartView *)chartView multAnnotationsInRect:(NSRect)gridRect {
     NSMutableArray *result = [NSMutableArray array];
     for (NSMutableDictionary *annoGroup in self.multAnnotations[@(self.currentPage)]) {
@@ -311,101 +351,121 @@ static dispatch_queue_t _dotLayersQueue;
     }
     return result.copy;
 }
+*/
 
-- (NSArray *)chartViewBackgroundRectsForSelectedObject:(EXTChartView *)chartView
+- (NSUInteger)indexOfObjectInArray:(NSArray *)array afterObjectIdenticalTo:(id)object
 {
-    NSRect (^rectForTerm)(EXTTerm *) = ^(EXTTerm *term) {
-        return [self.grid viewBoundingRectForGridPoint:[self.sequence.locConvertor gridPoint:term.location]];
-    };
+    if (array.count == 0) return NSNotFound;
 
-    NSArray *rects = nil;
-    id selectedObject = self.selectedObject;
+    const NSUInteger currentIndex = [array indexOfObjectIdenticalTo:object];
+    if (currentIndex == NSNotFound) return 0;
+    if (currentIndex + 1 == array.count) return NSNotFound;
 
-    if ([selectedObject isKindOfClass:[EXTTerm class]]) {
-        rects = @[[NSValue valueWithRect:rectForTerm(selectedObject)]];
-    }
-    else if ([self.selectedObject isKindOfClass:[EXTDifferential class]]) {
-        EXTDifferential *diff = selectedObject;
-        rects = @[[NSValue valueWithRect:rectForTerm(diff.start)],
-                  [NSValue valueWithRect:rectForTerm(diff.end)]];
-    }
-
-    return rects;
+    return currentIndex + 1;
 }
 
-- (NSBezierPath *)chartView:(EXTChartView *)chartView highlightPathForToolAtGridLocation:(EXTIntPoint)gridLocation
+#pragma mark - Computed properties
+
+- (NSArray *)termCells
 {
-    NSBezierPath *highlightPath;
-
-    switch (self.selectedToolTag) {
-        case EXTToolTagGenerator: {
-            const NSRect gridSquareInView = [[chartView grid] viewBoundingRectForGridPoint:gridLocation];
-            highlightPath = [NSBezierPath bezierPathWithRect:gridSquareInView];
-            break;
-        }
-
-        case EXTToolTagDifferential: {
-            EXTGrid *grid = chartView.grid;
-            const EXTIntPoint targetGridPoint = [self.sequence.locConvertor followDifflAtGridLocation:gridLocation page:self.currentPage];
-            const NSRect sourceRect = [grid viewBoundingRectForGridPoint:gridLocation];
-            const NSRect targetRect = [grid viewBoundingRectForGridPoint:targetGridPoint];
-
-            highlightPath = [NSBezierPath bezierPathWithRect:sourceRect];
-            [highlightPath appendBezierPathWithRect:targetRect];
-            break;
-        }
-
-        default:
-            highlightPath = nil;
-    }
-    
-    return highlightPath;
+    return [[self.privateTermCells[@(self.currentPage)] allValues] copy];
 }
 
+- (NSArray *)differentials
+{
+    return [self.privateDifferentials[@(self.currentPage)] copy];
+}
+
+@end
+
+
+@implementation EXTChartViewModelTerm
++ (instancetype)viewModelTermWithModelTerm:(EXTTerm *)modelTerm gridLocation:(EXTIntPoint)gridLocation
+{
+    EXTChartViewModelTerm *newTerm = [[self class] new];
+    if (newTerm) {
+        newTerm->_gridLocation = gridLocation;
+        newTerm->_modelTerm = modelTerm;
+    }
+    return newTerm;
+}
 @end
 
 
 #pragma mark -- helper classes --
 
 
-@implementation EXTViewModelPoint
-+ (instancetype)newViewModelPointWithX:(NSInteger)x y:(NSInteger)y
+@implementation EXTChartViewModelTermCell
+@dynamic terms;
+
+- (instancetype)init
 {
-    EXTViewModelPoint *newPoint = [[self class] new];
-    newPoint->_x = x;
-    newPoint->_y = y;
-    return newPoint;
+    self = [super init];
+    if (self) {
+        _privateTerms = [NSMutableArray new];
+    }
+    return self;
 }
 
-- (instancetype)copyWithZone:(NSZone *)zone
++ (instancetype)termCellAtGridLocation:(EXTIntPoint)gridLocation
 {
-    return [[self class] newViewModelPointWithX:_x y:_y];
+    EXTChartViewModelTermCell *newTermCell = [[self class] new];
+    if (newTermCell) {
+        newTermCell->_gridLocation = gridLocation;
+    }
+    return newTermCell;
 }
 
-- (NSUInteger)hash {
-    return NSUINTROTATE(((NSUInteger)_x), NSUINT_BIT / 2) ^ _y;
+- (void)addTerm:(EXTChartViewModelTerm *)term withDimension:(NSInteger)dimension
+{
+    [self.privateTerms addObject:term];
+    self.totalRank += dimension;
 }
 
-- (BOOL)isEqual:(id)object
+- (NSArray *)terms
 {
-    EXTViewModelPoint *point = object;
-    return ([point isKindOfClass:[EXTViewModelPoint class]] &&
-            point.x == _x &&
-            point.y == _y);
+    return [self.privateTerms copy];
 }
 @end
 
+@implementation EXTChartViewModelDifferential
+@dynamic lines;
 
-@implementation EXTViewModelDifferential
-+ (instancetype)newViewModelDifferentialWithStart:(NSPoint)start end:(NSPoint)end
++ (instancetype)viewModelDifferentialWithModelDifferential:(EXTDifferential *)modelDifferential
+                                                 startTerm:(EXTChartViewModelTerm *)startTerm
+                                                   endTerm:(EXTChartViewModelTerm *)endTerm
 {
-    EXTViewModelDifferential *newDiff = [[self class] new];
-    newDiff->_start = start;
-    newDiff->_end = end;
+    EXTChartViewModelDifferential *newDiff = [[self class] new];
+    if (newDiff) {
+        newDiff->_modelDifferential = modelDifferential;
+        newDiff->_startTerm = startTerm;
+        newDiff->_endTerm = endTerm;
+    }
     return newDiff;
 }
+
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        _privateLines = [NSMutableArray array];
+    }
+    return self;
+}
+
+- (void)addLine:(EXTChartViewModelDifferentialLine *)line
+{
+    [self.privateLines addObject:line];
+}
+
+- (NSArray *)lines
+{
+    return [self.privateLines copy];
+}
 @end
 
+// MERGE
+/*
 @implementation EXTViewModelMultAnnotation
 + (instancetype)newViewModelMultAnnotationWithStart:(NSPoint)start
                                                 end:(NSPoint)end
@@ -416,60 +476,21 @@ static dispatch_queue_t _dotLayersQueue;
     return newAnno;
 }
 @end
+*/
 
 
-NSArray *dotPositions(NSInteger count,
-                      EXTIntPoint gridPoint,
-                      CGFloat gridSpacing)
+@implementation EXTChartViewModelDifferentialLine
++ (instancetype)viewModelDifferentialLineWithStartIndex:(NSInteger)startIndex endIndex:(NSInteger)endIndex
 {
-
-    switch (count) {
-        case 1:
-            return @[[NSValue valueWithRect:
-                      NSMakeRect(gridPoint.x*gridSpacing + 2.0/6.0*gridSpacing,
-                                 gridPoint.y*gridSpacing + 2.0/6.0*gridSpacing,
-                                 2.0*gridSpacing/6.0,
-                                 2.0*gridSpacing/6.0)]];
-
-        case 2:
-            return @[[NSValue valueWithRect:
-                      NSMakeRect(gridPoint.x*gridSpacing + 1.0/6.0*gridSpacing,
-                                 gridPoint.y*gridSpacing + 1.0/6.0*gridSpacing,
-                                 2.0*gridSpacing/6.0,
-                                 2.0*gridSpacing/6.0)],
-                     [NSValue valueWithRect:
-                      NSMakeRect(gridPoint.x*gridSpacing + 3.0/6.0*gridSpacing,
-                                 gridPoint.y*gridSpacing + 3.0/6.0*gridSpacing,
-                                 2.0*gridSpacing/6.0,
-                                 2.0*gridSpacing/6.0)]];
-
-        case 3:
-            return @[[NSValue valueWithRect:
-                      NSMakeRect(gridPoint.x*gridSpacing + 0.66/6.0*gridSpacing,
-                                 gridPoint.y*gridSpacing + 1.0/6.0*gridSpacing,
-                                 2.0*gridSpacing/6.0,
-                                 2.0*gridSpacing/6.0)],
-                     [NSValue valueWithRect:
-                      NSMakeRect(gridPoint.x*gridSpacing + 2.0/6.0*gridSpacing,
-                                 gridPoint.y*gridSpacing + 3.0/6.0*gridSpacing,
-                                 2.0*gridSpacing/6.0,
-                                 2.0*gridSpacing/6.0)],
-                     [NSValue valueWithRect:
-                      NSMakeRect(gridPoint.x*gridSpacing + 3.33/6.0*gridSpacing,
-                                 gridPoint.y*gridSpacing + 1.0/6.0*gridSpacing,
-                                 2.0*gridSpacing/6.0,
-                                 2.0*gridSpacing/6.0)]];
-
-        default:
-            return @[[NSValue valueWithRect:
-                      NSMakeRect(gridPoint.x*gridSpacing+0.15*gridSpacing,
-                                 gridPoint.y*gridSpacing+0.15*gridSpacing,
-                                 0.7*gridSpacing,
-                                 0.7*gridSpacing)]];
+    EXTChartViewModelDifferentialLine *newLine = [[self class] new];
+    if (newLine) {
+        newLine->_startIndex = startIndex;
+        newLine->_endIndex = endIndex;
     }
-
-    return nil;
+    return newLine;
 }
+@end
+
 
 static bool lineSegmentOverRect(NSPoint p1, NSPoint p2, NSRect rect)
 {

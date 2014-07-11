@@ -28,6 +28,7 @@
 #import "EXTTermInspectorViewController.h"
 #import "EXTChartRulerView.h"
 #import "EXTMultAnnotationInspectorController.h"
+#import "EXTChartClipView.h"
 
 
 #pragma mark - Private variables
@@ -140,6 +141,14 @@ typedef enum : NSInteger {
 
     // Chart scroll view
     {
+        [_chartScrollView setWantsLayer:YES];
+
+        // Swap clip view
+        EXTChartClipView *clipView = [[EXTChartClipView alloc] initWithFrame:_chartScrollView.contentView.frame];
+        clipView.postsBoundsChangedNotifications = YES;
+        _chartScrollView.contentView = clipView;
+        _chartScrollView.documentView = _chartView;
+
         [_chartScrollView setHasHorizontalRuler:YES];
         [_chartScrollView setHasVerticalRuler:YES];
 
@@ -177,6 +186,9 @@ typedef enum : NSInteger {
         // related to the document view bounds being fractional?
         // FIXME
         _chartScrollView.magnification = lround(_chartScrollView.magnification * _EXTMagnificationStepRoundingMultiplier) / _EXTMagnificationStepRoundingMultiplier;
+
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(clipViewBoundsDidChange:) name:NSViewBoundsDidChangeNotification object:clipView];
+        [self clipViewBoundsDidChange:nil];
     }
 
     // Toolbox
@@ -278,6 +290,13 @@ typedef enum : NSInteger {
     [[self window] makeFirstResponder:_chartView];
 }
 
+- (void)clipViewBoundsDidChange:(NSNotification *)notification
+{
+    EXTChartClipView *clipView = (EXTChartClipView *)_chartScrollView.contentView;
+    NSRect visibleRect = [_chartView convertRect:clipView.bounds fromView:clipView];
+    [_chartView adjustContentForRect:visibleRect];
+}
+
 - (void)windowWillClose:(NSNotification *)notification {
     // TODO: should these observer adds and removes be put into the EXTDIVD calls?
     [_chartScrollView removeObserver:self forKeyPath:@"magnification"];
@@ -305,6 +324,8 @@ typedef enum : NSInteger {
         if (delegate && [delegate respondsToSelector:@selector(documentWindowController:willRemoveInspectorView:)])
             [delegate documentWindowController:self willRemoveInspectorView:viewDelegatePair[@"view"]];
     }
+
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:NSViewBoundsDidChangeNotification object:[_chartScrollView contentView]];
 }
 
 #pragma mark - Zoom
@@ -498,8 +519,6 @@ typedef enum : NSInteger {
 }
 
 - (IBAction)exportArtBoard:(id)sender {
-    NSData *artBoardPDFData = [_chartView dataWithPDFInsideRect:[[_chartView artBoard] frame]];
-
     NSSavePanel *savePanel = [NSSavePanel savePanel];
     [savePanel setNameFieldStringValue:[NSString stringWithFormat:@"page_%d", [_chartViewController currentPage]]];
     [savePanel setAllowedFileTypes:@[@"pdf"]];
@@ -508,8 +527,33 @@ typedef enum : NSInteger {
     [savePanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result) {
         // TODO: error handling
         if (result == NSFileHandlingPanelOKButton)
-            [artBoardPDFData writeToURL:[savePanel URL] atomically:YES];
+            [self exportArtBoardToURL:[savePanel URL]];
     }];
+}
+
+- (void)exportArtBoardToURL:(NSURL *)URL
+{
+    const CGRect frame = self.chartView.artBoard.frame;
+    CGContextRef PDFContext = CGPDFContextCreateWithURL((__bridge CFURLRef)URL, &frame, NULL);
+
+    CGLayerRef layer = CGLayerCreateWithContext(PDFContext, frame.size, NULL);
+    CGContextRef layerContext = CGLayerGetContext(layer);
+
+    // Funny thing: -[CALayer renderInContext:] does not respect CALayer.zPosition. Instead, it simply follows
+    // the order in CALayer.sublayers.
+
+    NSGraphicsContext *drawingContext = [NSGraphicsContext graphicsContextWithGraphicsPort:layerContext flipped:NO];
+    [NSGraphicsContext saveGraphicsState];
+    [NSGraphicsContext setCurrentContext:drawingContext];
+    CGContextBeginPage(PDFContext, &frame);
+    {
+        [self.chartView.layer renderInContext:PDFContext];
+    }
+    CGContextEndPage(PDFContext);
+    CGPDFContextClose(PDFContext);
+    CGContextRelease(PDFContext);
+    CGLayerRelease(layer);
+    [NSGraphicsContext restoreGraphicsState];
 }
 
 - (IBAction)resetGridToDefaults:(id)sender {

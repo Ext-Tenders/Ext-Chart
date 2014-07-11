@@ -6,10 +6,16 @@
 //  Copyright 2011 Harvard University. All rights reserved.
 //
 
+#import <QuartzCore/QuartzCore.h>
+
 #import "EXTChartView.h"
 #import "EXTScrollView.h"
 #import "EXTGrid.h"
 #import "EXTArtBoard.h"
+#import "EXTChartViewModel.h"
+#import "EXTTermLayer.h"
+#import "EXTDifferentialLineLayer.h"
+#import "EXTChartViewInteraction.h"
 #import "NSUserDefaults+EXTAdditions.h"
 
 
@@ -23,18 +29,64 @@ NSString * const EXTChartViewHighlightColorPreferenceKey = @"EXTChartViewHighlig
 static void *_EXTChartViewArtBoardDrawingRectContext = &_EXTChartViewArtBoardDrawingRectContext;
 static void *_EXTChartViewGridAnyKeyContext = &_EXTChartViewGridAnyKeyContext;
 static void *_EXTChartViewGridSpacingContext = &_EXTChartViewGridSpacingContext;
+static void *_interactionTypeContext = &_interactionTypeContext;
+static void *_showsGridContext = &_showsGridContext;
+static void *_selectedObjectContext = &_selectedObjectContext;
 
-static CGFloat const _EXTHighlightLineWidth = 0.5;
+static const CGFloat _kBelowGridZPosition = -3.0;
+static const CGFloat _kGridZPosition = -2.0;
+static const CGFloat _kAboveGridZPosition = -1.0;
+static const CGFloat _kDifferentialZPosition = 1.0;
+static const CGFloat _kSelectedDifferentialZPosition = 2.0;
+static const CGFloat _kTermCellZPosition = 10.0;
 
+static const CGFloat _kBaseGridZPosition = 0.0;
+static const CGFloat _kEmphasisGridZPosition = 1.0;
+static const CGFloat _kAxesGridZPosition = 2.0;
 
-@interface EXTChartView () {
-	NSTrackingArea *_trackingArea;
-	NSBezierPath *_highlightPath;
-}
-@end
+static const CGFloat _kBaseGridLineWidth = 0.2;
+static const CGFloat _kEmphasisGridLineWidth = 0.2;
+static const CGFloat _kAxesGridLineWidth = 0.4;
+
+static const CGFloat _kArtBoardBorderWidth = 0.75;
+static const CGSize _kArtBoardShadowOffset = {-1.0, -2.0};
+static const CGFloat _kArtBoardShadowRadius = 2.0;
+static const CGFloat _kArtBoardShadowOpacity = 1.0;
+static const CFTimeInterval _kArtBoardTransitionDuration = 0.125;
+
+static CGColorRef _viewBackgroundColor;
+static CGColorRef _baseGridStrokeColor;
+static CGColorRef _emphasisGridStrokeColor;
+static CGColorRef _axesGridStrokeColor;
+static CGColorRef _artBoardBackgroundColor;
+static CGColorRef _artBoardBorderColor;
+static CGColorRef _artBoardShadowColor;
+
+static const CFTimeInterval _kTermHighlightAddAnimationDuration = 0.09 * 1.8;
+static const CFTimeInterval _kTermHighlightRemoveAnimationDuration = 0.07 * 1.8;
+static const CFTimeInterval _kDifferentialHighlightAddAnimationDuration = 0.09;
+static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.07;
 
 
 @implementation EXTChartView
+{
+	NSTrackingArea *_trackingArea;
+
+    CALayer *_gridLayer;
+    CAShapeLayer *_baseGridLayer;
+    CAShapeLayer *_emphasisGridLayer;
+    CAShapeLayer *_axesGridLayer;
+
+    CALayer *_artBoardBackgroundLayer;
+    CALayer *_artBoardBorderLayer;
+
+    NSArray *_termLayers;
+    NSArray *_differentialLineLayers;
+
+    NSArray *_highlightedLayers; // an array of CALayer<EXTChartViewInteraction> objects, or nil
+    NSSet *_selectedLayers;
+}
+
 
 #pragma mark - Life cycle
 
@@ -47,14 +99,119 @@ static CGFloat const _EXTHighlightLineWidth = 0.5;
     [[NSUserDefaults standardUserDefaults] registerDefaults:defaults];
 }
 
++ (void)initialize
+{
+    if (self == [EXTChartView class]) {
+        _viewBackgroundColor = CGColorCreateCopy([[NSColor windowBackgroundColor] CGColor]);
+        _baseGridStrokeColor = CGColorCreateCopy([[NSColor lightGrayColor] CGColor]);
+        _emphasisGridStrokeColor = CGColorCreateCopy([[NSColor darkGrayColor] CGColor]);
+        _axesGridStrokeColor = CGColorCreateCopy([[NSColor blueColor] CGColor]);
+        _artBoardBackgroundColor = CGColorCreateCopy([[NSColor whiteColor] CGColor]);
+        _artBoardBorderColor = CGColorCreateCopy([[NSColor blackColor] CGColor]);
+        _artBoardShadowColor = CGColorCreateCopy([[NSColor blackColor] CGColor]);
+    }
+}
+
 - (instancetype)initWithFrame:(NSRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
 		[self translateOriginToPoint:NSMakePoint(NSMidX(frame), NSMidY(frame))];
 
+        // Highlighting
+		{
+            _highlightColor = [[NSUserDefaults standardUserDefaults] extColorForKey:EXTChartViewHighlightColorPreferenceKey];
+        }
+
+        // Selection
+        {
+            _selectionColor = [NSColor orangeColor];
+        }
+
+        CALayer *rootLayer = [CALayer layer];
+        rootLayer.frame = self.bounds;
+        rootLayer.backgroundColor = _viewBackgroundColor;
+        rootLayer.opaque = YES;
+        rootLayer.drawsAsynchronously = YES;
+        rootLayer.delegate = self;
+
+        rootLayer.transform = CATransform3DMakeTranslation(NSMidX(frame), NSMidY(frame), 0);
+
         // Grid
         {
             _showsGrid = true;
+            _grid = [EXTGrid new];
+            
+            _gridLayer = [CAShapeLayer layer];
+            _gridLayer.frame = (CGRect){CGPointZero, frame.size};
+            _gridLayer.zPosition = _kGridZPosition;
+            [rootLayer addSublayer:_gridLayer];
+            
+            CAShapeLayer *(^gridSublayer)(CGRect, CGFloat, CGColorRef, CGFloat) = ^(CGRect frame, CGFloat zPosition, CGColorRef strokeColor, CGFloat lineWidth){
+                CAShapeLayer *layer = [CAShapeLayer layer];
+                layer.frame = frame;
+                layer.zPosition = zPosition;
+                layer.strokeColor = strokeColor;
+                layer.lineWidth = lineWidth;
+                return layer;
+            };
+            
+            _baseGridLayer = gridSublayer(_gridLayer.frame, _kBaseGridZPosition, _baseGridStrokeColor, _kBaseGridLineWidth);
+            _emphasisGridLayer = gridSublayer(_gridLayer.frame, _kEmphasisGridZPosition, _emphasisGridStrokeColor, _kEmphasisGridLineWidth);
+            _axesGridLayer = gridSublayer(_gridLayer.frame, _kAxesGridZPosition, _axesGridStrokeColor, _kAxesGridLineWidth);
+            
+            [_gridLayer addSublayer:_baseGridLayer];
+            [_gridLayer addSublayer:_emphasisGridLayer];
+            [_gridLayer addSublayer:_axesGridLayer];
+
+            [self addObserver:self forKeyPath:@"showsGrid" options:NSKeyValueObservingOptionNew context:_showsGridContext];
+            [self addObserver:self forKeyPath:@"selectedObject" options:NSKeyValueObservingOptionNew context:_selectedObjectContext];
+        }
+
+        // Art board
+        {
+            _artBoard = [EXTArtBoard new];
+
+            _artBoardBackgroundLayer = [CALayer layer];
+            _artBoardBorderLayer = [CALayer layer];
+
+            _artBoardBackgroundLayer.backgroundColor = _artBoardBackgroundColor;
+            _artBoardBackgroundLayer.zPosition = _kBelowGridZPosition;
+
+            _artBoardBorderLayer.zPosition = _kAboveGridZPosition;
+            _artBoardBorderLayer.borderWidth = _kArtBoardBorderWidth;
+            _artBoardBorderLayer.borderColor = _artBoardBorderColor;
+
+            _artBoardBorderLayer.shadowOffset = _kArtBoardShadowOffset;
+            _artBoardBorderLayer.shadowColor = _artBoardShadowColor;
+            _artBoardBorderLayer.shadowRadius = _kArtBoardShadowRadius;
+            _artBoardBorderLayer.shadowOpacity = _kArtBoardShadowOpacity;
+
+            [self _extAlignArtBoardToGrid];
+            [self _extUpdateArtBoardMinimumSize];
+
+            // Since the frame extends past the bounds rectangle, we need observe the drawingRect in order to know what to refresh when the artBoard changes
+            [_artBoard addObserver:self forKeyPath:@"drawingRect" options:NSKeyValueObservingOptionOld context:_EXTChartViewArtBoardDrawingRectContext];
+
+            [rootLayer addSublayer:_artBoardBackgroundLayer];
+            [rootLayer addSublayer:_artBoardBorderLayer];
+        }
+
+        // See http://www.cocoabuilder.com/archive/cocoa/324875-calayer-renderincontext-changes-zposition-of-some-child-layers.html
+        // See http://www.cocoabuilder.com/archive/cocoa/193266-reordering-calayer-sublayers-without-raping-my-performance.html
+        NSSortDescriptor *zPosition = [NSSortDescriptor sortDescriptorWithKey:@"zPosition" ascending:YES];
+        rootLayer.sublayers = [rootLayer.sublayers sortedArrayUsingDescriptors:@[zPosition]];
+
+        self.layerContentsRedrawPolicy = NSViewLayerContentsRedrawNever;
+        self.layerContentsPlacement = NSViewLayerContentsPlacementBottomLeft;
+        self.layer = rootLayer;
+        self.wantsLayer = YES;
+
+        [self addObserver:self forKeyPath:@"interactionType" options:NSKeyValueObservingOptionNew context:_interactionTypeContext];
+
+        // ----- Obsolete Begin
+        /*
+        // Grid
+        {
 
             _grid = [EXTGrid new];
             [_grid setBoundsRect:[self bounds]];
@@ -62,122 +219,107 @@ static CGFloat const _EXTHighlightLineWidth = 0.5;
             [_grid addObserver:self forKeyPath:@"gridSpacing" options:0 context:_EXTChartViewGridSpacingContext];
         }
 
-        // Art board
-        {
-            _artBoard = [EXTArtBoard new];
-            [self _extAlignArtBoardToGrid];
-            [self _extUpdateArtBoardMinimumSize];
-
-            // Since the frame extends past the bounds rectangle, we need observe the drawingRect in order to know what to refresh when the artBoard changes
-            [_artBoard addObserver:self forKeyPath:@"drawingRect" options:NSKeyValueObservingOptionOld context:_EXTChartViewArtBoardDrawingRectContext];
-        }
-
-        // Highlighting
-		{
-            _highlightsGridPositionUnderCursor = true;
-            _highlightColor = [[NSUserDefaults standardUserDefaults] extColorForKey:EXTChartViewHighlightColorPreferenceKey];
-        }
+         */
+        // ----- Obsolete End
     }
 
 	return self;
 }
 
 - (void)dealloc {
-    [_artBoard removeObserver:self forKeyPath:@"drawingRect" context:_EXTChartViewArtBoardDrawingRectContext];
+    // ----- Obsolete Begin
+    /*
     [_grid removeObserver:self forKeyPath:EXTGridAnyKey context:_EXTChartViewGridAnyKeyContext];
     [_grid removeObserver:self forKeyPath:@"gridSpacing" context:_EXTChartViewGridSpacingContext];
+     */
+    // ----- Obsolete End
+
+    [self removeObserver:self forKeyPath:@"showsGrid" context:_showsGridContext];
+    [self removeObserver:self forKeyPath:@"interactionType" context:_interactionTypeContext];
+    [self removeObserver:self forKeyPath:@"selectedObject" context:_selectedObjectContext];
     
+    [_artBoard removeObserver:self forKeyPath:@"drawingRect" context:_EXTChartViewArtBoardDrawingRectContext];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
-#pragma mark - Drawing
+- (void)adjustContentForRect:(NSRect)rect
+{
+    [CATransaction begin];
+    [CATransaction setDisableActions:YES];
+    {
+        _gridLayer.frame = rect;
+    }
+    [CATransaction commit];
 
-- (void)drawRect:(NSRect)dirtyRect {
-    // View background
-    NSDrawWindowBackground(dirtyRect);
+    const CGFloat spacing = _grid.gridSpacing;
 
-    // Art board background
-	[_artBoard fillRect]; // TODO: draw only the intersection of rect and the art board
+    const NSInteger firstVerticalLine = (NSInteger)floor(rect.origin.x / spacing);
+    const NSInteger firstHorizontalLine = (NSInteger)floor(rect.origin.y / spacing);
+    const NSInteger numberOfHorizontalLines = (NSInteger)ceil(rect.size.height / spacing) + 1;
+    const NSInteger numberOfVerticalLines = (NSInteger)ceil(rect.size.width / spacing) + 1;
 
-    // Grid
-	if (_showsGrid)
-		[_grid drawGridInRect:dirtyRect];
+    const CGPoint origin = {
+        .x = floor(rect.origin.x / spacing) * spacing,
+        .y = floor(rect.origin.y / spacing) * spacing,
+    };
+    const CGPoint originInSublayer = [_baseGridLayer convertPoint:origin fromLayer:self.layer];
+    CGPoint point = originInSublayer;
 
-    // Art board borders
-    // If we aren’t drawing to the screen (e.g., when exporting the art board as PDF), the
-    // art board looks nicer without a shadow
-    [_artBoard setHasShadow:[[NSGraphicsContext currentContext] isDrawingToScreen]];
-	[_artBoard strokeRect];   // we're drawing the entire artboard frame.   probably OK.
+    CGMutablePathRef basePath = CGPathCreateMutable();
+    CGMutablePathRef emphasisPath = CGPathCreateMutable();
 
-	// Axes
-	[_grid drawAxes];
+    for (NSInteger i = 0; i < numberOfHorizontalLines; ++i) {
+        CGMutablePathRef path = ((firstHorizontalLine + i) % 8) == 0 ? emphasisPath : basePath;
+        CGPathMoveToPoint(path, NULL, point.x, point.y);
+        CGPathAddLineToPoint(path, NULL, point.x + rect.size.width + spacing, point.y);
 
-	// Highlight rectangle. The highlightPath is stored, so we can correctly determine dirty rectangles.
-    // It is generated by a class method in the EXTTerm and EXTDifferential classes.
-	if (self.highlightsGridPositionUnderCursor && _highlightPath && [self needsToDrawRect:[self _extHighlightDrawingRect]]) {
-		[_highlightColor setStroke];
-		[_highlightPath stroke];
-	}
+        point.y += spacing;
+    }
 
-	//	At this point I'd like to switch to a coordinate system with a user specified origin, and scaled so that the grid is 1 by 1.
+    point = originInSublayer;
+    for (NSInteger i = 0; i < numberOfVerticalLines; ++i) {
+        CGMutablePathRef path = ((firstVerticalLine + i) % 8) == 0 ? emphasisPath : basePath;
+        CGPathMoveToPoint(path, NULL, point.x, point.y);
+        CGPathAddLineToPoint(path, NULL, point.x, point.y + rect.size.height + spacing);
 
-	//	NSGraphicsContext* theContext = [NSGraphicsContext currentContext];
-	//	[theContext saveGraphicsState];
-	//
-	//	//introduce a transformation matrix here
-	//	NSAffineTransform* xform = [NSAffineTransform transform];
-	//	[xform translateXBy:72.0 yBy:72.0];
-	//	[xform concat];
+        point.x += spacing;
+    }
 
-    if (!self.dataSource) return;
+    const bool crossesYAxis = NSMinX(rect) <= 0.0 && NSMaxX(rect) >= 0.0;
+    const bool crossesXAxis = NSMinY(rect) <= 0.0 && NSMaxY(rect) >= 0.0;
 
-    // Tint the grid square(s) where the selected object lie(s)
-    NSArray *backgroundRects = [self.dataSource chartViewBackgroundRectsForSelectedObject:self];
-    for (NSValue *rectValue in backgroundRects) {
-        const NSRect rect = rectValue.rectValue;
-        const CGFloat selectionInset = 0.25;
+    CGMutablePathRef axesPath = NULL;
+    if (crossesXAxis || crossesYAxis) {
+        axesPath = CGPathCreateMutable();
 
-        if ([self needsToDrawRect:rect]) {
-            NSColor *colour = [self.highlightColor blendedColorWithFraction:0.8 ofColor:NSColor.whiteColor];
-            [colour setFill];
-            const NSRect insetRect = NSInsetRect(rect, selectionInset, selectionInset);
-            NSRectFill(insetRect);
+        if (crossesYAxis) {
+            const CGPoint p1 = [_axesGridLayer convertPoint:(CGPoint){0.0, NSMinY(rect)} fromLayer:self.layer];
+            const CGPoint p2 = [_axesGridLayer convertPoint:(CGPoint){0.0, NSMaxY(rect)} fromLayer:self.layer];
+
+            CGPathMoveToPoint(axesPath, NULL, p1.x, p1.y);
+            CGPathAddLineToPoint(axesPath, NULL, p2.x, p2.y);
+        }
+
+        if (crossesXAxis) {
+            const CGPoint p1 = [_axesGridLayer convertPoint:(CGPoint){NSMinX(rect), 0.0} fromLayer:self.layer];
+            const CGPoint p2 = [_axesGridLayer convertPoint:(CGPoint){NSMaxX(rect), 0.0} fromLayer:self.layer];
+
+            CGPathMoveToPoint(axesPath, NULL, p1.x, p1.y);
+            CGPathAddLineToPoint(axesPath, NULL, p2.x, p2.y);
         }
     }
 
-    // actually loop through the available positions and perform the draw.
-    const EXTIntRect gridRect = [self.grid convertRectFromView:dirtyRect];
-    CGContextRef currentCGContext = [[NSGraphicsContext currentContext] graphicsPort];
-    CGRect layerFrame = {.size = {self.grid.gridSpacing, self.grid.gridSpacing}};
-
-    NSArray *counts = [self.dataSource chartView:self termCountsInGridRect:gridRect];
-    for (EXTChartViewTermCountData *countData in counts) {
-        CGLayerRef dotLayer = [self.dataSource chartView:self layerForTermCount:countData.count];
-        layerFrame.origin = (CGPoint){countData.point.x * self.grid.gridSpacing, countData.point.y * self.grid.gridSpacing};
-        CGContextDrawLayerInRect(currentCGContext, layerFrame, dotLayer);
+    [CATransaction begin];
+    [CATransaction setDisableActions:YES];
+    {
+        _baseGridLayer.path = basePath;
+        _emphasisGridLayer.path = emphasisPath;
+        _axesGridLayer.path = axesPath;
     }
+    [CATransaction commit];
 
-    // iterate also through the available differentials
-    NSArray *differentials = [self.dataSource chartView:self differentialsInRect:dirtyRect];
-
-    //    const bool differentialSelected = (differential == _selectedObject);
-    //    if (differentialSelected)
-    //        [[[self chartView] highlightColor] set];
-    //    else
-    //        [[NSColor blackColor] set];
-
-    [[NSColor blackColor] set];
-    NSBezierPath *line = [NSBezierPath bezierPath];
-    [line setLineWidth:0.25];
-    [line setLineCapStyle:NSRoundLineCapStyle];
-    for (EXTChartViewDifferentialData *diffData in differentials) {
-        [line moveToPoint:diffData.start];
-        [line lineToPoint:diffData.end];
-    }
-    [line stroke];
-
-    // TODO: draw certain multiplicative structures?
-    
+    // MERGE
+    /*
     // this is an array of dictionaries: {"style", array of
     NSArray *multAnnotationsData = [self.dataSource chartView:self multAnnotationsInRect:dirtyRect];
     for (NSDictionary *annotationGroup in multAnnotationsData) {
@@ -198,69 +340,208 @@ static CGFloat const _EXTHighlightLineWidth = 0.5;
         
         [line stroke];
     }
+    */
 
-    // TODO: draw highlighted object.
-
-    // Draw marquees
-//    const NSRect dirtyRect = [self.chartView.grid convertRectToView:gridRect];
-//    for (EXTMarquee *marquee in _document.marquees) {
-//        if (!NSIntersectsRect(dirtyRect, marquee.frame))
-//            continue;
-//
-//        // Images take precedence over text
-//        if (marquee.image)
-//            [marquee.image drawInRect:marquee.frame fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0];
-//        else
-//            [marquee.string drawInRect:marquee.frame withAttributes:nil];
-//    }
-//
-//    if ([self.selectedObject isKindOfClass:[EXTMarquee class]]) {
-//        EXTMarquee *selectedMarquee = self.selectedObject;
-//        [self.chartView.highlightColor setFill];
-//        NSFrameRect(selectedMarquee.frame);
-//    }
-
-    //  // restore the graphics context
-    //	[theContext restoreGraphicsState];
+    CGPathRelease(basePath);
+    CGPathRelease(emphasisPath);
+    CGPathRelease(axesPath);
 }
 
-- (void)resetHighlightPath {
-    if (_highlightPath)
-        [self setNeedsDisplayInRect:[self _extHighlightDrawingRect]];
+- (void)reloadCurrentPage
+{
+    const NSRect reloadRect = {{NSMinX(self.frame), NSMinY(self.frame)}, self.frame.size};
+    const EXTIntRect reloadGridRect = {
+        {(NSInteger)(reloadRect.origin.x / _grid.gridSpacing), (NSInteger)(reloadRect.origin.y / _grid.gridSpacing)},
+        {(NSInteger)(reloadRect.size.width / _grid.gridSpacing), (NSInteger)(reloadRect.size.height / _grid.gridSpacing)}};
+
+    // Terms
+    {
+        [_termLayers makeObjectsPerformSelector:@selector(removeFromSuperlayer)];
+        
+        NSMutableArray *newTermLayers = [NSMutableArray new];
+        
+        NSArray *termCells = [self.dataSource chartView:self termCellsInGridRect:reloadGridRect];
+        for (EXTChartViewModelTermCell *termCell in termCells) {
+            EXTTermLayer *newTermLayer = [EXTTermLayer termLayerWithTotalRank:termCell.totalRank length:_grid.gridSpacing];
+            newTermLayer.frame = (CGRect){{termCell.gridLocation.x * _grid.gridSpacing, termCell.gridLocation.y * _grid.gridSpacing}, {_grid.gridSpacing, _grid.gridSpacing}};
+            newTermLayer.termCell = termCell;
+            newTermLayer.highlightColor = [_highlightColor CGColor];
+            newTermLayer.selectionColor = [_selectionColor CGColor];
+            newTermLayer.zPosition = _kTermCellZPosition;
+            [newTermLayers addObject:newTermLayer];
+            [self.layer addSublayer:newTermLayer];
+        }
+        
+        _termLayers = [newTermLayers copy];
+    }
+
+
+    // Differentials
+    {
+        [_differentialLineLayers makeObjectsPerformSelector:@selector(removeFromSuperlayer)];
+
+        NSMutableArray *newDifferentialLineLayers = [NSMutableArray new];
+
+        NSArray *differentials = [self.dataSource chartView:self differentialsInGridRect:reloadGridRect];
+        for (EXTChartViewModelDifferential *diff in differentials) {
+            const CGPoint start = [_grid convertPointToView:diff.startTerm.gridLocation];
+            const CGPoint end = [_grid convertPointToView:diff.endTerm.gridLocation];
+            const CGPoint origin = {MIN(start.x, end.x), MIN(start.y, end.y)};
+            const CGSize size = {ABS(start.x - end.x), ABS(start.y - end.y)};
+
+            const NSInteger startTotalRank = diff.startTerm.termCell.totalRank;
+            const NSInteger endTotalRank = diff.endTerm.termCell.totalRank;
+
+            for (EXTChartViewModelDifferentialLine *line in diff.lines) {
+                EXTDifferentialLineLayer *newDifferentialLineLayer = [EXTDifferentialLineLayer layer];
+                newDifferentialLineLayer.frame = (CGRect){origin, size};
+                newDifferentialLineLayer.differential = diff;
+                newDifferentialLineLayer.line = line;
+                newDifferentialLineLayer.highlightColor = [_highlightColor CGColor];
+                newDifferentialLineLayer.selectionColor = [_selectionColor CGColor];
+                newDifferentialLineLayer.defaultZPosition = _kDifferentialZPosition;
+                newDifferentialLineLayer.selectedZPosition = _kSelectedDifferentialZPosition;
+                [newDifferentialLineLayers addObject:newDifferentialLineLayer];
+                [self.layer addSublayer:newDifferentialLineLayer];
+
+                const NSRect startDotRect = [EXTChartView dotBoundingBoxForTermCount:startTotalRank
+                                                                           termIndex:line.startIndex
+                                                                        gridLocation:diff.startTerm.gridLocation
+                                                                         gridSpacing:_grid.gridSpacing];
+                const NSRect endDotRect = [EXTChartView dotBoundingBoxForTermCount:endTotalRank
+                                                                         termIndex:line.endIndex
+                                                                      gridLocation:diff.endTerm.gridLocation
+                                                                       gridSpacing:_grid.gridSpacing];
+
+                const CGPoint startDotConnectionPoint = (startTotalRank <= 3 ?
+                                                         (CGPoint){NSMidX(startDotRect), NSMidY(startDotRect)} :
+                                                         (CGPoint){NSMinX(startDotRect), NSMidY(startDotRect)});
+                const CGPoint endDotConnectionPoint = (endTotalRank <= 3 ?
+                                                       (CGPoint){NSMidX(endDotRect), NSMidY(endDotRect)} :
+                                                       (CGPoint){NSMaxX(endDotRect), NSMidY(endDotRect)});
+                const CGPoint startInLayer = [newDifferentialLineLayer convertPoint:startDotConnectionPoint fromLayer:self.layer];
+                const CGPoint endInLayer = [newDifferentialLineLayer convertPoint:endDotConnectionPoint fromLayer:self.layer];
+
+                CGMutablePathRef path = CGPathCreateMutable();
+                CGPathMoveToPoint(path, NULL, startInLayer.x, startInLayer.y);
+                CGPathAddLineToPoint(path, NULL, endInLayer.x, endInLayer.y);
+                newDifferentialLineLayer.path = path;
+                CGPathRelease(path);
+            }
+        }
+
+        _differentialLineLayers = [newDifferentialLineLayers copy];
+    }
+}
+
+
+- (void)resetCursorRects
+{
+	if (self.interactionType == EXTChartInteractionTypeArtBoard) [_artBoard buildCursorRectsInView:self];
+}
+
+- (void)updateHighlight
+{
+    switch (self.interactionType) {
+        case EXTChartInteractionTypeTerm:
+            [self updateTermHighlight];
+            break;
+
+        case EXTChartInteractionTypeDifferential:
+            [self updateDifferentialHighlight];
+            break;
+
+        case EXTChartInteractionTypeMultiplicativeStructure:
+        case EXTChartInteractionTypeArtBoard:
+        case EXTChartInteractionTypeNone:
+        default:
+            break;
+    }
+}
+
+- (void)updateTermHighlight
+{
+    EXTTermLayer *layerToHighlight = nil;
 
     const NSRect dataRect = [_trackingArea rect];
     const NSPoint currentMouseLocation = [self convertPoint:[[self window] mouseLocationOutsideOfEventStream] fromView:nil];
     if (NSPointInRect(currentMouseLocation, dataRect)) {
         const EXTIntPoint mouseLocationInGrid = [_grid convertPointFromView:currentMouseLocation];
-        _highlightPath = [self.dataSource chartView:self highlightPathForToolAtGridLocation:mouseLocationInGrid];
-        [_highlightPath setLineWidth:_EXTHighlightLineWidth];
-        [self setNeedsDisplayInRect:[self _extHighlightDrawingRect]];
+        for (EXTTermLayer *layer in _termLayers) {
+            if (EXTEqualIntPoints(layer.termCell.gridLocation, mouseLocationInGrid)) {
+                layerToHighlight = layer;
+                break;
+            }
+        }
     }
-    else {
-        _highlightPath = nil;
+
+    CALayer<EXTChartViewInteraction> *currentlyHighlightedLayer = [_highlightedLayers firstObject];
+    if (currentlyHighlightedLayer != layerToHighlight) {
+        [CATransaction begin];
+        {
+            {
+                [CATransaction setAnimationDuration:_kTermHighlightRemoveAnimationDuration];
+                [CATransaction setAnimationTimingFunction:[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseIn]];
+
+                currentlyHighlightedLayer.highlighted = false;
+            }
+            {
+                [CATransaction setAnimationDuration:_kTermHighlightAddAnimationDuration];
+                [CATransaction setAnimationTimingFunction:[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseOut]];
+
+                layerToHighlight.highlighted = true;
+            }
+        }
+        [CATransaction commit];
+
+        _highlightedLayers = (layerToHighlight ? @[layerToHighlight] : nil);
     }
 }
 
-- (NSRect)_extHighlightDrawingRect {
-    const CGFloat halfLineWidth = _EXTHighlightLineWidth / 2;
-    return NSInsetRect([_highlightPath bounds], -halfLineWidth, -halfLineWidth);
+- (void)updateDifferentialHighlight
+{
+    NSMutableArray *layersToHighlight = [NSMutableArray new];
+
+    const NSRect dataRect = [_trackingArea rect];
+    const NSPoint currentMouseLocation = [self convertPoint:[[self window] mouseLocationOutsideOfEventStream] fromView:nil];
+    if (NSPointInRect(currentMouseLocation, dataRect)) {
+        const EXTIntPoint mouseLocationInGrid = [_grid convertPointFromView:currentMouseLocation];
+        for (EXTDifferentialLineLayer *layer in _differentialLineLayers) {
+            if (EXTEqualIntPoints(layer.differential.startTerm.gridLocation, mouseLocationInGrid)) {
+                [layersToHighlight addObject:layer];
+            }
+        }
+    }
+
+    // To avoid flicker, do not remove highlight from a layer if we are going to add highlight to it anyway.
+    // This happens when the mouse has moved but it’s still in the same grid cell.
+    // TODO: Maybe a better option is to track whether the mouse has moved to a different grid cell, and do not send
+    //       -updateHighlight if the grid cell is the same.
+
+    NSMutableSet *layersToRemoveHighlight = [NSMutableSet setWithArray:_highlightedLayers];
+    [layersToRemoveHighlight minusSet:[NSSet setWithArray:layersToHighlight]];
+
+    [CATransaction begin];
+    {
+        [CATransaction setAnimationTimingFunction:[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseOut]];
+
+        {
+            [CATransaction setAnimationDuration:_kDifferentialHighlightRemoveAnimationDuration];
+
+            for (CALayer<EXTChartViewInteraction> *layer in layersToRemoveHighlight) layer.highlighted = false;
+        }
+        {
+            [CATransaction setAnimationDuration:_kDifferentialHighlightAddAnimationDuration];
+
+            for (CALayer<EXTChartViewInteraction> *layer in layersToHighlight) layer.highlighted = true;
+        }
+    }
+    [CATransaction commit];
+
+    _highlightedLayers = (layersToHighlight.count == 0 ? nil : [layersToHighlight copy]);
 }
 
 #pragma mark - Properties
-
-- (void)setShowsGrid:(bool)showsGrid {
-    if (showsGrid != _showsGrid) {
-        _showsGrid = showsGrid;
-        [self setNeedsDisplay:YES];
-    }
-}
-
-- (void)setHighlightsGridPositionUnderCursor:(bool)highlightsGridPositionUnderCursor {
-    if (highlightsGridPositionUnderCursor != _highlightsGridPositionUnderCursor) {
-        _highlightsGridPositionUnderCursor = highlightsGridPositionUnderCursor;
-        [self setNeedsDisplayInRect:[self _extHighlightDrawingRect]];
-    }
-}
 
 - (void)setArtBoardGridFrame:(EXTIntRect)artBoardGridFrame {
     _artBoardGridFrame = artBoardGridFrame;
@@ -302,7 +583,7 @@ static CGFloat const _EXTHighlightLineWidth = 0.5;
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
 	if (context == _EXTChartViewArtBoardDrawingRectContext) {
         [self setNeedsDisplayInRect:NSUnionRect([change[NSKeyValueChangeOldKey] rectValue], [_artBoard drawingRect])];
-        if (self.editingArtBoard)
+        if (self.interactionType == EXTChartInteractionTypeArtBoard)
             [[self window] invalidateCursorRectsForView:self];
 	}
 	else if (context == _EXTChartViewGridAnyKeyContext) {
@@ -311,6 +592,29 @@ static CGFloat const _EXTHighlightLineWidth = 0.5;
     else if (context == _EXTChartViewGridSpacingContext) {
         [self _extAlignArtBoardToGrid];
         [self _extUpdateArtBoardMinimumSize];
+    }
+    else if (context == _interactionTypeContext) {
+        for (CALayer<EXTChartViewInteraction> *layer in _highlightedLayers) {
+            layer.highlighted = false;
+        }
+
+        _highlightedLayers = nil;
+        [self updateHighlight];
+    }
+    else if (context == _showsGridContext) {
+        bool showsGrid = [change[NSKeyValueChangeNewKey] boolValue];
+        if (showsGrid) {
+            [self.layer addSublayer:_gridLayer];
+            NSClipView *clipView = [[self enclosingScrollView] contentView];
+            const NSRect visibleRect = [self convertRect:clipView.bounds fromView:clipView];
+            [self adjustContentForRect:visibleRect];
+        }
+        else {
+            [_gridLayer removeFromSuperlayer];
+        }
+    }
+    else if (context == _selectedObjectContext) {
+        [self reflectSelection];
     }
 	else {
 		[super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
@@ -330,11 +634,6 @@ static CGFloat const _EXTHighlightLineWidth = 0.5;
 }
 
 #pragma mark - Mouse tracking and cursor
-
-- (void)resetCursorRects {
-	if (self.editingArtBoard)
-		[_artBoard buildCursorRectsInView:self];
-}
 
 - (void)_extDragArtBoardWithEvent:(NSEvent *)event {
 	// ripped off from sketch.   according to apple's document, it is better not to override the event loop like this.  Also, see the DragItemAround code for what I think is a better way to organize this.
@@ -373,7 +672,7 @@ static CGFloat const _EXTHighlightLineWidth = 0.5;
 - (void)mouseDown:(NSEvent *)event {
 	const NSPoint location = [self convertPoint:[event locationInWindow] fromView:nil];
 
-    if (self.editingArtBoard) {
+    if (self.interactionType == EXTChartInteractionTypeArtBoard) {
         const EXTArtBoardMouseDragOperation artBoardDragOperation = [_artBoard mouseDragOperationAtPoint:location];
         if (artBoardDragOperation != EXTArtBoardMouseDragOperationNone) {
             [self _extDragArtBoardWithEvent:event];
@@ -381,20 +680,19 @@ static CGFloat const _EXTHighlightLineWidth = 0.5;
 	}
     else {
         [_delegate chartView:self mouseDownAtGridLocation:[_grid convertPointFromView:location]];
-        [self setNeedsDisplayInRect:[self _extHighlightDrawingRect]]; // TODO: is this necessary?
 	}
 }
 
 - (void)mouseMoved:(NSEvent *)event {
-    [self resetHighlightPath];
+    [self updateHighlight];
 }
 
 - (void)mouseEntered:(NSEvent *)event {
-    [self resetHighlightPath];
+    [self updateHighlight];
 }
 
 - (void)mouseExited:(NSEvent *)event {
-    [self resetHighlightPath];
+    [self updateHighlight];
 }
 
 - (void)updateTrackingAreas {
@@ -408,7 +706,7 @@ static CGFloat const _EXTHighlightLineWidth = 0.5;
                                                    owner:self
                                                 userInfo:nil];
     [self addTrackingArea:_trackingArea];
-    [self resetHighlightPath];
+    [self updateHighlight];
 }
 
 #pragma mark - Art board
@@ -430,6 +728,13 @@ static CGFloat const _EXTHighlightLineWidth = 0.5;
     };
 
     [_artBoard setFrame:artBoardFrame];
+    [CATransaction begin];
+    [CATransaction setAnimationDuration:_kArtBoardTransitionDuration];
+    {
+        _artBoardBackgroundLayer.frame = artBoardFrame;
+        _artBoardBorderLayer.frame = artBoardFrame;
+    }
+    [CATransaction commit];
 }
 
 - (void)_extUpdateArtBoardMinimumSize {
@@ -449,6 +754,100 @@ static CGFloat const _EXTHighlightLineWidth = 0.5;
     [_artBoard setMinimumSize:minimumSize];
 }
 
+#pragma mark - Selection
+
+- (void)reflectSelection
+{
+    if ([self.selectedObject isKindOfClass:[EXTChartViewModelTerm class]]) {
+        [self reflectSelectedTerm];
+    }
+    else if ([self.selectedObject isKindOfClass:[EXTChartViewModelDifferential class]]) {
+        [self reflectSelectedDifferential];
+    }
+    else {
+        [self reflectNoSelection];
+    }
+}
+
+- (void)reflectSelectedTerm
+{
+    NSAssert([self.selectedObject isKindOfClass:[EXTChartViewModelTerm class]], @"Mismatched selected object");
+
+    CAShapeLayer<EXTChartViewInteraction> *layerToSelect = nil;
+    for (EXTTermLayer *layer in _termLayers) {
+        if ([layer.termCell.terms containsObject:self.selectedObject]) {
+            layerToSelect = layer;
+            break;
+        }
+    }
+
+    CAShapeLayer<EXTChartViewInteraction> *selectedLayer = _selectedLayers.anyObject;
+
+    // FIXME: Need to think about this. We can click a term cell multiple times and the selection *changes* if there
+    //        are multiple terms located on that cell, and we may want to distinguish this visually
+//    if (_selectedLayer != layerToSelect) {
+        [CATransaction begin];
+        {
+            if (selectedLayer != layerToSelect) {
+            {
+                [CATransaction setAnimationDuration:_kTermHighlightRemoveAnimationDuration];
+                [CATransaction setAnimationTimingFunction:[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseIn]];
+
+                selectedLayer.selected = false;
+            }
+            }
+            {
+                [CATransaction setAnimationDuration:_kTermHighlightAddAnimationDuration];
+                [CATransaction setAnimationTimingFunction:[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseOut]];
+
+                layerToSelect.selected = true;
+            }
+        }
+        [CATransaction commit];
+
+        _selectedLayers = [NSSet setWithObject:layerToSelect];
+//    }
+}
+
+- (void)reflectSelectedDifferential
+{
+    NSAssert([self.selectedObject isKindOfClass:[EXTChartViewModelDifferential class]], @"Mismatched selected object");
+
+    NSMutableSet *layersToSelect = [NSMutableSet new];
+
+    for (EXTDifferentialLineLayer *layer in _differentialLineLayers) {
+        if (layer.differential == self.selectedObject) {
+            [layersToSelect addObject:layer];
+        }
+    }
+
+    NSMutableSet *layersToRemoveSelection = [_selectedLayers mutableCopy];
+    [layersToRemoveSelection minusSet:layersToSelect];
+
+    [CATransaction begin];
+    {
+        [CATransaction setAnimationTimingFunction:[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseOut]];
+
+        {
+            [CATransaction setAnimationDuration:_kDifferentialHighlightRemoveAnimationDuration];
+            for (CALayer<EXTChartViewInteraction> *layer in layersToRemoveSelection) layer.selected = false;
+
+        }
+        {
+            [CATransaction setAnimationDuration:_kDifferentialHighlightAddAnimationDuration];
+            for (CALayer<EXTChartViewInteraction> *layer in layersToSelect) layer.selected = true;
+        }
+    }
+    [CATransaction commit];
+
+    _selectedLayers = [layersToSelect copy];
+}
+
+- (void)reflectNoSelection
+{
+    for (CALayer<EXTChartViewInteraction> *layer in _selectedLayers) layer.selected = false;
+}
+
 #pragma mark - Resizing
 
 // Chart views shouldn’t be resized. However, it seems that Restoration changes the chart view frame as part of
@@ -464,69 +863,68 @@ static CGFloat const _EXTHighlightLineWidth = 0.5;
     return [self respondsToSelector:[item action]];
 }
 
+#pragma mark - Util
+
++ (CGRect)dotBoundingBoxForTermCount:(NSInteger)termCount
+                           termIndex:(NSInteger)termIndex
+                        gridLocation:(EXTIntPoint)gridLocation
+                         gridSpacing:(CGFloat)gridSpacing
+{
+    switch (termCount) {
+        case 1:
+            return CGRectMake(gridLocation.x*gridSpacing + 2.0/6.0*gridSpacing,
+                              gridLocation.y*gridSpacing + 2.0/6.0*gridSpacing,
+                              2.0*gridSpacing/6.0,
+                              2.0*gridSpacing/6.0);
+
+        case 2:
+            switch (termIndex) {
+                case 0:
+                    return CGRectMake(gridLocation.x*gridSpacing + 1.0/6.0*gridSpacing,
+                                      gridLocation.y*gridSpacing + 1.0/6.0*gridSpacing,
+                                      2.0*gridSpacing/6.0,
+                                      2.0*gridSpacing/6.0);
+                case 1:
+                    return CGRectMake(gridLocation.x*gridSpacing + 3.0/6.0*gridSpacing,
+                                      gridLocation.y*gridSpacing + 3.0/6.0*gridSpacing,
+                                      2.0*gridSpacing/6.0,
+                                      2.0*gridSpacing/6.0);
+            }
+
+        case 3:
+            switch (termIndex) {
+                case 0:
+                    return CGRectMake(gridLocation.x*gridSpacing + 0.66/6.0*gridSpacing,
+                                      gridLocation.y*gridSpacing + 1.0/6.0*gridSpacing,
+                                      2.0*gridSpacing/6.0,
+                                      2.0*gridSpacing/6.0);
+                case 1:
+                    return CGRectMake(gridLocation.x*gridSpacing + 2.0/6.0*gridSpacing,
+                                      gridLocation.y*gridSpacing + 3.0/6.0*gridSpacing,
+                                      2.0*gridSpacing/6.0,
+                                      2.0*gridSpacing/6.0);
+                case 2:
+                    return CGRectMake(gridLocation.x*gridSpacing + 3.33/6.0*gridSpacing,
+                                      gridLocation.y*gridSpacing + 1.0/6.0*gridSpacing,
+                                      2.0*gridSpacing/6.0,
+                                      2.0*gridSpacing/6.0);
+
+            }
+
+        default:
+            return CGRectMake(gridLocation.x*gridSpacing+0.15*gridSpacing,
+                              gridLocation.y*gridSpacing+0.15*gridSpacing,
+                              0.7*gridSpacing,
+                              0.7*gridSpacing);
+    }
+    
+    return CGRectZero;
+}
+
 @end
 
-
-@implementation EXTChartViewTermCountData
-+ (instancetype)chartViewTermCountDataWithCount:(NSInteger)count atGridPoint:(EXTIntPoint)gridPoint
-{
-    EXTChartViewTermCountData *result = [self new];
-    result.count = count;
-    result.point = gridPoint;
-    return result;
-}
-
-- (NSString *)description
-{
-    return [NSString stringWithFormat:@"Term count %ld at (%ld, %ld)", self.count, self.point.x, self.point.y];
-}
-
-- (BOOL)isEqual:(id)object
-{
-    EXTChartViewTermCountData *other = object;
-    return ([other isKindOfClass:[EXTChartViewTermCountData class]] &&
-            other.count == _count &&
-            other.point.x == _point.x &&
-            other.point.y == _point.y);
-
-}
-
-- (NSUInteger)hash
-{
-    return NSUINTROTATE(((NSUInteger)_point.x), NSUINT_BIT / 2) ^ _point.y ^ _count;
-}
-@end
-
-
-@implementation EXTChartViewDifferentialData
-+ (instancetype)chartViewDifferentialDataWithStart:(NSPoint)start end:(NSPoint)end
-{
-    EXTChartViewDifferentialData *result = [self new];
-    result.start = start;
-    result.end = end;
-    return result;
-}
-
-- (NSString *)description
-{
-    return [NSString stringWithFormat:@"Differential from %@ to %@", NSStringFromPoint(self.start), NSStringFromPoint(self.end)];
-}
-
-- (BOOL)isEqual:(id)object
-{
-    EXTChartViewDifferentialData *other = object;
-    return ([other isKindOfClass:[EXTChartViewDifferentialData class]] &&
-            NSEqualPoints(other.start, _start) &&
-            NSEqualPoints(other.end, _end));
-}
-
-- (NSUInteger)hash
-{
-    return (NSUINTROTATE(((NSUInteger)_start.x), NSUINT_BIT / 2) ^ (NSUInteger)_start.y ^
-            NSUINTROTATE(((NSUInteger)_end.y), NSUINT_BIT / 2) ^ (NSUInteger)_end.x);
-}
-@end
-
+// MERGE
+/*
 @implementation EXTChartViewMultAnnotationData
 + (instancetype)chartViewMultAnnotationDataWithStart:(NSPoint)start end:(NSPoint)end
 {
@@ -555,3 +953,4 @@ static CGFloat const _EXTHighlightLineWidth = 0.5;
             NSUINTROTATE(((NSUInteger)_end.y), NSUINT_BIT / 2) ^ (NSUInteger)_end.x);
 }
 @end
+*/

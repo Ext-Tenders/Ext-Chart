@@ -8,29 +8,40 @@
 
 
 #import <Cocoa/Cocoa.h>
-#import "EXTToolboxTag.h"
+#import "EXTChartInteractionType.h"
+
 
 @class EXTChartView, EXTArtBoard, EXTGrid;
 @protocol EXTChartViewDataSource, EXTChartViewDelegate;
 
+
 @interface EXTChartView : NSView <NSUserInterfaceValidations>
-@property(nonatomic, assign) bool showsGrid;
-@property(nonatomic, strong) EXTArtBoard *artBoard;
-@property(nonatomic, readonly) EXTGrid *grid;
-@property(nonatomic, strong) NSColor *highlightColor;
-@property(nonatomic, assign) EXTIntRect artBoardGridFrame; // the art board frame in grid coordinate space
-@property(nonatomic, assign) bool highlightsGridPositionUnderCursor;
-@property(nonatomic, assign) bool editingArtBoard;
+@property (nonatomic, assign) bool showsGrid;
+@property (nonatomic, strong) EXTArtBoard *artBoard;
+@property (nonatomic, readonly) EXTGrid *grid;
+@property (nonatomic, assign) EXTIntRect artBoardGridFrame; // the art board frame in grid coordinate space
+
+@property (nonatomic, assign) EXTChartInteractionType interactionType;
+@property (nonatomic, strong) NSColor *highlightColor;
+@property (nonatomic, strong) NSColor *selectionColor;
 
 @property (nonatomic, weak) id<EXTChartViewDataSource> dataSource;
-@property(nonatomic, weak) id<EXTChartViewDelegate> delegate;
+@property (nonatomic, weak) id<EXTChartViewDelegate> delegate;
 
-// TODO: I feel like maybe this doesn't belong here.  Shouldn't this be handled
-// by the controller somehow?  Hmph.
-- (void)resetHighlightPath;
+@property (nonatomic, weak) id selectedObject;
+
+// New chart view
+- (void)adjustContentForRect:(NSRect)rect;
+- (void)reloadCurrentPage;
 
 // Actions
 - (IBAction)zoomToFit:(id)sender;
+
+// Util
++ (CGRect)dotBoundingBoxForTermCount:(NSInteger)termCount
+                           termIndex:(NSInteger)termIndex
+                        gridLocation:(EXTIntPoint)gridLocation
+                         gridSpacing:(CGFloat)gridSpacing;
 @end
 
 
@@ -41,32 +52,10 @@
 
 @protocol EXTChartViewDataSource <NSObject>
 
-- (CGLayerRef)chartView:(EXTChartView *)chartView layerForTermCount:(NSInteger)count;
-- (NSArray *)chartView:(EXTChartView *)chartView termCountsInGridRect:(EXTIntRect)gridRect; // an array of EXTChartViewTermCountData
-- (NSArray *)chartView:(EXTChartView *)chartView differentialsInRect:(NSRect)gridRect; // an array of EXTChartViewDifferentialData
-- (NSArray *)chartView:(EXTChartView *)chartView multAnnotationsInRect:(NSRect)gridRect; // an array of {style, array of EXTChartViewMultAnnotationData}
-- (NSArray *)chartViewBackgroundRectsForSelectedObject:(EXTChartView *)chartView; // an array of NSRects
-- (NSBezierPath *)chartView:(EXTChartView *)chartView highlightPathForToolAtGridLocation:(EXTIntPoint)gridLocation;
-@end
+- (NSArray *)chartView:(EXTChartView *)chartView termCellsInGridRect:(EXTIntRect)gridRect; // an array of EXTChartViewModelTermCell
+- (NSArray *)chartView:(EXTChartView *)chartView differentialsInGridRect:(EXTIntRect)gridRect; // an array of EXTChartViewModelDifferential
+- (NSArray *)chartView:(EXTChartView *)chartView multAnnotationsInRect:(EXTIntRect)gridRect; // an array of {style, array of EXTChartViewMultAnnotationData}
 
-
-@interface EXTChartViewTermCountData : NSObject
-@property (nonatomic, assign) EXTIntPoint point;
-@property (nonatomic, assign) NSInteger count;
-+ (instancetype)chartViewTermCountDataWithCount:(NSInteger)count atGridPoint:(EXTIntPoint)gridPoint;
-@end
-
-
-@interface EXTChartViewDifferentialData : NSObject
-@property (nonatomic, assign) NSPoint start;
-@property (nonatomic, assign) NSPoint end;
-+ (instancetype)chartViewDifferentialDataWithStart:(NSPoint)start end:(NSPoint)end;
-@end
-
-@interface EXTChartViewMultAnnotationData : NSObject
-@property (nonatomic, assign) NSPoint start;
-@property (nonatomic, assign) NSPoint end;
-+ (instancetype)chartViewMultAnnotationDataWithStart:(NSPoint)start end:(NSPoint)end;
 @end
 
 #pragma mark - Exported variables

@@ -15,10 +15,10 @@
 
 
 @interface EXTChartViewController : NSViewController
-@property(nonatomic, readonly) EXTChartView *chartView;
-@property(nonatomic, weak) id selectedObject;
-@property(nonatomic, weak) EXTLeibnizWindowController *leibnizWindowController;
-@property(nonatomic, assign) int currentPage;
+@property (nonatomic, readonly) EXTChartView *chartView;
+@property (nonatomic, weak) EXTLeibnizWindowController *leibnizWindowController;
+@property (nonatomic, assign) int currentPage;
+@property (nonatomic, readonly, weak) id selectedObject;
 
 // Designated initialiser
 - (instancetype)initWithDocument:(EXTDocument *)document;

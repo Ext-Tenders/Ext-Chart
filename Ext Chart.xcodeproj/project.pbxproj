@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		093AEADD13E10759003E9F58 /* EXTPair.m in Sources */ = {isa = PBXBuildFile; fileRef = 093AEADC13E10759003E9F58 /* EXTPair.m */; };
+		141C8D3A196FCDAB0037A716 /* NSValue+EXTIntPoint.m in Sources */ = {isa = PBXBuildFile; fileRef = 141C8D39196FCDAB0037A716 /* NSValue+EXTIntPoint.m */; };
 		1435D32F194C10FA00863A90 /* EXTChartRulerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1435D32E194C10FA00863A90 /* EXTChartRulerView.m */; };
 		143F3DFE176D615100FB92B3 /* EXTUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 143F3DFD176D615100FB92B3 /* EXTUtilities.m */; };
 		144709A51946CDF8009C6958 /* EXTChartViewModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 144709A41946CDF8009C6958 /* EXTChartViewModel.m */; };
@@ -26,6 +27,9 @@
 		149831A717AE65EA000380A5 /* KUhC2 Example.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 149831A317AE65EA000380A5 /* KUhC2 Example.pdf */; };
 		149831A817AE65EA000380A5 /* Random Example.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 149831A417AE65EA000380A5 /* Random Example.pdf */; };
 		149831A917AE65EA000380A5 /* S5 Example.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 149831A517AE65EA000380A5 /* S5 Example.pdf */; };
+		14AA9E4219668A2200A709F1 /* EXTTermLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 14AA9E4119668A2200A709F1 /* EXTTermLayer.m */; };
+		14AA9E4619668D8900A709F1 /* EXTDifferentialLineLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 14AA9E4519668D8900A709F1 /* EXTDifferentialLineLayer.m */; };
+		14BCCBAD1961489E0019FEC3 /* EXTChartClipView.m in Sources */ = {isa = PBXBuildFile; fileRef = 14BCCBAC1961489E0019FEC3 /* EXTChartClipView.m */; };
 		14CCA38C1794F21D002EF861 /* ArtBoardTool.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 14CCA3891794F21D002EF861 /* ArtBoardTool.pdf */; };
 		14CCA38E1794F21D002EF861 /* Ext Chart.iconset in Resources */ = {isa = PBXBuildFile; fileRef = 14CCA38B1794F21D002EF861 /* Ext Chart.iconset */; };
 		14CD477117F00273007D71F1 /* EXTMarquee.m in Sources */ = {isa = PBXBuildFile; fileRef = 14CD477017F00273007D71F1 /* EXTMarquee.m */; };
@@ -106,8 +110,11 @@
 		093AEADC13E10759003E9F58 /* EXTPair.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTPair.m; sourceTree = "<group>"; };
 		1058C7A7FEA54F5311CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		13E42FBA07B3F13500E4EEF1 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
+		141C8D38196FCDAB0037A716 /* NSValue+EXTIntPoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSValue+EXTIntPoint.h"; sourceTree = "<group>"; };
+		141C8D39196FCDAB0037A716 /* NSValue+EXTIntPoint.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSValue+EXTIntPoint.m"; sourceTree = "<group>"; };
 		1435D32D194C10FA00863A90 /* EXTChartRulerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTChartRulerView.h; sourceTree = "<group>"; };
 		1435D32E194C10FA00863A90 /* EXTChartRulerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTChartRulerView.m; sourceTree = "<group>"; };
+		143976851966A47000D8FE87 /* EXTChartViewInteraction.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EXTChartViewInteraction.h; sourceTree = "<group>"; };
 		143F3DFC176D615100FB92B3 /* EXTUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTUtilities.h; sourceTree = "<group>"; };
 		143F3DFD176D615100FB92B3 /* EXTUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTUtilities.m; sourceTree = "<group>"; };
 		144709A31946CDF8009C6958 /* EXTChartViewModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTChartViewModel.h; sourceTree = "<group>"; };
@@ -137,6 +144,13 @@
 		149831A417AE65EA000380A5 /* Random Example.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = "Random Example.pdf"; path = "Images/Random Example.pdf"; sourceTree = "<group>"; };
 		149831A517AE65EA000380A5 /* S5 Example.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = "S5 Example.pdf"; path = "Images/S5 Example.pdf"; sourceTree = "<group>"; };
 		149A0EA6176C409C006F6142 /* NSCursor+EXTApplePrivate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSCursor+EXTApplePrivate.h"; sourceTree = "<group>"; };
+		14AA9E4019668A2200A709F1 /* EXTTermLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTTermLayer.h; sourceTree = "<group>"; };
+		14AA9E4119668A2200A709F1 /* EXTTermLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTTermLayer.m; sourceTree = "<group>"; };
+		14AA9E4419668D8900A709F1 /* EXTDifferentialLineLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTDifferentialLineLayer.h; sourceTree = "<group>"; };
+		14AA9E4519668D8900A709F1 /* EXTDifferentialLineLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTDifferentialLineLayer.m; sourceTree = "<group>"; };
+		14AAADA0196DC85E00ED8FEA /* EXTChartInteractionType.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EXTChartInteractionType.h; sourceTree = "<group>"; };
+		14BCCBAB1961489E0019FEC3 /* EXTChartClipView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTChartClipView.h; sourceTree = "<group>"; usesTabs = 0; };
+		14BCCBAC1961489E0019FEC3 /* EXTChartClipView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTChartClipView.m; sourceTree = "<group>"; usesTabs = 0; };
 		14CCA3891794F21D002EF861 /* ArtBoardTool.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = ArtBoardTool.pdf; path = Images/ArtBoardTool.pdf; sourceTree = "<group>"; };
 		14CCA38B1794F21D002EF861 /* Ext Chart.iconset */ = {isa = PBXFileReference; lastKnownFileType = folder.iconset; name = "Ext Chart.iconset"; path = "Images/Ext Chart.iconset"; sourceTree = "<group>"; };
 		14CD476F17F00273007D71F1 /* EXTMarquee.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTMarquee.h; sourceTree = "<group>"; };
@@ -322,6 +336,8 @@
 				14741D7117B7535A00AF73D9 /* NSUserDefaults+EXTAdditions.m */,
 				14F16A1417D34EE5002EACD3 /* NSKeyedArchiver+EXTAdditions.h */,
 				14F16A1517D34EE5002EACD3 /* NSKeyedArchiver+EXTAdditions.m */,
+				141C8D38196FCDAB0037A716 /* NSValue+EXTIntPoint.h */,
+				141C8D39196FCDAB0037A716 /* NSValue+EXTIntPoint.m */,
 			);
 			name = "System Categories";
 			sourceTree = "<group>";
@@ -370,6 +386,18 @@
 				3187BA2313DC6C6C00C26803 /* EXTScrollView.h */,
 				3187BA2413DC6C6C00C26803 /* EXTScrollView.m */,
 				1462B38917D19D4A00BFDF50 /* EXTToolboxTag.h */,
+				144709A31946CDF8009C6958 /* EXTChartViewModel.h */,
+				144709A41946CDF8009C6958 /* EXTChartViewModel.m */,
+				1435D32D194C10FA00863A90 /* EXTChartRulerView.h */,
+				1435D32E194C10FA00863A90 /* EXTChartRulerView.m */,
+				14BCCBAB1961489E0019FEC3 /* EXTChartClipView.h */,
+				14BCCBAC1961489E0019FEC3 /* EXTChartClipView.m */,
+				14AA9E4019668A2200A709F1 /* EXTTermLayer.h */,
+				14AA9E4119668A2200A709F1 /* EXTTermLayer.m */,
+				14AA9E4419668D8900A709F1 /* EXTDifferentialLineLayer.h */,
+				14AA9E4519668D8900A709F1 /* EXTDifferentialLineLayer.m */,
+				143976851966A47000D8FE87 /* EXTChartViewInteraction.h */,
+				14AAADA0196DC85E00ED8FEA /* EXTChartInteractionType.h */,
 			);
 			name = Views;
 			sourceTree = "<group>";
@@ -667,6 +695,7 @@
 				31D403BB13DA0476006A8C06 /* EXTTerm.m in Sources */,
 				31D403C013DA04D8006A8C06 /* EXTDifferential.m in Sources */,
 				3187BA2713DC6C6C00C26803 /* EXTScrollView.m in Sources */,
+				14BCCBAD1961489E0019FEC3 /* EXTChartClipView.m in Sources */,
 				093AEADD13E10759003E9F58 /* EXTPair.m in Sources */,
 				381A4800194E12BA005054BD /* EXTTermInspectorViewController.m in Sources */,
 				31C77BA813E63F6800E9DBFC /* EXTAppController.m in Sources */,
@@ -686,6 +715,8 @@
 				144709A51946CDF8009C6958 /* EXTChartViewModel.m in Sources */,
 				1467B26E178CF15E0084A2F6 /* EXTDocumentInspectorView.m in Sources */,
 				385BF11017AAD8D5008CA5B6 /* EXTGeneratorInspectorViewController.m in Sources */,
+				14AA9E4219668A2200A709F1 /* EXTTermLayer.m in Sources */,
+				14AA9E4619668D8900A709F1 /* EXTDifferentialLineLayer.m in Sources */,
 				149831A017AE04F3000380A5 /* EXTNewDocumentWindowController.m in Sources */,
 				14CD477117F00273007D71F1 /* EXTMarquee.m in Sources */,
 				3869FCF817B4587100D0D740 /* EXTDifferentialPaneController.m in Sources */,
@@ -695,6 +726,7 @@
 				14E757CD17BF128F008BED48 /* EXTGridInspectorViewController.m in Sources */,
 				3897740517F78B5800C6AD2F /* EXTZeroRangesInspector.m in Sources */,
 				3804BF6E17C07D7300A74325 /* EXTMatrixEditor.m in Sources */,
+				141C8D3A196FCDAB0037A716 /* NSValue+EXTIntPoint.m in Sources */,
 				38F707B817CDCD9D002273B1 /* EXTLeibnizWindowController.m in Sources */,
 				386330A61960F6E600AB8D05 /* EXTMultAnnotationInspectorController.m in Sources */,
 				14F16A1617D34EE5002EACD3 /* NSKeyedArchiver+EXTAdditions.m in Sources */,

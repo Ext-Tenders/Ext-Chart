@@ -18,7 +18,6 @@
 @property (nonatomic, strong) EXTChartViewModel *chartViewModel;
 
 @property (nonatomic, assign) EXTIntRect baseGridRect;
-@property (nonatomic, assign) NSRect baseRect;
 @end
 
 @implementation EXTTestCaseS5Demo
@@ -36,7 +35,6 @@
     self.chartViewModel.grid = self.grid;
 
     self.baseGridRect = (EXTIntRect){{0, 0}, {2, 5}};
-    self.baseRect = (NSRect){{0, 0}, {100, 100}};
 }
 
 - (void)goToPage:(NSInteger)targetPage
@@ -55,12 +53,12 @@
     XCTAssertEqual(termCounts.count, 6, "S5 should have exactly six term counts = six terms in page 0");
 
     NSArray *expectedTermsArray = @[
-                                    [EXTChartViewTermCountData chartViewTermCountDataWithCount:1 atGridPoint:(EXTIntPoint){0, 0}],
-                                    [EXTChartViewTermCountData chartViewTermCountDataWithCount:1 atGridPoint:(EXTIntPoint){1, 4}],
-                                    [EXTChartViewTermCountData chartViewTermCountDataWithCount:1 atGridPoint:(EXTIntPoint){0, 2}],
-                                    [EXTChartViewTermCountData chartViewTermCountDataWithCount:1 atGridPoint:(EXTIntPoint){1, 0}],
-                                    [EXTChartViewTermCountData chartViewTermCountDataWithCount:1 atGridPoint:(EXTIntPoint){0, 4}],
-                                    [EXTChartViewTermCountData chartViewTermCountDataWithCount:1 atGridPoint:(EXTIntPoint){1, 2}],
+                                    [EXTChartViewTermCountData chartViewTermCountDataWithCount:1 location:(EXTIntPoint){0, 0}],
+                                    [EXTChartViewTermCountData chartViewTermCountDataWithCount:1 location:(EXTIntPoint){1, 4}],
+                                    [EXTChartViewTermCountData chartViewTermCountDataWithCount:1 location:(EXTIntPoint){0, 2}],
+                                    [EXTChartViewTermCountData chartViewTermCountDataWithCount:1 location:(EXTIntPoint){1, 0}],
+                                    [EXTChartViewTermCountData chartViewTermCountDataWithCount:1 location:(EXTIntPoint){0, 4}],
+                                    [EXTChartViewTermCountData chartViewTermCountDataWithCount:1 location:(EXTIntPoint){1, 2}],
                                     ];
     NSSet *expectedTerms = [NSSet setWithArray:expectedTermsArray];
     NSSet *computedTerms = [NSSet setWithArray:termCounts];
@@ -71,7 +69,7 @@
 {
     [self goToPage:0];
 
-    NSArray *diffs = [self.chartViewModel chartView:nil differentialsInRect:self.baseRect];
+    NSArray *diffs = [self.chartViewModel chartView:nil differentialsInGridRect:self.baseGridRect];
     XCTAssertEqual(diffs.count, 0, @"There should be no differentials on page 0");
 }
 
@@ -79,7 +77,7 @@
 {
     [self goToPage:1];
 
-    NSArray *diffs = [self.chartViewModel chartView:nil differentialsInRect:self.baseRect];
+    NSArray *diffs = [self.chartViewModel chartView:nil differentialsInGridRect:self.baseGridRect];
     XCTAssertEqual(diffs.count, 0, @"There should be no differentials on page 1");
 }
 
@@ -87,12 +85,12 @@
 {
     [self goToPage:2];
 
-    NSArray *diffs = [self.chartViewModel chartView:nil differentialsInRect:self.baseRect];
+    NSArray *diffs = [self.chartViewModel chartView:nil differentialsInGridRect:self.baseGridRect];
     XCTAssertEqual(diffs.count, 2, @"There should be two differentials on page 2");
 
     NSArray *expectedDiffsArray = @[
-                                    [EXTChartViewDifferentialData chartViewDifferentialDataWithStart:(NSPoint){12, 4.5} end:(NSPoint){5.0999999999999996, 22.5}],
-                                    [EXTChartViewDifferentialData chartViewDifferentialDataWithStart:(NSPoint){12, 22.5} end:(NSPoint){5.0999999999999996, 40.5}],
+                                    [EXTChartViewDifferentialData chartViewDifferentialDataWithStartLocation:(EXTIntPoint){1, 0} startIndex:0 endLocation:(EXTIntPoint){0, 2} endIndex:0],
+                                    [EXTChartViewDifferentialData chartViewDifferentialDataWithStartLocation:(EXTIntPoint){1, 2} startIndex:0 endLocation:(EXTIntPoint){0, 4} endIndex:0],
                                     ];
     NSSet *expectedDiffs = [NSSet setWithArray:expectedDiffsArray];
     NSSet *computedDiffs = [NSSet setWithArray:diffs];
