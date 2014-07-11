@@ -1,5 +1,5 @@
 //
-//  EXTDifferentialLayer.h
+//  EXTDifferentialLineLayer.h
 //  Ext Chart
 //
 //  Created by Bavarious on 04/07/2014.
@@ -10,9 +10,12 @@
 #import "EXTChartViewInteraction.h"
 
 @class EXTChartViewModelDifferential;
+@class EXTChartViewModelDifferentialLine;
 
-@interface EXTDifferentialLayer : CAShapeLayer <EXTChartViewInteraction>
+
+@interface EXTDifferentialLineLayer : CAShapeLayer <EXTChartViewInteraction>
 @property (nonatomic, strong) EXTChartViewModelDifferential *differential;
+@property (nonatomic, strong) EXTChartViewModelDifferentialLine *line;
 
 @property (nonatomic, assign) CGFloat defaultZPosition;
 @property (nonatomic, assign) CGFloat selectedZPosition;

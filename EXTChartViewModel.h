@@ -14,6 +14,7 @@
 @class EXTDifferential;
 @class EXTGrid;
 @class EXTChartViewModelTermCell;
+@class EXTChartViewModelDifferential;
 
 
 @interface EXTChartViewModel : NSObject
@@ -43,9 +44,6 @@
 
 /// An array of EXTChartViewModelTerm objects.
 @property (nonatomic, readonly, strong) NSArray *terms;
-
-/// An array of EXTChartViewModelDifferential objects whose start terms are located in this cell.
-@property (nonatomic, readonly, strong) NSArray *differentials;
 @end
 
 
@@ -54,15 +52,22 @@
 @property (nonatomic, readonly, strong) EXTTerm *modelTerm;
 @property (nonatomic, readonly, assign) NSInteger dimension;
 
-/// An array of EXTChartViewModelDifferential objects that start at this term.
-@property (nonatomic, readonly) NSArray *differentials;
+/// There’s at most one differential per (term, page).
+@property (nonatomic, readonly, weak) EXTChartViewModelDifferential *differential;
 @end
 
 
 @interface EXTChartViewModelDifferential : NSObject
 @property (nonatomic, readonly, strong) EXTDifferential *modelDifferential;
 @property (nonatomic, readonly, strong) EXTChartViewModelTerm *startTerm;
-@property (nonatomic, readonly, assign) NSInteger startIndex;
 @property (nonatomic, readonly, strong) EXTChartViewModelTerm *endTerm;
+
+/// An array of EXTChartViewModelDifferentialLine objects.
+@property (nonatomic, readonly, copy) NSArray *lines;
+@end
+
+
+@interface EXTChartViewModelDifferentialLine : NSObject
+@property (nonatomic, readonly, assign) NSInteger startIndex;
 @property (nonatomic, readonly, assign) NSInteger endIndex;
 @end

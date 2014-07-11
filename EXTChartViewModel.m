@@ -30,28 +30,30 @@
 @interface EXTChartViewModelTermCell ()
 @property (nonatomic, readwrite, assign) NSInteger totalRank;
 @property (nonatomic, strong) NSMutableArray *privateTerms;
-@property (nonatomic, strong) NSMutableArray *privateDifferentials;
 @property (nonatomic, assign) NSInteger numberOfReferencedTerms;
 + (instancetype)termCellAtGridLocation:(EXTIntPoint)gridLocation;
 - (void)addTerm:(EXTChartViewModelTerm *)term withDimension:(NSInteger)dimension;
-- (void)addDifferential:(EXTChartViewModelDifferential *)differential;
 @end
 
 
 @interface EXTChartViewModelTerm ()
+@property (nonatomic, readwrite, weak) EXTChartViewModelDifferential *differential;
 @property (nonatomic, weak) EXTChartViewModelTermCell *termCell;
-@property (nonatomic, strong) NSMutableArray *privateDifferentials;
 + (instancetype)viewModelTermWithModelTerm:(EXTTerm *)modelTerm gridLocation:(EXTIntPoint)gridLocation;
-- (void)addDifferential:(EXTChartViewModelDifferential *)differential;
 @end
 
 
 @interface EXTChartViewModelDifferential ()
+@property (nonatomic, strong) NSMutableArray *privateLines;
 + (instancetype)viewModelDifferentialWithModelDifferential:(EXTDifferential *)modelDifferential
                                                  startTerm:(EXTChartViewModelTerm *)startTerm
-                                                startIndex:(NSInteger)startIndex
-                                                   endTerm:(EXTChartViewModelTerm *)endTerm
-                                                  endIndex:(NSInteger)endIndex;
+                                                   endTerm:(EXTChartViewModelTerm *)endTerm;
+- (void)addLine:(EXTChartViewModelDifferentialLine *)line;
+@end
+
+
+@interface EXTChartViewModelDifferentialLine ()
++ (instancetype)viewModelDifferentialLineWithStartIndex:(NSInteger)startIndex endIndex:(NSInteger)endIndex;
 @end
 
 
@@ -154,19 +156,20 @@ static bool lineSegmentIntersectsLineSegment(NSPoint l1p1, NSPoint l1p2, NSPoint
             NSAssert(startTerm, @"Differential should have non nil start term");
             NSAssert(endTerm, @"Differential should have non nil end term");
 
+            EXTChartViewModelDifferential *diff = [EXTChartViewModelDifferential viewModelDifferentialWithModelDifferential:differential
+                                                                                                                  startTerm:startTerm
+                                                                                                                    endTerm:endTerm];
+            [differentials addObject:diff];
+            startTerm.differential = diff;
+
             for (NSInteger i = 0; i < imageSize; ++i) {
                 NSInteger startOffset = startTerm.termCell.numberOfReferencedTerms;
                 NSInteger endOffset = endTerm.termCell.numberOfReferencedTerms;
                 startTerm.termCell.numberOfReferencedTerms += 1;
                 endTerm.termCell.numberOfReferencedTerms += 1;
 
-                EXTChartViewModelDifferential *diff = [EXTChartViewModelDifferential viewModelDifferentialWithModelDifferential:differential
-                                                                                                                      startTerm:startTerm
-                                                                                                                     startIndex:startOffset
-                                                                                                                        endTerm:endTerm
-                                                                                                                       endIndex:endOffset];
-                [differentials addObject:diff];
-                [startTerm addDifferential:diff];
+                EXTChartViewModelDifferentialLine *line = [EXTChartViewModelDifferentialLine viewModelDifferentialLineWithStartIndex:startOffset endIndex:endOffset];
+                [diff addLine:line];
             }
         }
     }
@@ -199,23 +202,35 @@ static bool lineSegmentIntersectsLineSegment(NSPoint l1p1, NSPoint l1p2, NSPoint
                 break;
             }
 
-            EXTChartViewModelTerm *currentTerm = ([self.selectedObject isKindOfClass:[EXTChartViewModelDifferential class]] ?
-                                                  ((EXTChartViewModelDifferential *)self.selectedObject).startTerm :
-                                                  nil);
-            NSUInteger newSelectionIndex = [self indexOfObjectInArray:currentTerm.differentials afterObjectIdenticalTo:self.selectedObject];
-            if (newSelectionIndex != NSNotFound) {
-                self.selectedObject = currentTerm.differentials[newSelectionIndex];
-                break;
+            // First, let’s check if the currently selected object is a differential whose start term is located at
+            // the selected grid cell
+            EXTChartViewModelTerm *selectedTermInCell = nil;
+            if ([self.selectedObject isKindOfClass:[EXTChartViewModelDifferential class]]) {
+                EXTChartViewModelTerm *selectedTerm = ((EXTChartViewModelDifferential *)self.selectedObject).startTerm;
+                if (selectedTerm.termCell == termCell) selectedTermInCell = selectedTerm;
             }
 
-            const NSUInteger nextTermIndex = [self indexOfObjectInArray:termCell.terms afterObjectIdenticalTo:currentTerm];
+            NSUInteger nextTermIndex;
+
+            // If the selected term is located in this cell, try to select the differential for the next term in that cell
+            if (selectedTermInCell) {
+                nextTermIndex = [self indexOfObjectInArray:termCell.terms afterObjectIdenticalTo:selectedTermInCell];
+            }
+            // Otherwise, try to select the first differential--the first term that has a differential
+            else {
+                nextTermIndex = [termCell.terms indexOfObjectPassingTest:^BOOL(EXTChartViewModelTerm *term, NSUInteger idx, BOOL *stop) {
+                    return term.differential != nil;
+                }];
+            }
+
             if (nextTermIndex != NSNotFound) {
-                EXTChartViewModelTerm *nextTerm = termCell.terms[nextTermIndex];
-                self.selectedObject = nextTerm.differentials.firstObject;
-                break;
+                EXTChartViewModelTerm *newTerm = termCell.terms[nextTermIndex];
+                self.selectedObject = newTerm.differential;
+            }
+            else {
+                self.selectedObject = nil;
             }
 
-            self.selectedObject = nil;
             break;
         }
 
@@ -326,17 +341,6 @@ static bool lineSegmentIntersectsLineSegment(NSPoint l1p1, NSPoint l1p2, NSPoint
 
 
 @implementation EXTChartViewModelTerm
-@dynamic differentials;
-
-- (instancetype)init
-{
-    self = [super init];
-    if (self) {
-        _privateDifferentials = [NSMutableArray new];
-    }
-    return self;
-}
-
 + (instancetype)viewModelTermWithModelTerm:(EXTTerm *)modelTerm gridLocation:(EXTIntPoint)gridLocation
 {
     EXTChartViewModelTerm *newTerm = [[self class] new];
@@ -346,30 +350,17 @@ static bool lineSegmentIntersectsLineSegment(NSPoint l1p1, NSPoint l1p2, NSPoint
     }
     return newTerm;
 }
-
-- (void)addDifferential:(EXTChartViewModelDifferential *)differential
-{
-    [self.privateDifferentials addObject:differential];
-    [self.termCell addDifferential:differential];
-}
-
-- (NSArray *)differentials
-{
-    return [self.privateDifferentials copy];
-}
 @end
 
 
 @implementation EXTChartViewModelTermCell
 @dynamic terms;
-@dynamic differentials;
 
 - (instancetype)init
 {
     self = [super init];
     if (self) {
         _privateTerms = [NSMutableArray new];
-        _privateDifferentials = [NSMutableArray new];
     }
     return self;
 }
@@ -389,38 +380,58 @@ static bool lineSegmentIntersectsLineSegment(NSPoint l1p1, NSPoint l1p2, NSPoint
     self.totalRank += dimension;
 }
 
-- (void)addDifferential:(EXTChartViewModelDifferential *)differential
-{
-    [self.privateDifferentials addObject:differential];
-}
-
 - (NSArray *)terms
 {
     return [self.privateTerms copy];
 }
-
-- (NSArray *)differentials
-{
-    return [self.privateDifferentials copy];
-}
 @end
 
 @implementation EXTChartViewModelDifferential
+@dynamic lines;
+
 + (instancetype)viewModelDifferentialWithModelDifferential:(EXTDifferential *)modelDifferential
                                                  startTerm:(EXTChartViewModelTerm *)startTerm
-                                        startIndex:(NSInteger)startIndex
-                                           endTerm:(EXTChartViewModelTerm *)endTerm
-                                          endIndex:(NSInteger)endIndex
+                                                   endTerm:(EXTChartViewModelTerm *)endTerm
 {
     EXTChartViewModelDifferential *newDiff = [[self class] new];
     if (newDiff) {
         newDiff->_modelDifferential = modelDifferential;
         newDiff->_startTerm = startTerm;
-        newDiff->_startIndex = startIndex;
         newDiff->_endTerm = endTerm;
-        newDiff->_endIndex = endIndex;
     }
     return newDiff;
+}
+
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        _privateLines = [NSMutableArray array];
+    }
+    return self;
+}
+
+- (void)addLine:(EXTChartViewModelDifferentialLine *)line
+{
+    [self.privateLines addObject:line];
+}
+
+- (NSArray *)lines
+{
+    return [self.privateLines copy];
+}
+@end
+
+
+@implementation EXTChartViewModelDifferentialLine
++ (instancetype)viewModelDifferentialLineWithStartIndex:(NSInteger)startIndex endIndex:(NSInteger)endIndex
+{
+    EXTChartViewModelDifferentialLine *newLine = [[self class] new];
+    if (newLine) {
+        newLine->_startIndex = startIndex;
+        newLine->_endIndex = endIndex;
+    }
+    return newLine;
 }
 @end
 

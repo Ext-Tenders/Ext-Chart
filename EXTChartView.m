@@ -14,7 +14,7 @@
 #import "EXTArtBoard.h"
 #import "EXTChartViewModel.h"
 #import "EXTTermLayer.h"
-#import "EXTDifferentialLayer.h"
+#import "EXTDifferentialLineLayer.h"
 #import "EXTChartViewInteraction.h"
 #import "NSUserDefaults+EXTAdditions.h"
 
@@ -81,10 +81,10 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
     CALayer *_artBoardBorderLayer;
 
     NSArray *_termLayers;
-    NSArray *_differentialLayers;
+    NSArray *_differentialLineLayers;
 
     NSArray *_highlightedLayers; // an array of CALayer<EXTChartViewInteraction> objects, or nil
-    CALayer<EXTChartViewInteraction> *_selectedLayer;
+    NSSet *_selectedLayers;
 }
 
 
@@ -360,25 +360,16 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
 
     // Differentials
     {
-        [_differentialLayers makeObjectsPerformSelector:@selector(removeFromSuperlayer)];
+        [_differentialLineLayers makeObjectsPerformSelector:@selector(removeFromSuperlayer)];
 
-        NSMutableArray *newDifferentialLayers = [NSMutableArray new];
+        NSMutableArray *newDifferentialLineLayers = [NSMutableArray new];
 
         NSArray *differentials = [self.dataSource chartView:self differentialsInGridRect:reloadGridRect];
         for (EXTChartViewModelDifferential *diff in differentials) {
-            EXTDifferentialLayer *newDifferentialLayer = [EXTDifferentialLayer layer];
             const CGPoint start = [_grid convertPointToView:diff.startTerm.gridLocation];
             const CGPoint end = [_grid convertPointToView:diff.endTerm.gridLocation];
             const CGPoint origin = {MIN(start.x, end.x), MIN(start.y, end.y)};
             const CGSize size = {ABS(start.x - end.x), ABS(start.y - end.y)};
-            newDifferentialLayer.frame = (CGRect){origin, size};
-            newDifferentialLayer.differential = diff;
-            newDifferentialLayer.highlightColor = [_highlightColor CGColor];
-            newDifferentialLayer.selectionColor = [_selectionColor CGColor];
-            newDifferentialLayer.defaultZPosition = _kDifferentialZPosition;
-            newDifferentialLayer.selectedZPosition = _kSelectedDifferentialZPosition;
-            [newDifferentialLayers addObject:newDifferentialLayer];
-            [self.layer addSublayer:newDifferentialLayer];
 
             // FIXME: This is ugly, oh so ugly
             NSInteger startTotalRank = 0;
@@ -397,33 +388,45 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
                 }
             }
 
+            for (EXTChartViewModelDifferentialLine *line in diff.lines) {
+                EXTDifferentialLineLayer *newDifferentialLineLayer = [EXTDifferentialLineLayer layer];
+                newDifferentialLineLayer.frame = (CGRect){origin, size};
+                newDifferentialLineLayer.differential = diff;
+                newDifferentialLineLayer.line = line;
+                newDifferentialLineLayer.highlightColor = [_highlightColor CGColor];
+                newDifferentialLineLayer.selectionColor = [_selectionColor CGColor];
+                newDifferentialLineLayer.defaultZPosition = _kDifferentialZPosition;
+                newDifferentialLineLayer.selectedZPosition = _kSelectedDifferentialZPosition;
+                [newDifferentialLineLayers addObject:newDifferentialLineLayer];
+                [self.layer addSublayer:newDifferentialLineLayer];
 
-            const NSRect startDotRect = [EXTChartView dotBoundingBoxForTermCount:startTotalRank
-                                                                       termIndex:diff.startIndex
-                                                                    gridLocation:diff.startTerm.gridLocation
-                                                                     gridSpacing:_grid.gridSpacing];
-            const NSRect endDotRect = [EXTChartView dotBoundingBoxForTermCount:endTotalRank
-                                                                     termIndex:diff.endIndex
-                                                                  gridLocation:diff.endTerm.gridLocation
-                                                                   gridSpacing:_grid.gridSpacing];
+                const NSRect startDotRect = [EXTChartView dotBoundingBoxForTermCount:startTotalRank
+                                                                           termIndex:line.startIndex
+                                                                        gridLocation:diff.startTerm.gridLocation
+                                                                         gridSpacing:_grid.gridSpacing];
+                const NSRect endDotRect = [EXTChartView dotBoundingBoxForTermCount:endTotalRank
+                                                                         termIndex:line.endIndex
+                                                                      gridLocation:diff.endTerm.gridLocation
+                                                                       gridSpacing:_grid.gridSpacing];
 
-            const CGPoint startDotConnectionPoint = (startTotalRank <= 3 ?
-                                                     (CGPoint){NSMidX(startDotRect), NSMidY(startDotRect)} :
-                                                     (CGPoint){NSMinX(startDotRect), NSMidY(startDotRect)});
-            const CGPoint endDotConnectionPoint = (endTotalRank <= 3 ?
-                                                   (CGPoint){NSMidX(endDotRect), NSMidY(endDotRect)} :
-                                                   (CGPoint){NSMaxX(endDotRect), NSMidY(endDotRect)});
-            const CGPoint startInLayer = [newDifferentialLayer convertPoint:startDotConnectionPoint fromLayer:self.layer];
-            const CGPoint endInLayer = [newDifferentialLayer convertPoint:endDotConnectionPoint fromLayer:self.layer];
+                const CGPoint startDotConnectionPoint = (startTotalRank <= 3 ?
+                                                         (CGPoint){NSMidX(startDotRect), NSMidY(startDotRect)} :
+                                                         (CGPoint){NSMinX(startDotRect), NSMidY(startDotRect)});
+                const CGPoint endDotConnectionPoint = (endTotalRank <= 3 ?
+                                                       (CGPoint){NSMidX(endDotRect), NSMidY(endDotRect)} :
+                                                       (CGPoint){NSMaxX(endDotRect), NSMidY(endDotRect)});
+                const CGPoint startInLayer = [newDifferentialLineLayer convertPoint:startDotConnectionPoint fromLayer:self.layer];
+                const CGPoint endInLayer = [newDifferentialLineLayer convertPoint:endDotConnectionPoint fromLayer:self.layer];
 
-            CGMutablePathRef path = CGPathCreateMutable();
-            CGPathMoveToPoint(path, NULL, startInLayer.x, startInLayer.y);
-            CGPathAddLineToPoint(path, NULL, endInLayer.x, endInLayer.y);
-            newDifferentialLayer.path = path;
-            CGPathRelease(path);
+                CGMutablePathRef path = CGPathCreateMutable();
+                CGPathMoveToPoint(path, NULL, startInLayer.x, startInLayer.y);
+                CGPathAddLineToPoint(path, NULL, endInLayer.x, endInLayer.y);
+                newDifferentialLineLayer.path = path;
+                CGPathRelease(path);
+            }
         }
 
-        _differentialLayers = [newDifferentialLayers copy];
+        _differentialLineLayers = [newDifferentialLineLayers copy];
     }
 }
 
@@ -499,7 +502,7 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
     const NSPoint currentMouseLocation = [self convertPoint:[[self window] mouseLocationOutsideOfEventStream] fromView:nil];
     if (NSPointInRect(currentMouseLocation, dataRect)) {
         const EXTIntPoint mouseLocationInGrid = [_grid convertPointFromView:currentMouseLocation];
-        for (EXTDifferentialLayer *layer in _differentialLayers) {
+        for (EXTDifferentialLineLayer *layer in _differentialLineLayers) {
             if (EXTEqualIntPoints(layer.differential.startTerm.gridLocation, mouseLocationInGrid)) {
                 [layersToHighlight addObject:layer];
             }
@@ -774,17 +777,19 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
         }
     }
 
+    CAShapeLayer<EXTChartViewInteraction> *selectedLayer = _selectedLayers.anyObject;
+
     // FIXME: Need to think about this. We can click a term cell multiple times and the selection *changes* if there
     //        are multiple terms located on that cell, and we may want to distinguish this visually
 //    if (_selectedLayer != layerToSelect) {
         [CATransaction begin];
         {
-            if (_selectedLayer != layerToSelect) {
+            if (selectedLayer != layerToSelect) {
             {
                 [CATransaction setAnimationDuration:_kTermHighlightRemoveAnimationDuration];
                 [CATransaction setAnimationTimingFunction:[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseIn]];
 
-                _selectedLayer.selected = false;
+                selectedLayer.selected = false;
             }
             }
             {
@@ -796,7 +801,7 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
         }
         [CATransaction commit];
 
-        _selectedLayer = layerToSelect;
+        _selectedLayers = [NSSet setWithObject:layerToSelect];
 //    }
 }
 
@@ -804,13 +809,16 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
 {
     NSAssert([self.selectedObject isKindOfClass:[EXTChartViewModelDifferential class]], @"Mismatched selected object");
 
-    CAShapeLayer<EXTChartViewInteraction> *layerToSelect = nil;
+    NSMutableSet *layersToSelect = [NSMutableSet new];
 
-    for (EXTDifferentialLayer *layer in _differentialLayers) {
+    for (EXTDifferentialLineLayer *layer in _differentialLineLayers) {
         if (layer.differential == self.selectedObject) {
-            layerToSelect = layer;
+            [layersToSelect addObject:layer];
         }
     }
+
+    NSMutableSet *layersToRemoveSelection = [_selectedLayers mutableCopy];
+    [layersToRemoveSelection minusSet:layersToSelect];
 
     [CATransaction begin];
     {
@@ -818,23 +826,22 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
 
         {
             [CATransaction setAnimationDuration:_kDifferentialHighlightRemoveAnimationDuration];
+            for (CALayer<EXTChartViewInteraction> *layer in layersToRemoveSelection) layer.selected = false;
 
-            _selectedLayer.selected = false;
         }
         {
             [CATransaction setAnimationDuration:_kDifferentialHighlightAddAnimationDuration];
-
-            layerToSelect.selected = true;
+            for (CALayer<EXTChartViewInteraction> *layer in layersToSelect) layer.selected = true;
         }
     }
     [CATransaction commit];
 
-    _selectedLayer = layerToSelect;
+    _selectedLayers = [layersToSelect copy];
 }
 
 - (void)reflectNoSelection
 {
-    _selectedLayer.selected = false;
+    for (CALayer<EXTChartViewInteraction> *layer in _selectedLayers) layer.selected = false;
 }
 
 #pragma mark - Resizing

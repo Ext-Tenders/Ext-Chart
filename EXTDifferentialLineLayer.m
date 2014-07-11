@@ -1,12 +1,12 @@
 //
-//  EXTDifferentialLayer.m
+//  EXTDifferentialLineLayer.m
 //  Ext Chart
 //
 //  Created by Bavarious on 04/07/2014.
 //  Copyright (c) 2014 Harvard University. All rights reserved.
 //
 
-#import "EXTDifferentialLayer.h"
+#import "EXTDifferentialLineLayer.h"
 
 #pragma mark - Private variables
 
@@ -18,7 +18,7 @@ static const CGFloat _kHighlightedDifferentialLineWidth = _kDifferentialLineWidt
 static CGColorRef _differentialStrokeColor;
 
 
-@implementation EXTDifferentialLayer
+@implementation EXTDifferentialLineLayer
 
 @synthesize highlighted = _highlighted;
 @synthesize highlightColor = _highlightColor;
@@ -26,7 +26,7 @@ static CGColorRef _differentialStrokeColor;
 @synthesize selectionColor = _selectionColor;
 
 
-static void commonInit(EXTDifferentialLayer *self)
+static void commonInit(EXTDifferentialLineLayer *self)
 {
     self.lineWidth = _kDifferentialLineWidth;
     self.strokeColor = _differentialStrokeColor;
@@ -38,7 +38,7 @@ static void commonInit(EXTDifferentialLayer *self)
 
 + (void)initialize
 {
-    if (self == [EXTDifferentialLayer class]) {
+    if (self == [EXTDifferentialLineLayer class]) {
         _differentialStrokeColor = CGColorCreateCopy([[NSColor blackColor] CGColor]);
     }
 }
@@ -53,8 +53,8 @@ static void commonInit(EXTDifferentialLayer *self)
 - (instancetype)initWithLayer:(id)layer
 {
     self = [super init];
-    if (self && [layer isKindOfClass:[EXTDifferentialLayer class]]) {
-        EXTDifferentialLayer *otherLayer = layer;
+    if (self && [layer isKindOfClass:[EXTDifferentialLineLayer class]]) {
+        EXTDifferentialLineLayer *otherLayer = layer;
         _differential = otherLayer.differential;
 
         commonInit(self);

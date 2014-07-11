@@ -159,13 +159,22 @@ static void *_selectedToolTagContext = &_selectedToolTagContext;
 
     [self.chartViewModel selectObjectAtGridLocation:gridLocation];
 
-    // If we couldn’t select a differential, try to build one
+    // If we couldn’t select a differential, try to build one for the first term in that grid cell that doesn’t have
+    // a differential yet.
+    // Note that this code is in the view controller because the view & the view model do not currently handle empty
+    // differentials, and other parts of Ext Chart rely on the EXTChartViewController.selectedObject pointing to
+    // EXTDifferential
     if (!self.selectedObject && self.chartViewModel.interactionType == EXTChartInteractionTypeDifferential) {
         EXTChartViewModelTermCell *termCell = [self.chartViewModel termCellAtGridLocation:gridLocation];
         for (EXTChartViewModelTerm *term in termCell.terms) {
-            if (term.differentials.count > 0) continue;
-
+            // We ignore terms that already have a differential in this page.
+            // Since the view model ignores empty differentials, it is possible that a differential for this term
+            // has been created and the view model doesn’t know about it, so we need to query the model instead.
+            // TODO: Should the view model care about empty differentials as well? Food for thought.
             EXTLocation *sourceLoc = term.modelTerm.location;
+            EXTDifferential *diff = [_document.sseq findDifflWithSource:sourceLoc onPage:self.currentPage];
+            if (diff) continue;
+
             EXTLocation *endLoc = [[sourceLoc class] followDiffl:sourceLoc page:self.currentPage];
             EXTTerm *modelEndTerm = [_document.sseq findTerm:endLoc];
             if (!modelEndTerm) continue;
