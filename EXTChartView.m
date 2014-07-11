@@ -244,8 +244,6 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
 
 - (void)adjustContentForRect:(NSRect)rect
 {
-//    NSLog(@"Will prepare content for rect %@", NSStringFromRect(rect));
-
     [CATransaction begin];
     [CATransaction setDisableActions:YES];
     {
@@ -260,13 +258,11 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
     const NSInteger numberOfHorizontalLines = (NSInteger)ceil(rect.size.height / spacing) + 1;
     const NSInteger numberOfVerticalLines = (NSInteger)ceil(rect.size.width / spacing) + 1;
 
-//    NSLog(@"Number of horizontal lines is %ld, vertical is %ld", (long)numberOfHorizontalLines, (long)numberOfVerticalLines);
     const CGPoint origin = {
         .x = floor(rect.origin.x / spacing) * spacing,
         .y = floor(rect.origin.y / spacing) * spacing,
     };
     const CGPoint originInSublayer = [_baseGridLayer convertPoint:origin fromLayer:self.layer];
-//    NSLog(@"Initial point is %@ in view, %@ in grid sublayer", NSStringFromPoint(origin), NSStringFromPoint(originInSublayer));
     CGPoint point = originInSublayer;
 
     CGMutablePathRef basePath = CGPathCreateMutable();
@@ -292,13 +288,11 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
     const bool crossesYAxis = NSMinX(rect) <= 0.0 && NSMaxX(rect) >= 0.0;
     const bool crossesXAxis = NSMinY(rect) <= 0.0 && NSMaxY(rect) >= 0.0;
 
-//    NSLog(@"crosses Y? %d X? %d, rect is %@", crossesYAxis, crossesXAxis, NSStringFromRect(rect));
-
     CGMutablePathRef axesPath = NULL;
     if (crossesXAxis || crossesYAxis) {
         axesPath = CGPathCreateMutable();
 
-        if (crossesXAxis) {
+        if (crossesYAxis) {
             const CGPoint p1 = [_axesGridLayer convertPoint:(CGPoint){0.0, NSMinY(rect)} fromLayer:self.layer];
             const CGPoint p2 = [_axesGridLayer convertPoint:(CGPoint){0.0, NSMaxY(rect)} fromLayer:self.layer];
 
@@ -306,7 +300,7 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
             CGPathAddLineToPoint(axesPath, NULL, p2.x, p2.y);
         }
 
-        if (crossesYAxis) {
+        if (crossesXAxis) {
             const CGPoint p1 = [_axesGridLayer convertPoint:(CGPoint){NSMinX(rect), 0.0} fromLayer:self.layer];
             const CGPoint p2 = [_axesGridLayer convertPoint:(CGPoint){NSMaxX(rect), 0.0} fromLayer:self.layer];
 
