@@ -15,10 +15,18 @@
 static CFMutableDictionaryRef _glyphPathCache;
 static CGColorRef _termCountFillColor;
 static CGColorRef _termCountStrokeColor;
-static const CGFloat _kTermCountLineWidth = 1.0;
+static const CGFloat _kTermCountLineWidth = 0.8;
 static const CGFloat _kTermCountSingleDigitFontSizeFactor = 0.7;
-static const CGFloat _kTermCountDoubleDigitFontSizeFactor = 0.55;
+static const CGFloat _kTermCountDoubleDigitFontSizeFactor = 0.4;
 static NSString * const _kTermCountFontName = @"Palatino-Roman";
+
+#pragma mark - Private classes
+
+@interface EXTTermLayerGlyphCacheKey : NSObject <NSCopying>
+@property (nonatomic, assign) CGFloat fontSize;
+@property (nonatomic, assign) CGGlyph glyph;
++ (instancetype)glyphCacheKeyWithFontSize:(CGFloat)fontSize glyph:(CGGlyph)glyph;
+@end
 
 
 @implementation EXTTermLayer
@@ -31,7 +39,7 @@ static NSString * const _kTermCountFontName = @"Palatino-Roman";
 + (void)initialize
 {
     if (self == [EXTTermLayer class]) {
-        _glyphPathCache = CFDictionaryCreateMutable(kCFAllocatorDefault, 0, NULL, &kCFTypeDictionaryValueCallBacks);
+        _glyphPathCache = CFDictionaryCreateMutable(kCFAllocatorDefault, 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
 
         _termCountFillColor = CGColorCreateCopy([[NSColor blackColor] CGColor]);
         _termCountStrokeColor = CGColorCreateCopy([[NSColor blackColor] CGColor]);
@@ -147,39 +155,28 @@ static NSString * const _kTermCountFontName = @"Palatino-Roman";
 }
 
 // From Apple’s CoreAnimationText sample code
-// _glyphPathCache is a two-level dictionary where the first key is the font, the second key is the glyph and the value is the corresponding path
 + (CGPathRef)pathForGlyph:(CGGlyph)glyph fromFont:(CTFontRef)font
 {
-    // First we lookup the font to get to its glyph dictionary
-    CFMutableDictionaryRef glyphDict = (CFMutableDictionaryRef)CFDictionaryGetValue(_glyphPathCache, font);
-    if(glyphDict == NULL)
-    {
-        // And if this font hasn't been seen before, we'll create and set the dictionary for it
-        glyphDict = CFDictionaryCreateMutable(kCFAllocatorDefault, 0, NULL, &kCFTypeDictionaryValueCallBacks);
-        CFDictionarySetValue(_glyphPathCache, font, glyphDict);
-        CFRelease(glyphDict);
-    }
-    // Next we try to get a path for the given glyph from the glyph dictionary
-    CGPathRef path = (CGPathRef)CFDictionaryGetValue(glyphDict, (const void *)(uintptr_t)glyph);
-    if(path == NULL)
-    {
-        // If the path hasn't been seen before, then we'll create the path from the font & glyph and cache it.
+    const CGFloat fontSize = CTFontGetSize(font);
+    EXTTermLayerGlyphCacheKey *cacheKey = [EXTTermLayerGlyphCacheKey glyphCacheKeyWithFontSize:fontSize glyph:glyph];
+    CGPathRef path = (CGPathRef)CFDictionaryGetValue(_glyphPathCache, (const void *)cacheKey);
+    if (path == NULL) {
         path = CTFontCreatePathForGlyph(font, glyph, NULL);
-        if(path == NULL)
-        {
-            // If a glyph does not have a path, then we need a placeholder to set in the dictionary
+        if (path == NULL) {
             path = (CGPathRef)kCFNull;
         }
-        CFDictionarySetValue(glyphDict, (const void *)(uintptr_t)glyph, path);
+
+        CFDictionarySetValue(_glyphPathCache, (const void *)cacheKey, path);
         CFRelease(path);
     }
-    if(path == (CGPathRef)kCFNull)
-    {
+
+    if (path == (CGPathRef)kCFNull) {
         // If we got the placeholder, then set the path to NULL
         // (this will happen either after discovering the glyph path is NULL,
         // or after looking that up in the dictionary).
         path = NULL;
     }
+    
     return path;
 }
 
@@ -257,4 +254,40 @@ static NSString * const _kTermCountFontName = @"Palatino-Roman";
     }
 }
 
+@end
+
+
+@implementation EXTTermLayerGlyphCacheKey
++ (instancetype)glyphCacheKeyWithFontSize:(CGFloat)fontSize glyph:(CGGlyph)glyph
+{
+    EXTTermLayerGlyphCacheKey *key = [EXTTermLayerGlyphCacheKey new];
+    if (key) {
+        key->_fontSize = fontSize;
+        key->_glyph = glyph;
+    }
+    return key;
+}
+
+- (instancetype)copyWithZone:(NSZone *)zone
+{
+    EXTTermLayerGlyphCacheKey *copy = [EXTTermLayerGlyphCacheKey new];
+    if (copy) {
+        copy->_fontSize = self->_fontSize;
+        copy->_glyph = self->_glyph;
+    }
+    return copy;
+}
+
+- (NSUInteger)hash
+{
+    return NSUINTROTATE(((NSUInteger)_fontSize), NSUINT_BIT / 2) ^ (NSUInteger)_glyph;
+}
+
+- (BOOL)isEqual:(id)object
+{
+    EXTTermLayerGlyphCacheKey *otherKey = object;
+    return ([otherKey isKindOfClass:[EXTTermLayerGlyphCacheKey class]] &&
+            otherKey->_fontSize == self->_fontSize &&
+            otherKey->_glyph == self->_glyph);
+}
 @end
