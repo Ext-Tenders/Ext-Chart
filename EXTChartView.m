@@ -444,7 +444,7 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
                 
                 newAnnotationLayer.frame = (CGRect){origin, size};
                 newAnnotationLayer.annotation = annoData;
-                newAnnotationLayer.defaultZPosition = _kDifferentialZPosition;
+                newAnnotationLayer.defaultZPosition = _kMultAnnotationZPosition;
                 [newMultAnnotationLayers addObject:newAnnotationLayer];
                 [self.layer addSublayer:newAnnotationLayer];
                 
