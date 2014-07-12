@@ -33,18 +33,17 @@
 
 
 @interface EXTChartViewModelTermCell ()
-@property (nonatomic, readwrite, assign) NSInteger totalRank;
 @property (nonatomic, strong) NSMutableArray *privateTerms;
 @property (nonatomic, assign) NSInteger numberOfReferencedTerms;
 + (instancetype)termCellAtGridLocation:(EXTIntPoint)gridLocation;
-- (void)addTerm:(EXTChartViewModelTerm *)term withDimension:(NSInteger)dimension;
+- (void)addTerm:(EXTChartViewModelTerm *)term;
 @end
 
 
 @interface EXTChartViewModelTerm ()
 @property (nonatomic, readwrite, weak) EXTChartViewModelTermCell *termCell;
 @property (nonatomic, readwrite, weak) EXTChartViewModelDifferential *differential;
-+ (instancetype)viewModelTermWithModelTerm:(EXTTerm *)modelTerm gridLocation:(EXTIntPoint)gridLocation;
++ (instancetype)viewModelTermWithModelTerm:(EXTTerm *)modelTerm dimension:(NSInteger)dimension;
 @end
 
 
@@ -111,14 +110,15 @@ static bool lineSegmentIntersectsLineSegment(NSPoint l1p1, NSPoint l1p2, NSPoint
 
         const EXTIntPoint gridLocation = [self.sequence.locConvertor gridPoint:term.location];
         NSValue *gridLocationValue = [NSValue extValueWithIntPoint:gridLocation];
-        EXTChartViewModelTerm *viewModelTerm = [EXTChartViewModelTerm viewModelTermWithModelTerm:term gridLocation:gridLocation];
+        EXTChartViewModelTerm *viewModelTerm = [EXTChartViewModelTerm viewModelTermWithModelTerm:term
+                                                                                       dimension:termDimension];
         EXTChartViewModelTermCell *termCell = termCells[gridLocationValue];
         if (!termCell) {
             termCell = [EXTChartViewModelTermCell termCellAtGridLocation:gridLocation];
             termCells[gridLocationValue] = termCell;
         }
 
-        [termCell addTerm:viewModelTerm withDimension:termDimension];
+        [termCell addTerm:viewModelTerm];
         viewModelTerm.termCell = termCell;
 
         [modelToViewModelTermMap setObject:viewModelTerm forKey:term];
@@ -348,12 +348,12 @@ static bool lineSegmentIntersectsLineSegment(NSPoint l1p1, NSPoint l1p2, NSPoint
 
 
 @implementation EXTChartViewModelTerm
-+ (instancetype)viewModelTermWithModelTerm:(EXTTerm *)modelTerm gridLocation:(EXTIntPoint)gridLocation
++ (instancetype)viewModelTermWithModelTerm:(EXTTerm *)modelTerm dimension:(NSInteger)dimension
 {
     EXTChartViewModelTerm *newTerm = [[self class] new];
     if (newTerm) {
-        newTerm->_gridLocation = gridLocation;
         newTerm->_modelTerm = modelTerm;
+        newTerm->_dimension = dimension;
     }
     return newTerm;
 }
@@ -365,6 +365,7 @@ static bool lineSegmentIntersectsLineSegment(NSPoint l1p1, NSPoint l1p2, NSPoint
 
 @implementation EXTChartViewModelTermCell
 @dynamic terms;
+@dynamic totalRank;
 
 - (instancetype)init
 {
@@ -384,15 +385,19 @@ static bool lineSegmentIntersectsLineSegment(NSPoint l1p1, NSPoint l1p2, NSPoint
     return newTermCell;
 }
 
-- (void)addTerm:(EXTChartViewModelTerm *)term withDimension:(NSInteger)dimension
+- (void)addTerm:(EXTChartViewModelTerm *)term
 {
     [self.privateTerms addObject:term];
-    self.totalRank += dimension;
 }
 
 - (NSArray *)terms
 {
     return [self.privateTerms copy];
+}
+
+- (NSInteger)totalRank
+{
+    return [[self.privateTerms valueForKeyPath:@"@sum.dimension"] integerValue];
 }
 @end
 
