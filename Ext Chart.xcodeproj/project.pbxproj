@@ -47,6 +47,7 @@
 		31D403BB13DA0476006A8C06 /* EXTTerm.m in Sources */ = {isa = PBXBuildFile; fileRef = 31D403BA13DA0476006A8C06 /* EXTTerm.m */; };
 		31D403C013DA04D8006A8C06 /* EXTDifferential.m in Sources */ = {isa = PBXBuildFile; fileRef = 31D403BF13DA04D8006A8C06 /* EXTDifferential.m */; };
 		31D5D2E513F6933B00F1B2F9 /* EXTArtBoard.m in Sources */ = {isa = PBXBuildFile; fileRef = 31D5D2E413F6933B00F1B2F9 /* EXTArtBoard.m */; };
+		38036BF71970872600C56E2B /* EXTMultAnnotationLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 38036BF61970872600C56E2B /* EXTMultAnnotationLayer.m */; };
 		3804BF6E17C07D7300A74325 /* EXTMatrixEditor.m in Sources */ = {isa = PBXBuildFile; fileRef = 3804BF6D17C07D7300A74325 /* EXTMatrixEditor.m */; };
 		381A4800194E12BA005054BD /* EXTTermInspectorViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 381A47FE194E12BA005054BD /* EXTTermInspectorViewController.m */; };
 		381A4801194E12BA005054BD /* EXTTermInspector.xib in Resources */ = {isa = PBXBuildFile; fileRef = 381A47FF194E12BA005054BD /* EXTTermInspector.xib */; };
@@ -187,6 +188,8 @@
 		31D403BF13DA04D8006A8C06 /* EXTDifferential.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTDifferential.m; sourceTree = "<group>"; };
 		31D5D2E313F6933B00F1B2F9 /* EXTArtBoard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTArtBoard.h; sourceTree = "<group>"; };
 		31D5D2E413F6933B00F1B2F9 /* EXTArtBoard.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTArtBoard.m; sourceTree = "<group>"; };
+		38036BF51970872600C56E2B /* EXTMultAnnotationLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTMultAnnotationLayer.h; sourceTree = "<group>"; };
+		38036BF61970872600C56E2B /* EXTMultAnnotationLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTMultAnnotationLayer.m; sourceTree = "<group>"; };
 		3804BF6C17C07D7300A74325 /* EXTMatrixEditor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTMatrixEditor.h; sourceTree = "<group>"; };
 		3804BF6D17C07D7300A74325 /* EXTMatrixEditor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTMatrixEditor.m; sourceTree = "<group>"; };
 		381A47FD194E12BA005054BD /* EXTTermInspectorViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTTermInspectorViewController.h; sourceTree = "<group>"; };
@@ -369,12 +372,17 @@
 		14C13C4E174FE3B3001BE9F9 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				38036BF81970872E00C56E2B /* Layers */,
 				31D5D2E313F6933B00F1B2F9 /* EXTArtBoard.h */,
 				31D5D2E413F6933B00F1B2F9 /* EXTArtBoard.m */,
+				14BCCBAB1961489E0019FEC3 /* EXTChartClipView.h */,
+				14BCCBAC1961489E0019FEC3 /* EXTChartClipView.m */,
+				14AAADA0196DC85E00ED8FEA /* EXTChartInteractionType.h */,
 				1435D32D194C10FA00863A90 /* EXTChartRulerView.h */,
 				1435D32E194C10FA00863A90 /* EXTChartRulerView.m */,
 				317707DF13D7893A003475A2 /* EXTChartView.h */,
 				317707E013D7893A003475A2 /* EXTChartView.m */,
+				143976851966A47000D8FE87 /* EXTChartViewInteraction.h */,
 				144709A31946CDF8009C6958 /* EXTChartViewModel.h */,
 				144709A41946CDF8009C6958 /* EXTChartViewModel.m */,
 				149314561783B6EA0080EF28 /* EXTDocumentControlsView.h */,
@@ -390,14 +398,6 @@
 				144709A41946CDF8009C6958 /* EXTChartViewModel.m */,
 				1435D32D194C10FA00863A90 /* EXTChartRulerView.h */,
 				1435D32E194C10FA00863A90 /* EXTChartRulerView.m */,
-				14BCCBAB1961489E0019FEC3 /* EXTChartClipView.h */,
-				14BCCBAC1961489E0019FEC3 /* EXTChartClipView.m */,
-				14AA9E4019668A2200A709F1 /* EXTTermLayer.h */,
-				14AA9E4119668A2200A709F1 /* EXTTermLayer.m */,
-				14AA9E4419668D8900A709F1 /* EXTDifferentialLineLayer.h */,
-				14AA9E4519668D8900A709F1 /* EXTDifferentialLineLayer.m */,
-				143976851966A47000D8FE87 /* EXTChartViewInteraction.h */,
-				14AAADA0196DC85E00ED8FEA /* EXTChartInteractionType.h */,
 			);
 			name = Views;
 			sourceTree = "<group>";
@@ -544,6 +544,19 @@
 				1058C7A8FEA54F5311CA2CBB /* Other Frameworks */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		38036BF81970872E00C56E2B /* Layers */ = {
+			isa = PBXGroup;
+			children = (
+				14AA9E4419668D8900A709F1 /* EXTDifferentialLineLayer.h */,
+				14AA9E4519668D8900A709F1 /* EXTDifferentialLineLayer.m */,
+				38036BF51970872600C56E2B /* EXTMultAnnotationLayer.h */,
+				38036BF61970872600C56E2B /* EXTMultAnnotationLayer.m */,
+				14AA9E4019668A2200A709F1 /* EXTTermLayer.h */,
+				14AA9E4119668A2200A709F1 /* EXTTermLayer.m */,
+			);
+			name = Layers;
 			sourceTree = "<group>";
 		};
 		3869FCF417B442AE00D0D740 /* Locations */ = {
@@ -693,6 +706,7 @@
 				317707C413D784B0003475A2 /* EXTGrid.m in Sources */,
 				317707E113D7893A003475A2 /* EXTChartView.m in Sources */,
 				31D403BB13DA0476006A8C06 /* EXTTerm.m in Sources */,
+				38036BF71970872600C56E2B /* EXTMultAnnotationLayer.m in Sources */,
 				31D403C013DA04D8006A8C06 /* EXTDifferential.m in Sources */,
 				3187BA2713DC6C6C00C26803 /* EXTScrollView.m in Sources */,
 				14BCCBAD1961489E0019FEC3 /* EXTChartClipView.m in Sources */,

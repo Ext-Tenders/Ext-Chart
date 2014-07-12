@@ -24,9 +24,8 @@
 /// Indexed by @(page). Each element is an NSMutableArray of EXTChartViewModelDifferential objects.
 @property (nonatomic, strong) NSMutableDictionary *privateDifferentials;
 
-// MERGE
-// indexed by @(page). Each element is a mutable dictionary of a style, keyed on @"style", and an array, keyed on @"annotations", of EXTViewModelMultAnnotation objects
-// @property (nonatomic, strong) NSMutableDictionary *privateMultAnnotations;
+// Indexed by @(page). Each element is a mutable dictionary of a style, keyed on @"style", and an array, keyed on @"annotations", of EXTViewModelMultAnnotation objects
+@property (nonatomic, strong) NSMutableDictionary *privateMultAnnotations;
 
 /// Indexed by @(page). Each element is an NSMapTable mapping EXTTerm objects to EXTChartViewModelTerm objects.
 @property (nonatomic, strong) NSMutableDictionary *modelToViewModelTermMap;
@@ -62,6 +61,10 @@
 + (instancetype)viewModelDifferentialLineWithStartIndex:(NSInteger)startIndex endIndex:(NSInteger)endIndex;
 @end
 
+@interface EXTChartViewModelMultAnnotation ()
++ (instancetype)viewModelMultAnnotationWithModelAnnotation:(NSDictionary*)modelMultAnnotation startTerm:(EXTChartViewModelTerm*)startTerm endTerm:(EXTChartViewModelTerm*)endTerm;
+@end
+
 
 #pragma mark - Private functions
 
@@ -78,8 +81,7 @@ static bool lineSegmentIntersectsLineSegment(NSPoint l1p1, NSPoint l1p2, NSPoint
     if (self) {
         _privateTermCells = [NSMutableDictionary new];
         _privateDifferentials = [NSMutableDictionary new];
-        // MERGE
-        //_privateMultAnnotations = [NSMutableDictionary new];
+        _privateMultAnnotations = [NSMutableDictionary new];
         _modelToViewModelTermMap = [NSMutableDictionary new];
     }
     return self;
@@ -164,8 +166,6 @@ static bool lineSegmentIntersectsLineSegment(NSPoint l1p1, NSPoint l1p2, NSPoint
         }
     }
     
-    // MERGE
-    /*
     // --- Multiplicative annotations
     NSMutableArray *annotationPairs = [NSMutableArray new];
     for (NSMutableDictionary *rule in self.multiplicationAnnotationRules) {
@@ -188,23 +188,12 @@ static bool lineSegmentIntersectsLineSegment(NSPoint l1p1, NSPoint l1p2, NSPoint
                 continue;
             
             // otherwise, draw something.
-            const EXTIntPoint startPoint = [self.sequence.locConvertor gridPoint:term.location];
-            const EXTIntPoint endPoint = [self.sequence.locConvertor gridPoint:[self.sequence.indexClass addLocation:term.location to:rule[@"location"]]];
-            EXTViewModelPoint *modelStartPoint = [EXTViewModelPoint newViewModelPointWithX:startPoint.x y:startPoint.y];
-            EXTViewModelPoint *modelEndPoint = [EXTViewModelPoint newViewModelPointWithX:endPoint.x y:endPoint.y];
-            const NSInteger startCount = [counts[modelStartPoint] integerValue];
-            const NSInteger endCount = [counts[modelEndPoint] integerValue];
-            NSArray *startRects = dotPositions(startCount, startPoint, self.grid.gridSpacing);
-            NSArray *endRects = dotPositions(endCount, endPoint, self.grid.gridSpacing);
-                
-            NSRect startRect = [startRects[0] rectValue];
-            NSRect endRect = [endRects[0] rectValue];
-            NSPoint viewStartPoint = (NSPoint){startRect.origin.x, startRect.origin.y + startRect.size.height / 2};
-            NSPoint viewEndPoint = (NSPoint){
-                endRect.origin.x + endRect.size.width - 0.1 * self.grid.gridSpacing,
-                endRect.origin.y + endRect.size.height / 2
-            };
-            EXTViewModelMultAnnotation *anno = [EXTViewModelMultAnnotation newViewModelMultAnnotationWithStart:viewStartPoint end:viewEndPoint];
+            EXTTerm *targetTerm = [self.sequence findTerm:[self.sequence.indexClass addLocation:term.location to:rule[@"location"]]];
+            EXTChartViewModelTerm *startTerm = [modelToViewModelTermMap objectForKey:term];
+            EXTChartViewModelTerm *endTerm = [modelToViewModelTermMap objectForKey:targetTerm];
+            
+            EXTChartViewModelMultAnnotation *anno = [EXTChartViewModelMultAnnotation viewModelMultAnnotationWithModelAnnotation:rule startTerm:startTerm endTerm:endTerm];
+            
             [annotationArray addObject:anno];
         }
         
@@ -215,12 +204,10 @@ static bool lineSegmentIntersectsLineSegment(NSPoint l1p1, NSPoint l1p2, NSPoint
             entry[@"style"] = rule[@"style"];
         [annotationPairs addObject:entry];
     }
-    */
 
     self.privateTermCells[@(self.currentPage)] = termCells;
     self.privateDifferentials[@(self.currentPage)] = differentials;
-    // MERGE
-    //self.multAnnotations[@(self.currentPage)] = annotationPairs;
+    self.privateMultAnnotations[@(self.currentPage)] = annotationPairs;
     self.modelToViewModelTermMap[@(self.currentPage)] = modelToViewModelTermMap; // FIXME: Do we need to keep this?
 }
 
@@ -329,30 +316,6 @@ static bool lineSegmentIntersectsLineSegment(NSPoint l1p1, NSPoint l1p2, NSPoint
     return result;
 }
 
-// MERGE
-/*
-- (NSArray *)chartView:(EXTChartView *)chartView multAnnotationsInRect:(NSRect)gridRect {
-    NSMutableArray *result = [NSMutableArray array];
-    for (NSMutableDictionary *annoGroup in self.multAnnotations[@(self.currentPage)]) {
-        NSMutableArray *convertedAnnotations = [NSMutableArray new];
-        for (EXTViewModelMultAnnotation *anno in annoGroup[@"annotations"]) {
-            if (lineSegmentOverRect(anno.start, anno.end, gridRect)) {
-                EXTChartViewMultAnnotationData *data = [EXTChartViewMultAnnotationData new];
-                data.start = anno.start;
-                data.end = anno.end;
-                [convertedAnnotations addObject:data];
-            }
-        }
-        NSMutableDictionary *entry = [NSMutableDictionary new];
-        entry[@"annotations"] = convertedAnnotations;
-        if (annoGroup[@"style"])
-            entry[@"style"] = annoGroup[@"style"];
-        [result addObject:entry];
-    }
-    return result.copy;
-}
-*/
-
 - (NSUInteger)indexOfObjectInArray:(NSArray *)array afterObjectIdenticalTo:(id)object
 {
     if (array.count == 0) return NSNotFound;
@@ -374,6 +337,11 @@ static bool lineSegmentIntersectsLineSegment(NSPoint l1p1, NSPoint l1p2, NSPoint
 - (NSArray *)differentials
 {
     return [self.privateDifferentials[@(self.currentPage)] copy];
+}
+
+- (NSArray *)multAnnotations
+{
+    return [self.privateMultAnnotations[@(self.currentPage)] copy];
 }
 
 @end
@@ -464,19 +432,21 @@ static bool lineSegmentIntersectsLineSegment(NSPoint l1p1, NSPoint l1p2, NSPoint
 }
 @end
 
-// MERGE
-/*
-@implementation EXTViewModelMultAnnotation
-+ (instancetype)newViewModelMultAnnotationWithStart:(NSPoint)start
-                                                end:(NSPoint)end
-{
-    EXTViewModelMultAnnotation *newAnno = [[self class] new];
-    newAnno->_start = start;
-    newAnno->_end = end;
+
+@implementation EXTChartViewModelMultAnnotation
++ (instancetype)viewModelMultAnnotationWithModelAnnotation:(NSDictionary*)modelMultAnnotation startTerm:(EXTChartViewModelTerm*)startTerm endTerm:(EXTChartViewModelTerm*)endTerm {
+    
+    EXTChartViewModelMultAnnotation *newAnno = [[self class] new];
+    
+    if (newAnno) {
+        newAnno->_modelMultAnnotation = modelMultAnnotation;
+        newAnno->_startTerm = startTerm;
+        newAnno->_endTerm = endTerm;
+    }
+    
     return newAnno;
 }
 @end
-*/
 
 
 @implementation EXTChartViewModelDifferentialLine

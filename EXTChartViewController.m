@@ -64,14 +64,10 @@ static void *_selectedToolTagContext = &_selectedToolTagContext;
         _chartViewModel = [EXTChartViewModel new];
         _chartViewModel.sequence = document.sseq;
 
-        // MERGE
-        // these all seem to have gone somewhere else. look for other binds.
-        /*
         [_chartViewModel bind:@"multiplicationAnnotationRules"
                      toObject:document
                   withKeyPath:@"multiplicationAnnotations"
                       options:nil];
-        */
 
         [_chartViewModel addObserver:self forKeyPath:@"selectedObject" options:0 context:_selectedObjectContext];
     }
@@ -88,9 +84,7 @@ static void *_selectedToolTagContext = &_selectedToolTagContext;
     [_document.mainWindowController removeObserver:self
                                         forKeyPath:@"selectedToolTag"];
     
-    // MERGE
-    // ditto above.
-    //[_chartViewModel unbind:@"multiplicationAnnotationRules"];
+    [_chartViewModel unbind:@"multiplicationAnnotationRules"];
 
     [self.chartViewModel removeObserver:self forKeyPath:@"selectedObject" context:_selectedObjectContext];
 
@@ -225,6 +219,35 @@ static void *_selectedToolTagContext = &_selectedToolTagContext;
         }
     }
     return [result copy];
+}
+
+
+- (NSArray *)chartView:(EXTChartView *)chartView
+ multAnnotationsInRect:(EXTIntRect)gridRect {
+    
+    NSMutableArray *result = [NSMutableArray array];
+    const NSRect rect = [self.chartView.grid convertRectToView:gridRect];
+    
+    for (NSMutableDictionary *annoGroup in
+                        self.chartViewModel.multAnnotations) {
+        NSMutableArray *convertedAnnotations = [NSMutableArray new];
+        
+        for (EXTChartViewModelMultAnnotation *anno in annoGroup[@"annotations"]) {
+            const NSPoint start = [self.chartView.grid convertPointToView:anno.startTerm.gridLocation];
+            const NSPoint end = [self.chartView.grid convertPointToView:anno.endTerm.gridLocation];
+            
+            if (lineSegmentOverRect(start, end, rect))
+                [convertedAnnotations addObject:anno];
+        }
+        
+        NSMutableDictionary *entry = [NSMutableDictionary new];
+        entry[@"annotations"] = convertedAnnotations;
+        if (annoGroup[@"style"])
+            entry[@"style"] = annoGroup[@"style"];
+        [result addObject:entry];
+    }
+    
+    return result;
 }
 
 #pragma mark - NSKeyValueObserving

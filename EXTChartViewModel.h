@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "EXTChartInteractionType.h"
+#import "EXTDocument.h"
 
 @class EXTSpectralSequence;
 @class EXTTerm;
@@ -26,13 +27,19 @@
 /// An array of EXTViewModelDifferential objects.
 @property (nonatomic, readonly) NSArray *differentials;
 
+/// An array of EXTViewModelMultAnnotation objects.
+@property (nonatomic, readonly) NSArray *multAnnotations;
+
 @property (nonatomic, assign) NSInteger currentPage;
 @property (nonatomic, weak) EXTGrid *grid;
-// MERGE
-//@property (weak) NSMutableArray *multiplicationAnnotationRules;
+
 @property (nonatomic, assign) EXTChartInteractionType interactionType;
 
 @property (nonatomic, weak) id selectedObject; // TODO: Should this really be readwrite?
+
+/// An array of dictionaries containing instructions on how to draw the
+/// multiplication annotations. This is inherited from the parent EXTDocument.
+@property (nonatomic, readonly) NSArray *multiplicationAnnotationRules;
 
 - (void)reloadCurrentPage;
 - (void)selectObjectAtGridLocation:(EXTIntPoint)gridLocation;
@@ -75,8 +82,8 @@
 @property (nonatomic, readonly, assign) NSInteger endIndex;
 @end
 
-@interface EXTViewModelMultAnnotation : NSObject
-@property (nonatomic, assign) NSPoint start;
-@property (nonatomic, assign) NSPoint end;
-+ (instancetype)newViewModelMultAnnotationWithStart:(NSPoint)start end:(NSPoint)end;
+@interface EXTChartViewModelMultAnnotation : NSObject
+@property (nonatomic, readonly, strong) NSDictionary *modelMultAnnotation;
+@property (nonatomic, readonly, strong) EXTChartViewModelTerm *startTerm;
+@property (nonatomic, readonly, strong) EXTChartViewModelTerm *endTerm;
 @end

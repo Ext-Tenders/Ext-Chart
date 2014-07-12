@@ -15,6 +15,7 @@
 #import "EXTChartViewModel.h"
 #import "EXTTermLayer.h"
 #import "EXTDifferentialLineLayer.h"
+#import "EXTMultAnnotationLayer.h"
 #import "EXTChartViewInteraction.h"
 #import "NSUserDefaults+EXTAdditions.h"
 
@@ -36,8 +37,10 @@ static void *_selectedObjectContext = &_selectedObjectContext;
 static const CGFloat _kBelowGridZPosition = -3.0;
 static const CGFloat _kGridZPosition = -2.0;
 static const CGFloat _kAboveGridZPosition = -1.0;
-static const CGFloat _kDifferentialZPosition = 1.0;
-static const CGFloat _kSelectedDifferentialZPosition = 2.0;
+
+static const CGFloat _kMultAnnotationZPosition = 1.0;
+static const CGFloat _kDifferentialZPosition = 5.0;
+static const CGFloat _kSelectedDifferentialZPosition = 6.0;
 static const CGFloat _kTermCellZPosition = 10.0;
 
 static const CGFloat _kBaseGridZPosition = 0.0;
@@ -82,6 +85,7 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
 
     NSArray *_termLayers;
     NSArray *_differentialLineLayers;
+    NSArray *_multAnnotationLayers;
 
     NSArray *_highlightedLayers; // an array of CALayer<EXTChartViewInteraction> objects, or nil
     NSSet *_selectedLayers;
@@ -318,30 +322,6 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
     }
     [CATransaction commit];
 
-    // MERGE
-    /*
-    // this is an array of dictionaries: {"style", array of
-    NSArray *multAnnotationsData = [self.dataSource chartView:self multAnnotationsInRect:dirtyRect];
-    for (NSDictionary *annotationGroup in multAnnotationsData) {
-        NSArray *multAnnotations = annotationGroup[@"annotations"];
-        
-        // TODO: eventually we will want to read the style we're supposed to
-        // draw these multiplications in from the "style" key of the dicationary
-        
-        [[NSColor blackColor] set];
-        NSBezierPath *line = [NSBezierPath bezierPath];
-        [line setLineWidth:0.25];
-        [line setLineCapStyle:NSRoundLineCapStyle];
-        
-        for (EXTChartViewMultAnnotationData *annoData in multAnnotations) {
-            [line moveToPoint:annoData.start];
-            [line lineToPoint:annoData.end];
-        }
-        
-        [line stroke];
-    }
-    */
-
     CGPathRelease(basePath);
     CGPathRelease(emphasisPath);
     CGPathRelease(axesPath);
@@ -431,6 +411,70 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
         }
 
         _differentialLineLayers = [newDifferentialLineLayers copy];
+    }
+    
+    // multiplicative annotations.
+    {
+        [_multAnnotationLayers makeObjectsPerformSelector:@selector(removeFromSuperlayer)];
+        
+        NSMutableArray *newMultAnnotationLayers = [NSMutableArray new];
+        
+        NSArray *annotations = [self.dataSource chartView:self multAnnotationsInRect:reloadGridRect];
+        
+        for (NSDictionary *annotationGroup in annotations) {
+            NSArray *multAnnotations = annotationGroup[@"annotations"];
+            
+            // TODO: eventually we will want to read the style we're supposed to
+            // draw these multiplications in from the "style" key of the dicationary
+            
+            //[[NSColor blackColor] set];
+            //NSBezierPath *line = [NSBezierPath bezierPath];
+            //[line setLineWidth:0.25];
+            //[line setLineCapStyle:NSRoundLineCapStyle];
+            
+            for (EXTChartViewModelMultAnnotation *annoData in multAnnotations) {
+                EXTMultAnnotationLineLayer *newAnnotationLayer = [EXTMultAnnotationLineLayer layer];
+                
+                const CGPoint start = [_grid convertPointToView:annoData.startTerm.gridLocation];
+                const CGPoint end = [_grid convertPointToView:annoData.endTerm.gridLocation];
+                const CGPoint origin = {MIN(start.x, end.x), MIN(start.y, end.y)};
+                const CGSize size = {ABS(start.x - end.x), ABS(start.y - end.y)};
+                const NSInteger startTotalRank = annoData.startTerm.termCell.totalRank;
+                const NSInteger endTotalRank = annoData.endTerm.termCell.totalRank;
+                
+                newAnnotationLayer.frame = (CGRect){origin, size};
+                newAnnotationLayer.annotation = annoData;
+                newAnnotationLayer.defaultZPosition = _kDifferentialZPosition;
+                [newMultAnnotationLayers addObject:newAnnotationLayer];
+                [self.layer addSublayer:newAnnotationLayer];
+                
+                const NSRect startDotRect = [EXTChartView dotBoundingBoxForTermCount:startTotalRank
+                                                                           termIndex:0
+                                                                        gridLocation:annoData.startTerm.gridLocation
+                                                                         gridSpacing:_grid.gridSpacing];
+                const NSRect endDotRect = [EXTChartView dotBoundingBoxForTermCount:endTotalRank
+                                                                         termIndex:0
+                                                                      gridLocation:annoData.endTerm.gridLocation
+                                                                       gridSpacing:_grid.gridSpacing];
+                
+                const CGPoint startDotConnectionPoint = (startTotalRank <= 3 ?
+                                                         (CGPoint){NSMidX(startDotRect), NSMidY(startDotRect)} :
+                                                         (CGPoint){NSMinX(startDotRect), NSMidY(startDotRect)});
+                const CGPoint endDotConnectionPoint = (endTotalRank <= 3 ?
+                                                       (CGPoint){NSMidX(endDotRect), NSMidY(endDotRect)} :
+                                                       (CGPoint){NSMaxX(endDotRect), NSMidY(endDotRect)});
+                const CGPoint startInLayer = [newAnnotationLayer convertPoint:startDotConnectionPoint fromLayer:self.layer];
+                const CGPoint endInLayer = [newAnnotationLayer convertPoint:endDotConnectionPoint fromLayer:self.layer];
+                
+                CGMutablePathRef path = CGPathCreateMutable();
+                CGPathMoveToPoint(path, NULL, startInLayer.x, startInLayer.y);
+                CGPathAddLineToPoint(path, NULL, endInLayer.x, endInLayer.y);
+                newAnnotationLayer.path = path;
+                CGPathRelease(path);
+            }
+        }
+        
+        _multAnnotationLayers = [newMultAnnotationLayers copy];
     }
 }
 
@@ -922,35 +966,3 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
 }
 
 @end
-
-// MERGE
-/*
-@implementation EXTChartViewMultAnnotationData
-+ (instancetype)chartViewMultAnnotationDataWithStart:(NSPoint)start end:(NSPoint)end
-{
-    EXTChartViewMultAnnotationData *result = [self new];
-    result.start = start;
-    result.end = end;
-    return result;
-}
-
-- (NSString *)description
-{
-    return [NSString stringWithFormat:@"Annotation from %@ to %@", NSStringFromPoint(self.start), NSStringFromPoint(self.end)];
-}
-
-- (BOOL)isEqual:(id)object
-{
-    EXTChartViewMultAnnotationData *other = object;
-    return ([other isKindOfClass:[EXTChartViewMultAnnotationData class]] &&
-            NSEqualPoints(other.start, _start) &&
-            NSEqualPoints(other.end, _end));
-}
-
-- (NSUInteger)hash
-{
-    return (NSUINTROTATE(((NSUInteger)_start.x), NSUINT_BIT / 2) ^ (NSUInteger)_start.y ^
-            NSUINTROTATE(((NSUInteger)_end.y), NSUINT_BIT / 2) ^ (NSUInteger)_end.x);
-}
-@end
-*/
