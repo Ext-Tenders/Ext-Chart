@@ -15,9 +15,7 @@
 // be either a dictionary of pairs of base class + exponent.  multiplication
 // should act by iterating through and adding these lists together.
 //
-// for robustness, a nil entry in a tag should be thought of as zero, so that
-// when introducing a new class we don't have to go back and add a bunch of
-// labels to the existing tags.
+// IMPORTANT NOTE: the tags dictionary should not allow ANY key with a @0 value.
 @implementation EXTPolynomialTag
 
 @synthesize tags;
@@ -73,29 +71,7 @@
     
     EXTPolynomialTag *target = (EXTPolynomialTag*)object;
     
-    for (NSString *key in target.tags.keyEnumerator) {
-        int value = [[target.tags objectForKey:key] intValue];
-        if (value == 0)
-            continue;
-        NSNumber *selfValue = [tags objectForKey:key];
-        if (!selfValue)
-            return FALSE;
-        if ([selfValue intValue] != value)
-            return FALSE;
-    }
-    
-    for (NSString *key in tags.keyEnumerator) {
-        int value = [[tags objectForKey:key] intValue];
-        if (value == 0)
-            continue;
-        NSNumber *targetValue = [target.tags objectForKey:key];
-        if (!targetValue)
-            return FALSE;
-        if ([targetValue intValue] != value)
-            return FALSE;
-    }
-    
-    return TRUE;
+    return ([target.tags isEqualToDictionary:tags]);
 }
 
 -(instancetype) copyWithZone:(NSZone *)zone {
@@ -329,8 +305,10 @@
             EXTPolynomialTag *tag = [EXTPolynomialTag new];
             tag.tags = [NSMutableDictionary dictionaryWithCapacity:generators.count];
             for (int i = 0; i < generators.count; i++) {
-                [tag.tags setObject:@((NSInteger)CFArrayGetValueAtIndex(counter, i))
-                             forKey:CFArrayGetValueAtIndex(names, i)];
+                NSInteger value = (NSInteger)CFArrayGetValueAtIndex(counter, i);
+                if (value != 0)
+                    [tag.tags setObject:@(value)
+                                 forKey:CFArrayGetValueAtIndex(names, i)];
             }
             [term.names addObject:[tag copy]];
         
