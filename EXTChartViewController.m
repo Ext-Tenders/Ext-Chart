@@ -212,8 +212,8 @@ static void *_selectedToolTagContext = &_selectedToolTagContext;
 
     NSMutableArray *result = [NSMutableArray array];
     for (EXTChartViewModelDifferential *diff in self.chartViewModel.differentials) {
-        const NSPoint start = [self.chartView.grid convertPointToView:diff.startTerm.gridLocation];
-        const NSPoint end = [self.chartView.grid convertPointToView:diff.endTerm.gridLocation];
+        const NSPoint start = [self.chartView.grid convertPointToView:diff.startTerm.termCell.gridLocation];
+        const NSPoint end = [self.chartView.grid convertPointToView:diff.endTerm.termCell.gridLocation];
         if (lineSegmentOverRect(start, end, rect)) {
             [result addObject:diff];
         }
@@ -233,8 +233,8 @@ static void *_selectedToolTagContext = &_selectedToolTagContext;
         NSMutableArray *convertedAnnotations = [NSMutableArray new];
         
         for (EXTChartViewModelMultAnnotation *anno in annoGroup[@"annotations"]) {
-            const NSPoint start = [self.chartView.grid convertPointToView:anno.startTerm.gridLocation];
-            const NSPoint end = [self.chartView.grid convertPointToView:anno.endTerm.gridLocation];
+            const NSPoint start = [self.chartView.grid convertPointToView:anno.startTerm.termCell.gridLocation];
+            const NSPoint end = [self.chartView.grid convertPointToView:anno.endTerm.termCell.gridLocation];
             
             if (lineSegmentOverRect(start, end, rect))
                 [convertedAnnotations addObject:anno];

@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		093AEADD13E10759003E9F58 /* EXTPair.m in Sources */ = {isa = PBXBuildFile; fileRef = 093AEADC13E10759003E9F58 /* EXTPair.m */; };
 		141C8D3A196FCDAB0037A716 /* NSValue+EXTIntPoint.m in Sources */ = {isa = PBXBuildFile; fileRef = 141C8D39196FCDAB0037A716 /* NSValue+EXTIntPoint.m */; };
+		141FBE6B19713D830020E844 /* EXTChartViewModelTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 141FBE6A19713D830020E844 /* EXTChartViewModelTestCase.m */; };
 		1435D32F194C10FA00863A90 /* EXTChartRulerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1435D32E194C10FA00863A90 /* EXTChartRulerView.m */; };
 		143F3DFE176D615100FB92B3 /* EXTUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 143F3DFD176D615100FB92B3 /* EXTUtilities.m */; };
 		144709A51946CDF8009C6958 /* EXTChartViewModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 144709A41946CDF8009C6958 /* EXTChartViewModel.m */; };
@@ -113,6 +114,7 @@
 		13E42FBA07B3F13500E4EEF1 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
 		141C8D38196FCDAB0037A716 /* NSValue+EXTIntPoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSValue+EXTIntPoint.h"; sourceTree = "<group>"; };
 		141C8D39196FCDAB0037A716 /* NSValue+EXTIntPoint.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSValue+EXTIntPoint.m"; sourceTree = "<group>"; };
+		141FBE6A19713D830020E844 /* EXTChartViewModelTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTChartViewModelTestCase.m; sourceTree = "<group>"; };
 		1435D32D194C10FA00863A90 /* EXTChartRulerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTChartRulerView.h; sourceTree = "<group>"; };
 		1435D32E194C10FA00863A90 /* EXTChartRulerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTChartRulerView.m; sourceTree = "<group>"; };
 		143976851966A47000D8FE87 /* EXTChartViewInteraction.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EXTChartViewInteraction.h; sourceTree = "<group>"; };
@@ -294,6 +296,7 @@
 			isa = PBXGroup;
 			children = (
 				145CD95E194A11BF006621A6 /* EXTTestCaseS5Demo.m */,
+				141FBE6A19713D830020E844 /* EXTChartViewModelTestCase.m */,
 				145CD951194A0AE5006621A6 /* Supporting Files */,
 			);
 			path = "Ext Chart Tests";
@@ -378,13 +381,9 @@
 				14BCCBAB1961489E0019FEC3 /* EXTChartClipView.h */,
 				14BCCBAC1961489E0019FEC3 /* EXTChartClipView.m */,
 				14AAADA0196DC85E00ED8FEA /* EXTChartInteractionType.h */,
-				1435D32D194C10FA00863A90 /* EXTChartRulerView.h */,
-				1435D32E194C10FA00863A90 /* EXTChartRulerView.m */,
 				317707DF13D7893A003475A2 /* EXTChartView.h */,
 				317707E013D7893A003475A2 /* EXTChartView.m */,
 				143976851966A47000D8FE87 /* EXTChartViewInteraction.h */,
-				144709A31946CDF8009C6958 /* EXTChartViewModel.h */,
-				144709A41946CDF8009C6958 /* EXTChartViewModel.m */,
 				149314561783B6EA0080EF28 /* EXTDocumentControlsView.h */,
 				149314571783B6EA0080EF28 /* EXTDocumentControlsView.m */,
 				1467B26C178CF15E0084A2F6 /* EXTDocumentInspectorView.h */,
@@ -694,6 +693,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				145CD95F194A11BF006621A6 /* EXTTestCaseS5Demo.m in Sources */,
+				141FBE6B19713D830020E844 /* EXTChartViewModelTestCase.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
