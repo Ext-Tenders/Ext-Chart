@@ -59,7 +59,6 @@
         XCTAssertEqual(termCell.terms.count, 1, @"Each cell should have exactly one term");
 
         EXTChartViewModelTerm *term = [termCell.terms firstObject];
-        XCTAssertTrue(EXTEqualIntPoints(term.gridLocation, termCell.gridLocation), @"Term location should be the same as its cell");
         XCTAssertEqual(term.dimension, 1, @"Term should have dimension 1");
     }
 }
@@ -102,8 +101,8 @@
             const EXTIntPoint startLocation = [locations[0] extIntPointValue];
             const EXTIntPoint endLocation = [locations[1] extIntPointValue];
 
-            return (EXTEqualIntPoints(startLocation, diff.startTerm.gridLocation) &&
-                    EXTEqualIntPoints(endLocation, diff.endTerm.gridLocation));
+            return (EXTEqualIntPoints(startLocation, diff.startTerm.termCell.gridLocation) &&
+                    EXTEqualIntPoints(endLocation, diff.endTerm.termCell.gridLocation));
         }];
 
         XCTAssertNotEqual(index, NSNotFound, @"Differential start/end locations are not expected");
