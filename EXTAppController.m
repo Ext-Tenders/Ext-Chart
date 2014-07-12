@@ -11,6 +11,12 @@
 #import "EXTPreferencesWindowController.h"
 
 
+static inline bool isRunningTests(void) {
+    DLog(@"Process arguments: %@", [[NSProcessInfo processInfo] arguments]);
+    return [[[NSProcessInfo processInfo] arguments] containsObject:@"-XCTest"];
+}
+
+
 @implementation EXTAppController {
     EXTNewDocumentWindowController *_newDocumentWindowController;
     EXTPreferencesWindowController *_preferencesWindowController;
@@ -26,6 +32,8 @@
 }
 
 - (BOOL)applicationOpenUntitledFile:(NSApplication *)sender {
+    if (isRunningTests()) return NO;
+
     [self newDocument:nil];
     return YES;
 }
