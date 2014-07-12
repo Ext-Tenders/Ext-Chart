@@ -43,7 +43,7 @@
 @interface EXTChartViewModelTerm ()
 @property (nonatomic, readwrite, weak) EXTChartViewModelTermCell *termCell;
 @property (nonatomic, readwrite, weak) EXTChartViewModelDifferential *differential;
-+ (instancetype)viewModelTermWithModelTerm:(EXTTerm *)modelTerm gridLocation:(EXTIntPoint)gridLocation dimension:(NSInteger)dimension;
++ (instancetype)viewModelTermWithModelTerm:(EXTTerm *)modelTerm dimension:(NSInteger)dimension;
 @end
 
 
@@ -111,7 +111,6 @@ static bool lineSegmentIntersectsLineSegment(NSPoint l1p1, NSPoint l1p2, NSPoint
         const EXTIntPoint gridLocation = [self.sequence.locConvertor gridPoint:term.location];
         NSValue *gridLocationValue = [NSValue extValueWithIntPoint:gridLocation];
         EXTChartViewModelTerm *viewModelTerm = [EXTChartViewModelTerm viewModelTermWithModelTerm:term
-                                                                                    gridLocation:gridLocation
                                                                                        dimension:termDimension];
         EXTChartViewModelTermCell *termCell = termCells[gridLocationValue];
         if (!termCell) {
@@ -349,11 +348,10 @@ static bool lineSegmentIntersectsLineSegment(NSPoint l1p1, NSPoint l1p2, NSPoint
 
 
 @implementation EXTChartViewModelTerm
-+ (instancetype)viewModelTermWithModelTerm:(EXTTerm *)modelTerm gridLocation:(EXTIntPoint)gridLocation dimension:(NSInteger)dimension
++ (instancetype)viewModelTermWithModelTerm:(EXTTerm *)modelTerm dimension:(NSInteger)dimension
 {
     EXTChartViewModelTerm *newTerm = [[self class] new];
     if (newTerm) {
-        newTerm->_gridLocation = gridLocation;
         newTerm->_modelTerm = modelTerm;
         newTerm->_dimension = dimension;
     }

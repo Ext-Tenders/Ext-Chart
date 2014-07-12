@@ -57,7 +57,7 @@
 
 
 @interface EXTChartViewModelTerm : NSObject
-@property (nonatomic, readonly, assign) EXTIntPoint gridLocation;
+//@property (nonatomic, readonly, assign) EXTIntPoint gridLocation;
 @property (nonatomic, readonly, strong) EXTTerm *modelTerm;
 @property (nonatomic, readonly, weak) EXTChartViewModelTermCell *termCell;
 @property (nonatomic, readonly, assign) NSInteger dimension;

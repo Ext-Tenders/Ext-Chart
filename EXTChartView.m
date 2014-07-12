@@ -364,8 +364,8 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
 
         NSArray *differentials = [self.dataSource chartView:self differentialsInGridRect:reloadGridRect];
         for (EXTChartViewModelDifferential *diff in differentials) {
-            const CGPoint start = [_grid convertPointToView:diff.startTerm.gridLocation];
-            const CGPoint end = [_grid convertPointToView:diff.endTerm.gridLocation];
+            const CGPoint start = [_grid convertPointToView:diff.startTerm.termCell.gridLocation];
+            const CGPoint end = [_grid convertPointToView:diff.endTerm.termCell.gridLocation];
             const CGPoint origin = {MIN(start.x, end.x), MIN(start.y, end.y)};
             const CGSize size = {ABS(start.x - end.x), ABS(start.y - end.y)};
 
@@ -386,11 +386,11 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
 
                 const NSRect startDotRect = [EXTChartView dotBoundingBoxForTermCount:startTotalRank
                                                                            termIndex:line.startIndex
-                                                                        gridLocation:diff.startTerm.gridLocation
+                                                                        gridLocation:diff.startTerm.termCell.gridLocation
                                                                          gridSpacing:_grid.gridSpacing];
                 const NSRect endDotRect = [EXTChartView dotBoundingBoxForTermCount:endTotalRank
                                                                          termIndex:line.endIndex
-                                                                      gridLocation:diff.endTerm.gridLocation
+                                                                      gridLocation:diff.endTerm.termCell.gridLocation
                                                                        gridSpacing:_grid.gridSpacing];
 
                 const CGPoint startDotConnectionPoint = (startTotalRank <= 3 ?
@@ -435,8 +435,8 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
             for (EXTChartViewModelMultAnnotation *annoData in multAnnotations) {
                 EXTMultAnnotationLineLayer *newAnnotationLayer = [EXTMultAnnotationLineLayer layer];
                 
-                const CGPoint start = [_grid convertPointToView:annoData.startTerm.gridLocation];
-                const CGPoint end = [_grid convertPointToView:annoData.endTerm.gridLocation];
+                const CGPoint start = [_grid convertPointToView:annoData.startTerm.termCell.gridLocation];
+                const CGPoint end = [_grid convertPointToView:annoData.endTerm.termCell.gridLocation];
                 const CGPoint origin = {MIN(start.x, end.x), MIN(start.y, end.y)};
                 const CGSize size = {ABS(start.x - end.x), ABS(start.y - end.y)};
                 const NSInteger startTotalRank = annoData.startTerm.termCell.totalRank;
@@ -450,11 +450,11 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
                 
                 const NSRect startDotRect = [EXTChartView dotBoundingBoxForTermCount:startTotalRank
                                                                            termIndex:0
-                                                                        gridLocation:annoData.startTerm.gridLocation
+                                                                        gridLocation:annoData.startTerm.termCell.gridLocation
                                                                          gridSpacing:_grid.gridSpacing];
                 const NSRect endDotRect = [EXTChartView dotBoundingBoxForTermCount:endTotalRank
                                                                          termIndex:0
-                                                                      gridLocation:annoData.endTerm.gridLocation
+                                                                      gridLocation:annoData.endTerm.termCell.gridLocation
                                                                        gridSpacing:_grid.gridSpacing];
                 
                 const CGPoint startDotConnectionPoint = (startTotalRank <= 3 ?
@@ -551,7 +551,7 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
     if (NSPointInRect(currentMouseLocation, dataRect)) {
         const EXTIntPoint mouseLocationInGrid = [_grid convertPointFromView:currentMouseLocation];
         for (EXTDifferentialLineLayer *layer in _differentialLineLayers) {
-            if (EXTEqualIntPoints(layer.differential.startTerm.gridLocation, mouseLocationInGrid)) {
+            if (EXTEqualIntPoints(layer.differential.startTerm.termCell.gridLocation, mouseLocationInGrid)) {
                 [layersToHighlight addObject:layer];
             }
         }
