@@ -12,7 +12,6 @@
 
 
 static inline bool isRunningTests(void) {
-    DLog(@"Process arguments: %@", [[NSProcessInfo processInfo] arguments]);
     return [[[NSProcessInfo processInfo] arguments] containsObject:@"-XCTest"];
 }
 
