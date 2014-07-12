@@ -38,10 +38,10 @@
 - (IBAction)zoomToFit:(id)sender;
 
 // Util
-+ (CGRect)dotBoundingBoxForTermCount:(NSInteger)termCount
-                           termIndex:(NSInteger)termIndex
-                        gridLocation:(EXTIntPoint)gridLocation
-                         gridSpacing:(CGFloat)gridSpacing;
++ (CGRect)dotBoundingBoxForCellRank:(NSInteger)cellRank
+                          termIndex:(NSInteger)termIndex
+                       gridLocation:(EXTIntPoint)gridLocation
+                        gridSpacing:(CGFloat)gridSpacing;
 @end
 
 

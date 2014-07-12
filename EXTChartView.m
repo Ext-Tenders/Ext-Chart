@@ -384,14 +384,14 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
                 [newDifferentialLineLayers addObject:newDifferentialLineLayer];
                 [self.layer addSublayer:newDifferentialLineLayer];
 
-                const NSRect startDotRect = [EXTChartView dotBoundingBoxForTermCount:startTotalRank
-                                                                           termIndex:line.startIndex
-                                                                        gridLocation:diff.startTerm.termCell.gridLocation
-                                                                         gridSpacing:_grid.gridSpacing];
-                const NSRect endDotRect = [EXTChartView dotBoundingBoxForTermCount:endTotalRank
-                                                                         termIndex:line.endIndex
-                                                                      gridLocation:diff.endTerm.termCell.gridLocation
-                                                                       gridSpacing:_grid.gridSpacing];
+                const NSRect startDotRect = [EXTChartView dotBoundingBoxForCellRank:startTotalRank
+                                                                          termIndex:line.startIndex
+                                                                       gridLocation:diff.startTerm.termCell.gridLocation
+                                                                        gridSpacing:_grid.gridSpacing];
+                const NSRect endDotRect = [EXTChartView dotBoundingBoxForCellRank:endTotalRank
+                                                                        termIndex:line.endIndex
+                                                                     gridLocation:diff.endTerm.termCell.gridLocation
+                                                                      gridSpacing:_grid.gridSpacing];
 
                 const CGPoint startDotConnectionPoint = (startTotalRank <= 3 ?
                                                          (CGPoint){NSMidX(startDotRect), NSMidY(startDotRect)} :
@@ -448,14 +448,14 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
                 [newMultAnnotationLayers addObject:newAnnotationLayer];
                 [self.layer addSublayer:newAnnotationLayer];
                 
-                const NSRect startDotRect = [EXTChartView dotBoundingBoxForTermCount:startTotalRank
-                                                                           termIndex:0
-                                                                        gridLocation:annoData.startTerm.termCell.gridLocation
-                                                                         gridSpacing:_grid.gridSpacing];
-                const NSRect endDotRect = [EXTChartView dotBoundingBoxForTermCount:endTotalRank
-                                                                         termIndex:0
-                                                                      gridLocation:annoData.endTerm.termCell.gridLocation
-                                                                       gridSpacing:_grid.gridSpacing];
+                const NSRect startDotRect = [EXTChartView dotBoundingBoxForCellRank:startTotalRank
+                                                                          termIndex:0
+                                                                       gridLocation:annoData.startTerm.termCell.gridLocation
+                                                                        gridSpacing:_grid.gridSpacing];
+                const NSRect endDotRect = [EXTChartView dotBoundingBoxForCellRank:endTotalRank
+                                                                        termIndex:0
+                                                                     gridLocation:annoData.endTerm.termCell.gridLocation
+                                                                      gridSpacing:_grid.gridSpacing];
                 
                 const CGPoint startDotConnectionPoint = (startTotalRank <= 3 ?
                                                          (CGPoint){NSMidX(startDotRect), NSMidY(startDotRect)} :
@@ -909,12 +909,12 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
 
 #pragma mark - Util
 
-+ (CGRect)dotBoundingBoxForTermCount:(NSInteger)termCount
-                           termIndex:(NSInteger)termIndex
-                        gridLocation:(EXTIntPoint)gridLocation
-                         gridSpacing:(CGFloat)gridSpacing
++ (CGRect)dotBoundingBoxForCellRank:(NSInteger)cellRank
+                          termIndex:(NSInteger)termIndex
+                       gridLocation:(EXTIntPoint)gridLocation
+                        gridSpacing:(CGFloat)gridSpacing
 {
-    switch (termCount) {
+    switch (cellRank) {
         case 1:
             return CGRectMake(gridLocation.x*gridSpacing + 2.0/6.0*gridSpacing,
                               gridLocation.y*gridSpacing + 2.0/6.0*gridSpacing,

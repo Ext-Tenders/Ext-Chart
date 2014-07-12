@@ -13,12 +13,12 @@
 #pragma mark - Private variables
 
 static CFMutableDictionaryRef _glyphPathCache;
-static CGColorRef _termCountFillColor;
-static CGColorRef _termCountStrokeColor;
-static const CGFloat _kTermCountLineWidth = 0.8;
-static const CGFloat _kTermCountSingleDigitFontSizeFactor = 0.7;
-static const CGFloat _kTermCountDoubleDigitFontSizeFactor = 0.4;
-static NSString * const _kTermCountFontName = @"Palatino-Roman";
+static CGColorRef _fillColor;
+static CGColorRef _strokeColor;
+static const CGFloat _kLineWidth = 0.8;
+static const CGFloat _kSingleDigitFontSizeFactor = 0.7;
+static const CGFloat _kDoubleDigitFontSizeFactor = 0.4;
+static NSString * const _fontName = @"Palatino-Roman";
 
 #pragma mark - Private classes
 
@@ -41,8 +41,8 @@ static NSString * const _kTermCountFontName = @"Palatino-Roman";
     if (self == [EXTTermLayer class]) {
         _glyphPathCache = CFDictionaryCreateMutable(kCFAllocatorDefault, 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
 
-        _termCountFillColor = CGColorCreateCopy([[NSColor blackColor] CGColor]);
-        _termCountStrokeColor = CGColorCreateCopy([[NSColor blackColor] CGColor]);
+        _fillColor = CGColorCreateCopy([[NSColor blackColor] CGColor]);
+        _strokeColor = CGColorCreateCopy([[NSColor blackColor] CGColor]);
     }
 }
 
@@ -69,23 +69,23 @@ static NSString * const _kTermCountFontName = @"Palatino-Roman";
     CGPathMoveToPoint(path, NULL, 0.0, 0.0);
 
     for (NSInteger i = 0; i < totalRank; ++i) {
-        const CGRect box = [EXTChartView dotBoundingBoxForTermCount:totalRank termIndex:i gridLocation:(EXTIntPoint){0} gridSpacing:length];
+        const CGRect box = [EXTChartView dotBoundingBoxForCellRank:totalRank termIndex:i gridLocation:(EXTIntPoint){0} gridSpacing:length];
         CGPathAddEllipseInRect(path, NULL, box);
     }
 
     if (totalRank <= 3) {
-        layer.fillColor = _termCountFillColor;
+        layer.fillColor = _fillColor;
         layer.lineWidth = 0.0;
     }
     else {
         layer.fillColor = [[NSColor clearColor] CGColor];
-        layer.strokeColor = _termCountStrokeColor;
-        layer.lineWidth = _kTermCountLineWidth;
+        layer.strokeColor = _strokeColor;
+        layer.lineWidth = _kLineWidth;
 
         NSString *label = [NSString stringWithFormat:@"%ld", (long)totalRank];
         CGFloat fontSize = round((totalRank < 10 ?
-                                  length * _kTermCountSingleDigitFontSizeFactor :
-                                  length * _kTermCountDoubleDigitFontSizeFactor));
+                                  length * _kSingleDigitFontSizeFactor :
+                                  length * _kDoubleDigitFontSizeFactor));
         CGSize textSize;
         NSArray *glyphLayers = [self layersForString:label atSize:fontSize totalSize:&textSize];
         // Centre the layers horizontally
@@ -113,7 +113,7 @@ static NSString * const _kTermCountFontName = @"Palatino-Roman";
 
     NSMutableArray *layers = [NSMutableArray new];
     outSize->width = outSize->height = 0.0;
-    NSFont *font = [NSFont fontWithName:_kTermCountFontName size:fontSize];
+    NSFont *font = [NSFont fontWithName:_fontName size:fontSize];
     NSDictionary *attrs = @{NSFontAttributeName: font};
 
     NSAttributedString *attrString = [[NSAttributedString alloc] initWithString:string attributes:attrs];
@@ -239,8 +239,8 @@ static NSString * const _kTermCountFontName = @"Palatino-Roman";
         fillColor = strokeColor = self.highlightColor;
     }
     else {
-        fillColor = _termCountFillColor;
-        strokeColor = _termCountStrokeColor;
+        fillColor = _fillColor;
+        strokeColor = _strokeColor;
     }
 
     if (self.termCell.totalRank <= 3) {
