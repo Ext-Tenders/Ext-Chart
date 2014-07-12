@@ -402,7 +402,12 @@
                                                     with:right.names[j]];
         int index = [target.names indexOfObject:sumTag];
         if (index != -1) {
-            retData[(i*right.size+j)*ret.height+index] = [self koszulSignForMultiplying:left.names[i] by:right.names[j]];
+            if (self.defaultCharacteristic == 2)
+                retData[(i*right.size+j)*ret.height+index] = 1;
+            else
+                retData[(i*right.size+j)*ret.height+index] =
+                                [self koszulSignForMultiplying:left.names[i]
+                                                            by:right.names[j]];
         }
     }
     
