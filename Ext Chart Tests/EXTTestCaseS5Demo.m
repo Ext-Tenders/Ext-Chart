@@ -9,15 +9,10 @@
 #import <XCTest/XCTest.h>
 #import "EXTDemos.h"
 #import "EXTChartViewModel.h"
-#import "EXTChartView.h"
-#import "EXTGrid.h"
+#import "NSValue+EXTIntPoint.h"
 
 @interface EXTTestCaseS5Demo : XCTestCase
-@property (nonatomic, strong) EXTSpectralSequence *sequence;
-@property (nonatomic, strong) EXTGrid *grid;
 @property (nonatomic, strong) EXTChartViewModel *chartViewModel;
-
-@property (nonatomic, assign) EXTIntRect baseGridRect;
 @end
 
 @implementation EXTTestCaseS5Demo
@@ -25,16 +20,9 @@
 - (void)setUp
 {
     [super setUp];
-    self.sequence = EXTDemos.S5Demo;
-
-    self.grid = [EXTGrid new];
-    self.grid.gridSpacing = 9.0;
 
     self.chartViewModel = [EXTChartViewModel new];
-    self.chartViewModel.sequence = self.sequence;
-    self.chartViewModel.grid = self.grid;
-
-    self.baseGridRect = (EXTIntRect){{0, 0}, {2, 5}};
+    self.chartViewModel.sequence = EXTDemos.S5Demo;
 }
 
 - (void)goToPage:(NSInteger)targetPage
@@ -49,27 +37,38 @@
 {
     [self goToPage:0];
 
-    NSArray *termCounts = [self.chartViewModel chartView:nil termCountsInGridRect:self.baseGridRect];
-    XCTAssertEqual(termCounts.count, 6, "S5 should have exactly six term counts = six terms in page 0");
+    NSArray *termCells = self.chartViewModel.termCells;
+    XCTAssertEqual(termCells.count, 6, "S5 should have exactly six term cells in page 0");
 
-    NSArray *expectedTermsArray = @[
-                                    [EXTChartViewTermCountData chartViewTermCountDataWithCount:1 location:(EXTIntPoint){0, 0}],
-                                    [EXTChartViewTermCountData chartViewTermCountDataWithCount:1 location:(EXTIntPoint){1, 4}],
-                                    [EXTChartViewTermCountData chartViewTermCountDataWithCount:1 location:(EXTIntPoint){0, 2}],
-                                    [EXTChartViewTermCountData chartViewTermCountDataWithCount:1 location:(EXTIntPoint){1, 0}],
-                                    [EXTChartViewTermCountData chartViewTermCountDataWithCount:1 location:(EXTIntPoint){0, 4}],
-                                    [EXTChartViewTermCountData chartViewTermCountDataWithCount:1 location:(EXTIntPoint){1, 2}],
-                                    ];
-    NSSet *expectedTerms = [NSSet setWithArray:expectedTermsArray];
-    NSSet *computedTerms = [NSSet setWithArray:termCounts];
-    XCTAssertTrue([expectedTerms isEqualToSet:computedTerms], @"Term (and term counts) do not match");
+    NSArray *expectedLocations = @[
+                                   [NSValue extValueWithIntPoint:(EXTIntPoint){0, 0}],
+                                   [NSValue extValueWithIntPoint:(EXTIntPoint){1, 4}],
+                                   [NSValue extValueWithIntPoint:(EXTIntPoint){0, 2}],
+                                   [NSValue extValueWithIntPoint:(EXTIntPoint){1, 0}],
+                                   [NSValue extValueWithIntPoint:(EXTIntPoint){0, 4}],
+                                   [NSValue extValueWithIntPoint:(EXTIntPoint){1, 2}],
+                                   ];
+
+    for (EXTChartViewModelTermCell *termCell in termCells) {
+        const NSUInteger index = [expectedLocations indexOfObjectPassingTest:^BOOL(NSValue *locationValue, NSUInteger idx, BOOL *stop) {
+            return EXTEqualIntPoints([locationValue extIntPointValue], termCell.gridLocation);
+        }];
+
+        XCTAssertNotEqual(index, NSNotFound, @"Term cell location is not expected");
+        XCTAssertEqual(termCell.totalRank, 1, @"Each cell should have total rank 1");
+        XCTAssertEqual(termCell.terms.count, 1, @"Each cell should have exactly one term");
+
+        EXTChartViewModelTerm *term = [termCell.terms firstObject];
+        XCTAssertTrue(EXTEqualIntPoints(term.gridLocation, termCell.gridLocation), @"Term location should be the same as its cell");
+        XCTAssertEqual(term.dimension, 1, @"Term should have dimension 1");
+    }
 }
 
 - (void)testDifferentialsOnPage0
 {
     [self goToPage:0];
 
-    NSArray *diffs = [self.chartViewModel chartView:nil differentialsInGridRect:self.baseGridRect];
+    NSArray *diffs = self.chartViewModel.differentials;
     XCTAssertEqual(diffs.count, 0, @"There should be no differentials on page 0");
 }
 
@@ -77,7 +76,7 @@
 {
     [self goToPage:1];
 
-    NSArray *diffs = [self.chartViewModel chartView:nil differentialsInGridRect:self.baseGridRect];
+    NSArray *diffs = self.chartViewModel.differentials;
     XCTAssertEqual(diffs.count, 0, @"There should be no differentials on page 1");
 }
 
@@ -85,15 +84,32 @@
 {
     [self goToPage:2];
 
-    NSArray *diffs = [self.chartViewModel chartView:nil differentialsInGridRect:self.baseGridRect];
+    NSArray *diffs = self.chartViewModel.differentials;
     XCTAssertEqual(diffs.count, 2, @"There should be two differentials on page 2");
 
-    NSArray *expectedDiffsArray = @[
-                                    [EXTChartViewDifferentialData chartViewDifferentialDataWithStartLocation:(EXTIntPoint){1, 0} startIndex:0 endLocation:(EXTIntPoint){0, 2} endIndex:0],
-                                    [EXTChartViewDifferentialData chartViewDifferentialDataWithStartLocation:(EXTIntPoint){1, 2} startIndex:0 endLocation:(EXTIntPoint){0, 4} endIndex:0],
-                                    ];
-    NSSet *expectedDiffs = [NSSet setWithArray:expectedDiffsArray];
-    NSSet *computedDiffs = [NSSet setWithArray:diffs];
-    XCTAssertTrue([expectedDiffs isEqualToSet:computedDiffs], @"Differentials do not match");
+    NSArray *differentialLocations0 = @[
+                                        [NSValue extValueWithIntPoint:(EXTIntPoint){1, 0}],
+                                        [NSValue extValueWithIntPoint:(EXTIntPoint){0, 2}],
+                                        ];
+    NSArray *differentialLocations1 = @[
+                                        [NSValue extValueWithIntPoint:(EXTIntPoint){1, 2}],
+                                        [NSValue extValueWithIntPoint:(EXTIntPoint){0, 4}],
+                                        ];
+    NSArray *expectedLocations = @[differentialLocations0, differentialLocations1];
+
+    for (EXTChartViewModelDifferential *diff in diffs) {
+        NSUInteger index = [expectedLocations indexOfObjectPassingTest:^BOOL(NSArray *locations, NSUInteger idx, BOOL *stop) {
+            const EXTIntPoint startLocation = [locations[0] extIntPointValue];
+            const EXTIntPoint endLocation = [locations[1] extIntPointValue];
+
+            return (EXTEqualIntPoints(startLocation, diff.startTerm.gridLocation) &&
+                    EXTEqualIntPoints(endLocation, diff.endTerm.gridLocation));
+        }];
+
+        XCTAssertNotEqual(index, NSNotFound, @"Differential start/end locations are not expected");
+        XCTAssertEqual(diff.lines.count, 1, @"Each differential should have exactly one line");
+        XCTAssertEqual([[diff.lines firstObject] startIndex], 0, @"Each differential line should have start index 0");
+        XCTAssertEqual([[diff.lines firstObject] endIndex], 0, @"Each differential line should have end index 0");
+    }
 }
 @end
