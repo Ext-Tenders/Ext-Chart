@@ -374,12 +374,12 @@
         //
         // start by replacing this column with the Bezout-weighted sum of the
         // old columns.
-        NSMutableArray *bezoutArray = [NSMutableArray arrayWithCapacity:width];
-        for (int j = 0; j < width; j++)
-            bezoutArray[j] = @(bezout[j]);
-        NSArray *newColumn = [ret actOn:bezoutArray];
-        for (int j = 0; j < height; j++)
-            retData[pivotColumn*ret.height+j] = [newColumn[j] intValue];
+        for (int i = 0; i < ret.height; i++) {
+            int newVal = 0;
+            for (int j = 0; j < width; j++)
+                newVal += bezout[j] * retData[ret.height*j+i];
+            retData[ret.height*pivotColumn+i] = newVal;
+        }
         
         EXTMatrix *rightmostFactor = nil;
         int *rightmostData = nil;
