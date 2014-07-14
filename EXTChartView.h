@@ -31,7 +31,7 @@
 @property (nonatomic, weak) id selectedObject;
 
 // New chart view
-- (void)adjustContentForRect:(NSRect)rect;
+- (void)updateVisibleRect;
 - (void)reloadCurrentPage;
 
 // Actions

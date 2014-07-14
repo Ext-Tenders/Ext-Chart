@@ -240,8 +240,11 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
-- (void)adjustContentForRect:(NSRect)rect
+- (void)updateVisibleRect
 {
+    NSClipView *clipView = [[self enclosingScrollView] contentView];
+    const NSRect rect = [self convertRect:clipView.bounds fromView:clipView];
+
     [CATransaction begin];
     [CATransaction setDisableActions:YES];
     {
@@ -636,16 +639,12 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
         _axesGridLayer.strokeColor = [_grid.axisColor CGColor];
     }
     else if (context == _gridSpacingContext) {
-        NSClipView *clipView = [[self enclosingScrollView] contentView];
-        const NSRect visibleRect = [self convertRect:clipView.bounds fromView:clipView];
-        [self adjustContentForRect:visibleRect];
+        [self updateVisibleRect];
         [self _extAlignArtBoardToGrid];
         [self _extUpdateArtBoardMinimumSize];
 	}
     else if (context == _gridEmphasisSpacingContext) {
-        NSClipView *clipView = [[self enclosingScrollView] contentView];
-        const NSRect visibleRect = [self convertRect:clipView.bounds fromView:clipView];
-        [self adjustContentForRect:visibleRect];
+        [self updateVisibleRect];
     }
     else if (context == _interactionTypeContext) {
         for (CALayer<EXTChartViewInteraction> *layer in _highlightedLayers) {
@@ -659,9 +658,7 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
         bool showsGrid = [change[NSKeyValueChangeNewKey] boolValue];
         if (showsGrid) {
             [self.layer addSublayer:_gridLayer];
-            NSClipView *clipView = [[self enclosingScrollView] contentView];
-            const NSRect visibleRect = [self convertRect:clipView.bounds fromView:clipView];
-            [self adjustContentForRect:visibleRect];
+            [self updateVisibleRect];
         }
         else {
             [_gridLayer removeFromSuperlayer];

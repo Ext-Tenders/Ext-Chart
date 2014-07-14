@@ -293,9 +293,7 @@ typedef enum : NSInteger {
 
 - (void)clipViewBoundsDidChange:(NSNotification *)notification
 {
-    EXTChartClipView *clipView = (EXTChartClipView *)_chartScrollView.contentView;
-    NSRect visibleRect = [_chartView convertRect:clipView.bounds fromView:clipView];
-    [_chartView adjustContentForRect:visibleRect];
+    [self.chartView updateVisibleRect];
 }
 
 - (void)windowWillClose:(NSNotification *)notification {
