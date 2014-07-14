@@ -11,6 +11,7 @@
 
 
 @class EXTChartView;
+@class EXTChartViewModel;
 @class EXTDocument;
 
 
@@ -19,6 +20,7 @@
 @property (nonatomic, weak) EXTLeibnizWindowController *leibnizWindowController;
 @property (nonatomic, assign) int currentPage;
 @property (nonatomic, readonly, weak) id selectedObject;
+@property (nonatomic, readonly, strong) EXTChartViewModel *chartViewModel;
 
 // Designated initialiser
 - (instancetype)initWithDocument:(EXTDocument *)document;

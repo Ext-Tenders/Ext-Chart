@@ -12,6 +12,7 @@
 #import "EXTDocumentWindowController.h"
 #import "EXTDocument.h"
 #import "EXTChartView.h"
+#import "EXTChartViewModel.h"
 #import "EXTGrid.h"
 #import "EXTArtBoard.h"
 #import "EXTScrollView.h"
@@ -131,12 +132,12 @@ typedef enum : NSInteger {
 
         [_chartView bind:@"highlightColor" toObject:self.extDocument withKeyPath:@"highlightColor" options:nil];
         [_chartView bind:@"artBoardGridFrame" toObject:self.extDocument withKeyPath:@"artBoardGridFrame" options:nil];
-        
-        [_chartView.grid bind:@"gridColor" toObject:self.extDocument withKeyPath:@"gridColor" options:nil];
-        [_chartView.grid bind:@"emphasisGridColor" toObject:self.extDocument withKeyPath:@"gridEmphasisColor" options:nil];
-        [_chartView.grid bind:@"axisColor" toObject:self.extDocument withKeyPath:@"axisColor" options:nil];
-        [_chartView.grid bind:@"gridSpacing" toObject:self.extDocument withKeyPath:@"gridSpacing" options:nil];
-        [_chartView.grid bind:@"emphasisSpacing" toObject:self.extDocument withKeyPath:@"gridEmphasisSpacing" options:nil];
+
+        [self.chartViewController.chartViewModel.grid bind:@"gridColor" toObject:self.extDocument withKeyPath:@"gridColor" options:nil];
+        [self.chartViewController.chartViewModel.grid bind:@"emphasisGridColor" toObject:self.extDocument withKeyPath:@"gridEmphasisColor" options:nil];
+        [self.chartViewController.chartViewModel.grid bind:@"axisColor" toObject:self.extDocument withKeyPath:@"axisColor" options:nil];
+        [self.chartViewController.chartViewModel.grid bind:@"gridSpacing" toObject:self.extDocument withKeyPath:@"gridSpacing" options:nil];
+        [self.chartViewController.chartViewModel.grid bind:@"emphasisSpacing" toObject:self.extDocument withKeyPath:@"gridEmphasisSpacing" options:nil];
     }
 
     // Chart scroll view
@@ -308,11 +309,11 @@ typedef enum : NSInteger {
     [_chartView unbind:@"highlightColor"];
     [_chartView unbind:@"artBoardGridFrame"];
 
-    [_chartView.grid unbind:@"gridColor"];
-    [_chartView.grid unbind:@"emphasisGridColor"];
-    [_chartView.grid unbind:@"axisColor"];
-    [_chartView.grid unbind:@"gridSpacing"];
-    [_chartView.grid unbind:@"emphasisSpacing"];
+    [_chartViewController.chartViewModel.grid unbind:@"gridColor"];
+    [_chartViewController.chartViewModel.grid unbind:@"emphasisGridColor"];
+    [_chartViewController.chartViewModel.grid unbind:@"axisColor"];
+    [_chartViewController.chartViewModel.grid unbind:@"gridSpacing"];
+    [_chartViewController.chartViewModel.grid unbind:@"emphasisSpacing"];
 
     [_chartScrollView.horizontalRulerView unbind:@"unitToPointsConversionFactor"];
     [_chartScrollView.horizontalRulerView unbind:@"emphasisSpacing"];

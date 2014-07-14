@@ -12,8 +12,6 @@
 
 #pragma mark - Public variables
 
-NSString * const EXTGridAnyKey = @"anyGridKey";
-
 NSString * const EXTGridColorPreferenceKey = @"EXTGridColor";
 NSString * const EXTGridSpacingPreferenceKey = @"EXTGridSpacing";
 NSString * const EXTGridEmphasisColorPreferenceKey = @"EXTGridEmphasisColor";
@@ -114,12 +112,6 @@ NSString * const EXTGridAxisColorPreferenceKey = @"EXTGridAxisColor";
         .size.width = _gridSpacing,
         .size.height = _gridSpacing
     };
-}
-
-#pragma mark NSKeyValueObserving
-
-+ (NSSet *)keyPathsForValuesAffectingAnyGridKey {
-	return [NSSet setWithObjects:@"gridColor", @"emphasisGridColor", @"gridSpacing", @"emphasisSpacing", @"axisColor", nil];
 }
 
 @end

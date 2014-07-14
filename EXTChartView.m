@@ -28,11 +28,15 @@ NSString * const EXTChartViewHighlightColorPreferenceKey = @"EXTChartViewHighlig
 #pragma mark - Private variables
 
 static void *_EXTChartViewArtBoardDrawingRectContext = &_EXTChartViewArtBoardDrawingRectContext;
-static void *_EXTChartViewGridAnyKeyContext = &_EXTChartViewGridAnyKeyContext;
-static void *_EXTChartViewGridSpacingContext = &_EXTChartViewGridSpacingContext;
 static void *_interactionTypeContext = &_interactionTypeContext;
 static void *_showsGridContext = &_showsGridContext;
 static void *_selectedObjectContext = &_selectedObjectContext;
+
+static void *_gridColorContext = &_gridColorContext;
+static void *_gridEmphasisColorContext = &_gridEmphasisColorContext;
+static void *_gridAxisColorContext = &_gridAxisColorContext;
+static void *_gridSpacingContext = &_gridSpacingContext;
+static void *_gridEmphasisSpacingContext = &_gridEmphasisSpacingContext;
 
 static const CGFloat _kBelowGridZPosition = -3.0;
 static const CGFloat _kGridZPosition = -2.0;
@@ -48,8 +52,8 @@ static const CGFloat _kEmphasisGridZPosition = 1.0;
 static const CGFloat _kAxesGridZPosition = 2.0;
 
 static const CGFloat _kBaseGridLineWidth = 0.2;
-static const CGFloat _kEmphasisGridLineWidth = 0.2;
-static const CGFloat _kAxesGridLineWidth = 0.4;
+static const CGFloat _kEmphasisGridLineWidth = 0.4;
+static const CGFloat _kAxesGridLineWidth = 0.6;
 
 static const CGFloat _kArtBoardBorderWidth = 0.75;
 static const CGSize _kArtBoardShadowOffset = {-1.0, -2.0};
@@ -58,9 +62,6 @@ static const CGFloat _kArtBoardShadowOpacity = 1.0;
 static const CFTimeInterval _kArtBoardTransitionDuration = 0.125;
 
 static CGColorRef _viewBackgroundColor;
-static CGColorRef _baseGridStrokeColor;
-static CGColorRef _emphasisGridStrokeColor;
-static CGColorRef _axesGridStrokeColor;
 static CGColorRef _artBoardBackgroundColor;
 static CGColorRef _artBoardBorderColor;
 static CGColorRef _artBoardShadowColor;
@@ -107,9 +108,6 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
 {
     if (self == [EXTChartView class]) {
         _viewBackgroundColor = CGColorCreateCopy([[NSColor windowBackgroundColor] CGColor]);
-        _baseGridStrokeColor = CGColorCreateCopy([[NSColor lightGrayColor] CGColor]);
-        _emphasisGridStrokeColor = CGColorCreateCopy([[NSColor darkGrayColor] CGColor]);
-        _axesGridStrokeColor = CGColorCreateCopy([[NSColor blueColor] CGColor]);
         _artBoardBackgroundColor = CGColorCreateCopy([[NSColor whiteColor] CGColor]);
         _artBoardBorderColor = CGColorCreateCopy([[NSColor blackColor] CGColor]);
         _artBoardShadowColor = CGColorCreateCopy([[NSColor blackColor] CGColor]);
@@ -159,9 +157,9 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
                 return layer;
             };
             
-            _baseGridLayer = gridSublayer(_gridLayer.frame, _kBaseGridZPosition, _baseGridStrokeColor, _kBaseGridLineWidth);
-            _emphasisGridLayer = gridSublayer(_gridLayer.frame, _kEmphasisGridZPosition, _emphasisGridStrokeColor, _kEmphasisGridLineWidth);
-            _axesGridLayer = gridSublayer(_gridLayer.frame, _kAxesGridZPosition, _axesGridStrokeColor, _kAxesGridLineWidth);
+            _baseGridLayer = gridSublayer(_gridLayer.frame, _kBaseGridZPosition, [_grid.gridColor CGColor], _kBaseGridLineWidth);
+            _emphasisGridLayer = gridSublayer(_gridLayer.frame, _kEmphasisGridZPosition, [_grid.emphasisGridColor CGColor], _kEmphasisGridLineWidth);
+            _axesGridLayer = gridSublayer(_gridLayer.frame, _kAxesGridZPosition, [_grid.axisColor CGColor], _kAxesGridLineWidth);
             
             [_gridLayer addSublayer:_baseGridLayer];
             [_gridLayer addSublayer:_emphasisGridLayer];
@@ -169,6 +167,14 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
 
             [self addObserver:self forKeyPath:@"showsGrid" options:NSKeyValueObservingOptionNew context:_showsGridContext];
             [self addObserver:self forKeyPath:@"selectedObject" options:NSKeyValueObservingOptionNew context:_selectedObjectContext];
+
+//            @property (nonatomic, assign, getter=isVisible) bool visible;
+
+            [_grid addObserver:self forKeyPath:@"gridColor" options:0 context:_gridColorContext];
+            [_grid addObserver:self forKeyPath:@"emphasisGridColor" options:0 context:_gridEmphasisColorContext];
+            [_grid addObserver:self forKeyPath:@"axisColor" options:0 context:_gridAxisColorContext];
+            [_grid addObserver:self forKeyPath:@"gridSpacing" options:0 context:_gridSpacingContext];
+            [_grid addObserver:self forKeyPath:@"emphasisSpacing" options:0 context:_gridEmphasisSpacingContext];
         }
 
         // Art board
@@ -219,7 +225,6 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
 
             _grid = [EXTGrid new];
             [_grid setBoundsRect:[self bounds]];
-            [_grid addObserver:self forKeyPath:EXTGridAnyKey options:0 context:_EXTChartViewGridAnyKeyContext];
             [_grid addObserver:self forKeyPath:@"gridSpacing" options:0 context:_EXTChartViewGridSpacingContext];
         }
 
@@ -241,7 +246,13 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
     [self removeObserver:self forKeyPath:@"showsGrid" context:_showsGridContext];
     [self removeObserver:self forKeyPath:@"interactionType" context:_interactionTypeContext];
     [self removeObserver:self forKeyPath:@"selectedObject" context:_selectedObjectContext];
-    
+
+    [_grid removeObserver:self forKeyPath:@"gridColor" context:_gridColorContext];
+    [_grid removeObserver:self forKeyPath:@"emphasisGridColor" context:_gridEmphasisColorContext];
+    [_grid removeObserver:self forKeyPath:@"axisColor" context:_gridAxisColorContext];
+    [_grid removeObserver:self forKeyPath:@"gridSpacing" context:_gridSpacingContext];
+    [_grid removeObserver:self forKeyPath:@"emphasisSpcaing" context:_gridEmphasisSpacingContext];
+
     [_artBoard removeObserver:self forKeyPath:@"drawingRect" context:_EXTChartViewArtBoardDrawingRectContext];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
@@ -256,6 +267,7 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
     [CATransaction commit];
 
     const CGFloat spacing = _grid.gridSpacing;
+    const NSInteger emphasisSpacing = _grid.emphasisSpacing;
 
     const NSInteger firstVerticalLine = (NSInteger)floor(rect.origin.x / spacing);
     const NSInteger firstHorizontalLine = (NSInteger)floor(rect.origin.y / spacing);
@@ -273,7 +285,7 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
     CGMutablePathRef emphasisPath = CGPathCreateMutable();
 
     for (NSInteger i = 0; i < numberOfHorizontalLines; ++i) {
-        CGMutablePathRef path = ((firstHorizontalLine + i) % 8) == 0 ? emphasisPath : basePath;
+        CGMutablePathRef path = ((firstHorizontalLine + i) % emphasisSpacing) == 0 ? emphasisPath : basePath;
         CGPathMoveToPoint(path, NULL, point.x, point.y);
         CGPathAddLineToPoint(path, NULL, point.x + rect.size.width + spacing, point.y);
 
@@ -282,7 +294,7 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
 
     point = originInSublayer;
     for (NSInteger i = 0; i < numberOfVerticalLines; ++i) {
-        CGMutablePathRef path = ((firstVerticalLine + i) % 8) == 0 ? emphasisPath : basePath;
+        CGMutablePathRef path = ((firstVerticalLine + i) % emphasisSpacing) == 0 ? emphasisPath : basePath;
         CGPathMoveToPoint(path, NULL, point.x, point.y);
         CGPathAddLineToPoint(path, NULL, point.x, point.y + rect.size.height + spacing);
 
@@ -321,6 +333,8 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
         _axesGridLayer.path = axesPath;
     }
     [CATransaction commit];
+
+    // FIXME: need to rescale layers when grid spacing changes
 
     CGPathRelease(basePath);
     CGPathRelease(emphasisPath);
@@ -624,18 +638,33 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
 
 #pragma mark - Key-value observing
 
+// FIXME: simplify this monster
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
 	if (context == _EXTChartViewArtBoardDrawingRectContext) {
         [self setNeedsDisplayInRect:NSUnionRect([change[NSKeyValueChangeOldKey] rectValue], [_artBoard drawingRect])];
         if (self.interactionType == EXTChartInteractionTypeArtBoard)
             [[self window] invalidateCursorRectsForView:self];
 	}
-	else if (context == _EXTChartViewGridAnyKeyContext) {
-		[self setNeedsDisplay:YES];
-	}
-    else if (context == _EXTChartViewGridSpacingContext) {
+    else if (context == _gridColorContext) {
+        _baseGridLayer.strokeColor = [_grid.gridColor CGColor];
+    }
+    else if (context == _gridEmphasisColorContext) {
+        _emphasisGridLayer.strokeColor = [_grid.emphasisGridColor CGColor];
+    }
+    else if (context == _gridAxisColorContext) {
+        _axesGridLayer.strokeColor = [_grid.axisColor CGColor];
+    }
+    else if (context == _gridSpacingContext) {
+        NSClipView *clipView = [[self enclosingScrollView] contentView];
+        const NSRect visibleRect = [self convertRect:clipView.bounds fromView:clipView];
+        [self adjustContentForRect:visibleRect];
         [self _extAlignArtBoardToGrid];
         [self _extUpdateArtBoardMinimumSize];
+	}
+    else if (context == _gridEmphasisSpacingContext) {
+        NSClipView *clipView = [[self enclosingScrollView] contentView];
+        const NSRect visibleRect = [self convertRect:clipView.bounds fromView:clipView];
+        [self adjustContentForRect:visibleRect];
     }
     else if (context == _interactionTypeContext) {
         for (CALayer<EXTChartViewInteraction> *layer in _highlightedLayers) {

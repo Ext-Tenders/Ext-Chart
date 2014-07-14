@@ -19,8 +19,8 @@
 
 
 @interface EXTChartViewController () <EXTChartViewDataSource, EXTChartViewDelegate>
-@property (nonatomic, weak) id selectedObject;
-@property (nonatomic, strong) EXTChartViewModel *chartViewModel;
+@property (nonatomic, readwrite, weak) id selectedObject;
+@property (nonatomic, readwrite, strong) EXTChartViewModel *chartViewModel;
 @end
 
 #pragma mark - Private variables
@@ -106,6 +106,7 @@ static void *_selectedToolTagContext = &_selectedToolTagContext;
 
     [self.chartView bind:@"interactionType" toObject:self.chartViewModel withKeyPath:@"interactionType" options:nil];
     [self.chartView bind:@"selectedObject" toObject:self.chartViewModel withKeyPath:@"selectedObject" options:nil];
+    [self.chartView bind:@"grid" toObject:self.chartViewModel withKeyPath:@"grid" options:nil];
 
     [self reloadCurrentPage];
 }
