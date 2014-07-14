@@ -234,7 +234,7 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
     [_grid removeObserver:self forKeyPath:@"emphasisGridColor" context:_gridEmphasisColorContext];
     [_grid removeObserver:self forKeyPath:@"axisColor" context:_gridAxisColorContext];
     [_grid removeObserver:self forKeyPath:@"gridSpacing" context:_gridSpacingContext];
-    [_grid removeObserver:self forKeyPath:@"emphasisSpcaing" context:_gridEmphasisSpacingContext];
+    [_grid removeObserver:self forKeyPath:@"emphasisSpacing" context:_gridEmphasisSpacingContext];
 
     [_artBoard removeObserver:self forKeyPath:@"drawingRect" context:_EXTChartViewArtBoardDrawingRectContext];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
