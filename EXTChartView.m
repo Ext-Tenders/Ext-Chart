@@ -31,6 +31,7 @@ static void *_EXTChartViewArtBoardDrawingRectContext = &_EXTChartViewArtBoardDra
 static void *_interactionTypeContext = &_interactionTypeContext;
 static void *_showsGridContext = &_showsGridContext;
 static void *_selectedObjectContext = &_selectedObjectContext;
+static void *_highlightColorContext = &_highlightColorContext;
 
 static void *_gridColorContext = &_gridColorContext;
 static void *_gridEmphasisColorContext = &_gridEmphasisColorContext;
@@ -166,7 +167,6 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
             [_gridLayer addSublayer:_axesGridLayer];
 
             [self addObserver:self forKeyPath:@"showsGrid" options:NSKeyValueObservingOptionNew context:_showsGridContext];
-            [self addObserver:self forKeyPath:@"selectedObject" options:NSKeyValueObservingOptionNew context:_selectedObjectContext];
 
 //            @property (nonatomic, assign, getter=isVisible) bool visible;
 
@@ -216,36 +216,19 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
         self.layer = rootLayer;
         self.wantsLayer = YES;
 
+        [self addObserver:self forKeyPath:@"selectedObject" options:NSKeyValueObservingOptionNew context:_selectedObjectContext];
         [self addObserver:self forKeyPath:@"interactionType" options:NSKeyValueObservingOptionNew context:_interactionTypeContext];
-
-        // ----- Obsolete Begin
-        /*
-        // Grid
-        {
-
-            _grid = [EXTGrid new];
-            [_grid setBoundsRect:[self bounds]];
-            [_grid addObserver:self forKeyPath:@"gridSpacing" options:0 context:_EXTChartViewGridSpacingContext];
-        }
-
-         */
-        // ----- Obsolete End
+        [self addObserver:self forKeyPath:@"highlightColor" options:0 context:_highlightColorContext];
     }
 
 	return self;
 }
 
 - (void)dealloc {
-    // ----- Obsolete Begin
-    /*
-    [_grid removeObserver:self forKeyPath:EXTGridAnyKey context:_EXTChartViewGridAnyKeyContext];
-    [_grid removeObserver:self forKeyPath:@"gridSpacing" context:_EXTChartViewGridSpacingContext];
-     */
-    // ----- Obsolete End
-
     [self removeObserver:self forKeyPath:@"showsGrid" context:_showsGridContext];
     [self removeObserver:self forKeyPath:@"interactionType" context:_interactionTypeContext];
     [self removeObserver:self forKeyPath:@"selectedObject" context:_selectedObjectContext];
+    [self removeObserver:self forKeyPath:@"highlightColor" context:_highlightColorContext];
 
     [_grid removeObserver:self forKeyPath:@"gridColor" context:_gridColorContext];
     [_grid removeObserver:self forKeyPath:@"emphasisGridColor" context:_gridEmphasisColorContext];
@@ -333,8 +316,6 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
         _axesGridLayer.path = axesPath;
     }
     [CATransaction commit];
-
-    // FIXME: need to rescale layers when grid spacing changes
 
     CGPathRelease(basePath);
     CGPathRelease(emphasisPath);
@@ -688,6 +669,11 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
     }
     else if (context == _selectedObjectContext) {
         [self reflectSelection];
+    }
+    else if (context == _highlightColorContext) {
+        CGColorRef highlightColor = [self.highlightColor CGColor];
+        for (EXTTermLayer *layer in _termLayers) layer.highlightColor = highlightColor;
+        for (EXTDifferentialLineLayer *layer in _termLayers) layer.highlightColor = highlightColor;
     }
 	else {
 		[super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
