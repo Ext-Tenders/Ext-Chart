@@ -13,17 +13,6 @@
 @property(nonatomic, strong) NSColor *gridColor, *emphasisGridColor, *axisColor;
 @property(nonatomic, assign) CGFloat gridSpacing;
 @property(nonatomic, assign) NSInteger emphasisSpacing;
-@property(nonatomic, assign) NSRect boundsRect;
-@property(nonatomic, strong) NSBezierPath *gridPath, *emphasisGridPath;
-
-// Drawing
--(NSBezierPath *) makeGridInRect: (NSRect) rect withFactor:(NSUInteger) factor;
-
-- (void) drawGridInRect:(NSRect)rect;
-- (void) drawGrid;
-- (void) drawAxes;
-
-- (void) drawEnclosingRectAtPoint: (NSPoint)point;
 
 /*! Given a view point, returns the grid point representing the origin of the grid square containing that view point */
 - (EXTIntPoint)convertPointFromView:(NSPoint)viewPoint;
@@ -39,10 +28,6 @@
 
 /*! Given a grid rectangle, returns the corresponding rectangle in view coordinate space */
 - (NSRect)convertRectToView:(EXTIntRect)gridRect;
-
-/*! Given a grid point, returns a grid square rectangle in view coordinate space whose origin matches the grid point */
-- (NSRect)viewBoundingRectForGridPoint:(EXTIntPoint)gridSquareOrigin;
-
 @end
 
 #pragma mark - Public variables
