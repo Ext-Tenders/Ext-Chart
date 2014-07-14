@@ -19,6 +19,7 @@
     @property(nonatomic, weak) IBOutlet NSTextField *gridEmphasisSpacingField;
     @property(nonatomic, weak) IBOutlet NSColorWell *axisColorWell;
     @property(nonatomic, weak) IBOutlet NSColorWell *highlightColorWell;
+    @property(nonatomic, weak) IBOutlet NSColorWell *selectionColorWell;
 @end
 
 
@@ -39,6 +40,7 @@
     [_gridEmphasisSpacingField bind:NSValueBinding toObject:doc withKeyPath:@"gridEmphasisSpacing" options:nil];
     [_axisColorWell bind:NSValueBinding toObject:doc withKeyPath:@"axisColor" options:nil];
     [_highlightColorWell bind:NSValueBinding toObject:doc withKeyPath:@"highlightColor" options:nil];
+    [_selectionColorWell bind:NSValueBinding toObject:doc withKeyPath:@"selectionColor" options:nil];
 }
 
 - (void)documentWindowController:(EXTDocumentWindowController *)windowController willRemoveInspectorView:(NSView *)inspectorView {
@@ -49,6 +51,7 @@
     [_gridEmphasisSpacingField unbind:NSValueBinding];
     [_axisColorWell unbind:NSValueBinding];
     [_highlightColorWell unbind:NSValueBinding];
+    [_selectionColorWell unbind:NSValueBinding];
 }
 
 @end

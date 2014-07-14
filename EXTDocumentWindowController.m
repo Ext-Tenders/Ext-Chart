@@ -131,6 +131,7 @@ typedef enum : NSInteger {
         [_chartViewController addObserver:self forKeyPath:@"selectedObject" options:NSKeyValueObservingOptionNew context:_EXTChartViewControllerSelectedObjectContext];
 
         [_chartView bind:@"highlightColor" toObject:self.extDocument withKeyPath:@"highlightColor" options:nil];
+        [_chartView bind:@"selectionColor" toObject:self.extDocument withKeyPath:@"selectionColor" options:nil];
         [_chartView bind:@"artBoardGridFrame" toObject:self.extDocument withKeyPath:@"artBoardGridFrame" options:nil];
 
         [self.chartViewController.chartViewModel.grid bind:@"gridColor" toObject:self.extDocument withKeyPath:@"gridColor" options:nil];
@@ -305,6 +306,7 @@ typedef enum : NSInteger {
     [_chartViewController removeObserver:self forKeyPath:@"selectedObject"];
 
     [_chartView unbind:@"highlightColor"];
+    [_chartView unbind:@"selectionColor"];
     [_chartView unbind:@"artBoardGridFrame"];
 
     [_chartViewController.chartViewModel.grid unbind:@"gridColor"];

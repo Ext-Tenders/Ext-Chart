@@ -23,6 +23,7 @@
     @property(nonatomic, strong) NSColor *gridEmphasisColor;
     @property(nonatomic, strong) NSColor *axisColor;
     @property(nonatomic, strong) NSColor *highlightColor;
+    @property(nonatomic, strong) NSColor *selectionColor;
     @property(nonatomic, assign) CGFloat gridSpacing;
     @property(nonatomic, assign) NSInteger gridEmphasisSpacing;
     @property(nonatomic, assign) EXTIntRect artBoardGridFrame;

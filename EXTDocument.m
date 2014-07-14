@@ -37,6 +37,7 @@
         _gridEmphasisColor = [defaults extColorForKey:EXTGridEmphasisColorPreferenceKey];
         _axisColor = [defaults extColorForKey:EXTGridAxisColorPreferenceKey];
         _highlightColor = [defaults extColorForKey:EXTChartViewHighlightColorPreferenceKey];
+        _selectionColor = [defaults extColorForKey:EXTChartViewSelectionColorPreferenceKey];
         _gridSpacing = [defaults doubleForKey:EXTGridSpacingPreferenceKey];
         _gridEmphasisSpacing = [defaults integerForKey:EXTGridEmphasisSpacingPreferenceKey];
         _artBoardGridFrame = (EXTIntRect){{0}, {20, 15}};
@@ -70,6 +71,7 @@
     [arch encodeObject:_gridEmphasisColor forKey:@"gridEmphasisColor"];
     [arch encodeObject:_axisColor forKey:@"axisColor"];
     [arch encodeObject:_highlightColor forKey:@"highlightColor"];
+    [arch encodeObject:_selectionColor forKey:@"selectionColor"];
     [arch encodeDouble:_gridSpacing forKey:@"gridSpacing"];
     [arch encodeInteger:_gridEmphasisSpacing forKey:@"gridEmphasisSpacing"];
     [arch extEncodeIntRect:_artBoardGridFrame forKey:@"artBoardGridFrame"];
@@ -109,6 +111,9 @@
 
     if ([unarchiver containsValueForKey:@"highlightColor"])
         self.highlightColor = [unarchiver decodeObjectForKey:@"highlightColor"];
+
+    if ([unarchiver containsValueForKey:@"selectionColor"])
+        self.highlightColor = [unarchiver decodeObjectForKey:@"selectionColor"];
 
     if ([unarchiver containsValueForKey:@"gridSpacing"])
         self.gridSpacing = [unarchiver decodeDoubleForKey:@"gridSpacing"];

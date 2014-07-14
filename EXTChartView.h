@@ -61,3 +61,4 @@
 #pragma mark - Exported variables
 
 extern NSString * const EXTChartViewHighlightColorPreferenceKey;
+extern NSString * const EXTChartViewSelectionColorPreferenceKey;

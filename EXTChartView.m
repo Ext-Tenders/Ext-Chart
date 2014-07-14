@@ -23,6 +23,7 @@
 #pragma mark - Exported variables
 
 NSString * const EXTChartViewHighlightColorPreferenceKey = @"EXTChartViewHighlightColor";
+NSString * const EXTChartViewSelectionColorPreferenceKey = @"EXTChartViewSelectionColor";
 
 
 #pragma mark - Private variables
@@ -32,6 +33,7 @@ static void *_interactionTypeContext = &_interactionTypeContext;
 static void *_showsGridContext = &_showsGridContext;
 static void *_selectedObjectContext = &_selectedObjectContext;
 static void *_highlightColorContext = &_highlightColorContext;
+static void *_selectionColorContext = &_selectionColorContext;
 
 static void *_gridColorContext = &_gridColorContext;
 static void *_gridEmphasisColorContext = &_gridEmphasisColorContext;
@@ -101,7 +103,11 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
     [self exposeBinding:@"highlightColor"];
 
     NSColor *highlightColor = [NSColor colorWithCalibratedRed:0.0 green:1.0 blue:1.0 alpha:1.0];
-    NSDictionary *defaults = @{EXTChartViewHighlightColorPreferenceKey : [NSArchiver archivedDataWithRootObject:highlightColor]};
+    NSColor *selectionColor = [NSColor colorWithCalibratedRed:0.0 green:0.5 blue:1.0 alpha:1.0];
+    NSDictionary *defaults = @{
+                               EXTChartViewHighlightColorPreferenceKey : [NSArchiver archivedDataWithRootObject:highlightColor],
+                               EXTChartViewSelectionColorPreferenceKey : [NSArchiver archivedDataWithRootObject:selectionColor],
+                               };
     [[NSUserDefaults standardUserDefaults] registerDefaults:defaults];
 }
 
@@ -127,7 +133,7 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
 
         // Selection
         {
-            _selectionColor = [NSColor orangeColor];
+            _selectionColor = [[NSUserDefaults standardUserDefaults] extColorForKey:EXTChartViewSelectionColorPreferenceKey];
         }
 
         CALayer *rootLayer = [CALayer layer];
@@ -219,6 +225,7 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
         [self addObserver:self forKeyPath:@"selectedObject" options:NSKeyValueObservingOptionNew context:_selectedObjectContext];
         [self addObserver:self forKeyPath:@"interactionType" options:NSKeyValueObservingOptionNew context:_interactionTypeContext];
         [self addObserver:self forKeyPath:@"highlightColor" options:0 context:_highlightColorContext];
+        [self addObserver:self forKeyPath:@"selectionColor" options:0 context:_selectionColorContext];
     }
 
 	return self;
@@ -229,6 +236,7 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
     [self removeObserver:self forKeyPath:@"interactionType" context:_interactionTypeContext];
     [self removeObserver:self forKeyPath:@"selectedObject" context:_selectedObjectContext];
     [self removeObserver:self forKeyPath:@"highlightColor" context:_highlightColorContext];
+    [self removeObserver:self forKeyPath:@"selectionColor" context:_selectionColorContext];
 
     [_grid removeObserver:self forKeyPath:@"gridColor" context:_gridColorContext];
     [_grid removeObserver:self forKeyPath:@"emphasisGridColor" context:_gridEmphasisColorContext];
@@ -670,7 +678,12 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
     else if (context == _highlightColorContext) {
         CGColorRef highlightColor = [self.highlightColor CGColor];
         for (EXTTermLayer *layer in _termLayers) layer.highlightColor = highlightColor;
-        for (EXTDifferentialLineLayer *layer in _termLayers) layer.highlightColor = highlightColor;
+        for (EXTDifferentialLineLayer *layer in _differentialLineLayers) layer.highlightColor = highlightColor;
+    }
+    else if (context == _selectionColorContext) {
+        CGColorRef selectionColor = [self.selectionColor CGColor];
+        for (EXTTermLayer *layer in _termLayers) layer.selectionColor = selectionColor;
+        for (EXTDifferentialLineLayer *layer in _differentialLineLayers) layer.selectionColor = selectionColor;
     }
 	else {
 		[super observeValueForKeyPath:keyPath ofObject:object change:change context:context];

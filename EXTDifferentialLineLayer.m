@@ -78,6 +78,7 @@ static void commonInit(EXTDifferentialLineLayer *self)
     if (_highlightColor != highlightColor) {
         CGColorRelease(_highlightColor);
         _highlightColor = CGColorCreateCopy(highlightColor);
+        [self updateInteractionStatus];
     }
 }
 
@@ -86,6 +87,7 @@ static void commonInit(EXTDifferentialLineLayer *self)
     if (_selectionColor != selectionColor) {
         CGColorRelease(_selectionColor);
         _selectionColor = CGColorCreateCopy(selectionColor);
+        [self updateInteractionStatus];
     }
 }
 
