@@ -11,7 +11,7 @@
 @interface EXTGrid : NSObject
 
 @property (nonatomic, strong) NSColor *gridColor, *emphasisGridColor, *axisColor;
-@property (nonatomic, assign) CGFloat gridSpacing;
+@property (nonatomic, assign) NSInteger gridSpacing;
 @property (nonatomic, assign) NSInteger emphasisSpacing;
 @property (nonatomic, assign, getter=isVisible) bool visible;
 

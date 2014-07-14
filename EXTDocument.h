@@ -24,7 +24,7 @@
     @property(nonatomic, strong) NSColor *axisColor;
     @property(nonatomic, strong) NSColor *highlightColor;
     @property(nonatomic, strong) NSColor *selectionColor;
-    @property(nonatomic, assign) CGFloat gridSpacing;
+    @property(nonatomic, assign) NSInteger gridSpacing;
     @property(nonatomic, assign) NSInteger gridEmphasisSpacing;
     @property(nonatomic, assign) EXTIntRect artBoardGridFrame;
     @property(nonatomic, readonly) EXTDocumentWindowController *mainWindowController;

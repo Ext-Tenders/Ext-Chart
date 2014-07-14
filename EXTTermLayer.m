@@ -15,7 +15,7 @@
 static CFMutableDictionaryRef _glyphPathCache;
 static CGColorRef _fillColor;
 static CGColorRef _strokeColor;
-static const CGFloat _kLineWidth = 0.8;
+static const CGFloat _kLineWidth = 2.0;
 static const CGFloat _kSingleDigitFontSizeFactor = 0.7;
 static const CGFloat _kDoubleDigitFontSizeFactor = 0.4;
 static NSString * const _fontName = @"Palatino-Roman";
@@ -62,7 +62,7 @@ static NSString * const _fontName = @"Palatino-Roman";
     CGColorRelease(_selectionColor);
 }
 
-+ (instancetype)termLayerWithTotalRank:(NSInteger)totalRank length:(CGFloat)length
++ (instancetype)termLayerWithTotalRank:(NSInteger)totalRank length:(NSInteger)length
 {
     EXTTermLayer *layer = [EXTTermLayer layer];
     CGMutablePathRef path = CGPathCreateMutable();

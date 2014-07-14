@@ -17,7 +17,7 @@
 #import "NSKeyedArchiver+EXTAdditions.h"
 
 
-#define PRESENT_FILE_VERSION 5
+#define PRESENT_FILE_VERSION 6
 #define MINIMUM_FILE_VERSION_ALLOWED 5
 
 
@@ -38,7 +38,7 @@
         _axisColor = [defaults extColorForKey:EXTGridAxisColorPreferenceKey];
         _highlightColor = [defaults extColorForKey:EXTChartViewHighlightColorPreferenceKey];
         _selectionColor = [defaults extColorForKey:EXTChartViewSelectionColorPreferenceKey];
-        _gridSpacing = [defaults doubleForKey:EXTGridSpacingPreferenceKey];
+        _gridSpacing = [defaults integerForKey:EXTGridSpacingPreferenceKey];
         _gridEmphasisSpacing = [defaults integerForKey:EXTGridEmphasisSpacingPreferenceKey];
         _artBoardGridFrame = (EXTIntRect){{0}, {20, 15}};
         _multiplicationAnnotations = [NSMutableArray new];
@@ -72,7 +72,7 @@
     [arch encodeObject:_axisColor forKey:@"axisColor"];
     [arch encodeObject:_highlightColor forKey:@"highlightColor"];
     [arch encodeObject:_selectionColor forKey:@"selectionColor"];
-    [arch encodeDouble:_gridSpacing forKey:@"gridSpacing"];
+    [arch encodeInteger:_gridSpacing forKey:@"gridSpacing"];
     [arch encodeInteger:_gridEmphasisSpacing forKey:@"gridEmphasisSpacing"];
     [arch extEncodeIntRect:_artBoardGridFrame forKey:@"artBoardGridFrame"];
     [arch encodeObject:_multiplicationAnnotations forKey:@"multiplicationAnnotations"];
@@ -115,8 +115,15 @@
     if ([unarchiver containsValueForKey:@"selectionColor"])
         self.highlightColor = [unarchiver decodeObjectForKey:@"selectionColor"];
 
-    if ([unarchiver containsValueForKey:@"gridSpacing"])
-        self.gridSpacing = [unarchiver decodeDoubleForKey:@"gridSpacing"];
+    // Until version 5, grid spacing was of type double. Version 6 changed it to integer.
+    if ([unarchiver containsValueForKey:@"gridSpacing"]) {
+        if (version >= 6) {
+            self.gridSpacing = [unarchiver decodeIntegerForKey:@"gridSpacing"];
+        }
+        else {
+            self.gridSpacing = (NSInteger)[unarchiver decodeDoubleForKey:@"gridSpacing"];
+        }
+    }
 
     if ([unarchiver containsValueForKey:@"gridEmphasisSpacing"])
         self.gridEmphasisSpacing = [unarchiver decodeIntegerForKey:@"gridEmphasisSpacing"];

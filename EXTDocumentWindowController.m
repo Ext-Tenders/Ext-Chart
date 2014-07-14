@@ -561,7 +561,7 @@ typedef enum : NSInteger {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     EXTDocument *doc = self.extDocument;
 
-	doc.gridSpacing = [defaults doubleForKey:EXTGridSpacingPreferenceKey];
+	doc.gridSpacing = [defaults integerForKey:EXTGridSpacingPreferenceKey];
 	doc.gridEmphasisSpacing = [defaults integerForKey:EXTGridEmphasisSpacingPreferenceKey];
 
 	doc.gridColor = [defaults extColorForKey:EXTGridColorPreferenceKey];

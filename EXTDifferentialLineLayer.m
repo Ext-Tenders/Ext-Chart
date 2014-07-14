@@ -13,7 +13,7 @@
 static void *_highlightedContext = &_highlightedContext;
 static void *_selectedContext = &_selectedContext;
 
-static const CGFloat _kDifferentialLineWidth = 0.25;
+static const CGFloat _kDifferentialLineWidth = 0.8;
 static const CGFloat _kHighlightedDifferentialLineWidth = _kDifferentialLineWidth * 5;
 static CGColorRef _differentialStrokeColor;
 

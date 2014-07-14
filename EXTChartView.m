@@ -54,9 +54,9 @@ static const CGFloat _kBaseGridZPosition = 0.0;
 static const CGFloat _kEmphasisGridZPosition = 1.0;
 static const CGFloat _kAxesGridZPosition = 2.0;
 
-static const CGFloat _kBaseGridLineWidth = 0.2;
-static const CGFloat _kEmphasisGridLineWidth = 0.4;
-static const CGFloat _kAxesGridLineWidth = 0.6;
+static const CGFloat _kBaseGridLineWidth = 0.25;
+static const CGFloat _kEmphasisGridLineWidth = 0.25;
+static const CGFloat _kAxesGridLineWidth = 1.0;
 
 static const CGFloat _kArtBoardBorderWidth = 0.75;
 static const CGSize _kArtBoardShadowOffset = {-1.0, -2.0};
@@ -937,7 +937,7 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
 + (CGRect)dotBoundingBoxForCellRank:(NSInteger)cellRank
                           termIndex:(NSInteger)termIndex
                        gridLocation:(EXTIntPoint)gridLocation
-                        gridSpacing:(CGFloat)gridSpacing
+                        gridSpacing:(NSInteger)gridSpacing
 {
     switch (cellRank) {
         case 1:

@@ -41,7 +41,7 @@
 + (CGRect)dotBoundingBoxForCellRank:(NSInteger)cellRank
                           termIndex:(NSInteger)termIndex
                        gridLocation:(EXTIntPoint)gridLocation
-                        gridSpacing:(CGFloat)gridSpacing;
+                        gridSpacing:(NSInteger)gridSpacing;
 @end
 
 

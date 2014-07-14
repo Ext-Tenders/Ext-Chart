@@ -25,7 +25,7 @@ NSString * const EXTGridAxisColorPreferenceKey = @"EXTGridAxisColor";
 + (void)load {
     NSDictionary *defaults = @{
                                EXTGridColorPreferenceKey : [NSArchiver archivedDataWithRootObject:[NSColor lightGrayColor]],
-                               EXTGridSpacingPreferenceKey : @(9.0),
+                               EXTGridSpacingPreferenceKey : @(26),
                                EXTGridEmphasisColorPreferenceKey : [NSArchiver archivedDataWithRootObject:[NSColor darkGrayColor]],
                                EXTGridEmphasisSpacingPreferenceKey : @(8),
                                EXTGridAxisColorPreferenceKey : [NSArchiver archivedDataWithRootObject:[NSColor blueColor]],
@@ -40,7 +40,7 @@ NSString * const EXTGridAxisColorPreferenceKey = @"EXTGridAxisColor";
 
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
 
-	_gridSpacing = [defaults doubleForKey:EXTGridSpacingPreferenceKey];
+	_gridSpacing = [defaults integerForKey:EXTGridSpacingPreferenceKey];
 	_emphasisSpacing = [defaults integerForKey:EXTGridEmphasisSpacingPreferenceKey];
 
 	_gridColor = [defaults extColorForKey:EXTGridColorPreferenceKey];
