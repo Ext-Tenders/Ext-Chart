@@ -119,13 +119,17 @@
                   ofLocations:(CFArrayRef)generators {
     int a = 0, b = 0, c = 0;
     
-    for (int i = 0; i < CFArrayGetCount(coeffs); i++) {
-        EXTTriple *thisGuy = CFArrayGetValueAtIndex(generators, i);
+    // access this just once.
+    int max = CFArrayGetCount(coeffs);
+    
+    for (int i = 0; i < max; i++) {
+        // don't bother retaining this object while we have it.
+        __unsafe_unretained EXTTriple *thisGuy = CFArrayGetValueAtIndex(generators, i);
         NSInteger scale = (NSInteger)CFArrayGetValueAtIndex(coeffs, i);
         
-        a += scale*thisGuy.a;
-        b += scale*thisGuy.b;
-        c += scale*thisGuy.c;
+        a += scale*thisGuy->a;
+        b += scale*thisGuy->b;
+        c += scale*thisGuy->c;
     }
     
     return [EXTTriple tripleWithA:a B:b C:c];

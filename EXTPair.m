@@ -61,15 +61,19 @@
 }
 
 +(EXTPair*) linearCombination:(CFArrayRef)coeffs
-                  ofLocations:(CFArrayRef)generators {
+                    ofLocations:(CFArrayRef)generators {
     int a = 0, b = 0;
     
-    for (int i = 0; i < CFArrayGetCount(coeffs); i++) {
-        EXTPair *thisGuy = CFArrayGetValueAtIndex(generators, i);
+    // access this just once.
+    int max = CFArrayGetCount(coeffs);
+    
+    for (int i = 0; i < max; i++) {
+        // don't bother retaining this object while we have it.
+        __unsafe_unretained EXTPair *thisGuy = CFArrayGetValueAtIndex(generators, i);
         NSInteger scale = (NSInteger)CFArrayGetValueAtIndex(coeffs, i);
         
-        a += scale*thisGuy.a;
-        b += scale*thisGuy.b;
+        a += scale*thisGuy->a;
+        b += scale*thisGuy->b;
     }
     
     return [EXTPair pairWithA:a B:b];
