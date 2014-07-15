@@ -234,26 +234,21 @@ static bool lineSegmentIntersectsLineSegment(NSPoint l1p1, NSPoint l1p2, NSPoint
                 break;
             }
 
-            // First, let’s check if the currently selected object is a differential whose start term is located at
+            // Let’s check if the currently selected object is a differential whose start term is located at
             // the selected grid cell
-            EXTChartViewModelTerm *selectedTermInCell = nil;
+            NSUInteger selectedTermIndex = NSNotFound;
             if ([self.selectedObject isKindOfClass:[EXTChartViewModelDifferential class]]) {
                 EXTChartViewModelTerm *selectedTerm = ((EXTChartViewModelDifferential *)self.selectedObject).startTerm;
-                if (selectedTerm.termCell == termCell) selectedTermInCell = selectedTerm;
+                if (selectedTerm.termCell == termCell) {
+                    selectedTermIndex = [termCell.terms indexOfObjectIdenticalTo:selectedTerm];
+                }
             }
 
-            NSUInteger nextTermIndex;
-
-            // If the selected term is located in this cell, try to select the differential for the next term in that cell
-            if (selectedTermInCell) {
-                nextTermIndex = [self indexOfObjectInArray:termCell.terms afterObjectIdenticalTo:selectedTermInCell];
-            }
-            // Otherwise, try to select the first differential--the first term that has a differential
-            else {
-                nextTermIndex = [termCell.terms indexOfObjectPassingTest:^BOOL(EXTChartViewModelTerm *term, NSUInteger idx, BOOL *stop) {
-                    return term.differential != nil;
-                }];
-            }
+            NSUInteger nextTermIndex = [termCell.terms indexOfObjectPassingTest:^BOOL(EXTChartViewModelTerm *term, NSUInteger idx, BOOL *stop) {
+                const bool afterSelected = (selectedTermIndex == NSNotFound ? true : idx > selectedTermIndex);
+                const bool hasDifferential = term.differential != nil;
+                return afterSelected && hasDifferential;
+            }];
 
             if (nextTermIndex != NSNotFound) {
                 EXTChartViewModelTerm *newTerm = termCell.terms[nextTermIndex];
