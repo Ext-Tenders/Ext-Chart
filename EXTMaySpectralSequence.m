@@ -196,8 +196,10 @@
                     else
                         oldSq1Exp = @(2*r);
                     
-                    targetTag.tags[hinext] = oldSq0Exp;
-                    targetTag.tags[hij] = oldSq1Exp;
+                    if ([oldSq0Exp intValue] != 0)
+                        targetTag.tags[hinext] = oldSq0Exp;
+                    if ([oldSq1Exp intValue] != 0)
+                        targetTag.tags[hij] = oldSq1Exp;
                 }
                 
                 // if this tag exists in the dictionary, we must discard it,

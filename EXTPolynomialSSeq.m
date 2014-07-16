@@ -258,6 +258,8 @@
 -(void) resizePolyClass:(NSObject<NSCopying>*)name
                    upTo:(int)newBound
             onCondition:(bool (^)(EXTLocation*))condition {
+    Class<EXTLocation> indexClass = self.indexClass;
+    
     CFMutableArrayRef counter = CFArrayCreateMutable(kCFAllocatorDefault, generators.count, NULL);
     CFMutableArrayRef upperBounds = CFArrayCreateMutable(kCFAllocatorDefault, generators.count, NULL);
     CFMutableArrayRef locations = CFArrayCreateMutable(kCFAllocatorDefault, generators.count, NULL);
@@ -290,7 +292,7 @@
     BOOL totalRollover = FALSE;
     while (!totalRollover) {
         // search for a term in the location encoded by the counter
-        EXTLocation *workingLoc = [[self indexClass] linearCombination:counter ofLocations:locations];
+        EXTLocation *workingLoc = [indexClass linearCombination:counter ofLocations:locations];
         
         if (condition(workingLoc)) {
             EXTTerm *term = [self findTerm:workingLoc];
@@ -310,24 +312,26 @@
                     [tag.tags setObject:@(value)
                                  forKey:CFArrayGetValueAtIndex(names, i)];
             }
-            [term.names addObject:[tag copy]];
+            [term.names addObject:tag];
         
             // also need to modify all incoming and outgoing differentials.
-            EXTMatrix *inclusion = [EXTMatrix matrixWidth:(term.size-1)
-                                                   height:term.size];
-            int *inclusionData = inclusion.presentation.mutableBytes;
-            for (int i = 0; i < term.size-1; i++)
-                inclusionData[i*inclusion.height + i] = 1;
-            for (int i = 1; i < self.differentials.count; i++) {
-                EXTDifferential
-                    *outgoing = [self findDifflWithSource:workingLoc onPage:i],
-                    *incoming = [self findDifflWithTarget:workingLoc onPage:i];
-                for (EXTPartialDefinition *p in outgoing.partialDefinitions)
-                    p.inclusion = [EXTMatrix newMultiply:inclusion
-                                                      by:p.inclusion];
-                for (EXTPartialDefinition *p in incoming.partialDefinitions)
-                    p.action = [EXTMatrix newMultiply:inclusion
-                                                   by:p.action];
+            if (self.differentials.count > 0) {
+                EXTMatrix *inclusion = [EXTMatrix matrixWidth:(term.size-1)
+                                                       height:term.size];
+                int *inclusionData = inclusion.presentation.mutableBytes;
+                for (int i = 0; i < term.size-1; i++)
+                    inclusionData[i*inclusion.height + i] = 1;
+                for (int i = 1; i < self.differentials.count; i++) {
+                    EXTDifferential
+                        *outgoing = [self findDifflWithSource:workingLoc onPage:i],
+                        *incoming = [self findDifflWithTarget:workingLoc onPage:i];
+                    for (EXTPartialDefinition *p in outgoing.partialDefinitions)
+                        p.inclusion = [EXTMatrix newMultiply:inclusion
+                                                          by:p.inclusion];
+                    for (EXTPartialDefinition *p in incoming.partialDefinitions)
+                        p.action = [EXTMatrix newMultiply:inclusion
+                                                       by:p.action];
+                }
             }
         }
         
