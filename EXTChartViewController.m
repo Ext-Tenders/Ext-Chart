@@ -69,7 +69,7 @@ static void *_selectedToolTagContext = &_selectedToolTagContext;
                   withKeyPath:@"multiplicationAnnotations"
                       options:nil];
 
-        [_chartViewModel addObserver:self forKeyPath:@"selectedObject" options:0 context:_selectedObjectContext];
+        [self addObserver:self forKeyPath:@"selectedObject" options:0 context:_selectedObjectContext];
     }
     return self;
 }
@@ -86,7 +86,7 @@ static void *_selectedToolTagContext = &_selectedToolTagContext;
     
     [_chartViewModel unbind:@"multiplicationAnnotationRules"];
 
-    [self.chartViewModel removeObserver:self forKeyPath:@"selectedObject" context:_selectedObjectContext];
+    [self removeObserver:self forKeyPath:@"selectedObject" context:_selectedObjectContext];
 
     self.chartViewModel = nil;
     _document = nil;
@@ -164,33 +164,137 @@ static void *_selectedToolTagContext = &_selectedToolTagContext;
         return;
     }
 
-    [self.chartViewModel selectObjectAtGridLocation:gridLocation];
+    // TODO: lots!
+    switch (self.chartViewModel.interactionType) {
+        case EXTChartInteractionTypeTerm: {
+            NSArray *terms = [_document.sseq findTermsUnderPoint:gridLocation];
+            NSUInteger oldIndex = NSNotFound;
 
-    // If we couldn’t select a differential, try to build one for the first term in that grid cell that doesn’t have
-    // a differential yet.
-    // Note that this code is in the view controller because the view & the view model do not currently handle empty
-    // differentials, and other parts of Ext Chart rely on the EXTChartViewController.selectedObject pointing to
-    // EXTDifferential
-    if (!self.selectedObject && self.chartViewModel.interactionType == EXTChartInteractionTypeDifferential) {
-        EXTChartViewModelTermCell *termCell = [self.chartViewModel termCellAtGridLocation:gridLocation];
-        for (EXTChartViewModelTerm *term in termCell.terms) {
-            // We ignore terms that already have a differential in this page.
-            // Since the view model ignores empty differentials, it is possible that a differential for this term
-            // has been created and the view model doesn’t know about it, so we need to query the model instead.
-            // TODO: Should the view model care about empty differentials as well? Food for thought.
-            EXTLocation *sourceLoc = term.modelTerm.location;
-            EXTDifferential *diff = [_document.sseq findDifflWithSource:sourceLoc onPage:self.currentPage];
-            if (diff) continue;
+            // if there's nothing under this click, just quit now.
+            if (terms.count == 0) {
+                self.selectedObject = nil;
+                return;
+            }
 
-            EXTLocation *endLoc = [[sourceLoc class] followDiffl:sourceLoc page:self.currentPage];
-            EXTTerm *modelEndTerm = [_document.sseq findTerm:endLoc];
-            if (!modelEndTerm) continue;
+            // if we used to have something selected, and it was a term at this
+            // location, then we should find its position in our list.
+            if ([self.selectedObject isKindOfClass:[EXTTerm class]])
+                oldIndex = [terms indexOfObject:(EXTTerm*)self.selectedObject];
 
-            EXTDifferential *newModelDiff = [EXTDifferential newDifferential:term.modelTerm end:modelEndTerm page:self.currentPage];
-            [_document.sseq addDifferential:newModelDiff];
-            self.selectedObject = newModelDiff;
+            // the new index is one past the old index, unless we have to wrap.
+            int newIndex = oldIndex;
+            EXTTerm *term = nil;
+            if (oldIndex == NSNotFound) {
+                oldIndex = 0;
+                newIndex = 0;
+            }
+            do {
+                if (newIndex == (terms.count - 1))
+                    newIndex = 0;
+                else
+                    newIndex = newIndex + 1;
+                term = terms[newIndex];
+
+                // if we've found it, good!  quit!
+                if (term) {
+                    self.selectedObject = term;
+                    break;
+                }
+            } while (newIndex != oldIndex);
+
             break;
         }
+
+        case EXTChartInteractionTypeDifferential: {
+            NSArray *terms = [_document.sseq findTermsUnderPoint:gridLocation];
+            NSUInteger oldIndex = NSNotFound;
+
+            // if there's nothing under this click, just quit now.
+            if (terms.count == 0) {
+                self.selectedObject = nil;
+                return;
+            }
+
+            // if we used to have something selected, and it was a differential
+            // on this page, then we should find its position in our list.
+            if ([self.selectedObject isKindOfClass:[EXTDifferential class]] &&
+                (((EXTDifferential*)self.selectedObject).page == _currentPage))
+                oldIndex = [terms indexOfObject:((EXTDifferential*)self.selectedObject).start];
+
+            // the new index is one past the old index, unless we have to wrap.
+            int newIndex = oldIndex;
+            EXTTerm *source = nil, *end = nil;
+            EXTDifferential *diff = nil;
+            if (oldIndex == NSNotFound) {
+                oldIndex = 0;
+                newIndex = 0;
+            }
+            do {
+                if (newIndex == (terms.count - 1))
+                    newIndex = 0;
+                else
+                    newIndex = newIndex + 1;
+                source = terms[newIndex];
+                diff = [_document.sseq findDifflWithSource:source.location onPage:_currentPage];
+
+                // if we've found it, good!  quit!
+                if (diff) {
+                    self.selectedObject = diff;
+                    break;
+                }
+
+                // if there's no differential, then let's try to build it.
+                EXTLocation *endLoc = [[source.location class] followDiffl:source.location page:_currentPage];
+                end = [_document.sseq findTerm:endLoc];
+
+                if (end) {
+                    // but if there is, let's build it and set it up.
+                    diff = [EXTDifferential newDifferential:source end:end page:_currentPage];
+                    [_document.sseq addDifferential:diff];
+                    self.selectedObject = diff;
+                    break;
+                }
+
+                // if there's no target term, then this won't work, and we
+                // should cycle.
+            } while (newIndex != oldIndex);
+
+            break;
+        }
+
+//        case EXTToolTagMarquee: {
+//            const NSRect gridRectInView = [self.chartView.grid viewBoundingRectForGridPoint:gridLocation];
+//            NSIndexSet *marqueesAtPoint = [_document.marquees indexesOfObjectsPassingTest:^BOOL(EXTMarquee *marquee, NSUInteger idx, BOOL *stop) {
+//                return NSIntersectsRect(gridRectInView, marquee.frame);
+//            }];
+//
+//            EXTMarquee *newSelectedMarquee = nil;
+//
+//            if (marqueesAtPoint.count == 0) {
+//                newSelectedMarquee = [EXTMarquee new];
+//                newSelectedMarquee.string = @"New marquee";
+//                newSelectedMarquee.frame = (NSRect){gridRectInView.origin, {100.0, 15.0}};
+//                [_document.marquees addObject:newSelectedMarquee];
+//            }
+//            else {
+//                // Cycle through all marquees lying on that grid square
+//                const NSInteger previousSelectedMarqueeIndex = ([self.selectedObject isKindOfClass:[EXTMarquee class]] ?
+//                                                                [_document.marquees indexOfObject:self.selectedObject] :
+//                                                                -1);
+//                NSInteger newSelectedMarqueeIndex = [marqueesAtPoint indexGreaterThanIndex:previousSelectedMarqueeIndex];
+//                if (newSelectedMarqueeIndex == NSNotFound)
+//                    newSelectedMarqueeIndex = [marqueesAtPoint firstIndex];
+//
+//                newSelectedMarquee = _document.marquees[newSelectedMarqueeIndex];
+//            }
+//
+//            self.selectedObject = newSelectedMarquee;
+//            
+//            break;
+//        }
+
+        default:
+            break;
     }
 }
 
@@ -263,14 +367,14 @@ static void *_selectedToolTagContext = &_selectedToolTagContext;
         self.chartViewModel.interactionType = [EXTChartViewController interactionTypeFromToolTag:newTag];
     }
     else if (context == _selectedObjectContext) {
-        if ([self.chartViewModel.selectedObject isKindOfClass:[EXTChartViewModelTerm class]]) {
-            self.selectedObject = ((EXTChartViewModelTerm *)self.chartViewModel.selectedObject).modelTerm;
+        if ([self.selectedObject isKindOfClass:[EXTTerm class]]) {
+            self.chartViewModel.selectedObject = [self.chartViewModel viewModelTermForModelTerm:self.selectedObject];
         }
-        else if ([self.chartViewModel.selectedObject isKindOfClass:[EXTChartViewModelDifferential class]]) {
-            self.selectedObject = ((EXTChartViewModelDifferential *)self.chartViewModel.selectedObject).modelDifferential;
+        else if ([self.selectedObject isKindOfClass:[EXTDifferential class]]) {
+            self.chartViewModel.selectedObject = [self.chartViewModel viewModelDifferentialForModelDifferential:self.selectedObject];
         }
         else {
-            self.selectedObject = nil;
+            self.chartViewModel.selectedObject = nil;
         }
     }
     else {
