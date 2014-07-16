@@ -115,7 +115,7 @@
     // two, and so we project to the higher nonzero May filtration degree to get
     // just d2 b30 = h13 h20^2 + h21^2 h11.  of course, we should *also* only
     // project away to higher filtration classes that actually exist.  for the
-    // A(2) May SS, this means that d2 b30 = h12^2 h21, since the other classes
+    // A(2) May SS, this means that d2 b30 = h21^2 h11, since the other classes
     // have all been deleted by the A --> A(2) quotient.
     
     EXTTerm *startTerm = [self findTerm:location],
