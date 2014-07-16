@@ -211,92 +211,18 @@ static bool lineSegmentIntersectsLineSegment(NSPoint l1p1, NSPoint l1p2, NSPoint
     self.modelToViewModelTermMap[@(self.currentPage)] = modelToViewModelTermMap; // FIXME: Do we need to keep this?
 }
 
-- (void)selectObjectAtGridLocation:(EXTIntPoint)gridLocation
-{
-    switch (self.interactionType) {
-        case EXTChartInteractionTypeTerm: {
-            EXTChartViewModelTermCell *termCell = [self termCellAtGridLocation:gridLocation];
-            if (termCell.terms.count == 0) {
-                self.selectedObject = nil;
-                break;
-            }
+- (EXTChartViewModelTerm *)viewModelTermForModelTerm:(EXTTerm *)term {
+    return [self.modelToViewModelTermMap[@(self.currentPage)] objectForKey:term];
+}
 
-            NSUInteger newSelectionIndex = [self indexOfObjectInArray:termCell.terms afterObjectIdenticalTo:self.selectedObject];
-            self.selectedObject = (newSelectionIndex == NSNotFound ? nil : termCell.terms[newSelectionIndex]);
-
-            break;
+- (EXTChartViewModelDifferential *)viewModelDifferentialForModelDifferential:(EXTDifferential *)differential {
+    for (EXTChartViewModelDifferential *viewModelDiff in self.privateDifferentials[@(self.currentPage)]) {
+        if (viewModelDiff.modelDifferential == differential) {
+            return viewModelDiff;
         }
-
-        case EXTChartInteractionTypeDifferential: {
-            EXTChartViewModelTermCell *termCell = [self termCellAtGridLocation:gridLocation];
-            if (termCell.terms.count == 0) {
-                self.selectedObject = nil;
-                break;
-            }
-
-            // Let’s check if the currently selected object is a differential whose start term is located at
-            // the selected grid cell
-            NSUInteger selectedTermIndex = NSNotFound;
-            if ([self.selectedObject isKindOfClass:[EXTChartViewModelDifferential class]]) {
-                EXTChartViewModelTerm *selectedTerm = ((EXTChartViewModelDifferential *)self.selectedObject).startTerm;
-                if (selectedTerm.termCell == termCell) {
-                    selectedTermIndex = [termCell.terms indexOfObjectIdenticalTo:selectedTerm];
-                }
-            }
-
-            NSUInteger nextTermIndex = [termCell.terms indexOfObjectPassingTest:^BOOL(EXTChartViewModelTerm *term, NSUInteger idx, BOOL *stop) {
-                const bool afterSelected = (selectedTermIndex == NSNotFound ? true : idx > selectedTermIndex);
-                const bool hasDifferential = term.differential != nil;
-                return afterSelected && hasDifferential;
-            }];
-
-            if (nextTermIndex != NSNotFound) {
-                EXTChartViewModelTerm *newTerm = termCell.terms[nextTermIndex];
-                self.selectedObject = newTerm.differential;
-            }
-            else {
-                self.selectedObject = nil;
-            }
-
-            break;
-        }
-
-//        case EXTToolTagMarquee: {
-//            const NSRect gridRectInView = [self.chartView.grid viewBoundingRectForGridPoint:gridLocation];
-//            NSIndexSet *marqueesAtPoint = [_document.marquees indexesOfObjectsPassingTest:^BOOL(EXTMarquee *marquee, NSUInteger idx, BOOL *stop) {
-//                return NSIntersectsRect(gridRectInView, marquee.frame);
-//            }];
-//
-//            EXTMarquee *newSelectedMarquee = nil;
-//
-//            if (marqueesAtPoint.count == 0) {
-//                newSelectedMarquee = [EXTMarquee new];
-//                newSelectedMarquee.string = @"New marquee";
-//                newSelectedMarquee.frame = (NSRect){gridRectInView.origin, {100.0, 15.0}};
-//                [_document.marquees addObject:newSelectedMarquee];
-//            }
-//            else {
-//                // Cycle through all marquees lying on that grid square
-//                const NSInteger previousSelectedMarqueeIndex = ([self.selectedObject isKindOfClass:[EXTMarquee class]] ?
-//                                                                [_document.marquees indexOfObject:self.selectedObject] :
-//                                                                -1);
-//                NSInteger newSelectedMarqueeIndex = [marqueesAtPoint indexGreaterThanIndex:previousSelectedMarqueeIndex];
-//                if (newSelectedMarqueeIndex == NSNotFound)
-//                    newSelectedMarqueeIndex = [marqueesAtPoint firstIndex];
-//
-//                newSelectedMarquee = _document.marquees[newSelectedMarqueeIndex];
-//            }
-//
-//            self.selectedObject = newSelectedMarquee;
-//
-//            break;
-//        }
-
-        case EXTChartInteractionTypeArtBoard:
-        case EXTChartInteractionTypeMultiplicativeStructure:
-        default:
-            break;
     }
+
+    return nil;
 }
 
 - (EXTChartViewModelTermCell *)termCellAtGridLocation:(EXTIntPoint)gridLocation

@@ -14,6 +14,7 @@
 @class EXTTerm;
 @class EXTDifferential;
 @class EXTGrid;
+@class EXTChartViewModelTerm;
 @class EXTChartViewModelTermCell;
 @class EXTChartViewModelDifferential;
 
@@ -42,7 +43,8 @@
 @property (nonatomic, readonly) NSArray *multiplicationAnnotationRules;
 
 - (void)reloadCurrentPage;
-- (void)selectObjectAtGridLocation:(EXTIntPoint)gridLocation;
+- (EXTChartViewModelTerm *)viewModelTermForModelTerm:(EXTTerm *)term;
+- (EXTChartViewModelDifferential *)viewModelDifferentialForModelDifferential:(EXTDifferential *)differential;
 - (EXTChartViewModelTermCell *)termCellAtGridLocation:(EXTIntPoint)gridLocation;
 @end
 
