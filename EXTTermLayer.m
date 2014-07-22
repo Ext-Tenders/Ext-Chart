@@ -12,22 +12,33 @@
 
 #pragma mark - Private variables
 
-static CFMutableDictionaryRef _glyphPathCache;
-static CGColorRef _fillColor;
-static CGColorRef _strokeColor;
-static const CGFloat _kLineWidth = 2.0;
-static const CGFloat _kSingleDigitFontSizeFactor = 0.7;
+static NSCache *_dotImageCache;
+
+static NSColor *_color;
+static const CGFloat _kLineWidth = 1.0 / 26.0;
+static const CGFloat _kSingleDigitFontSizeFactor = 0.5;
 static const CGFloat _kDoubleDigitFontSizeFactor = 0.4;
 static NSString * const _fontName = @"Palatino-Roman";
 
+#pragma mark - Private functions
+
+static NSSize boundingSizeForAttributedString(NSAttributedString *s);
+
 #pragma mark - Private classes
 
-@interface EXTTermLayerGlyphCacheKey : NSObject <NSCopying>
-@property (nonatomic, assign) CGFloat fontSize;
-@property (nonatomic, assign) CGGlyph glyph;
-+ (instancetype)glyphCacheKeyWithFontSize:(CGFloat)fontSize glyph:(CGGlyph)glyph;
+@interface EXTDotImageCacheKey : NSObject
+@property (nonatomic, readonly) NSInteger rank;
+@property (nonatomic, readonly) CGFloat length;
+@property (nonatomic, readonly) NSColor *color;
++ (instancetype)dotImageCacheKeyWithRank:(NSInteger)rank length:(CGFloat)length color:(NSColor *)color;
 @end
 
+#pragma mark - Class extensions
+
+@interface EXTTermLayer ()
+@property (nonatomic, readonly) CGFloat scaledLength;
+@property (nonatomic, readonly) NSColor *termColor;
+@end
 
 @implementation EXTTermLayer
 
@@ -39,10 +50,8 @@ static NSString * const _fontName = @"Palatino-Roman";
 + (void)initialize
 {
     if (self == [EXTTermLayer class]) {
-        _glyphPathCache = CFDictionaryCreateMutable(kCFAllocatorDefault, 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
-
-        _fillColor = CGColorCreateCopy([[NSColor blackColor] CGColor]);
-        _strokeColor = CGColorCreateCopy([[NSColor blackColor] CGColor]);
+        _dotImageCache = [NSCache new];
+        _color = [NSColor blackColor];
     }
 }
 
@@ -52,6 +61,10 @@ static NSString * const _fontName = @"Palatino-Roman";
     if (self && [layer isKindOfClass:[EXTTermLayer class]]) {
         EXTTermLayer *otherLayer = layer;
         _termCell = otherLayer.termCell;
+        _highlighted = otherLayer.highlighted;
+        _selected = otherLayer.selected;
+        _highlightColor = CGColorCreateCopy(otherLayer.highlightColor);
+        _selectionColor = CGColorCreateCopy(otherLayer.selectionColor);
     }
     return self;
 }
@@ -65,120 +78,96 @@ static NSString * const _fontName = @"Palatino-Roman";
 + (instancetype)termLayerWithTotalRank:(NSInteger)totalRank length:(NSInteger)length
 {
     EXTTermLayer *layer = [EXTTermLayer layer];
-    CGMutablePathRef path = CGPathCreateMutable();
-    CGPathMoveToPoint(path, NULL, 0.0, 0.0);
-
-    for (NSInteger i = 0; i < totalRank; ++i) {
-        const CGRect box = [EXTChartView dotBoundingBoxForCellRank:totalRank termIndex:i gridLocation:(EXTIntPoint){0} gridSpacing:length];
-        CGPathAddEllipseInRect(path, NULL, box);
-    }
-
-    if (totalRank <= 3) {
-        layer.fillColor = _fillColor;
-        layer.lineWidth = 0.0;
-    }
-    else {
-        layer.fillColor = [[NSColor clearColor] CGColor];
-        layer.strokeColor = _strokeColor;
-        layer.lineWidth = _kLineWidth;
-
-        NSString *label = [NSString stringWithFormat:@"%ld", (long)totalRank];
-        CGFloat fontSize = round((totalRank < 10 ?
-                                  length * _kSingleDigitFontSizeFactor :
-                                  length * _kDoubleDigitFontSizeFactor));
-        CGSize textSize;
-        NSArray *glyphLayers = [self layersForString:label atSize:fontSize totalSize:&textSize];
-        // Centre the layers horizontally
-        const CGSize offset = {(length - textSize.width) / 2.0, (length - textSize.height) / 2.0};
-
-        for (CAShapeLayer *glyphLayer in glyphLayers) {
-            CGPoint position = glyphLayer.position;
-            position.x += offset.width;
-            position.y = offset.height;
-            glyphLayer.position = position;
-
-            [layer addSublayer:glyphLayer];
-        }
-    }
-
-    layer.path = path;
-    CGPathRelease(path);
-
+    layer.contents = [self dotImageForRank:totalRank length:length color:_color];
+    layer.drawsAsynchronously = YES;
     return layer;
 }
 
-+ (NSArray *)layersForString:(NSString *)string atSize:(CGFloat)fontSize totalSize:(CGSize *)outSize
-{
-    NSParameterAssert(outSize);
+- (void)resetContents {
+    self.contents = [EXTTermLayer dotImageForRank:self.termCell.totalRank
+                                           length:self.scaledLength
+                                            color:self.termColor];
+}
 
-    NSMutableArray *layers = [NSMutableArray new];
-    outSize->width = outSize->height = 0.0;
-    NSFont *font = [NSFont fontWithName:_fontName size:fontSize];
-    NSDictionary *attrs = @{NSFontAttributeName: font};
++ (NSImage *)dotImageForRank:(NSInteger)rank length:(CGFloat)length color:(NSColor *)color {
+    NSParameterAssert(color);
 
-    NSAttributedString *attrString = [[NSAttributedString alloc] initWithString:string attributes:attrs];
-    CTLineRef line = CTLineCreateWithAttributedString((__bridge CFAttributedStringRef)attrString);
-    CFArrayRef glyphRuns = CTLineGetGlyphRuns(line);
-    CFIndex glyphRunsCount = CFArrayGetCount(glyphRuns);
-    for (CFIndex glyphRunIndex = 0; glyphRunIndex < glyphRunsCount; ++glyphRunIndex) {
-        CTRunRef run = CFArrayGetValueAtIndex(glyphRuns, glyphRunIndex);
-        CFIndex runGlyphCount = CTRunGetGlyphCount(run);
-        CGPoint positions[runGlyphCount];
-        CGGlyph glyphs[runGlyphCount];
+    EXTDotImageCacheKey *cacheKey = [EXTDotImageCacheKey dotImageCacheKeyWithRank:rank length:round(length) color:color];
+    NSImage *image = [_dotImageCache objectForKey:cacheKey];
 
-        CTRunGetPositions(run, (CFRange){0}, positions);
-        CTRunGetGlyphs(run, (CFRange){0}, glyphs);
-        for (CFIndex glyphIndex = 0; glyphIndex < runGlyphCount; ++glyphIndex) {
-            CAShapeLayer *layer = CAShapeLayer.layer;
-            layer.position = positions[glyphIndex];
-            layer.path = [self pathForGlyph:glyphs[glyphIndex] atSize:fontSize];
-            [layers addObject:layer];
-
-            NSRect glyphBoundingRect = [font boundingRectForGlyph:glyphs[glyphIndex]];
-            outSize->height = MAX(outSize->height, glyphBoundingRect.size.height);
-        }
+#ifdef LOG_IMGCACHE_STATS
+    static NSInteger cacheHits, cacheMisses;
+#endif
+    if (image) {
+#ifdef LOG_IMGCACHE_STATS
+        ++cacheHits;
+        DLog(@"Dot iamage cache HIT; hits = %ld, misses = %ld", (long)cacheHits, (long)cacheMisses);
+#endif
+        return image;
     }
 
-    outSize->width = CTLineGetTypographicBounds(line, NULL, NULL, NULL);
+#ifdef LOG_IMGCACHE_STATS
+    ++cacheMisses;
+    DLog(@"Dot iamage cache MISS; hits = %ld, misses = %ld", (long)cacheHits, (long)cacheMisses);
+    DLog(@"Rank is %ld, length is %f, color is %@", (long)rank, round(length), color);
+#endif
 
-    CFRelease(line);
+    BOOL (^drawingHandler)(NSRect) = NULL;
 
-    return layers;
-}
-
-+ (CGPathRef)pathForGlyph:(CGGlyph)glyph atSize:(CGFloat)fontSize
-{
-    CTFontRef font = CTFontCreateWithName(CFSTR("Palatino-Roman"), fontSize, NULL);
-    CGPathRef path = [self pathForGlyph:glyph fromFont:font];
-    CFRelease(font);
-    return path;
-}
-
-// From Apple’s CoreAnimationText sample code
-+ (CGPathRef)pathForGlyph:(CGGlyph)glyph fromFont:(CTFontRef)font
-{
-    const CGFloat fontSize = CTFontGetSize(font);
-    EXTTermLayerGlyphCacheKey *cacheKey = [EXTTermLayerGlyphCacheKey glyphCacheKeyWithFontSize:fontSize glyph:glyph];
-    CGPathRef path = (CGPathRef)CFDictionaryGetValue(_glyphPathCache, (const void *)cacheKey);
-    if (path == NULL) {
-        path = CTFontCreatePathForGlyph(font, glyph, NULL);
-        if (path == NULL) {
-            path = (CGPathRef)kCFNull;
+    if (rank <= 3) {
+        NSBezierPath *path = [NSBezierPath bezierPath];
+        for (NSInteger i = 0; i < rank; ++i) {
+            const CGRect rect = [EXTChartView dotBoundingBoxForCellRank:rank
+                                                              termIndex:i
+                                                           gridLocation:(EXTIntPoint){0}
+                                                            gridSpacing:(NSInteger)length];
+            [path appendBezierPathWithOvalInRect:rect];
         }
 
-        CFDictionarySetValue(_glyphPathCache, (const void *)cacheKey, path);
-        CFRelease(path);
+        drawingHandler = ^(NSRect frame) {
+            [color setFill];
+            [path fill];
+            return YES;
+        };
+    }
+    else {
+        NSString *label = [NSString stringWithFormat:@"%ld", rank];
+        const CGFloat fontSize = length * ([label length] == 1 ? _kSingleDigitFontSizeFactor : _kDoubleDigitFontSizeFactor);
+        NSFont *font = [NSFont fontWithName:_fontName size:fontSize];
+        NSDictionary *attrs = @{
+                                NSFontAttributeName: font,
+                                NSForegroundColorAttributeName: color
+                                };
+        NSAttributedString *attrLabel = [[NSAttributedString alloc] initWithString:label attributes:attrs];
+
+        const CGRect drawingFrame = [EXTChartView dotBoundingBoxForCellRank:rank
+                                                                  termIndex:0
+                                                               gridLocation:(EXTIntPoint){0}
+                                                                gridSpacing:(NSInteger)length];
+        NSBezierPath *path = [NSBezierPath bezierPathWithOvalInRect:drawingFrame];
+        path.lineWidth = _kLineWidth * length;
+        const NSSize labelSize = boundingSizeForAttributedString(attrLabel);
+
+        drawingHandler = ^(NSRect frame) {
+            // We want the label centred horizontally & vertically inside frame
+            const NSRect textFrame = {
+                .origin.x = (frame.size.width - labelSize.width) / 2,
+                .origin.y = /*FIXME: magic*/ 0.35 * frame.size.height,
+                .size = labelSize,
+            };
+
+            [color setStroke];
+            [path stroke];
+            [attrLabel drawWithRect:textFrame options:0]; // FIXME: doesn’t match positioning in -drawInRect:. Works with magic above
+            return YES;
+        };
     }
 
-    if (path == (CGPathRef)kCFNull) {
-        // If we got the placeholder, then set the path to NULL
-        // (this will happen either after discovering the glyph path is NULL,
-        // or after looking that up in the dictionary).
-        path = NULL;
-    }
-    
-    return path;
+    image = [NSImage imageWithSize:(CGSize){length, length} flipped:NO drawingHandler:drawingHandler];
+    [_dotImageCache setObject:image forKey:cacheKey];
+    return image;
 }
+
 
 #pragma mark - Properties
 
@@ -230,66 +219,70 @@ static NSString * const _fontName = @"Palatino-Roman";
     }
 }
 
+- (CGFloat)scaledLength {
+    return self.bounds.size.width * self.contentsScale;
+}
+
+- (NSColor *)termColor {
+    return (self.selected ? [NSColor colorWithCGColor:self.selectionColor] :
+            self.highlighted ? [NSColor colorWithCGColor:self.highlightColor] :
+            _color);
+}
+
 - (void)updateInteractionStatus
 {
-    CGColorRef fillColor, strokeColor;
-
-    if (self.selected) {
-        fillColor = strokeColor = self.selectionColor;
-    }
-    else if (self.highlighted) {
-        fillColor = strokeColor = self.highlightColor;
-    }
-    else {
-        fillColor = _fillColor;
-        strokeColor = _strokeColor;
-    }
-
-    if (self.termCell.totalRank <= 3) {
-        self.fillColor = fillColor;
-    }
-    else {
-        self.strokeColor = strokeColor;
-        for (CAShapeLayer *sublayer in self.sublayers) {
-            sublayer.fillColor = strokeColor;
-        }
-    }
+    self.contents = [EXTTermLayer dotImageForRank:self.termCell.totalRank
+                                           length:self.scaledLength
+                                            color:self.termColor];
 }
 
 @end
 
+#pragma mark - Private functions
 
-@implementation EXTTermLayerGlyphCacheKey
-+ (instancetype)glyphCacheKeyWithFontSize:(CGFloat)fontSize glyph:(CGGlyph)glyph
-{
-    EXTTermLayerGlyphCacheKey *key = [EXTTermLayerGlyphCacheKey new];
-    if (key) {
-        key->_fontSize = fontSize;
-        key->_glyph = glyph;
+NSSize boundingSizeForAttributedString(NSAttributedString *s) {
+    NSCParameterAssert(s);
+
+    CTLineRef line = CTLineCreateWithAttributedString((__bridge CFAttributedStringRef)s);
+    NSCAssert(line, @"Line should not be null");
+
+    CGFloat ascent, descent;
+    NSSize size;
+    size.width = CTLineGetTypographicBounds(line, &ascent, &descent, NULL);
+    size.height = ascent + descent;
+
+    CFRelease(line);
+
+    return size;
+}
+
+
+@implementation EXTDotImageCacheKey
++ (instancetype)dotImageCacheKeyWithRank:(NSInteger)rank length:(CGFloat)length color:(NSColor *)color {
+    NSParameterAssert(color);
+
+    EXTDotImageCacheKey *newKey = [[self class] new];
+    if (newKey) {
+        newKey->_rank = rank;
+        newKey->_length = length;
+        newKey->_color = color;
     }
-    return key;
+    return newKey;
 }
 
-- (instancetype)copyWithZone:(NSZone *)zone
-{
-    EXTTermLayerGlyphCacheKey *copy = [EXTTermLayerGlyphCacheKey new];
-    if (copy) {
-        copy->_fontSize = self->_fontSize;
-        copy->_glyph = self->_glyph;
-    }
-    return copy;
+- (BOOL)isEqual:(id)object {
+    EXTDotImageCacheKey *other = object;
+    return (other != nil &&
+            [other isKindOfClass:[EXTDotImageCacheKey class]] &&
+            other->_rank == _rank &&
+            other->_length == _length &&
+            [other->_color isEqualTo:_color]);
 }
 
-- (NSUInteger)hash
-{
-    return NSUINTROTATE(((NSUInteger)_fontSize), NSUINT_BIT / 2) ^ (NSUInteger)_glyph;
-}
 
-- (BOOL)isEqual:(id)object
-{
-    EXTTermLayerGlyphCacheKey *otherKey = object;
-    return ([otherKey isKindOfClass:[EXTTermLayerGlyphCacheKey class]] &&
-            otherKey->_fontSize == self->_fontSize &&
-            otherKey->_glyph == self->_glyph);
+- (NSUInteger)hash {
+    return (NSUINTROTATE((NSUInteger)_rank, NSUINT_BIT / 2) ^
+            (NSUInteger)_length ^
+            [_color hash]);
 }
 @end

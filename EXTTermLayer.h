@@ -11,8 +11,9 @@
 
 @class EXTChartViewModelTermCell;
 
-@interface EXTTermLayer : CAShapeLayer <EXTChartViewInteraction>
+@interface EXTTermLayer : CALayer <EXTChartViewInteraction>
 @property (nonatomic, strong) EXTChartViewModelTermCell *termCell;
 
 + (instancetype)termLayerWithTotalRank:(NSInteger)totalRank length:(NSInteger)length;
+- (void)resetContents;
 @end

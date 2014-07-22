@@ -29,6 +29,7 @@
 @property (nonatomic, weak) id<EXTChartViewDelegate> delegate;
 
 @property (nonatomic, weak) id selectedObject;
+@property (nonatomic, assign) bool inLiveMagnify;
 
 // New chart view
 - (void)updateVisibleRect;
