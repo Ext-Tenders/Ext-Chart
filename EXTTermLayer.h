@@ -11,9 +11,11 @@
 
 @class EXTChartViewModelTermCell;
 
-@interface EXTTermLayer : CALayer <EXTChartViewInteraction>
+@protocol EXTTermLayer <EXTChartViewInteraction>
 @property (nonatomic, strong) EXTChartViewModelTermCell *termCell;
 
 + (instancetype)termLayerWithTotalRank:(NSInteger)totalRank length:(NSInteger)length;
-- (void)resetContents;
+
+@optional
+- (void)resetContents; // FIXME: rename this to something more meaningful
 @end
