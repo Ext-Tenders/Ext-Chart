@@ -22,7 +22,7 @@ static CGColorRef _differentialStrokeColor;
 
 @synthesize highlighted = _highlighted;
 @synthesize highlightColor = _highlightColor;
-@synthesize selected = _selected;
+@synthesize selectedObject = _selectedObject;
 @synthesize selectionColor = _selectionColor;
 
 
@@ -101,7 +101,7 @@ static void commonInit(EXTDifferentialLineLayer *self)
 
 - (void)updateInteractionStatus
 {
-    if (self.selected) {
+    if (self.selectedObject) {
         self.strokeColor = self.selectionColor;
         self.lineWidth = _kHighlightedDifferentialLineWidth;
         self.zPosition = self.selectedZPosition;

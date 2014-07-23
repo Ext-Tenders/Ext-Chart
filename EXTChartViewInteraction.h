@@ -13,6 +13,8 @@
 @property (nonatomic, assign, getter = isHighlighted) bool highlighted;
 @property (nonatomic, assign) CGColorRef highlightColor;
 
-@property (nonatomic, assign, getter = isSelected) bool selected;
+// Note: AQuartz/ImageKit currently (OS X v10.9) defines -[CALayer(LayerExtra) setSelected:], which in turn interferes
+// with surrogate forwarding if we name the property `selected`. To avoid this problem, the property name is `selectedObject`.
+@property (nonatomic, assign, getter = isSelectedObject) bool selectedObject;
 @property (nonatomic, assign) CGColorRef selectionColor;
 @end

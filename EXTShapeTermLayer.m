@@ -18,7 +18,6 @@ static CGColorRef _strokeColor;
 static const CGFloat _kLineWidth = 2.0;
 static const CGFloat _kSingleDigitFontSizeFactor = 0.7;
 static const CGFloat _kDoubleDigitFontSizeFactor = 0.4;
-static NSString * const _fontName = @"Palatino-Roman";
 
 #pragma mark - Private classes
 
@@ -28,14 +27,21 @@ static NSString * const _fontName = @"Palatino-Roman";
 + (instancetype)glyphCacheKeyWithFontSize:(CGFloat)fontSize glyph:(CGGlyph)glyph;
 @end
 
+#pragma mark - Class extensions
+
+@interface EXTShapeTermLayer ()
+@property (nonatomic, strong) EXTTermLayerSurrogate *surrogate;
+@end
+
 
 @implementation EXTShapeTermLayer
 
-@synthesize highlighted = _highlighted;
-@synthesize highlightColor = _highlightColor;
-@synthesize selected = _selected;
-@synthesize selectionColor = _selectionColor;
-@synthesize termCell = _termCell;
+@dynamic highlighted;
+@dynamic selectedObject;
+@dynamic highlightColor;
+@dynamic selectionColor;
+
+@dynamic termCell;
 
 + (void)initialize
 {
@@ -47,20 +53,34 @@ static NSString * const _fontName = @"Palatino-Roman";
     }
 }
 
+- (instancetype)init {
+    self = [super init];
+    if (!self) return nil;
+
+    _surrogate = [EXTTermLayerSurrogate new];
+
+    __weak typeof(self) weakSelf = self;
+    _surrogate.interactionChangedContinuation = ^{
+        typeof(self) strongSelf = weakSelf;
+        [strongSelf updateInteractionStatus];
+    };
+
+    _surrogate.selectionAnimationContinuation = ^(CAAnimation *animation){
+        typeof(self) strongSelf = weakSelf;
+        [strongSelf addAnimation:animation forKey:@"selection"];
+    };
+
+    return self;
+}
+
 - (instancetype)initWithLayer:(id)layer
 {
     self = [super initWithLayer:layer];
     if (self && [layer isKindOfClass:[EXTShapeTermLayer class]]) {
         EXTShapeTermLayer *otherLayer = layer;
-        _termCell = otherLayer.termCell;
+        _surrogate = [otherLayer.surrogate copy];
     }
     return self;
-}
-
-- (void)dealloc
-{
-    CGColorRelease(_highlightColor);
-    CGColorRelease(_selectionColor);
 }
 
 + (instancetype)termLayerWithTotalRank:(NSInteger)totalRank length:(NSInteger)length
@@ -114,7 +134,7 @@ static NSString * const _fontName = @"Palatino-Roman";
 
     NSMutableArray *layers = [NSMutableArray new];
     outSize->width = outSize->height = 0.0;
-    NSFont *font = [NSFont fontWithName:_fontName size:fontSize];
+    NSFont *font = [NSFont fontWithName:EXTTermLayerFontName size:fontSize];
     NSDictionary *attrs = @{NSFontAttributeName: font};
 
     NSAttributedString *attrString = [[NSAttributedString alloc] initWithString:string attributes:attrs];
@@ -181,61 +201,24 @@ static NSString * const _fontName = @"Palatino-Roman";
     return path;
 }
 
-#pragma mark - Properties
 
-- (void)setHighlightColor:(CGColorRef)highlightColor
-{
-    if (_highlightColor != highlightColor) {
-        CGColorRelease(_highlightColor);
-        _highlightColor = CGColorCreateCopy(highlightColor);
-        [self updateInteractionStatus];
-    }
++ (bool)isSelectorHandledBySurrogate:(SEL)selector {
+    return [[EXTTermLayerSurrogate surrogateSelectors] containsObject:NSStringFromSelector(selector)];
 }
 
-- (void)setSelectionColor:(CGColorRef)selectionColor
-{
-    if (_selectionColor != selectionColor) {
-        CGColorRelease(_selectionColor);
-        _selectionColor = CGColorCreateCopy(selectionColor);
-        [self updateInteractionStatus];
-    }
++ (BOOL)resolveInstanceMethod:(SEL)selector {
+    return [self isSelectorHandledBySurrogate:selector] || [super resolveInstanceMethod:selector];
 }
 
-- (void)setHighlighted:(bool)highlighted
-{
-    if (highlighted != _highlighted) {
-        _highlighted = highlighted;
-        [self updateInteractionStatus];
-    }
-}
-
-- (void)setSelected:(bool)selected
-{
-    if (selected != _selected) {
-        _selected = selected;
-        [self updateInteractionStatus];
-    }
-
-    if (selected) {
-        CAKeyframeAnimation *animation = CAKeyframeAnimation.animation;
-        animation.keyPath = @"transform";
-        animation.values = @[[NSValue valueWithCATransform3D:CATransform3DIdentity],
-                             [NSValue valueWithCATransform3D:CATransform3DMakeScale(0.75, 0.75, 1.0)],
-                             [NSValue valueWithCATransform3D:CATransform3DMakeScale(1.5, 1.5, 1.0)],
-                             [NSValue valueWithCATransform3D:CATransform3DIdentity]];
-        animation.keyTimes = @[@0.0, @0.3, @0.8, @1.0];
-        animation.duration = 0.2;
-        animation.removedOnCompletion = YES;
-
-        [self addAnimation:animation forKey:@"setSelectedTrue"];
-    }
+- (id)forwardingTargetForSelector:(SEL)selector {
+    return [[self class] isSelectorHandledBySurrogate:selector] ? self.surrogate : [super forwardingTargetForSelector:selector];
 }
 
 - (void)updateInteractionStatus
 {
     CGColorRef fillColor, strokeColor;
 
-    if (self.selected) {
+    if (self.selectedObject) {
         fillColor = strokeColor = self.selectionColor;
     }
     else if (self.highlighted) {

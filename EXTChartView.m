@@ -136,6 +136,11 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
     if (self) {
 		[self translateOriginToPoint:NSMakePoint(NSMidX(frame), NSMidY(frame))];
 
+// Use 1 for vector charts, 0 for raster charts
+#if 0
+        _vectorChart = true;
+#endif
+
         // Interaction colors
         _highlightColor = [[NSUserDefaults standardUserDefaults] extColorForKey:EXTChartViewHighlightColorPreferenceKey];
         _selectionColor = [[NSUserDefaults standardUserDefaults] extColorForKey:EXTChartViewSelectionColorPreferenceKey];
@@ -366,7 +371,7 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
 
     [resizeTermLayerOperation addExecutionBlock:^{
         dispatch_apply(termLayersCount, resizeQueue, ^(size_t layerIndex) {
-            if (!weakResizeTermLayerOperation.cancelled) {
+            if (![weakResizeTermLayerOperation isCancelled]) {
                 CALayer<EXTTermLayer> *termLayer = termLayers[layerIndex];
                 [CATransaction begin];
                 [CATransaction setDisableActions:YES];
@@ -563,7 +568,7 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
 
 - (void)updateTermHighlight
 {
-    CALayer<EXTChartViewInteraction> *layerToHighlight = nil;
+    id<EXTChartViewInteraction> layerToHighlight = nil;
 
     const NSRect dataRect = [_trackingArea rect];
     const NSPoint currentMouseLocation = [self convertPoint:[[self window] mouseLocationOutsideOfEventStream] fromView:nil];
@@ -577,7 +582,7 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
         }
     }
 
-    CALayer<EXTChartViewInteraction> *currentlyHighlightedLayer = [_highlightedLayers firstObject];
+    id<EXTChartViewInteraction> currentlyHighlightedLayer = [_highlightedLayers firstObject];
     if (currentlyHighlightedLayer != layerToHighlight) {
         [CATransaction begin];
         {
@@ -919,14 +924,14 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
                 [CATransaction setAnimationDuration:_kTermHighlightRemoveAnimationDuration];
                 [CATransaction setAnimationTimingFunction:[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseIn]];
 
-                selectedLayer.selected = false;
+                selectedLayer.selectedObject = false;
             }
             }
             {
                 [CATransaction setAnimationDuration:_kTermHighlightAddAnimationDuration];
                 [CATransaction setAnimationTimingFunction:[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseOut]];
 
-                layerToSelect.selected = true;
+                layerToSelect.selectedObject = true;
             }
         }
         [CATransaction commit];
@@ -956,12 +961,12 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
 
         {
             [CATransaction setAnimationDuration:_kDifferentialHighlightRemoveAnimationDuration];
-            for (CALayer<EXTChartViewInteraction> *layer in layersToRemoveSelection) layer.selected = false;
+            for (id<EXTChartViewInteraction> layer in layersToRemoveSelection) layer.selectedObject = false;
 
         }
         {
             [CATransaction setAnimationDuration:_kDifferentialHighlightAddAnimationDuration];
-            for (CALayer<EXTChartViewInteraction> *layer in layersToSelect) layer.selected = true;
+            for (id<EXTChartViewInteraction> layer in layersToSelect) layer.selectedObject = true;
         }
     }
     [CATransaction commit];
@@ -971,7 +976,7 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
 
 - (void)reflectNoSelection
 {
-    for (CALayer<EXTChartViewInteraction> *layer in _selectedLayers) layer.selected = false;
+    for (id<EXTChartViewInteraction> layer in _selectedLayers) layer.selectedObject = false;
 }
 
 #pragma mark - Resizing
