@@ -34,6 +34,7 @@
 
 // New chart view
 - (void)updateVisibleRect;
+- (void)updateRect:(NSRect)rect;
 - (void)reloadCurrentPage;
 
 // Actions

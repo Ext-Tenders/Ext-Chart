@@ -267,7 +267,10 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
 {
     NSClipView *clipView = [[self enclosingScrollView] contentView];
     const NSRect rect = [self convertRect:clipView.bounds fromView:clipView];
+    [self updateRect:rect];
+}
 
+- (void)updateRect:(NSRect)rect {
     [CATransaction begin];
     [CATransaction setDisableActions:YES];
     {

@@ -12,6 +12,7 @@
 #import "EXTDocumentWindowController.h"
 #import "EXTDocument.h"
 #import "EXTChartView.h"
+#import "EXTChartViewController.h"
 #import "EXTChartViewModel.h"
 #import "EXTGrid.h"
 #import "EXTArtBoard.h"
@@ -547,6 +548,18 @@ typedef enum : NSInteger {
 - (void)exportArtBoardToURL:(NSURL *)URL
 {
     const CGRect frame = self.chartView.artBoard.frame;
+
+    EXTChartView *exportChartView = [[EXTChartView alloc] initWithFrame:(NSRect){NSZeroPoint, self.chartView.frame.size}];
+    exportChartView.vectorChart = true;
+    exportChartView.dataSource = self.chartViewController;
+    exportChartView.delegate = self.chartViewController;
+    exportChartView.grid.gridSpacing = self.chartViewController.chartViewModel.grid.gridSpacing;
+    exportChartView.grid.emphasisSpacing = self.chartViewController.chartViewModel.grid.emphasisSpacing;
+    [exportChartView bind:@"artBoardGridFrame" toObject:self.extDocument withKeyPath:@"artBoardGridFrame" options:nil];
+
+    [exportChartView reloadCurrentPage];
+    [exportChartView updateRect:frame];
+
     CGContextRef PDFContext = CGPDFContextCreateWithURL((__bridge CFURLRef)URL, &frame, NULL);
 
     CGLayerRef layer = CGLayerCreateWithContext(PDFContext, frame.size, NULL);
@@ -560,13 +573,15 @@ typedef enum : NSInteger {
     [NSGraphicsContext setCurrentContext:drawingContext];
     CGContextBeginPage(PDFContext, &frame);
     {
-        [self.chartView.layer renderInContext:PDFContext];
+        [exportChartView.layer renderInContext:PDFContext];
     }
     CGContextEndPage(PDFContext);
     CGPDFContextClose(PDFContext);
     CGContextRelease(PDFContext);
     CGLayerRelease(layer);
     [NSGraphicsContext restoreGraphicsState];
+
+    [exportChartView unbind:@"artBoardGridFrame"];
 }
 
 - (IBAction)resetGridToDefaults:(id)sender {

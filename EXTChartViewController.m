@@ -18,7 +18,7 @@
 #import "EXTDifferential.h"
 
 
-@interface EXTChartViewController () <EXTChartViewDataSource, EXTChartViewDelegate>
+@interface EXTChartViewController ()
 @property (nonatomic, readwrite, weak) id selectedObject;
 @property (nonatomic, readwrite, strong) EXTChartViewModel *chartViewModel;
 @end

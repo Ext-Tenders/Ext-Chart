@@ -15,7 +15,7 @@
 @class EXTDocument;
 
 
-@interface EXTChartViewController : NSViewController
+@interface EXTChartViewController : NSViewController <EXTChartViewDataSource, EXTChartViewDelegate>
 @property (nonatomic, readonly) EXTChartView *chartView;
 @property (nonatomic, weak) EXTLeibnizWindowController *leibnizWindowController;
 @property (nonatomic, assign) int currentPage;
