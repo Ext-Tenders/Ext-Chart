@@ -6,7 +6,8 @@
 //  Copyright (c) 2013 Harvard University. All rights reserved.
 //
 
-#import <Cocoa/Cocoa.h>
+@import Cocoa;
+
 #import "EXTLeibnizWindowController.h"
 
 

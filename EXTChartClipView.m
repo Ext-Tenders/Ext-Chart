@@ -6,7 +6,8 @@
 //  Copyright (c) 2014 Harvard University. All rights reserved.
 //
 
-#import <QuartzCore/QuartzCore.h>
+@import QuartzCore;
+
 #import "EXTChartClipView.h"
 
 // This is based on http://github.com/github/Rebel RBLClipView

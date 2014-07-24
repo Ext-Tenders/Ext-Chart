@@ -6,7 +6,7 @@
 //  Copyright (c) 2013 Harvard University. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
+@import Foundation;
 
 /*
 +(EXTLocation*) scale:(EXTLocation*)loc by:(int)scale {

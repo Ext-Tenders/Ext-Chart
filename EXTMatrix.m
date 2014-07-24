@@ -6,7 +6,6 @@
 //  Copyright (c) 2013 Harvard University. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
 #import "EXTMatrix.h"
 
 // little class to keep track of partial subdefinitions of a parent matrix

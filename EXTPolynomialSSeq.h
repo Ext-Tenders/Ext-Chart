@@ -6,6 +6,8 @@
 //  Copyright (c) 2013 Harvard University. All rights reserved.
 //
 
+@import Foundation;
+
 #import "EXTSpectralSequence.h"
 #import "EXTMultiplicationTables.h"
 

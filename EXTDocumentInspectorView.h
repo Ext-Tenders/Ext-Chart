@@ -6,11 +6,7 @@
 //  Copyright (c) 2013 Harvard University. All rights reserved.
 //
 
-#import <Cocoa/Cocoa.h>
-
-
-@class EXTDocumentInspectorView;
-
+@import Cocoa;
 
 @interface EXTDocumentInspectorView : NSView
     - (void)addSubview:(NSView *)subview

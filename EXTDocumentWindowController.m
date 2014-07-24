@@ -6,8 +6,7 @@
 //  Copyright (c) 2013 Harvard University. All rights reserved.
 //
 
-#import <Cocoa/Cocoa.h>
-#import <QuartzCore/QuartzCore.h>
+@import QuartzCore;
 
 #import "EXTDocumentWindowController.h"
 #import "EXTDocument.h"

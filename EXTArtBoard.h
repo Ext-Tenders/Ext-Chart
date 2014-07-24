@@ -6,8 +6,7 @@
 //  Copyright 2011 Harvard University. All rights reserved.
 //
 
-#import <Cocoa/Cocoa.h>
-
+@import Cocoa;
 
 typedef enum : NSUInteger {
     EXTArtBoardMouseDragOperationNone = 0,

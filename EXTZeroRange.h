@@ -12,7 +12,8 @@
 //  provided that they propagate as zero.  These classes track such regions.
 //
 
-#import <Foundation/Foundation.h>
+@import Foundation;
+
 #import "EXTLocation.h"
 #import "EXTPair.h"
 #import "EXTTriple.h"

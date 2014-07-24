@@ -6,7 +6,8 @@
 //  Copyright (c) 2013 Harvard University. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
+@import Foundation;
+
 #import "EXTLocation.h"
 #import "EXTZeroRange.h"
 // i guess objective C isn't particularly good at circular dependence

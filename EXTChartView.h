@@ -6,8 +6,8 @@
 //  Copyright 2011 Harvard University. All rights reserved.
 //
 
+@import Cocoa;
 
-#import <Cocoa/Cocoa.h>
 #import "EXTChartInteractionType.h"
 
 

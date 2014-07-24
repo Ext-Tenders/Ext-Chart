@@ -6,8 +6,7 @@
 //  Copyright (c) 2014 Harvard University. All rights reserved.
 //
 
-#import <Cocoa/Cocoa.h>
+@import Cocoa;
 
 @interface EXTTermInspectorViewController : NSViewController
-
 @end

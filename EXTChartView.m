@@ -6,7 +6,7 @@
 //  Copyright 2011 Harvard University. All rights reserved.
 //
 
-#import <QuartzCore/QuartzCore.h>
+@import QuartzCore;
 
 #import "EXTChartView.h"
 #import "EXTScrollView.h"

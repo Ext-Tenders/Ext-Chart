@@ -6,7 +6,7 @@
 //  Copyright (c) 2014 Harvard University. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
+@import Foundation;
 
 @protocol EXTChartViewInteraction <NSObject>
 @required

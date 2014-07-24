@@ -6,7 +6,7 @@
 //  Copyright 2011 Harvard University. All rights reserved.
 //
 
-#import <Cocoa/Cocoa.h>
+@import Cocoa;
 
 @interface EXTAppController : NSObject <NSApplicationDelegate>
 @end

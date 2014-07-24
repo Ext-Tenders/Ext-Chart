@@ -6,7 +6,8 @@
 //  Copyright (c) 2014 Harvard University. All rights reserved.
 //
 
-#import <QuartzCore/QuartzCore.h>
+@import QuartzCore;
+
 #import "EXTChartViewInteraction.h"
 
 @class EXTChartViewModelDifferential;
