@@ -7,7 +7,7 @@
 //
 
 #import <Cocoa/Cocoa.h>
-#import <AppKit/AppKit.h>
+#import <QuartzCore/QuartzCore.h>
 
 #import "EXTDocumentWindowController.h"
 #import "EXTDocument.h"
