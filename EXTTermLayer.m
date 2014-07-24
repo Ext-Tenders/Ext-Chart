@@ -20,19 +20,26 @@ NSString * const EXTTermLayerFontName = @"Palatino-Roman";
 @synthesize termCell = _termCell;
 
 + (NSSet *)surrogateSelectors {
-    NSArray *selectors = @[
-                           NSStringFromSelector(@selector(isHighlighted)),
-                           NSStringFromSelector(@selector(setHighlighted:)),
-                           NSStringFromSelector(@selector(highlightColor)),
-                           NSStringFromSelector(@selector(setHighlightColor:)),
-                           NSStringFromSelector(@selector(isSelectedObject)),
-                           NSStringFromSelector(@selector(setSelectedObject:)),
-                           NSStringFromSelector(@selector(selectionColor)),
-                           NSStringFromSelector(@selector(setSelectionColor:)),
-                           NSStringFromSelector(@selector(termCell)),
-                           NSStringFromSelector(@selector(setTermCell:)),
-                           ];
-    return [NSSet setWithArray:selectors];
+    static NSSet *_selectors;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        NSArray *selectors = @[
+                               NSStringFromSelector(@selector(isHighlighted)),
+                               NSStringFromSelector(@selector(setHighlighted:)),
+                               NSStringFromSelector(@selector(highlightColor)),
+                               NSStringFromSelector(@selector(setHighlightColor:)),
+                               NSStringFromSelector(@selector(isSelectedObject)),
+                               NSStringFromSelector(@selector(setSelectedObject:)),
+                               NSStringFromSelector(@selector(selectionColor)),
+                               NSStringFromSelector(@selector(setSelectionColor:)),
+                               NSStringFromSelector(@selector(termCell)),
+                               NSStringFromSelector(@selector(setTermCell:)),
+                               ];
+
+        _selectors = [NSSet setWithArray:selectors];
+    });
+
+    return _selectors;
 }
 
 #pragma mark - Lifecycle
