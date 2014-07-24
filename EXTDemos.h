@@ -6,7 +6,8 @@
 //  Copyright (c) 2013 Harvard University. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
+@import Foundation;
+
 #import "EXTSpectralSequence.h"
 
 @interface EXTDemos : NSObject

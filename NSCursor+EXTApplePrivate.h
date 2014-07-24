@@ -6,7 +6,7 @@
 //  Copyright (c) 2013 Harvard University. All rights reserved.
 //
 
-#import <Cocoa/Cocoa.h>
+@import Cocoa;
 
 // NSCursor exports border resize cursors but it doesn’t export corner resize cursors
 @interface NSCursor (EXTApplePrivate)
