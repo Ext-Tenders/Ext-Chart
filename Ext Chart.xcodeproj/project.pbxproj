@@ -19,7 +19,6 @@
 		1460B40C17B735BD00B575E3 /* EXTPreferencesWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1460B40B17B735BD00B575E3 /* EXTPreferencesWindowController.m */; };
 		1460B40E17B7360700B575E3 /* EXTPreferences.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1460B40D17B7360700B575E3 /* EXTPreferences.xib */; };
 		1467B26E178CF15E0084A2F6 /* EXTDocumentInspectorView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1467B26D178CF15E0084A2F6 /* EXTDocumentInspectorView.m */; };
-		1467B272178D13A80084A2F6 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1467B271178D13A80084A2F6 /* QuartzCore.framework */; };
 		14741D7217B7535A00AF73D9 /* NSUserDefaults+EXTAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 14741D7117B7535A00AF73D9 /* NSUserDefaults+EXTAdditions.m */; };
 		149314581783B6EB0080EF28 /* EXTDocumentControlsView.m in Sources */ = {isa = PBXBuildFile; fileRef = 149314571783B6EA0080EF28 /* EXTDocumentControlsView.m */; };
 		1494C4E1197F861300126373 /* EXTImageTermLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 1494C4E0197F861300126373 /* EXTImageTermLayer.m */; };
@@ -82,11 +81,17 @@
 		8D15AC2F0486D014006FF6A4 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165FFE840EACC02AAC07 /* InfoPlist.strings */; };
 		8D15AC310486D014006FF6A4 /* EXTDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A37F4ACFDCFA73011CA2CEA /* EXTDocument.m */; settings = {ATTRIBUTES = (); }; };
 		8D15AC320486D014006FF6A4 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A37F4B0FDCFA73011CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
-		8D15AC340486D014006FF6A4 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A7FEA54F5311CA2CBB /* Cocoa.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
 		145CD959194A0AE5006621A6 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 2A37F4A9FDCFA73011CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8D15AC270486D014006FF6A4;
+			remoteInfo = "Ext Chart";
+		};
+		14724F411980D5820027A533 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 2A37F4A9FDCFA73011CA2CEA /* Project object */;
 			proxyType = 1;
@@ -261,8 +266,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				382BAD201942B25900E1DDED /* MBTableGrid.framework in Frameworks */,
-				1467B272178D13A80084A2F6 /* QuartzCore.framework in Frameworks */,
-				8D15AC340486D014006FF6A4 /* Cocoa.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -595,6 +598,7 @@
 			);
 			dependencies = (
 				145CD95A194A0AE5006621A6 /* PBXTargetDependency */,
+				14724F421980D5820027A533 /* PBXTargetDependency */,
 			);
 			name = "Ext Chart Tests";
 			productName = "Ext Chart Tests";
@@ -766,6 +770,11 @@
 			isa = PBXTargetDependency;
 			target = 8D15AC270486D014006FF6A4 /* Ext Chart */;
 			targetProxy = 145CD959194A0AE5006621A6 /* PBXContainerItemProxy */;
+		};
+		14724F421980D5820027A533 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8D15AC270486D014006FF6A4 /* Ext Chart */;
+			targetProxy = 14724F411980D5820027A533 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
