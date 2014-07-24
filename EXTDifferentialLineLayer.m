@@ -11,7 +11,7 @@
 #pragma mark - Private variables
 
 static void *_highlightedContext = &_highlightedContext;
-static void *_selectedContext = &_selectedContext;
+static void *_selectedObjectContext = &_selectedObjectContext;
 
 static const CGFloat _kDifferentialLineWidth = 0.8;
 static const CGFloat _kHighlightedDifferentialLineWidth = _kDifferentialLineWidth * 5;
@@ -33,7 +33,7 @@ static void commonInit(EXTDifferentialLineLayer *self)
     self.lineCap = kCALineCapRound;
 
     [self addObserver:self forKeyPath:@"highlighted" options:0 context:_highlightedContext];
-    [self addObserver:self forKeyPath:@"selected" options:0 context:_selectedContext];
+    [self addObserver:self forKeyPath:@"selectedObject" options:0 context:_selectedObjectContext];
 }
 
 + (void)initialize
@@ -65,7 +65,7 @@ static void commonInit(EXTDifferentialLineLayer *self)
 - (void)dealloc
 {
     [self removeObserver:self forKeyPath:@"highlighted" context:_highlightedContext];
-    [self removeObserver:self forKeyPath:@"selected" context:_selectedContext];
+    [self removeObserver:self forKeyPath:@"selectedObject" context:_selectedObjectContext];
 
     CGColorRelease(_highlightColor);
     CGColorRelease(_selectionColor);
@@ -95,7 +95,7 @@ static void commonInit(EXTDifferentialLineLayer *self)
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
-    if (context == _highlightedContext || context == _selectedContext) [self updateInteractionStatus];
+    if (context == _highlightedContext || context == _selectedObjectContext) [self updateInteractionStatus];
     else [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
 }
 
