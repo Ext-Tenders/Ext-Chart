@@ -14,6 +14,8 @@
 #import "EXTArtBoard.h"
 #import "EXTChartViewModel.h"
 #import "EXTTermLayer.h"
+#import "EXTImageTermLayer.h"
+#import "EXTShapeTermLayer.h"
 #import "EXTDifferentialLineLayer.h"
 #import "EXTMultAnnotationLayer.h"
 #import "EXTChartViewInteraction.h"
@@ -34,6 +36,7 @@ static void *_showsGridContext = &_showsGridContext;
 static void *_selectedObjectContext = &_selectedObjectContext;
 static void *_highlightColorContext = &_highlightColorContext;
 static void *_selectionColorContext = &_selectionColorContext;
+static void *_inLiveMagnifyContext = &_inLiveMagnifyContext;
 
 static void *_gridColorContext = &_gridColorContext;
 static void *_gridEmphasisColorContext = &_gridEmphasisColorContext;
@@ -87,12 +90,19 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
     CALayer *_artBoardBackgroundLayer;
     CALayer *_artBoardBorderLayer;
 
-    NSArray *_termLayers;
+    NSArray *_termLayers; // an array of CALayer<EXTTermLayer> objects
     NSArray *_differentialLineLayers;
     NSArray *_multAnnotationLayers;
 
     NSArray *_highlightedLayers; // an array of CALayer<EXTChartViewInteraction> objects, or nil
     NSSet *_selectedLayers;
+
+    CGFloat _magnification;
+
+    /// Operations in this queue resize term layers to match a given magnification. Each operation is responsible for
+    /// changing all term layers in the chart view and there should be only one active operation at any given time
+    /// since it’s wasteful to scale a term layer if it’s going to be scaled again.
+    NSOperationQueue *_resizeTermLayersQueue;
 }
 
 
@@ -126,15 +136,18 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
     if (self) {
 		[self translateOriginToPoint:NSMakePoint(NSMidX(frame), NSMidY(frame))];
 
-        // Highlighting
-		{
-            _highlightColor = [[NSUserDefaults standardUserDefaults] extColorForKey:EXTChartViewHighlightColorPreferenceKey];
-        }
+// Use 1 for vector charts, 0 for raster charts
+#if 0
+        _vectorChart = true;
+#endif
 
-        // Selection
-        {
-            _selectionColor = [[NSUserDefaults standardUserDefaults] extColorForKey:EXTChartViewSelectionColorPreferenceKey];
-        }
+        // Interaction colors
+        _highlightColor = [[NSUserDefaults standardUserDefaults] extColorForKey:EXTChartViewHighlightColorPreferenceKey];
+        _selectionColor = [[NSUserDefaults standardUserDefaults] extColorForKey:EXTChartViewSelectionColorPreferenceKey];
+
+        // Term layer resizing
+        _resizeTermLayersQueue = [NSOperationQueue new];
+        _resizeTermLayersQueue.maxConcurrentOperationCount = 1;
 
         CALayer *rootLayer = [CALayer layer];
         rootLayer.frame = self.bounds;
@@ -226,6 +239,7 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
         [self addObserver:self forKeyPath:@"interactionType" options:NSKeyValueObservingOptionNew context:_interactionTypeContext];
         [self addObserver:self forKeyPath:@"highlightColor" options:0 context:_highlightColorContext];
         [self addObserver:self forKeyPath:@"selectionColor" options:0 context:_selectionColorContext];
+        [self addObserver:self forKeyPath:@"inLiveMagnify" options:0 context:_inLiveMagnifyContext];
     }
 
 	return self;
@@ -237,6 +251,7 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
     [self removeObserver:self forKeyPath:@"selectedObject" context:_selectedObjectContext];
     [self removeObserver:self forKeyPath:@"highlightColor" context:_highlightColorContext];
     [self removeObserver:self forKeyPath:@"selectionColor" context:_selectionColorContext];
+    [self removeObserver:self forKeyPath:@"inLiveMagnify" context:_inLiveMagnifyContext];
 
     [_grid removeObserver:self forKeyPath:@"gridColor" context:_gridColorContext];
     [_grid removeObserver:self forKeyPath:@"emphasisGridColor" context:_gridEmphasisColorContext];
@@ -252,7 +267,10 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
 {
     NSClipView *clipView = [[self enclosingScrollView] contentView];
     const NSRect rect = [self convertRect:clipView.bounds fromView:clipView];
+    [self updateRect:rect];
+}
 
+- (void)updateRect:(NSRect)rect {
     [CATransaction begin];
     [CATransaction setDisableActions:YES];
     {
@@ -328,9 +346,48 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
     }
     [CATransaction commit];
 
+    const CGFloat newMagnification = [[self enclosingScrollView] magnification];
+    if (!self.inLiveMagnify && _magnification != newMagnification) {
+        [self resetTermLayerContentsToFitMagnification:newMagnification];
+        // TODO: We could prioritise visible layers first, or maybe reset only visible layers. Need to mind
+        //       PDF export, though.
+    }
+
+    _magnification = newMagnification;
+
     CGPathRelease(basePath);
     CGPathRelease(emphasisPath);
     CGPathRelease(axesPath);
+}
+
+- (void)resetTermLayerContentsToFitMagnification:(CGFloat)magnification {
+    if (self.vectorChart) return;
+
+    NSArray *termLayers = [_termLayers copy];
+    const size_t termLayersCount = [_termLayers count];
+    dispatch_queue_t resizeQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0);
+
+    [[_resizeTermLayersQueue operations] makeObjectsPerformSelector:@selector(cancel)];
+
+    NSBlockOperation *resizeTermLayerOperation = [NSBlockOperation new];
+    __weak NSBlockOperation *weakResizeTermLayerOperation = resizeTermLayerOperation;
+
+    [resizeTermLayerOperation addExecutionBlock:^{
+        dispatch_apply(termLayersCount, resizeQueue, ^(size_t layerIndex) {
+            if (![weakResizeTermLayerOperation isCancelled]) {
+                CALayer<EXTTermLayer> *termLayer = termLayers[layerIndex];
+                [CATransaction begin];
+                [CATransaction setDisableActions:YES];
+                {
+                    termLayer.contentsScale = magnification;
+                    [termLayer resetContents];
+                }
+                [CATransaction commit];
+            }
+        });
+    }];
+
+    [_resizeTermLayersQueue addOperation:resizeTermLayerOperation];
 }
 
 - (void)reloadCurrentPage
@@ -347,17 +404,20 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
         NSMutableArray *newTermLayers = [NSMutableArray new];
         
         NSArray *termCells = [self.dataSource chartView:self termCellsInGridRect:reloadGridRect];
+        Class<EXTTermLayer> termLayerClass = (self.vectorChart ? [EXTShapeTermLayer class] : [EXTImageTermLayer class]);
         for (EXTChartViewModelTermCell *termCell in termCells) {
-            EXTTermLayer *newTermLayer = [EXTTermLayer termLayerWithTotalRank:termCell.totalRank length:_grid.gridSpacing];
+            CALayer<EXTTermLayer> *newTermLayer = [termLayerClass termLayerWithTotalRank:termCell.totalRank length:_grid.gridSpacing];
             newTermLayer.frame = (CGRect){{termCell.gridLocation.x * _grid.gridSpacing, termCell.gridLocation.y * _grid.gridSpacing}, {_grid.gridSpacing, _grid.gridSpacing}};
             newTermLayer.termCell = termCell;
             newTermLayer.highlightColor = [_highlightColor CGColor];
             newTermLayer.selectionColor = [_selectionColor CGColor];
             newTermLayer.zPosition = _kTermCellZPosition;
+            newTermLayer.contentsScale = _magnification;
             [newTermLayers addObject:newTermLayer];
             [self.layer addSublayer:newTermLayer];
         }
-        
+
+        if (!self.vectorChart) [newTermLayers makeObjectsPerformSelector:@selector(resetContents)];
         _termLayers = [newTermLayers copy];
     }
 
@@ -511,13 +571,13 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
 
 - (void)updateTermHighlight
 {
-    EXTTermLayer *layerToHighlight = nil;
+    id<EXTChartViewInteraction> layerToHighlight = nil;
 
     const NSRect dataRect = [_trackingArea rect];
     const NSPoint currentMouseLocation = [self convertPoint:[[self window] mouseLocationOutsideOfEventStream] fromView:nil];
     if (NSPointInRect(currentMouseLocation, dataRect)) {
         const EXTIntPoint mouseLocationInGrid = [_grid convertPointFromView:currentMouseLocation];
-        for (EXTTermLayer *layer in _termLayers) {
+        for (CALayer<EXTTermLayer> *layer in _termLayers) {
             if (EXTEqualIntPoints(layer.termCell.gridLocation, mouseLocationInGrid)) {
                 layerToHighlight = layer;
                 break;
@@ -525,7 +585,7 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
         }
     }
 
-    CALayer<EXTChartViewInteraction> *currentlyHighlightedLayer = [_highlightedLayers firstObject];
+    id<EXTChartViewInteraction> currentlyHighlightedLayer = [_highlightedLayers firstObject];
     if (currentlyHighlightedLayer != layerToHighlight) {
         [CATransaction begin];
         {
@@ -677,13 +737,18 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
     }
     else if (context == _highlightColorContext) {
         CGColorRef highlightColor = [self.highlightColor CGColor];
-        for (EXTTermLayer *layer in _termLayers) layer.highlightColor = highlightColor;
-        for (EXTDifferentialLineLayer *layer in _differentialLineLayers) layer.highlightColor = highlightColor;
+        for (CALayer<EXTChartViewInteraction> *layer in _termLayers) layer.highlightColor = highlightColor;
+        for (CALayer<EXTChartViewInteraction> *layer in _differentialLineLayers) layer.highlightColor = highlightColor;
     }
     else if (context == _selectionColorContext) {
         CGColorRef selectionColor = [self.selectionColor CGColor];
-        for (EXTTermLayer *layer in _termLayers) layer.selectionColor = selectionColor;
-        for (EXTDifferentialLineLayer *layer in _differentialLineLayers) layer.selectionColor = selectionColor;
+        for (CALayer<EXTChartViewInteraction> *layer in _termLayers) layer.selectionColor = selectionColor;
+        for (CALayer<EXTChartViewInteraction> *layer in _differentialLineLayers) layer.selectionColor = selectionColor;
+    }
+    else if (context == _inLiveMagnifyContext) {
+        if (!self.inLiveMagnify) {
+            [self resetTermLayerContentsToFitMagnification:[[self enclosingScrollView] magnification]];
+        }
     }
 	else {
 		[super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
@@ -842,15 +907,15 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
 {
     NSAssert([self.selectedObject isKindOfClass:[EXTChartViewModelTerm class]], @"Mismatched selected object");
 
-    CAShapeLayer<EXTChartViewInteraction> *layerToSelect = nil;
-    for (EXTTermLayer *layer in _termLayers) {
+    id<EXTChartViewInteraction> layerToSelect = nil;
+    for (CALayer<EXTTermLayer> *layer in _termLayers) {
         if ([layer.termCell.terms containsObject:self.selectedObject]) {
             layerToSelect = layer;
             break;
         }
     }
 
-    CAShapeLayer<EXTChartViewInteraction> *selectedLayer = _selectedLayers.anyObject;
+    id<EXTChartViewInteraction> selectedLayer = _selectedLayers.anyObject;
 
     // FIXME: Need to think about this. We can click a term cell multiple times and the selection *changes* if there
     //        are multiple terms located on that cell, and we may want to distinguish this visually
@@ -862,14 +927,14 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
                 [CATransaction setAnimationDuration:_kTermHighlightRemoveAnimationDuration];
                 [CATransaction setAnimationTimingFunction:[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseIn]];
 
-                selectedLayer.selected = false;
+                selectedLayer.selectedObject = false;
             }
             }
             {
                 [CATransaction setAnimationDuration:_kTermHighlightAddAnimationDuration];
                 [CATransaction setAnimationTimingFunction:[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseOut]];
 
-                layerToSelect.selected = true;
+                layerToSelect.selectedObject = true;
             }
         }
         [CATransaction commit];
@@ -899,12 +964,12 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
 
         {
             [CATransaction setAnimationDuration:_kDifferentialHighlightRemoveAnimationDuration];
-            for (CALayer<EXTChartViewInteraction> *layer in layersToRemoveSelection) layer.selected = false;
+            for (id<EXTChartViewInteraction> layer in layersToRemoveSelection) layer.selectedObject = false;
 
         }
         {
             [CATransaction setAnimationDuration:_kDifferentialHighlightAddAnimationDuration];
-            for (CALayer<EXTChartViewInteraction> *layer in layersToSelect) layer.selected = true;
+            for (id<EXTChartViewInteraction> layer in layersToSelect) layer.selectedObject = true;
         }
     }
     [CATransaction commit];
@@ -914,7 +979,7 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
 
 - (void)reflectNoSelection
 {
-    for (CALayer<EXTChartViewInteraction> *layer in _selectedLayers) layer.selected = false;
+    for (id<EXTChartViewInteraction> layer in _selectedLayers) layer.selectedObject = false;
 }
 
 #pragma mark - Resizing

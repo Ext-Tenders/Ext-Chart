@@ -29,9 +29,12 @@
 @property (nonatomic, weak) id<EXTChartViewDelegate> delegate;
 
 @property (nonatomic, weak) id selectedObject;
+@property (nonatomic, assign) bool inLiveMagnify;
+@property (nonatomic, assign, getter=isVectorChart) bool vectorChart;
 
 // New chart view
 - (void)updateVisibleRect;
+- (void)updateRect:(NSRect)rect;
 - (void)reloadCurrentPage;
 
 // Actions
