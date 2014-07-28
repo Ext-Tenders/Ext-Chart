@@ -237,17 +237,6 @@ static bool lineSegmentIntersectsLineSegment(NSPoint l1p1, NSPoint l1p2, NSPoint
     return result;
 }
 
-- (NSUInteger)indexOfObjectInArray:(NSArray *)array afterObjectIdenticalTo:(id)object
-{
-    if (array.count == 0) return NSNotFound;
-
-    const NSUInteger currentIndex = [array indexOfObjectIdenticalTo:object];
-    if (currentIndex == NSNotFound) return 0;
-    if (currentIndex + 1 == array.count) return NSNotFound;
-
-    return currentIndex + 1;
-}
-
 #pragma mark - Computed properties
 
 - (NSArray *)termCells
