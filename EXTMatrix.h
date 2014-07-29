@@ -59,6 +59,7 @@
 -(int) rank;
 -(EXTMatrix*) scale:(int)scalar;
 +(EXTMatrix*) sum:(EXTMatrix*)a with:(EXTMatrix*)b;
++(EXTMatrix*) directSum:(EXTMatrix*)a with:(EXTMatrix*)b;
 
 // @[left inclusion, right inclusion]
 +(NSArray*) formIntersection:(EXTMatrix*)left with:(EXTMatrix*)right;

@@ -925,4 +925,21 @@
     return imageSize;
 }
 
++(EXTMatrix*) directSum:(EXTMatrix*)a with:(EXTMatrix*)b {
+    EXTMatrix *ret = [EXTMatrix matrixWidth:(a.width + b.width)
+                                     height:(a.height + b.height)];
+    int *retData = ret.presentation.mutableBytes,
+        *aData = a.presentation.mutableBytes,
+        *bData = b.presentation.mutableBytes;
+    
+    for (int i = 0; i < a.width; i++)
+        for (int j = 0; i < a.height; j++)
+            retData[i*ret.height+j] = aData[i*a.height+j];
+    for (int i = 0; i < b.width; i++)
+        for (int j = 0; j < b.height; j++)
+            retData[(i+a.width)*ret.height+(j+a.height)] = bData[i*b.height+j];
+    
+    return ret;
+}
+
 @end

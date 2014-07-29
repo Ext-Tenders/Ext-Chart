@@ -33,7 +33,6 @@
     // and an in-place initializer
     -(instancetype) setTerm:(EXTLocation*)whichLocation
                    andNames:(NSMutableArray*)whichNames;
-    // TODO: a direct sum constructor might be nice?
 
     // useful for drawing
     -(int) size;

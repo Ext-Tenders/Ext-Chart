@@ -746,29 +746,36 @@
 -(EXTSpectralSequence*) flattenSSeqAtPage:(int)page
                              ontoIndexing:(Class<EXTLocation>)newIndexingClass
                             viaProjection:(EXTLocation* (^)(EXTLocation*))projectionOperator {
-    EXTSpectralSequence *ret = [EXTSpectralSequence sSeqWithIndexingClass:newIndexingClass];
+    EXTSpectralSequence *ret = [[self class] new];
     
-    // iterate through the terms in self. we'll deal with term creation.
-    //   inspect this term for homology representatives on this page.
-    //   if there aren't any, then skip to the next term.
-    //   if there are some, then project this term's location using the operator
-    //   find the term in this spectral sequence written at this location.
-    //     if it doesn't exist, then create it.
-    //   add some term names to this term based on the homology reps' names.
-    // iterate through the terms in self again, this time for mult. struct.s.
-    //   inspect this term for homology representatives on this page.
-    //   if there aren't any, then skip to the next term.
-    //   if there are some, hold this term as rightTerm.
-    //   iterate through the terms in self; call each leftTerm.
-    //      if this leftTerm doesn't have any homology reps, skip it.
-    //      if it does, then build the restriction of the multiplication matrix.
-    //      express the results in terms of the homology reps on the target.
-    //      build a partial definition to store in the multiplication tables:
-    //        its action is the matrix we just computed.
-    //        its inclusion is the hadamard product of the inclusions of
-    //            leftTerm and rightTerm into the terms in this new sseq.
+    // loop through the terms, projecting and summing them.
+    ret.terms = [NSMutableDictionary new];
+    for (EXTTerm *term in self.terms) {
+        // project the term and find it in the new spectral sequence.
+        EXTLocation *projectedLoc = projectionOperator(term.location);
+        EXTTerm *projectedTerm = ret.terms[projectedLoc];
+        if (!projectedTerm)
+            ret.terms[projectedLoc] =
+                (projectedTerm = [EXTTerm term:projectedLoc
+                                      andNames:[NSMutableArray array]]);
+        
+        // flatten the term's cycles and boundaries into projectedTerm
+        projectedTerm.cycles[0] = [EXTMatrix directSum:projectedTerm.cycles[0]
+                                                  with:term.cycles[page]];
+        projectedTerm.boundaries[0] = [EXTMatrix directSum:projectedTerm.boundaries[0]
+                                                      with:term.boundaries[page]];
+        [projectedTerm.names addObjectsFromArray:term.names];
+    }
     
-    // there are no differentials.
+    // XXX: I am too lazy to do the multiplication tables right now. Someone
+    // should come back and handle them in the future, though, in almost the
+    // same way as the terms are handled above.
+    
+    // set up the new indexing class
+    ret->indexClass = newIndexingClass;
+    
+    // clear the differentials
+    ret.differentials = [NSMutableArray new];
     
     // return the new sseq.
     return ret;

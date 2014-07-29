@@ -699,4 +699,21 @@
     return [EXTMatrix rankOfMap:pushedForwardCycles intoQuotientByTheInclusion:boundaryMatrix];
 }
 
+-(EXTPolynomialSSeq *)flattenSSeqAtPage:(int)page
+                             ontoIndexing:(Class<EXTLocation>)newIndexingClass
+                            viaProjection:(NSObject<EXTLocation> *(^)(NSObject<EXTLocation> *))projectionOperator {
+    EXTPolynomialSSeq *ret = (EXTPolynomialSSeq*)
+                                [super flattenSSeqAtPage:page
+                                            ontoIndexing:newIndexingClass
+                                           viaProjection:projectionOperator];
+    
+    // most of the projection has been taken care of already. the only 'new'
+    // data to a polynomial spectral sequence are the polynomial generators,
+    // whose locations we should now flatten.
+    for (NSMutableDictionary *generator in ret.generators)
+        generator[@"location"] = projectionOperator(generator[@"location"]);
+    
+    return ret;
+}
+
 @end
