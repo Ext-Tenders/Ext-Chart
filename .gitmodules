@@ -1,3 +1,6 @@
 [submodule "ThirdParty/MBTableGrid"]
 	path = ThirdParty/MBTableGrid
 	url = https://github.com/bavarious/mbtablegrid.git
+[submodule "ThirdParty/Sparkle"]
+	path = ThirdParty/Sparkle
+	url = https://github.com/sparkle-project/Sparkle.git
