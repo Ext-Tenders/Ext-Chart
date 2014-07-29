@@ -4,7 +4,4 @@
    <FileRef
       location = "container:Ext Chart.xcodeproj">
    </FileRef>
-   <FileRef
-      location = "group:../MBTableGrid/MBTableGrid.xcodeproj">
-   </FileRef>
 </Workspace>

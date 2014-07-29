@@ -53,7 +53,6 @@
 		3804BF6E17C07D7300A74325 /* EXTMatrixEditor.m in Sources */ = {isa = PBXBuildFile; fileRef = 3804BF6D17C07D7300A74325 /* EXTMatrixEditor.m */; };
 		381A4800194E12BA005054BD /* EXTTermInspectorViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 381A47FE194E12BA005054BD /* EXTTermInspectorViewController.m */; };
 		381A4801194E12BA005054BD /* EXTTermInspector.xib in Resources */ = {isa = PBXBuildFile; fileRef = 381A47FF194E12BA005054BD /* EXTTermInspector.xib */; };
-		382BAD201942B25900E1DDED /* MBTableGrid.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 382BAD1E1942B23E00E1DDED /* MBTableGrid.framework */; };
 		382BAD221943E26B00E1DDED /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 382BAD211943E26B00E1DDED /* Credits.rtf */; };
 		3841EBD2177380C000ADA929 /* EXTZeroRange.m in Sources */ = {isa = PBXBuildFile; fileRef = 3841EBD1177380C000ADA929 /* EXTZeroRange.m */; };
 		385BF10D17AAD8C2008CA5B6 /* EXTGeneratorInspectorView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 385BF10B17AAD8C2008CA5B6 /* EXTGeneratorInspectorView.xib */; };
@@ -208,7 +207,6 @@
 		381A47FD194E12BA005054BD /* EXTTermInspectorViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTTermInspectorViewController.h; sourceTree = "<group>"; };
 		381A47FE194E12BA005054BD /* EXTTermInspectorViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTTermInspectorViewController.m; sourceTree = "<group>"; };
 		381A47FF194E12BA005054BD /* EXTTermInspector.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = EXTTermInspector.xib; sourceTree = "<group>"; };
-		382BAD1E1942B23E00E1DDED /* MBTableGrid.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MBTableGrid.framework; path = "../../../../Library/Developer/Xcode/DerivedData/Ext-Chart-Workspace/Products/Debug/MBTableGrid.framework"; sourceTree = "<group>"; };
 		382BAD211943E26B00E1DDED /* Credits.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; path = Credits.rtf; sourceTree = "<group>"; };
 		3841EBD0177380C000ADA929 /* EXTZeroRange.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTZeroRange.h; sourceTree = "<group>"; };
 		3841EBD1177380C000ADA929 /* EXTZeroRange.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTZeroRange.m; sourceTree = "<group>"; };
@@ -265,7 +263,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				382BAD201942B25900E1DDED /* MBTableGrid.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -275,7 +272,6 @@
 		1058C7A6FEA54F5311CA2CBB /* Linked Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				382BAD1E1942B23E00E1DDED /* MBTableGrid.framework */,
 				1467B271178D13A80084A2F6 /* QuartzCore.framework */,
 				1058C7A7FEA54F5311CA2CBB /* Cocoa.framework */,
 			);

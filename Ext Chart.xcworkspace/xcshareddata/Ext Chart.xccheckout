@@ -12,8 +12,6 @@
 	<dict>
 		<key>1FB30C83-8AC0-4D57-9B6C-F81804D913E3</key>
 		<string>https://github.com/ecpeterson/Ext-Chart.git</string>
-		<key>690C358A-11FA-4C4C-8CDD-785DBE5B08DD</key>
-		<string>https://github.com/mikecsh/mbtablegrid.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
 	<string>Ext Chart.xcworkspace</string>
@@ -21,8 +19,6 @@
 	<dict>
 		<key>1FB30C83-8AC0-4D57-9B6C-F81804D913E3</key>
 		<string>..</string>
-		<key>690C358A-11FA-4C4C-8CDD-785DBE5B08DD</key>
-		<string>../../MBTableGrid</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
 	<string>https://github.com/ecpeterson/Ext-Chart.git</string>
@@ -39,14 +35,6 @@
 			<string>1FB30C83-8AC0-4D57-9B6C-F81804D913E3</string>
 			<key>IDESourceControlWCCName</key>
 			<string>Ext-Chart</string>
-		</dict>
-		<dict>
-			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
-			<string>public.vcs.git</string>
-			<key>IDESourceControlWCCIdentifierKey</key>
-			<string>690C358A-11FA-4C4C-8CDD-785DBE5B08DD</string>
-			<key>IDESourceControlWCCName</key>
-			<string>MBTableGrid</string>
 		</dict>
 	</array>
 </dict>
