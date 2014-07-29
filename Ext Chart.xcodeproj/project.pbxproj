@@ -11,6 +11,7 @@
 		141C8D3A196FCDAB0037A716 /* NSValue+EXTIntPoint.m in Sources */ = {isa = PBXBuildFile; fileRef = 141C8D39196FCDAB0037A716 /* NSValue+EXTIntPoint.m */; };
 		141FBE6B19713D830020E844 /* EXTChartViewModelTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 141FBE6A19713D830020E844 /* EXTChartViewModelTestCase.m */; };
 		1431FF1D1987A7D800E995EC /* MBTableGrid.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1431FF1A1987A7AD00E995EC /* MBTableGrid.framework */; };
+		1431FF201987BF1E00E995EC /* MBTableGrid.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 1431FF1A1987A7AD00E995EC /* MBTableGrid.framework */; };
 		1435D32F194C10FA00863A90 /* EXTChartRulerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1435D32E194C10FA00863A90 /* EXTChartRulerView.m */; };
 		143F3DFE176D615100FB92B3 /* EXTUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 143F3DFD176D615100FB92B3 /* EXTUtilities.m */; };
 		144709A51946CDF8009C6958 /* EXTChartViewModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 144709A41946CDF8009C6958 /* EXTChartViewModel.m */; };
@@ -128,6 +129,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				1431FF201987BF1E00E995EC /* MBTableGrid.framework in Copy Frameworks */,
 			);
 			name = "Copy Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
