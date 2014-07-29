@@ -10,6 +10,7 @@
 		093AEADD13E10759003E9F58 /* EXTPair.m in Sources */ = {isa = PBXBuildFile; fileRef = 093AEADC13E10759003E9F58 /* EXTPair.m */; };
 		141C8D3A196FCDAB0037A716 /* NSValue+EXTIntPoint.m in Sources */ = {isa = PBXBuildFile; fileRef = 141C8D39196FCDAB0037A716 /* NSValue+EXTIntPoint.m */; };
 		141FBE6B19713D830020E844 /* EXTChartViewModelTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 141FBE6A19713D830020E844 /* EXTChartViewModelTestCase.m */; };
+		1431FF1D1987A7D800E995EC /* MBTableGrid.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1431FF1A1987A7AD00E995EC /* MBTableGrid.framework */; };
 		1435D32F194C10FA00863A90 /* EXTChartRulerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1435D32E194C10FA00863A90 /* EXTChartRulerView.m */; };
 		143F3DFE176D615100FB92B3 /* EXTUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 143F3DFD176D615100FB92B3 /* EXTUtilities.m */; };
 		144709A51946CDF8009C6958 /* EXTChartViewModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 144709A41946CDF8009C6958 /* EXTChartViewModel.m */; };
@@ -83,6 +84,27 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		1431FF171987A7AD00E995EC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1431FF121987A7AD00E995EC /* MBTableGrid.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 8D1107320486CEB800E47090;
+			remoteInfo = MBTableGridDemo;
+		};
+		1431FF191987A7AD00E995EC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1431FF121987A7AD00E995EC /* MBTableGrid.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = E2E62BAA1781C33400F36275;
+			remoteInfo = MBTableGrid;
+		};
+		1431FF1B1987A7D000E995EC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1431FF121987A7AD00E995EC /* MBTableGrid.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = E2E62BA91781C33400F36275;
+			remoteInfo = MBTableGrid;
+		};
 		145CD959194A0AE5006621A6 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 2A37F4A9FDCFA73011CA2CEA /* Project object */;
@@ -121,6 +143,7 @@
 		141C8D38196FCDAB0037A716 /* NSValue+EXTIntPoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSValue+EXTIntPoint.h"; sourceTree = "<group>"; };
 		141C8D39196FCDAB0037A716 /* NSValue+EXTIntPoint.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSValue+EXTIntPoint.m"; sourceTree = "<group>"; };
 		141FBE6A19713D830020E844 /* EXTChartViewModelTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTChartViewModelTestCase.m; sourceTree = "<group>"; };
+		1431FF121987A7AD00E995EC /* MBTableGrid.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = MBTableGrid.xcodeproj; path = ThirdParty/MBTableGrid/MBTableGrid.xcodeproj; sourceTree = "<group>"; };
 		1435D32D194C10FA00863A90 /* EXTChartRulerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTChartRulerView.h; sourceTree = "<group>"; };
 		1435D32E194C10FA00863A90 /* EXTChartRulerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTChartRulerView.m; sourceTree = "<group>"; };
 		143976851966A47000D8FE87 /* EXTChartViewInteraction.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EXTChartViewInteraction.h; sourceTree = "<group>"; };
@@ -263,6 +286,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1431FF1D1987A7D800E995EC /* MBTableGrid.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -286,6 +310,23 @@
 				2A37F4C5FDCFA73011CA2CEA /* Foundation.framework */,
 			);
 			name = "Other Frameworks";
+			sourceTree = "<group>";
+		};
+		1431FF111987A79800E995EC /* Third Party */ = {
+			isa = PBXGroup;
+			children = (
+				1431FF121987A7AD00E995EC /* MBTableGrid.xcodeproj */,
+			);
+			name = "Third Party";
+			sourceTree = "<group>";
+		};
+		1431FF131987A7AD00E995EC /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				1431FF181987A7AD00E995EC /* MBTableGrid.app */,
+				1431FF1A1987A7AD00E995EC /* MBTableGrid.framework */,
+			);
+			name = Products;
 			sourceTree = "<group>";
 		};
 		143F3DFF176D616800FB92B3 /* Support */ = {
@@ -496,6 +537,7 @@
 				145CD950194A0AE5006621A6 /* Ext Chart Tests */,
 				2A37F4C3FDCFA73011CA2CEA /* Frameworks */,
 				19C28FB0FE9D524F11CA2CBB /* Products */,
+				1431FF111987A79800E995EC /* Third Party */,
 			);
 			name = "Ext Chart";
 			sourceTree = "<group>";
@@ -613,6 +655,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				1431FF1C1987A7D000E995EC /* PBXTargetDependency */,
 			);
 			name = "Ext Chart";
 			productInstallPath = "$(HOME)/Applications";
@@ -647,6 +690,12 @@
 			);
 			mainGroup = 2A37F4AAFDCFA73011CA2CEA /* Ext Chart */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 1431FF131987A7AD00E995EC /* Products */;
+					ProjectRef = 1431FF121987A7AD00E995EC /* MBTableGrid.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				8D15AC270486D014006FF6A4 /* Ext Chart */,
@@ -654,6 +703,23 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		1431FF181987A7AD00E995EC /* MBTableGrid.app */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.application;
+			path = MBTableGrid.app;
+			remoteRef = 1431FF171987A7AD00E995EC /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		1431FF1A1987A7AD00E995EC /* MBTableGrid.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = MBTableGrid.framework;
+			remoteRef = 1431FF191987A7AD00E995EC /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		145CD94B194A0AE5006621A6 /* Resources */ = {
@@ -762,6 +828,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		1431FF1C1987A7D000E995EC /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = MBTableGrid;
+			targetProxy = 1431FF1B1987A7D000E995EC /* PBXContainerItemProxy */;
+		};
 		145CD95A194A0AE5006621A6 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 8D15AC270486D014006FF6A4 /* Ext Chart */;
