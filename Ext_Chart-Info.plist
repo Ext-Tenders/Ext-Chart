@@ -12,7 +12,7 @@
 				<string>sseq</string>
 			</array>
 			<key>CFBundleTypeIconFile</key>
-			<string></string>
+			<string>Document</string>
 			<key>CFBundleTypeName</key>
 			<string>SpectralSequence</string>
 			<key>CFBundleTypeOSTypes</key>

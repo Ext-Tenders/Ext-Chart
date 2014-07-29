@@ -40,6 +40,9 @@
                                       location:(EXTLocation*)loc
                                           upTo:(int)upTo
                                         downTo:(int)downTo;
+-(EXTSpectralSequence*) flattenSSeqAtPage:(int)page
+                             ontoIndexing:(Class<EXTLocation>)newIndexingClass
+                            viaProjection:(EXTLocation* (^)(EXTLocation*))projectionOperator;
 
 - (EXTTerm*)findTerm:(EXTLocation*)loc;
 - (void) addDifferential:(EXTDifferential*)diff;

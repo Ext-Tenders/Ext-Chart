@@ -53,6 +53,7 @@
 		31D5D2E513F6933B00F1B2F9 /* EXTArtBoard.m in Sources */ = {isa = PBXBuildFile; fileRef = 31D5D2E413F6933B00F1B2F9 /* EXTArtBoard.m */; };
 		38036BF71970872600C56E2B /* EXTMultAnnotationLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 38036BF61970872600C56E2B /* EXTMultAnnotationLayer.m */; };
 		3804BF6E17C07D7300A74325 /* EXTMatrixEditor.m in Sources */ = {isa = PBXBuildFile; fileRef = 3804BF6D17C07D7300A74325 /* EXTMatrixEditor.m */; };
+		380E58DE19870672006F5D21 /* Document.iconset in Resources */ = {isa = PBXBuildFile; fileRef = 380E58DD19870672006F5D21 /* Document.iconset */; };
 		381A4800194E12BA005054BD /* EXTTermInspectorViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 381A47FE194E12BA005054BD /* EXTTermInspectorViewController.m */; };
 		381A4801194E12BA005054BD /* EXTTermInspector.xib in Resources */ = {isa = PBXBuildFile; fileRef = 381A47FF194E12BA005054BD /* EXTTermInspector.xib */; };
 		382BAD221943E26B00E1DDED /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 382BAD211943E26B00E1DDED /* Credits.rtf */; };
@@ -229,6 +230,7 @@
 		38036BF61970872600C56E2B /* EXTMultAnnotationLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTMultAnnotationLayer.m; sourceTree = "<group>"; };
 		3804BF6C17C07D7300A74325 /* EXTMatrixEditor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTMatrixEditor.h; sourceTree = "<group>"; };
 		3804BF6D17C07D7300A74325 /* EXTMatrixEditor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTMatrixEditor.m; sourceTree = "<group>"; };
+		380E58DD19870672006F5D21 /* Document.iconset */ = {isa = PBXFileReference; lastKnownFileType = folder.iconset; name = Document.iconset; path = Images/Document.iconset; sourceTree = "<group>"; };
 		381A47FD194E12BA005054BD /* EXTTermInspectorViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTTermInspectorViewController.h; sourceTree = "<group>"; };
 		381A47FE194E12BA005054BD /* EXTTermInspectorViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTTermInspectorViewController.m; sourceTree = "<group>"; };
 		381A47FF194E12BA005054BD /* EXTTermInspector.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = EXTTermInspector.xib; sourceTree = "<group>"; };
@@ -496,6 +498,7 @@
 		14EF1A611756ED430012DD3C /* Images */ = {
 			isa = PBXGroup;
 			children = (
+				380E58DD19870672006F5D21 /* Document.iconset */,
 				14CCA38B1794F21D002EF861 /* Ext Chart.iconset */,
 				149831AA17AE6A0E000380A5 /* Toolbox */,
 				149831AB17AE6A1A000380A5 /* Examples */,
@@ -741,6 +744,7 @@
 				1DDD582C0DA1D0D100B32029 /* EXTDocument.xib in Resources */,
 				1DDD582D0DA1D0D100B32029 /* MainMenu.xib in Resources */,
 				38DDAA7B16EDA8990001841D /* README.md in Resources */,
+				380E58DE19870672006F5D21 /* Document.iconset in Resources */,
 				38F7830B17565F72009D207A /* LICENSE in Resources */,
 				14CCA38C1794F21D002EF861 /* ArtBoardTool.pdf in Resources */,
 				14CCA38E1794F21D002EF861 /* Ext Chart.iconset in Resources */,

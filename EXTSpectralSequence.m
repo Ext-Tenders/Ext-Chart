@@ -742,4 +742,36 @@
     return [EXTMatrix rankOfMap:[EXTMatrix newMultiply:multMatrix by:cycleMatrix] intoQuotientByTheInclusion:boundaryMatrix];
 }
 
+// tacit assumption: we don't need to run -computeGroupsForPage:
+-(EXTSpectralSequence*) flattenSSeqAtPage:(int)page
+                             ontoIndexing:(Class<EXTLocation>)newIndexingClass
+                            viaProjection:(EXTLocation* (^)(EXTLocation*))projectionOperator {
+    EXTSpectralSequence *ret = [EXTSpectralSequence sSeqWithIndexingClass:newIndexingClass];
+    
+    // iterate through the terms in self. we'll deal with term creation.
+    //   inspect this term for homology representatives on this page.
+    //   if there aren't any, then skip to the next term.
+    //   if there are some, then project this term's location using the operator
+    //   find the term in this spectral sequence written at this location.
+    //     if it doesn't exist, then create it.
+    //   add some term names to this term based on the homology reps' names.
+    // iterate through the terms in self again, this time for mult. struct.s.
+    //   inspect this term for homology representatives on this page.
+    //   if there aren't any, then skip to the next term.
+    //   if there are some, hold this term as rightTerm.
+    //   iterate through the terms in self; call each leftTerm.
+    //      if this leftTerm doesn't have any homology reps, skip it.
+    //      if it does, then build the restriction of the multiplication matrix.
+    //      express the results in terms of the homology reps on the target.
+    //      build a partial definition to store in the multiplication tables:
+    //        its action is the matrix we just computed.
+    //        its inclusion is the hadamard product of the inclusions of
+    //            leftTerm and rightTerm into the terms in this new sseq.
+    
+    // there are no differentials.
+    
+    // return the new sseq.
+    return ret;
+}
+
 @end
