@@ -18,7 +18,7 @@
 
 
 #define PRESENT_FILE_VERSION 7
-#define MINIMUM_FILE_VERSION_ALLOWED 5
+#define MINIMUM_FILE_VERSION_ALLOWED 7
 
 
 @implementation EXTDocument

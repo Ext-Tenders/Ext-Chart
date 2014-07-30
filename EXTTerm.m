@@ -81,16 +81,7 @@
         // note: we're just initializing the first element of the array, not
         // the whole thing.
         boundaries[0] = [coder decodeObjectForKey:@"boundaries"];
-        if (boundaries[0] == nil) {
-            NSLog(@"Installing default boundary matrix at internal location %@.", location.description);
-            boundaries[0] = [EXTMatrix matrixWidth:0 height:names.count];
-        }
-        
         cycles[0] = [coder decodeObjectForKey:@"cycles"];
-        if (cycles[0] == nil) {
-            NSLog(@"Installing default cycle matrix at internal location %@.", location.description);
-            cycles[0] = [EXTMatrix identity:names.count];
-        }
         
         homologyReps = [NSMutableArray array];
         [cycles addObject:[EXTMatrix identity:names.count].presentation];

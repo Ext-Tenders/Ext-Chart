@@ -937,7 +937,7 @@
         *bData = b.presentation.mutableBytes;
     
     for (int i = 0; i < a.width; i++)
-        for (int j = 0; i < a.height; j++)
+        for (int j = 0; j < a.height; j++)
             retData[i*ret.height+j] = aData[i*a.height+j];
     for (int i = 0; i < b.width; i++)
         for (int j = 0; j < b.height; j++)
