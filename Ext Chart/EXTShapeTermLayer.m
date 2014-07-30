@@ -27,21 +27,9 @@ static const CGFloat _kDoubleDigitFontSizeFactor = 0.4;
 + (instancetype)glyphCacheKeyWithFontSize:(CGFloat)fontSize glyph:(CGGlyph)glyph;
 @end
 
-#pragma mark - Class extensions
-
-@interface EXTShapeTermLayer ()
-@property (nonatomic, strong) EXTTermLayerSurrogate *surrogate;
-@end
-
-
 @implementation EXTShapeTermLayer
 
-@dynamic highlighted;
-@dynamic selectedObject;
-@dynamic highlightColor;
-@dynamic selectionColor;
-
-@dynamic termCell;
+@synthesize termCell = _termCell;
 
 + (void)initialize
 {
@@ -53,39 +41,21 @@ static const CGFloat _kDoubleDigitFontSizeFactor = 0.4;
     }
 }
 
-- (instancetype)init {
-    self = [super init];
-    if (!self) return nil;
-
-    _surrogate = [EXTTermLayerSurrogate new];
-
-    __weak EXTShapeTermLayer *weakSelf = self;
-    _surrogate.interactionChangedContinuation = ^{
-        __strong EXTShapeTermLayer *strongSelf = weakSelf;
-        [strongSelf updateInteractionStatus];
-    };
-
-    _surrogate.selectionAnimationContinuation = ^(CAAnimation *animation){
-        __strong EXTShapeTermLayer *strongSelf = weakSelf;
-        [strongSelf addAnimation:animation forKey:@"selection"];
-    };
-
-    return self;
-}
-
 - (instancetype)initWithLayer:(id)layer
 {
     self = [super initWithLayer:layer];
     if (self && [layer isKindOfClass:[EXTShapeTermLayer class]]) {
         EXTShapeTermLayer *otherLayer = layer;
-        _surrogate = [otherLayer.surrogate copy];
+        _termCell = otherLayer.termCell;
     }
     return self;
 }
 
-+ (instancetype)termLayerWithTotalRank:(NSInteger)totalRank length:(NSInteger)length
++ (instancetype)termLayerWithTermCell:(EXTChartViewModelTermCell *)termCell length:(NSInteger)length
 {
     EXTShapeTermLayer *layer = [EXTShapeTermLayer layer];
+    layer->_termCell = termCell;
+    const NSInteger totalRank = termCell.totalRank;
     CGMutablePathRef path = CGPathCreateMutable();
     CGPathMoveToPoint(path, NULL, 0.0, 0.0);
 
@@ -199,45 +169,6 @@ static const CGFloat _kDoubleDigitFontSizeFactor = 0.4;
     }
 
     return path;
-}
-
-
-+ (bool)isSelectorHandledBySurrogate:(SEL)selector {
-    return [[EXTTermLayerSurrogate surrogateSelectors] containsObject:NSStringFromSelector(selector)];
-}
-
-+ (BOOL)resolveInstanceMethod:(SEL)selector {
-    return [self isSelectorHandledBySurrogate:selector] || [super resolveInstanceMethod:selector];
-}
-
-- (id)forwardingTargetForSelector:(SEL)selector {
-    return [[self class] isSelectorHandledBySurrogate:selector] ? self.surrogate : [super forwardingTargetForSelector:selector];
-}
-
-- (void)updateInteractionStatus
-{
-    CGColorRef fillColor, strokeColor;
-
-    if (self.selectedObject) {
-        fillColor = strokeColor = self.selectionColor;
-    }
-    else if (self.highlighted) {
-        fillColor = strokeColor = self.highlightColor;
-    }
-    else {
-        fillColor = _fillColor;
-        strokeColor = _strokeColor;
-    }
-
-    if (self.termCell.totalRank <= 3) {
-        self.fillColor = fillColor;
-    }
-    else {
-        self.strokeColor = strokeColor;
-        for (CAShapeLayer *sublayer in self.sublayers) {
-            sublayer.fillColor = strokeColor;
-        }
-    }
 }
 
 @end

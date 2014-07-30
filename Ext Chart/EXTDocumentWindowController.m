@@ -549,7 +549,7 @@ typedef enum : NSInteger {
     const CGRect frame = self.chartView.artBoard.frame;
 
     EXTChartView *exportChartView = [[EXTChartView alloc] initWithFrame:(NSRect){NSZeroPoint, self.chartView.frame.size}];
-    exportChartView.vectorChart = true;
+    exportChartView.exportOnly = true;
     exportChartView.dataSource = self.chartViewController;
     exportChartView.delegate = self.chartViewController;
     exportChartView.grid.gridSpacing = self.chartViewController.chartViewModel.grid.gridSpacing;

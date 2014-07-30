@@ -30,7 +30,7 @@
 
 @property (nonatomic, weak) id selectedObject;
 @property (nonatomic, assign) bool inLiveMagnify;
-@property (nonatomic, assign, getter=isVectorChart) bool vectorChart;
+@property (nonatomic, assign, getter=isExportOnly) bool exportOnly;
 
 // New chart view
 - (void)updateVisibleRect;

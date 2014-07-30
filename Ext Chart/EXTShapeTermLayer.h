@@ -10,5 +10,5 @@
 
 #import "EXTTermLayer.h"
 
-@interface EXTShapeTermLayer : CAShapeLayer <EXTTermLayer>
+@interface EXTShapeTermLayer : CAShapeLayer <EXTTermLayerBase>
 @end

@@ -35,20 +35,18 @@ static NSSize boundingSizeForAttributedString(NSAttributedString *s);
 #pragma mark - Class extensions
 
 @interface EXTImageTermLayer ()
-
-@property (nonatomic, strong) EXTTermLayerSurrogate *surrogate;
 @property (nonatomic, readonly) CGFloat scaledLength;
 @property (nonatomic, readonly) NSColor *termColor;
 @end
 
 @implementation EXTImageTermLayer
 
-@dynamic highlighted;
-@dynamic selectedObject;
-@dynamic highlightColor;
-@dynamic selectionColor;
+@synthesize highlighted = _highlighted;
+@synthesize selectedObject = _selectedObject;
+@synthesize highlightColor = _highlightColor;
+@synthesize selectionColor = _selectionColor;
 
-@dynamic termCell;
+@synthesize termCell = _termCell;
 
 
 + (void)initialize
@@ -59,56 +57,31 @@ static NSSize boundingSizeForAttributedString(NSAttributedString *s);
     }
 }
 
-- (instancetype)init {
-    self = [super init];
-    if (!self) return nil;
-
-    _surrogate = [EXTTermLayerSurrogate new];
-    __weak EXTImageTermLayer* weakSelf = self;
-    _surrogate.interactionChangedContinuation = ^{
-        __strong EXTImageTermLayer *strongSelf = weakSelf;
-        [strongSelf updateInteractionStatus];
-    };
-
-    _surrogate.selectionAnimationContinuation = ^(CAAnimation *animation){
-        __strong EXTImageTermLayer *strongSelf = weakSelf;
-        [strongSelf addAnimation:animation forKey:@"selection"];
-    };
-
-    return self;
-}
-
-+ (bool)isSelectorHandledBySurrogate:(SEL)selector {
-    return [[EXTTermLayerSurrogate surrogateSelectors] containsObject:NSStringFromSelector(selector)];
-}
-
-+ (BOOL)resolveInstanceMethod:(SEL)selector {
-    return [self isSelectorHandledBySurrogate:selector] || [super resolveInstanceMethod:selector];
-}
-
-- (id)forwardingTargetForSelector:(SEL)selector {
-    return [[self class] isSelectorHandledBySurrogate:selector] ? self.surrogate : [super forwardingTargetForSelector:selector];
-}
-
 - (instancetype)initWithLayer:(id)layer
 {
     self = [super initWithLayer:layer];
     if (self && [layer isKindOfClass:[EXTImageTermLayer class]]) {
         EXTImageTermLayer *otherLayer = layer;
-        _surrogate = [otherLayer.surrogate copy];
+        _termCell = otherLayer.termCell;
     }
     return self;
 }
 
-+ (instancetype)termLayerWithTotalRank:(NSInteger)totalRank length:(NSInteger)length
++ (instancetype)termLayerWithTermCell:(EXTChartViewModelTermCell *)termCell length:(NSInteger)length
 {
     EXTImageTermLayer *layer = [EXTImageTermLayer layer];
-    layer.contents = [self dotImageForRank:totalRank length:length color:_color];
+    layer.contents = [self dotImageForRank:termCell.totalRank length:length color:_color];
+    layer->_termCell = termCell;
     layer.drawsAsynchronously = YES;
     return layer;
 }
 
-- (void)resetContents {
+- (void)dealloc {
+    CGColorRelease(_highlightColor);
+    CGColorRelease(_selectionColor);
+}
+
+- (void)reloadContents {
     self.contents = [EXTImageTermLayer dotImageForRank:self.termCell.totalRank
                                                 length:self.scaledLength
                                                  color:self.termColor];
@@ -208,6 +181,56 @@ static NSSize boundingSizeForAttributedString(NSAttributedString *s);
     self.contents = [EXTImageTermLayer dotImageForRank:self.termCell.totalRank
                                                 length:self.scaledLength
                                                  color:self.termColor];
+}
+
+#pragma mark - Properties
+
+- (void)setHighlightColor:(CGColorRef)highlightColor
+{
+    if (_highlightColor != highlightColor) {
+        CGColorRelease(_highlightColor);
+        _highlightColor = CGColorCreateCopy(highlightColor);
+        [self updateInteractionStatus];
+    }
+}
+
+- (void)setSelectionColor:(CGColorRef)selectionColor
+{
+    if (_selectionColor != selectionColor) {
+        CGColorRelease(_selectionColor);
+        _selectionColor = CGColorCreateCopy(selectionColor);
+        [self updateInteractionStatus];
+    }
+}
+
+- (void)setHighlighted:(bool)highlighted
+{
+    if (highlighted != _highlighted) {
+        _highlighted = highlighted;
+        [self updateInteractionStatus];
+    }
+}
+
+- (void)setSelectedObject:(bool)selectedObject
+{
+    if (selectedObject != _selectedObject) {
+        _selectedObject = selectedObject;
+        [self updateInteractionStatus];
+    }
+
+    if (selectedObject) {
+        CAKeyframeAnimation *animation = CAKeyframeAnimation.animation;
+        animation.keyPath = @"transform";
+        animation.values = @[[NSValue valueWithCATransform3D:CATransform3DIdentity],
+                             [NSValue valueWithCATransform3D:CATransform3DMakeScale(0.75, 0.75, 1.0)],
+                             [NSValue valueWithCATransform3D:CATransform3DMakeScale(1.5, 1.5, 1.0)],
+                             [NSValue valueWithCATransform3D:CATransform3DIdentity]];
+        animation.keyTimes = @[@0.0, @0.3, @0.8, @1.0];
+        animation.duration = 0.2;
+        animation.removedOnCompletion = YES;
+
+        [self addAnimation:animation forKey:@"selection"];
+    }
 }
 
 @end

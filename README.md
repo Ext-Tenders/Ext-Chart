@@ -4,19 +4,48 @@ The goal of this project is to facilitate the drawing and manipulation of spectr
 
 Ext Chart is open source software released under the [University of Illinois/NCSA Open Source License](http://opensource.org/licenses/NCSA).
 
-Discussion on Freenode at #Ext-Chart.
+We’re happy to talk about this project on Freenode at #Ext-Chart.
 
 # Development
 
-Use Xcode to download the Ext Chart repository from GitHub:
+## Build only
 
-1. Open Xcode and choose the Source Control > Check Out… menu item
-2. Type **https://github.com/ecpeterson/Ext-Chart.git** in the repository location field and click Next
+If you only want to build Ext Chart, use Xcode to download the Ext Chart repository from GitHub:
+
+1. Open Xcode and choose the Source Control > Check Out… menu item.
+2. Type **https://github.com/ecpeterson/Ext-Chart.git** in the repository location field and click Next.
 3. Select a folder in your disk where the project repository will be stored and click Check Out.
-
-    Xcode will download the repository. Since we use third-party projects, Xcode will also ask you to check out each third-party project as an additional working copy. Choose Check Out… and click Next so that Xcode downloads all dependent projects.
-
-4. We need to use a shared build folder for all projects in the workspace. Since this is an individual setting, you need to configure it in your system. In Xcode, choose the File > Workspace Settings… menu item. Click Advanced…, choose Shared Folder and type a folder name—we suggest ExtChartBuild.
+4. Open Xcode’s workspace.
 
 When restarting Xcode, make sure you open Ext Chart’s workspace instead of its project.
 
+## Contributing with commit rights
+
+If you have commit rights to Ext Chart’s repository:
+
+1. Open Xcode and choose the Source Control > Check Out… menu item.
+2. Type **https://github.com/ecpeterson/Ext-Chart.git** in the repository location field and click Next.
+3. Select a folder in your disk where the project repository will be stored and click Check Out.
+4. Open Xcode’s workspace.
+
+When restarting Xcode, make sure you open Ext Chart’s workspace instead of its project.
+
+## Contributing without commit rights
+
+If you don’t have commit rights to Ext Chart’s repository:
+
+1. Create a GitHub account and [fork](https://help.github.com/articles/fork-a-repo) Ext Chart’s repository.
+2. Open Xcode and choose the Source Control > Check Out… menu item.
+3. Type **https://github.com/YOURACCOUNT/Ext-Chart.git** in the repository location field and click Next.
+4. Select a folder in your disk where the project repository will be stored and click Check Out.
+5. Open Xcode’s workspace.
+
+When restarting Xcode, make sure you open Ext Chart’s workspace instead of its project.
+
+Whenever you want to implement a change:
+
+1. Create a feature branch in your Ext Chart repository.
+2. Commit to that branch.
+3. When the feature is finished and tested, push that branch to your GitHub account and submit a pull request.
+
+See the [Using pull requests page at GitHub](https://help.github.com/articles/using-pull-requests).
