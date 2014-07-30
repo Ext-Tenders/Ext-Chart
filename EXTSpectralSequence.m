@@ -762,7 +762,7 @@
     
     // loop through the terms, projecting and summing them.
     ret.terms = [NSMutableDictionary new];
-    for (EXTTerm *term in self.terms) {
+    for (EXTTerm *term in self.terms.allValues) {
         // project the term and find it in the new spectral sequence.
         EXTLocation *projectedLoc = projectionOperator(term.location);
         EXTTerm *projectedTerm = ret.terms[projectedLoc];
@@ -786,6 +786,10 @@
     
     // set up the new indexing class
     ret->indexClass = newIndexingClass;
+    
+    // there's probably something smarter to do here. whatever the smarter thing
+    // is, it requires changing the method signature.
+    ret.locConvertor = [[EXTPairToPoint alloc] initAdamsGrading];
     
     // clear the differentials
     ret.differentials = [NSMutableArray new];

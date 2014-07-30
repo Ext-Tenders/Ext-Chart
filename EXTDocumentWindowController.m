@@ -600,6 +600,31 @@ typedef enum : NSInteger {
     return;
 }
 
+- (IBAction)doFlattenSSeq:(id)sender {
+    // TODO: this should be fleshed out with a dialog box controlling at least
+    // the target indexing!
+    
+    if (![(Class)self.extDocument.sseq.indexClass isSubclassOfClass:[EXTTriple class]])
+        return;
+    
+    EXTSpectralSequence *flattenedSSeq = [self.extDocument.sseq
+            flattenSSeqAtPage:self.chartViewController.currentPage
+                 ontoIndexing:[EXTPair class]
+                viaProjection:(^(EXTLocation *loc) {
+                        EXTTriple *trip = (EXTTriple*)loc;
+                        return (EXTLocation*)[EXTPair pairWithA:(trip.b - trip.a) B:trip.a];
+        })];
+    
+    NSDocumentController *docController = [NSDocumentController sharedDocumentController];
+    EXTDocument *doc = [docController makeUntitledDocumentOfType:[docController defaultType] error:NULL];
+    [doc setSseq:flattenedSSeq];
+    [docController addDocument:doc];
+    [doc makeWindowControllers];
+    [doc showWindows];
+    
+    return;
+}
+
 
 - (IBAction)changeTool:(id)sender {
     NSAssert([sender respondsToSelector:@selector(tag)], @"This action requires senders that respond to -tag");

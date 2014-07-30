@@ -42,7 +42,7 @@
                                         downTo:(int)downTo;
 -(EXTSpectralSequence*) flattenSSeqAtPage:(int)page
                              ontoIndexing:(Class<EXTLocation>)newIndexingClass
-                            viaProjection:(EXTLocation* (^)(EXTLocation*))projectionOperator;
+                            viaProjection:(NSObject<EXTLocation>* (^)(NSObject<EXTLocation>*))projectionOperator;
 
 - (EXTTerm*)findTerm:(EXTLocation*)loc;
 - (void) addDifferential:(EXTDifferential*)diff;
