@@ -64,14 +64,14 @@ static NSSize boundingSizeForAttributedString(NSAttributedString *s);
     if (!self) return nil;
 
     _surrogate = [EXTTermLayerSurrogate new];
-    __weak typeof(self) weakSelf = self;
+    __weak EXTImageTermLayer* weakSelf = self;
     _surrogate.interactionChangedContinuation = ^{
-        typeof(self) strongSelf = weakSelf;
+        __strong EXTImageTermLayer *strongSelf = weakSelf;
         [strongSelf updateInteractionStatus];
     };
 
     _surrogate.selectionAnimationContinuation = ^(CAAnimation *animation){
-        typeof(self) strongSelf = weakSelf;
+        __strong EXTImageTermLayer *strongSelf = weakSelf;
         [strongSelf addAnimation:animation forKey:@"selection"];
     };
 

@@ -59,14 +59,14 @@ static const CGFloat _kDoubleDigitFontSizeFactor = 0.4;
 
     _surrogate = [EXTTermLayerSurrogate new];
 
-    __weak typeof(self) weakSelf = self;
+    __weak EXTShapeTermLayer *weakSelf = self;
     _surrogate.interactionChangedContinuation = ^{
-        typeof(self) strongSelf = weakSelf;
+        __strong EXTShapeTermLayer *strongSelf = weakSelf;
         [strongSelf updateInteractionStatus];
     };
 
     _surrogate.selectionAnimationContinuation = ^(CAAnimation *animation){
-        typeof(self) strongSelf = weakSelf;
+        __strong EXTShapeTermLayer *strongSelf = weakSelf;
         [strongSelf addAnimation:animation forKey:@"selection"];
     };
 
