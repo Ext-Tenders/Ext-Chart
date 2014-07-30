@@ -99,9 +99,7 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
 
     CGFloat _magnification;
 
-    /// Operations in this queue resize term layers to match a given magnification. Each operation is responsible for
-    /// changing all term layers in the chart view and there should be only one active operation at any given time
-    /// since it’s wasteful to scale a term layer if it’s going to be scaled again.
+    /// Operations in this queue resize term layers to match a given magnification or grid spacing. Each operation is responsible for changing all term layers in the chart view and there should be only one active operation at any given time since it’s wasteful to scale a term layer if it’s going to be scaled again.
     NSOperationQueue *_resizeTermLayersQueue;
 }
 
@@ -348,7 +346,7 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
 
     const CGFloat newMagnification = [[self enclosingScrollView] magnification];
     if (!self.inLiveMagnify && _magnification != newMagnification) {
-        [self resetTermLayerContentsToFitMagnification:newMagnification];
+        [self reloadTermLayerContentsToFitMagnification:newMagnification];
         // TODO: We could prioritise visible layers first, or maybe reset only visible layers. Need to mind
         //       PDF export, though.
     }
@@ -360,7 +358,18 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
     CGPathRelease(axesPath);
 }
 
-- (void)resetTermLayerContentsToFitMagnification:(CGFloat)magnification {
+- (void)reloadTermLayerContentsToFitMagnification:(CGFloat)magnification {
+    if (self.exportOnly) return;
+
+    [self reloadTermContentsWithBlock:^(EXTImageTermLayer *termLayer) {
+        termLayer.contentsScale = magnification;
+    } cancellable:true];
+}
+
+// FIXME: find a selector name where the block parameter is the last parameter
+- (void)reloadTermContentsWithBlock:(void(^)(EXTImageTermLayer *termLayer))block cancellable:(bool)cancellable {
+    NSParameterAssert(block);
+
     if (self.exportOnly) return;
 
     NSArray *termLayers = [_termLayers copy];
@@ -374,12 +383,13 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
 
     [resizeTermLayerOperation addExecutionBlock:^{
         dispatch_apply(termLayersCount, resizeQueue, ^(size_t layerIndex) {
-            if (![weakResizeTermLayerOperation isCancelled]) {
+            if (!(cancellable && [weakResizeTermLayerOperation isCancelled])) {
                 EXTImageTermLayer *termLayer = termLayers[layerIndex];
+
                 [CATransaction begin];
                 [CATransaction setDisableActions:YES];
                 {
-                    termLayer.contentsScale = magnification;
+                    block(termLayer);
                     [termLayer reloadContents];
                 }
                 [CATransaction commit];
@@ -717,6 +727,16 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
         _axesGridLayer.strokeColor = [_grid.axisColor CGColor];
     }
     else if (context == _gridSpacingContext) {
+        const CGFloat magnification = [[self enclosingScrollView] magnification];
+        const CGFloat gridSpacing = self.grid.gridSpacing;
+
+        [self reloadTermContentsWithBlock:^(EXTImageTermLayer *termLayer) {
+            const EXTIntPoint gridLocation = termLayer.termCell.gridLocation;
+
+            termLayer.frame = (CGRect){{gridLocation.x * gridSpacing, gridLocation.y * gridSpacing}, {gridSpacing, gridSpacing}};
+            termLayer.contentsScale = magnification;
+        } cancellable:false];
+
         [self updateVisibleRect];
         [self _extAlignArtBoardToGrid];
         [self _extUpdateArtBoardMinimumSize];
@@ -757,7 +777,7 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
     }
     else if (context == _inLiveMagnifyContext) {
         if (!self.inLiveMagnify) {
-            [self resetTermLayerContentsToFitMagnification:[[self enclosingScrollView] magnification]];
+            [self reloadTermLayerContentsToFitMagnification:[[self enclosingScrollView] magnification]];
         }
     }
 	else {
