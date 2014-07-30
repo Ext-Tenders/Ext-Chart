@@ -252,8 +252,8 @@
     
     // or, if this dimension is smaller than the one we were, we should modify
     // the dimensions of our matrices and lop them off / extend accordingly.
-    memcpy(newInclusion.presentation.mutableBytes, inclusion.presentation.mutableBytes, newInclusion.presentation.length);
-    memcpy(newAction.presentation.mutableBytes, action.presentation.mutableBytes, newAction.presentation.length);
+    memcpy(newInclusion.presentation.mutableBytes, inclusion.presentation.mutableBytes, inclusion.presentation.length);
+    memcpy(newAction.presentation.mutableBytes, action.presentation.mutableBytes, action.presentation.length);
     
     // store the fresh matrices
     self.actionEditor.representedObject = newAction;
