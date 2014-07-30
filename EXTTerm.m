@@ -70,14 +70,28 @@
 - (instancetype) initWithCoder: (NSCoder*) coder {
 	if (self = [super init])
 	{
+        boundaries = [NSMutableArray array];
+        cycles = [NSMutableArray array];
+        
         names = [coder decodeObjectForKey:@"names"];
         location = [coder decodeObjectForKey:@"location"];
         displayBasis = [coder decodeObjectForKey:@"displayBasis"];
         displayNames = [coder decodeObjectForKey:@"displayNames"];
         
-        // start off with the default cycles and boundaries
-        boundaries = [NSMutableArray array];
-        cycles = [NSMutableArray array];
+        // note: we're just initializing the first element of the array, not
+        // the whole thing.
+        boundaries[0] = [coder decodeObjectForKey:@"boundaries"];
+        if (boundaries[0] == nil) {
+            NSLog(@"Installing default boundary matrix at internal location %@.", location.description);
+            boundaries[0] = [EXTMatrix matrixWidth:0 height:names.count];
+        }
+        
+        cycles[0] = [coder decodeObjectForKey:@"cycles"];
+        if (cycles[0] == nil) {
+            NSLog(@"Installing default cycle matrix at internal location %@.", location.description);
+            cycles[0] = [EXTMatrix identity:names.count];
+        }
+        
         homologyReps = [NSMutableArray array];
         [cycles addObject:[EXTMatrix identity:names.count].presentation];
         [boundaries addObject:@[]];
@@ -91,6 +105,8 @@
 	[coder encodeObject:location forKey:@"location"];
     [coder encodeObject:displayBasis forKey:@"displayBasis"];
     [coder encodeObject:displayNames forKey:@"displayNames"];
+    [coder encodeObject:boundaries[0] forKey:@"boundaries"];
+    [coder encodeObject:cycles[0] forKey:@"cycles"];
 }
 
 #pragma mark *** not yet sure how to classify this (it's an init, in some sense) ***
