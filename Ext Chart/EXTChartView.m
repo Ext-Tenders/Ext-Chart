@@ -446,17 +446,11 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
 
         NSArray *differentials = [self.dataSource chartView:self differentialsInGridRect:reloadGridRect];
         for (EXTChartViewModelDifferential *diff in differentials) {
-            const CGPoint start = [_grid convertPointToView:diff.startTerm.termCell.gridLocation];
-            const CGPoint end = [_grid convertPointToView:diff.endTerm.termCell.gridLocation];
-            const CGPoint origin = {MIN(start.x, end.x), MIN(start.y, end.y)};
-            const CGSize size = {ABS(start.x - end.x), ABS(start.y - end.y)};
-
-            const NSInteger startTotalRank = diff.startTerm.termCell.totalRank;
-            const NSInteger endTotalRank = diff.endTerm.termCell.totalRank;
+            const CGRect layerFrame = [self frameForDifferential:diff];
 
             for (EXTChartViewModelDifferentialLine *line in diff.lines) {
                 EXTDifferentialLineLayer *newDifferentialLineLayer = [EXTDifferentialLineLayer layer];
-                newDifferentialLineLayer.frame = (CGRect){origin, size};
+                newDifferentialLineLayer.frame = layerFrame;
                 newDifferentialLineLayer.differential = diff;
                 newDifferentialLineLayer.line = line;
                 newDifferentialLineLayer.highlightColor = [_highlightColor CGColor];
@@ -466,23 +460,10 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
                 [newDifferentialLineLayers addObject:newDifferentialLineLayer];
                 [self.layer addSublayer:newDifferentialLineLayer];
 
-                const NSRect startDotRect = [EXTChartView dotBoundingBoxForCellRank:startTotalRank
-                                                                          termIndex:line.startIndex
-                                                                       gridLocation:diff.startTerm.termCell.gridLocation
-                                                                        gridSpacing:_grid.gridSpacing];
-                const NSRect endDotRect = [EXTChartView dotBoundingBoxForCellRank:endTotalRank
-                                                                        termIndex:line.endIndex
-                                                                     gridLocation:diff.endTerm.termCell.gridLocation
-                                                                      gridSpacing:_grid.gridSpacing];
-
-                const CGPoint startDotConnectionPoint = (startTotalRank <= 3 ?
-                                                         (CGPoint){NSMidX(startDotRect), NSMidY(startDotRect)} :
-                                                         (CGPoint){NSMinX(startDotRect), NSMidY(startDotRect)});
-                const CGPoint endDotConnectionPoint = (endTotalRank <= 3 ?
-                                                       (CGPoint){NSMidX(endDotRect), NSMidY(endDotRect)} :
-                                                       (CGPoint){NSMaxX(endDotRect), NSMidY(endDotRect)});
-                const CGPoint startInLayer = [newDifferentialLineLayer convertPoint:startDotConnectionPoint fromLayer:self.layer];
-                const CGPoint endInLayer = [newDifferentialLineLayer convertPoint:endDotConnectionPoint fromLayer:self.layer];
+                CGPoint start, end;
+                [self getStart:&start end:&end forDifferential:diff line:line];
+                const CGPoint startInLayer = [newDifferentialLineLayer convertPoint:start fromLayer:self.layer];
+                const CGPoint endInLayer = [newDifferentialLineLayer convertPoint:end fromLayer:self.layer];
 
                 CGMutablePathRef path = CGPathCreateMutable();
                 CGPathMoveToPoint(path, NULL, startInLayer.x, startInLayer.y);
@@ -671,6 +652,46 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
     _highlightedLayers = (layersToHighlight.count == 0 ? nil : [layersToHighlight copy]);
 }
 
+- (CGRect)frameForDifferential:(EXTChartViewModelDifferential *)differential {
+    const CGPoint start = [self.grid convertPointToView:differential.startTerm.termCell.gridLocation];
+    const CGPoint end = [self.grid convertPointToView:differential.endTerm.termCell.gridLocation];
+    const CGPoint origin = {MIN(start.x, end.x), MIN(start.y, end.y)};
+    const CGSize size = {ABS(start.x - end.x), ABS(start.y - end.y)};
+
+    return (CGRect){origin, size};
+}
+
+- (void)getStart:(CGPoint *)start
+             end:(CGPoint *)end
+ forDifferential:(EXTChartViewModelDifferential *)differential
+            line:(EXTChartViewModelDifferentialLine *)line
+{
+    NSParameterAssert(start);
+    NSParameterAssert(end);
+    NSParameterAssert(differential);
+    NSParameterAssert(line);
+
+    const NSInteger startTotalRank = differential.startTerm.termCell.totalRank;
+    const NSInteger endTotalRank = differential.endTerm.termCell.totalRank;
+
+    const NSRect startDotRect = [EXTChartView dotBoundingBoxForCellRank:startTotalRank
+                                                              termIndex:line.startIndex
+                                                           gridLocation:differential.startTerm.termCell.gridLocation
+                                                            gridSpacing:self.grid.gridSpacing];
+    const NSRect endDotRect = [EXTChartView dotBoundingBoxForCellRank:endTotalRank
+                                                            termIndex:line.endIndex
+                                                         gridLocation:differential.endTerm.termCell.gridLocation
+                                                          gridSpacing:self.grid.gridSpacing];
+
+    *start = (startTotalRank <= 3 ?
+              (CGPoint){NSMidX(startDotRect), NSMidY(startDotRect)} :
+              (CGPoint){NSMinX(startDotRect), NSMidY(startDotRect)});
+
+    *end = (endTotalRank <= 3 ?
+            (CGPoint){NSMidX(endDotRect), NSMidY(endDotRect)} :
+            (CGPoint){NSMaxX(endDotRect), NSMidY(endDotRect)});
+}
+
 #pragma mark - Properties
 
 - (void)setArtBoardGridFrame:(EXTIntRect)artBoardGridFrame {
@@ -736,6 +757,28 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
             termLayer.frame = (CGRect){{gridLocation.x * gridSpacing, gridLocation.y * gridSpacing}, {gridSpacing, gridSpacing}};
             termLayer.contentsScale = magnification;
         } cancellable:false];
+
+
+        [CATransaction begin];
+        [CATransaction setDisableActions:YES];
+        for (EXTDifferentialLineLayer *diffLayer in _differentialLineLayers) {
+            EXTChartViewModelDifferential *diff = diffLayer.differential;
+            EXTChartViewModelDifferentialLine *line = diffLayer.line;
+
+            diffLayer.frame = [self frameForDifferential:diff];
+
+            CGPoint start, end;
+            [self getStart:&start end:&end forDifferential:diff line:line];
+            const CGPoint startInLayer = [diffLayer convertPoint:start fromLayer:self.layer];
+            const CGPoint endInLayer = [diffLayer convertPoint:end fromLayer:self.layer];
+
+            CGMutablePathRef path = CGPathCreateMutable();
+            CGPathMoveToPoint(path, NULL, startInLayer.x, startInLayer.y);
+            CGPathAddLineToPoint(path, NULL, endInLayer.x, endInLayer.y);
+            diffLayer.path = path;
+            CGPathRelease(path);
+        }
+        [CATransaction commit];
 
         [self updateVisibleRect];
         [self _extAlignArtBoardToGrid];
