@@ -7,8 +7,8 @@
 //
 
 #import "EXTMatrixEditor.h"
-#import "ThirdParty/MBTableGrid/MBTableGridHeaderView.h"
-#import "ThirdParty/MBTableGrid/MBTableGridCell.h"
+#import "MBTableGrid/MBTableGridHeaderView.h"
+#import "MBTableGrid/MBTableGridCell.h"
 #import <objc/runtime.h>
 
 
