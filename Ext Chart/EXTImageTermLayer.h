@@ -10,5 +10,6 @@
 
 #import "EXTTermLayer.h"
 
-@interface EXTImageTermLayer : CALayer <EXTTermLayer>
+@interface EXTImageTermLayer : CALayer <EXTTermLayerBase, EXTChartViewInteraction>
+- (void)reloadContents;
 @end

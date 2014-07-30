@@ -136,9 +136,9 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
     if (self) {
 		[self translateOriginToPoint:NSMakePoint(NSMidX(frame), NSMidY(frame))];
 
-// Use 1 for vector charts, 0 for raster charts
+// Use 0 for regular, image-based interactive charts and 1 for export-only, vector-based charts
 #if 0
-        _vectorChart = true;
+        _exportOnly = true;
 #endif
 
         // Interaction colors
@@ -361,7 +361,7 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
 }
 
 - (void)resetTermLayerContentsToFitMagnification:(CGFloat)magnification {
-    if (self.vectorChart) return;
+    if (self.exportOnly) return;
 
     NSArray *termLayers = [_termLayers copy];
     const size_t termLayersCount = [_termLayers count];
@@ -375,12 +375,12 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
     [resizeTermLayerOperation addExecutionBlock:^{
         dispatch_apply(termLayersCount, resizeQueue, ^(size_t layerIndex) {
             if (![weakResizeTermLayerOperation isCancelled]) {
-                CALayer<EXTTermLayer> *termLayer = termLayers[layerIndex];
+                EXTImageTermLayer *termLayer = termLayers[layerIndex];
                 [CATransaction begin];
                 [CATransaction setDisableActions:YES];
                 {
                     termLayer.contentsScale = magnification;
-                    [termLayer resetContents];
+                    [termLayer reloadContents];
                 }
                 [CATransaction commit];
             }
@@ -404,20 +404,26 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
         NSMutableArray *newTermLayers = [NSMutableArray new];
         
         NSArray *termCells = [self.dataSource chartView:self termCellsInGridRect:reloadGridRect];
-        Class<EXTTermLayer> termLayerClass = (self.vectorChart ? [EXTShapeTermLayer class] : [EXTImageTermLayer class]);
+        Class<EXTTermLayerBase> termLayerClass = (self.exportOnly ? [EXTShapeTermLayer class] : [EXTImageTermLayer class]);
+        const bool interactiveTermLayer = (termLayerClass == [EXTImageTermLayer class]);
+
         for (EXTChartViewModelTermCell *termCell in termCells) {
-            CALayer<EXTTermLayer> *newTermLayer = [termLayerClass termLayerWithTotalRank:termCell.totalRank length:_grid.gridSpacing];
+            CALayer<EXTTermLayerBase> *newTermLayer = [termLayerClass termLayerWithTermCell:termCell length:_grid.gridSpacing];
             newTermLayer.frame = (CGRect){{termCell.gridLocation.x * _grid.gridSpacing, termCell.gridLocation.y * _grid.gridSpacing}, {_grid.gridSpacing, _grid.gridSpacing}};
-            newTermLayer.termCell = termCell;
-            newTermLayer.highlightColor = [_highlightColor CGColor];
-            newTermLayer.selectionColor = [_selectionColor CGColor];
             newTermLayer.zPosition = _kTermCellZPosition;
             newTermLayer.contentsScale = _magnification;
+
+            if (interactiveTermLayer) {
+                id<EXTChartViewInteraction> layer = (id<EXTChartViewInteraction>)newTermLayer;
+                layer.highlightColor = [_highlightColor CGColor];
+                layer.selectionColor = [_selectionColor CGColor];
+            }
+
             [newTermLayers addObject:newTermLayer];
             [self.layer addSublayer:newTermLayer];
         }
 
-        if (!self.vectorChart) [newTermLayers makeObjectsPerformSelector:@selector(resetContents)];
+        if (!self.exportOnly) [newTermLayers makeObjectsPerformSelector:@selector(reloadContents)];
         _termLayers = [newTermLayers copy];
     }
 
@@ -571,13 +577,15 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
 
 - (void)updateTermHighlight
 {
+    if (self.exportOnly) return;
+
     id<EXTChartViewInteraction> layerToHighlight = nil;
 
     const NSRect dataRect = [_trackingArea rect];
     const NSPoint currentMouseLocation = [self convertPoint:[[self window] mouseLocationOutsideOfEventStream] fromView:nil];
     if (NSPointInRect(currentMouseLocation, dataRect)) {
         const EXTIntPoint mouseLocationInGrid = [_grid convertPointFromView:currentMouseLocation];
-        for (CALayer<EXTTermLayer> *layer in _termLayers) {
+        for (CALayer<EXTTermLayerBase, EXTChartViewInteraction> *layer in _termLayers) {
             if (EXTEqualIntPoints(layer.termCell.gridLocation, mouseLocationInGrid)) {
                 layerToHighlight = layer;
                 break;
@@ -610,6 +618,8 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
 
 - (void)updateDifferentialHighlight
 {
+    if (self.exportOnly) return;
+
     NSMutableArray *layersToHighlight = [NSMutableArray new];
 
     const NSRect dataRect = [_trackingArea rect];
@@ -892,6 +902,8 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
 
 - (void)reflectSelection
 {
+    if (self.exportOnly) return;
+
     if ([self.selectedObject isKindOfClass:[EXTChartViewModelTerm class]]) {
         [self reflectSelectedTerm];
     }
@@ -908,7 +920,7 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
     NSAssert([self.selectedObject isKindOfClass:[EXTChartViewModelTerm class]], @"Mismatched selected object");
 
     id<EXTChartViewInteraction> layerToSelect = nil;
-    for (CALayer<EXTTermLayer> *layer in _termLayers) {
+    for (CALayer<EXTTermLayerBase, EXTChartViewInteraction> *layer in _termLayers) {
         if ([layer.termCell.terms containsObject:self.selectedObject]) {
             layerToSelect = layer;
             break;
