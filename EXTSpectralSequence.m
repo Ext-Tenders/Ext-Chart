@@ -168,7 +168,9 @@
                 for (int j = 0; j < t2.size; j++)
                     [names addObject:[NSString stringWithFormat:@"%@ %@", t1.names[i], t2.names[j]]];
             
-            EXTTerm *t1t2 = [EXTTerm term:loc andNames:names];
+            EXTTerm *t1t2 = [EXTTerm term:loc withNames:names andCharacteristic:defaultCharacteristic];
+            t1t2.cycles[0] = [EXTMatrix hadamardProduct:t1.cycles[0] with:t2.cycles[0]];
+            t1t2.boundaries[0] = [EXTMatrix hadamardProduct:t1.boundaries[0] with:t2.boundaries[0]];
             
             [tensorTerms addObject:
                 [NSMutableArray arrayWithArray:@[t1t2, t1, t2, @false]]];
@@ -197,11 +199,20 @@
         
         // now, we sum them together. we want a list of names.
         NSMutableArray *sumNames = [NSMutableArray array];
-        for (NSMutableArray *workingTerm in atThisLoc)
+        EXTMatrix *sumCycles = [EXTMatrix matrixWidth:0 height:0],
+              *sumBoundaries = [EXTMatrix matrixWidth:0 height:0];
+        for (NSMutableArray *workingTerm in atThisLoc) {
             [sumNames addObjectsFromArray:((EXTTerm*)workingTerm[0]).names];
+            sumCycles = [EXTMatrix directSum:sumCycles with:((EXTTerm*)workingTerm[0]).cycles[0]];
+            sumBoundaries = [EXTMatrix directSum:sumBoundaries with:((EXTTerm*)workingTerm[0]).boundaries[0]];
+        }
+        
+        EXTTerm *splicedTerm = [EXTTerm term:loc withNames:sumNames andCharacteristic:defaultCharacteristic];
+        splicedTerm.cycles[0] = sumCycles;
+        splicedTerm.boundaries[0] = sumBoundaries;
         
         // finally, add the summed term and its child terms to the spliced terms
-        [splicedTensorTerms addObject:@[[EXTTerm term:loc andNames:sumNames], atThisLoc]];
+        [splicedTensorTerms addObject:@[splicedTerm, atThisLoc]];
     }
     
     // store these terms into the returning spectral sequence.
@@ -508,10 +519,11 @@
         // TODO: possibly there's a better way to name these classes. at the
         // moment, i've opted to name them for easy LaTeX printing.
         EXTLocation *workingLoc = [locClass scale:loc by:i];
-        EXTTerm *workingTerm = [EXTTerm term:workingLoc andNames:
+        EXTTerm *workingTerm = [EXTTerm term:workingLoc withNames:
                                 [NSMutableArray arrayWithObject:
                                  [NSString stringWithFormat:@"(%@)^{%d}",
-                                  name, i]]];
+                                  name, i]]
+                                andCharacteristic:0];
         [l.terms setObject:workingTerm forKey:workingLoc];
     }
     
@@ -757,7 +769,8 @@
         if (!projectedTerm)
             ret.terms[projectedLoc] =
                 (projectedTerm = [EXTTerm term:projectedLoc
-                                      andNames:[NSMutableArray array]]);
+                                     withNames:[NSMutableArray array]
+                             andCharacteristic:defaultCharacteristic]);
         
         // flatten the term's cycles and boundaries into projectedTerm
         projectedTerm.cycles[0] = [EXTMatrix directSum:projectedTerm.cycles[0]

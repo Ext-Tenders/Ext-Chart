@@ -140,8 +140,10 @@
         generators = [NSMutableArray array];
         
         EXTTerm *unit =
-            [EXTTerm term:[locClass identityLocation] andNames:
-                       [NSMutableArray arrayWithObject:[EXTPolynomialTag new]]];
+            [EXTTerm term:[locClass identityLocation]
+                withNames:[NSMutableArray arrayWithObject:[EXTPolynomialTag new]]
+        andCharacteristic:0];
+        
         [self.terms setObject:unit forKey:unit.location];
     }
     
@@ -299,7 +301,10 @@
         
             // if it doesn't exist, create it
             if (!term) {
-                term = [EXTTerm term:workingLoc andNames:[NSMutableArray array]];
+                term = [EXTTerm term:workingLoc
+                           withNames:[NSMutableArray array]
+                   andCharacteristic:self.defaultCharacteristic];
+                
                 [self.terms setObject:term forKey:workingLoc];
             }
             
@@ -313,6 +318,10 @@
                                  forKey:CFArrayGetValueAtIndex(names, i)];
             }
             [term.names addObject:tag];
+            
+            // the new name is automatically a cycle and not a boundary.
+            term.cycles[0] = [EXTMatrix directSum:term.cycles[0] with:[EXTMatrix identity:1]];
+            term.boundaries[0] = [EXTMatrix directSum:term.boundaries[0] with:[EXTMatrix matrixWidth:0 height:1]];
         
             // also need to modify all incoming and outgoing differentials.
             if (self.differentials.count > 0) {

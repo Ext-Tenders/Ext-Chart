@@ -928,6 +928,10 @@
 +(EXTMatrix*) directSum:(EXTMatrix*)a with:(EXTMatrix*)b {
     EXTMatrix *ret = [EXTMatrix matrixWidth:(a.width + b.width)
                                      height:(a.height + b.height)];
+    
+    // this is something of a kludge.
+    ret.characteristic = a.characteristic;
+    
     int *retData = ret.presentation.mutableBytes,
         *aData = a.presentation.mutableBytes,
         *bData = b.presentation.mutableBytes;

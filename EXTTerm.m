@@ -28,7 +28,8 @@
 
 // setTerm re/initializes an EXTTerm with the desired values.
 -(instancetype) setTerm:(EXTLocation*)whichLocation
-               andNames:(NSMutableArray*)whichNames {
+              withNames:(NSMutableArray*)whichNames
+      andCharacteristic:(int)characteristic {
     // first try to initialize the memory for the object which we don't control
 
     // if it succeeds, then initialize the members
@@ -42,19 +43,22 @@
     [self setNames:whichNames];
 
     // initialize the cycles to contain everything.
-    [cycles addObject:[EXTMatrix identity:whichNames.count].presentation];
+    [cycles addObject:[EXTMatrix identity:whichNames.count]];
+    ((EXTMatrix*)cycles[0]).characteristic = characteristic;
 
     // and we start with no boundaries.
-    [boundaries addObject:@[]];
+    [boundaries addObject:[EXTMatrix matrixWidth:0 height:whichNames.count]];
+    ((EXTMatrix*)boundaries[0]).characteristic = characteristic;
 
     // regardless, return the object as best we've initialized it.
     return self;
 }
 
-+(EXTTerm*) term:(EXTLocation*)whichLocation
-        andNames:(NSMutableArray*)whichNames {
++(EXTTerm*)     term:(EXTLocation*)whichLocation
+           withNames:(NSMutableArray*)whichNames
+   andCharacteristic:(int)characteristic {
     EXTTerm *term = [EXTTerm new];
-    [term setTerm:whichLocation andNames:whichNames];
+    [term setTerm:whichLocation withNames:whichNames andCharacteristic:characteristic];
     return term;
 }
 
@@ -89,16 +93,6 @@
     [coder encodeObject:displayNames forKey:@"displayNames"];
 }
 
-#pragma mark ***EXTTool class methods***
-
-- (void)addSelfToSS:(EXTDocument *)theDocument {
-    NSMutableDictionary *terms = [theDocument.sseq terms];
-    
-    // if we're not already added, add us.
-    if (![[terms objectForKey:self.location] isEqual:self])
-        [terms setObject:self forKey:self.location];
-}
-
 #pragma mark *** not yet sure how to classify this (it's an init, in some sense) ***
 
 // TODO: this requires sophisticated logic now that terms understand where they
@@ -120,7 +114,6 @@
                  sSeq:(EXTSpectralSequence*)sSeq {
     // if we're at the bottom page, then there are no differentials to test.
     if (whichPage == 0) {
-        [cycles setObject:[EXTMatrix identity:self.size] atIndexedSubscript:0];
         return;
     }
 
@@ -179,7 +172,6 @@
 -(void) computeBoundaries:(int)whichPage sSeq:(EXTSpectralSequence*)sSeq {
     // if this is page 0, we have a default value to start with.
     if (whichPage == 0) {
-        [boundaries setObject:[EXTMatrix matrixWidth:0 height:self.size] atIndexedSubscript:0];
         return;
     }
     
@@ -212,11 +204,11 @@
          inCharacteristic:(int)characteristic {
     [self computeCycles:whichPage sSeq:sSeq];
     [self computeBoundaries:whichPage sSeq:sSeq];
-    ((EXTMatrix*)cycles[whichPage]).characteristic = sSeq.defaultCharacteristic;
-    ((EXTMatrix*)boundaries[whichPage]).characteristic = sSeq.defaultCharacteristic;
     
     EXTMatrix *cycleMat = self.cycles[whichPage],
               *boundaryMat = self.boundaries[whichPage];
+    cycleMat.characteristic = sSeq.defaultCharacteristic;
+    boundaryMat.characteristic = sSeq.defaultCharacteristic;
     
     homologyReps[whichPage] = [EXTMatrix findOrdersOf:boundaryMat in:cycleMat];
 }

@@ -62,8 +62,8 @@
 +(EXTSpectralSequence*) ladderDemo {
     EXTSpectralSequence *ret = [EXTSpectralSequence new];
     
-    EXTTerm *start = [EXTTerm term:[EXTPair pairWithA:1 B:0] andNames:[NSMutableArray arrayWithObject:@"e"]],
-    *end = [EXTTerm term:[EXTPair pairWithA:0 B:1] andNames:[NSMutableArray arrayWithObject:@"x"]];
+    EXTTerm *start = [EXTTerm term:[EXTPair pairWithA:1 B:0] withNames:[NSMutableArray arrayWithObject:@"e"] andCharacteristic:2],
+    *end = [EXTTerm term:[EXTPair pairWithA:0 B:1] withNames:[NSMutableArray arrayWithObject:@"x"] andCharacteristic:2];
     
     ret.terms = [NSMutableDictionary dictionaryWithObjects:@[start, end] forKeys:@[start.location, end.location]];
     
@@ -170,7 +170,7 @@
                 break;
         }
         
-        EXTTerm *term = [EXTTerm term:location andNames:[NSMutableArray arrayWithArray:names]];
+        EXTTerm *term = [EXTTerm term:location withNames:[NSMutableArray arrayWithArray:names] andCharacteristic:2];
         
         [ret.terms setObject:term forKey:term.location];
     }
@@ -185,17 +185,23 @@
     
     // add the terms in the SSS for S^1 --> S^5 --> CP^2
     EXTTerm *e   = [EXTTerm term:[EXTPair pairWithA:1 B:0]
-                        andNames:[NSMutableArray arrayWithArray:@[@"e"]]],
-    *x   = [EXTTerm term:[EXTPair pairWithA:0 B:2]
-                andNames:[NSMutableArray arrayWithArray:@[@"x"]]],
-    *ex  = [EXTTerm term:[EXTPair pairWithA:1 B:2]
-                andNames:[NSMutableArray arrayWithArray:@[@"ex"]]],
-    *x2  = [EXTTerm term:[EXTPair pairWithA:0 B:4]
-                andNames:[NSMutableArray arrayWithArray:@[@"x2"]]],
-    *ex2 = [EXTTerm term:[EXTPair pairWithA:1 B:4]
-                andNames:[NSMutableArray arrayWithArray:@[@"ex2"]]],
-    *one = [EXTTerm term:[EXTPair pairWithA:0 B:0]
-                andNames:[NSMutableArray arrayWithArray:@[@"1"]]];
+                       withNames:[NSMutableArray arrayWithArray:@[@"e"]]
+               andCharacteristic:0],
+            *x   = [EXTTerm term:[EXTPair pairWithA:0 B:2]
+                       withNames:[NSMutableArray arrayWithArray:@[@"x"]]
+               andCharacteristic:0],
+            *ex  = [EXTTerm term:[EXTPair pairWithA:1 B:2]
+                       withNames:[NSMutableArray arrayWithArray:@[@"ex"]]
+               andCharacteristic:0],
+            *x2  = [EXTTerm term:[EXTPair pairWithA:0 B:4]
+                       withNames:[NSMutableArray arrayWithArray:@[@"x2"]]
+               andCharacteristic:0],
+            *ex2  = [EXTTerm term:[EXTPair pairWithA:1 B:4]
+                        withNames:[NSMutableArray arrayWithArray:@[@"ex2"]]
+                andCharacteristic:0],
+            *one  = [EXTTerm term:[EXTPair pairWithA:0 B:0]
+                        withNames:[NSMutableArray arrayWithArray:@[@"1"]]
+                andCharacteristic:0];
     
     ret.terms = [NSMutableDictionary dictionaryWithObjects:@[one,e,x,ex,x2,ex2] forKeys:@[one.location,e.location,x.location,ex.location,x2.location,ex2.location]];
     

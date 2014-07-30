@@ -29,10 +29,12 @@
 
     // a constructor
     +(instancetype) term:(EXTLocation*)whichLocation
-                andNames:(NSMutableArray*)whichNames;
+               withNames:(NSMutableArray*)whichNames
+       andCharacteristic:(int)characteristic;
     // and an in-place initializer
     -(instancetype) setTerm:(EXTLocation*)whichLocation
-                   andNames:(NSMutableArray*)whichNames;
+                  withNames:(NSMutableArray*)whichNames
+          andCharacteristic:(int)characteristic;
 
     // useful for drawing
     -(int) size;
@@ -40,9 +42,6 @@
     -(void) updateDataForPage:(int)whichPage
                        inSSeq:(EXTSpectralSequence*)sSeq
              inCharacteristic:(int)characteristic;
-
-    // TODO: here are some other routines that i haven't investigated yet.
-    - (void)addSelfToSS:(EXTDocument*)theDocument;
 
     -(NSString*) nameForVector:(NSArray*)vector;
 @end
