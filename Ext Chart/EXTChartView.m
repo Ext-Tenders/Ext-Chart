@@ -446,11 +446,8 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
 
         NSArray *differentials = [self.dataSource chartView:self differentialsInGridRect:reloadGridRect];
         for (EXTChartViewModelDifferential *diff in differentials) {
-            const CGRect layerFrame = [self frameForLineFromStartCell:diff.startTerm.termCell toEndCell:diff.endTerm.termCell];
-
             for (EXTChartViewModelDifferentialLine *line in diff.lines) {
                 EXTDifferentialLineLayer *newDifferentialLineLayer = [EXTDifferentialLineLayer layer];
-                newDifferentialLineLayer.frame = layerFrame;
                 newDifferentialLineLayer.differential = diff;
                 newDifferentialLineLayer.line = line;
                 newDifferentialLineLayer.highlightColor = [_highlightColor CGColor];
@@ -459,25 +456,11 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
                 newDifferentialLineLayer.selectedZPosition = _kSelectedDifferentialZPosition;
                 [newDifferentialLineLayers addObject:newDifferentialLineLayer];
                 [self.layer addSublayer:newDifferentialLineLayer];
-
-
-                CGPoint start, end;
-
-                [self getRootLayerStartPoint:&start
-                                    endPoint:&end
-                        forLineFromStartCell:diff.startTerm.termCell
-                                  startIndex:line.startIndex
-                                     endCell:diff.endTerm.termCell
-                                    endIndex:line.endIndex];
-
-                const CGPoint startInLayer = [newDifferentialLineLayer convertPoint:start fromLayer:self.layer];
-                const CGPoint endInLayer = [newDifferentialLineLayer convertPoint:end fromLayer:self.layer];
-
-                CGMutablePathRef path = CGPathCreateMutable();
-                CGPathMoveToPoint(path, NULL, startInLayer.x, startInLayer.y);
-                CGPathAddLineToPoint(path, NULL, endInLayer.x, endInLayer.y);
-                newDifferentialLineLayer.path = path;
-                CGPathRelease(path);
+                [self configureFrameAndPathInLayer:newDifferentialLineLayer
+                              forLineFromStartCell:diff.startTerm.termCell
+                                        startIndex:line.startIndex
+                                         toEndCell:diff.endTerm.termCell
+                                          endIndex:line.endIndex];
             }
         }
 
@@ -506,28 +489,15 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
             for (EXTChartViewModelMultAnnotation *annoData in multAnnotations) {
                 EXTMultAnnotationLineLayer *newAnnotationLayer = [EXTMultAnnotationLineLayer layer];
                 
-                newAnnotationLayer.frame = [self frameForLineFromStartCell:annoData.startTerm.termCell toEndCell:annoData.endTerm.termCell];
                 newAnnotationLayer.annotation = annoData;
                 newAnnotationLayer.defaultZPosition = _kMultAnnotationZPosition;
                 [newMultAnnotationLayers addObject:newAnnotationLayer];
                 [self.layer addSublayer:newAnnotationLayer];
-
-                CGPoint start, end;
-
-                [self getRootLayerStartPoint:&start
-                                    endPoint:&end
-                        forLineFromStartCell:annoData.startTerm.termCell
-                                  startIndex:0
-                                     endCell:annoData.endTerm.termCell
-                                    endIndex:0];
-                const CGPoint startInLayer = [newAnnotationLayer convertPoint:start fromLayer:self.layer];
-                const CGPoint endInLayer = [newAnnotationLayer convertPoint:end fromLayer:self.layer];
-                
-                CGMutablePathRef path = CGPathCreateMutable();
-                CGPathMoveToPoint(path, NULL, startInLayer.x, startInLayer.y);
-                CGPathAddLineToPoint(path, NULL, endInLayer.x, endInLayer.y);
-                newAnnotationLayer.path = path;
-                CGPathRelease(path);
+                [self configureFrameAndPathInLayer:newAnnotationLayer
+                              forLineFromStartCell:annoData.startTerm.termCell
+                                        startIndex:0
+                                         toEndCell:annoData.endTerm.termCell
+                                          endIndex:0];
             }
         }
         
@@ -646,26 +616,22 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
     _highlightedLayers = (layersToHighlight.count == 0 ? nil : [layersToHighlight copy]);
 }
 
-- (CGRect)frameForLineFromStartCell:(EXTChartViewModelTermCell *)startCell toEndCell:(EXTChartViewModelTermCell *)endCell {
+- (void)configureFrameAndPathInLayer:(CAShapeLayer *)layer
+                forLineFromStartCell:(EXTChartViewModelTermCell *)startCell
+                          startIndex:(NSInteger)startIndex
+                           toEndCell:(EXTChartViewModelTermCell *)endCell
+                            endIndex:(NSInteger)endIndex
+{
+    NSParameterAssert(layer);
+    NSParameterAssert(startCell);
+    NSParameterAssert(endCell);
+
     const CGPoint start = [self.grid convertPointToView:startCell.gridLocation];
     const CGPoint end = [self.grid convertPointToView:endCell.gridLocation];
     const CGPoint origin = {MIN(start.x, end.x), MIN(start.y, end.y)};
     const CGSize size = {ABS(start.x - end.x), ABS(start.y - end.y)};
 
-    return (CGRect){origin, size};
-}
-
-- (void)getRootLayerStartPoint:(CGPoint *)start
-                           endPoint:(CGPoint *)end
-          forLineFromStartCell:(EXTChartViewModelTermCell *)startCell
-                    startIndex:(NSInteger)startIndex
-                       endCell:(EXTChartViewModelTermCell *)endCell
-                      endIndex:(NSInteger)endIndex
-{
-    NSParameterAssert(start);
-    NSParameterAssert(end);
-    NSParameterAssert(startCell);
-    NSParameterAssert(endCell);
+    layer.frame = (CGRect){origin, size};
 
     const NSInteger startTotalRank = startCell.totalRank;
     const NSInteger endTotalRank = endCell.totalRank;
@@ -679,13 +645,22 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
                                                          gridLocation:endCell.gridLocation
                                                           gridSpacing:self.grid.gridSpacing];
 
-    *start = (startTotalRank <= 3 ?
-              (CGPoint){NSMidX(startDotRect), NSMidY(startDotRect)} :
-              (CGPoint){NSMinX(startDotRect), NSMidY(startDotRect)});
+    const CGPoint startInRootLayer = (startTotalRank <= 3 ?
+                                      (CGPoint){NSMidX(startDotRect), NSMidY(startDotRect)} :
+                                      (CGPoint){NSMinX(startDotRect), NSMidY(startDotRect)});
 
-    *end = (endTotalRank <= 3 ?
-            (CGPoint){NSMidX(endDotRect), NSMidY(endDotRect)} :
-            (CGPoint){NSMaxX(endDotRect), NSMidY(endDotRect)});
+    const CGPoint endInRootLayer = (endTotalRank <= 3 ?
+                                   (CGPoint){NSMidX(endDotRect), NSMidY(endDotRect)} :
+                                   (CGPoint){NSMaxX(endDotRect), NSMidY(endDotRect)});
+
+    const CGPoint startInLayer = [layer convertPoint:startInRootLayer fromLayer:self.layer];
+    const CGPoint endInLayer = [layer convertPoint:endInRootLayer fromLayer:self.layer];
+
+    CGMutablePathRef path = CGPathCreateMutable();
+    CGPathMoveToPoint(path, NULL, startInLayer.x, startInLayer.y);
+    CGPathAddLineToPoint(path, NULL, endInLayer.x, endInLayer.y);
+    layer.path = path;
+    CGPathRelease(path);
 }
 
 #pragma mark - Properties
@@ -761,47 +736,20 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
             for (EXTDifferentialLineLayer *diffLayer in _differentialLineLayers) {
                 EXTChartViewModelDifferential *diff = diffLayer.differential;
                 EXTChartViewModelDifferentialLine *line = diffLayer.line;
-
-                diffLayer.frame = [self frameForLineFromStartCell:diff.startTerm.termCell toEndCell:diff.endTerm.termCell];
-
-                CGPoint start, end;
-                [self getRootLayerStartPoint:&start
-                                    endPoint:&end
-                        forLineFromStartCell:diff.startTerm.termCell
-                                  startIndex:line.startIndex
-                                     endCell:diff.endTerm.termCell
-                                    endIndex:line.endIndex];
-                const CGPoint startInLayer = [diffLayer convertPoint:start fromLayer:self.layer];
-                const CGPoint endInLayer = [diffLayer convertPoint:end fromLayer:self.layer];
-
-                CGMutablePathRef path = CGPathCreateMutable();
-                CGPathMoveToPoint(path, NULL, startInLayer.x, startInLayer.y);
-                CGPathAddLineToPoint(path, NULL, endInLayer.x, endInLayer.y);
-                diffLayer.path = path;
-                CGPathRelease(path);
+                [self configureFrameAndPathInLayer:diffLayer
+                              forLineFromStartCell:diff.startTerm.termCell
+                                        startIndex:line.startIndex
+                                         toEndCell:diff.endTerm.termCell
+                                          endIndex:line.endIndex];
             }
 
             for (EXTMultAnnotationLineLayer *multAnnoLayer in _multAnnotationLayers) {
                 EXTChartViewModelMultAnnotation *multAnno = multAnnoLayer.annotation;
-
-                multAnnoLayer.frame = [self frameForLineFromStartCell:multAnno.startTerm.termCell toEndCell:multAnno.endTerm.termCell];
-
-                CGPoint start, end;
-
-                [self getRootLayerStartPoint:&start
-                                    endPoint:&end
-                        forLineFromStartCell:multAnno.startTerm.termCell
-                                  startIndex:0
-                                     endCell:multAnno.endTerm.termCell
-                                    endIndex:0];
-                const CGPoint startInLayer = [multAnnoLayer convertPoint:start fromLayer:self.layer];
-                const CGPoint endInLayer = [multAnnoLayer convertPoint:end fromLayer:self.layer];
-
-                CGMutablePathRef path = CGPathCreateMutable();
-                CGPathMoveToPoint(path, NULL, startInLayer.x, startInLayer.y);
-                CGPathAddLineToPoint(path, NULL, endInLayer.x, endInLayer.y);
-                multAnnoLayer.path = path;
-                CGPathRelease(path);
+                [self configureFrameAndPathInLayer:multAnnoLayer
+                              forLineFromStartCell:multAnno.startTerm.termCell
+                                        startIndex:0
+                                         toEndCell:multAnno.endTerm.termCell
+                                          endIndex:0];
             }
         }
         [CATransaction commit];
