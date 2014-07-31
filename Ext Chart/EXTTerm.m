@@ -84,8 +84,6 @@
         cycles[0] = [coder decodeObjectForKey:@"cycles"];
         
         homologyReps = [NSMutableArray array];
-        [cycles addObject:[EXTMatrix identity:names.count].presentation];
-        [boundaries addObject:@[]];
 	}
     
 	return self;
