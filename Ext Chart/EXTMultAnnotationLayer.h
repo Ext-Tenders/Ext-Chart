@@ -17,4 +17,5 @@
 @property (nonatomic, strong) EXTChartViewModelMultAnnotation *annotation;
 
 @property (nonatomic, assign) CGFloat defaultZPosition;
+@property (nonatomic, assign) CGFloat defaultLineWidth;
 @end

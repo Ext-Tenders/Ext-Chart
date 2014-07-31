@@ -72,6 +72,9 @@ static CGColorRef _artBoardBackgroundColor;
 static CGColorRef _artBoardBorderColor;
 static CGColorRef _artBoardShadowColor;
 
+static const CGFloat _kDifferentialProportionalLineWidth = 0.8 / 26.0;
+static const CGFloat _kMultAnnotationProportionalLineWidth = 0.5 / 26.0;
+
 static const CFTimeInterval _kTermHighlightAddAnimationDuration = 0.09 * 1.8;
 static const CFTimeInterval _kTermHighlightRemoveAnimationDuration = 0.07 * 1.8;
 static const CFTimeInterval _kDifferentialHighlightAddAnimationDuration = 0.09;
@@ -450,6 +453,7 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
                 EXTDifferentialLineLayer *newDifferentialLineLayer = [EXTDifferentialLineLayer layer];
                 newDifferentialLineLayer.differential = diff;
                 newDifferentialLineLayer.line = line;
+                newDifferentialLineLayer.defaultLineWidth = _kDifferentialProportionalLineWidth * self.grid.gridSpacing;
                 newDifferentialLineLayer.highlightColor = [_highlightColor CGColor];
                 newDifferentialLineLayer.selectionColor = [_selectionColor CGColor];
                 newDifferentialLineLayer.defaultZPosition = _kDifferentialZPosition;
@@ -490,6 +494,7 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
                 EXTMultAnnotationLineLayer *newAnnotationLayer = [EXTMultAnnotationLineLayer layer];
                 
                 newAnnotationLayer.annotation = annoData;
+                newAnnotationLayer.defaultLineWidth = _kMultAnnotationProportionalLineWidth * self.grid.gridSpacing;
                 newAnnotationLayer.defaultZPosition = _kMultAnnotationZPosition;
                 [newMultAnnotationLayers addObject:newAnnotationLayer];
                 [self.layer addSublayer:newAnnotationLayer];
@@ -741,6 +746,8 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
                                         startIndex:line.startIndex
                                          toEndCell:diff.endTerm.termCell
                                           endIndex:line.endIndex];
+
+                diffLayer.defaultLineWidth = _kDifferentialProportionalLineWidth * self.grid.gridSpacing;
             }
 
             for (EXTMultAnnotationLineLayer *multAnnoLayer in _multAnnotationLayers) {
@@ -750,6 +757,8 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
                                         startIndex:0
                                          toEndCell:multAnno.endTerm.termCell
                                           endIndex:0];
+
+                multAnnoLayer.defaultLineWidth = _kMultAnnotationProportionalLineWidth * self.grid.gridSpacing;
             }
         }
         [CATransaction commit];
