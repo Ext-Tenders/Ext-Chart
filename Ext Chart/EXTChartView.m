@@ -104,6 +104,12 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
 
     /// Operations in this queue resize term layers to match a given magnification or grid spacing. Each operation is responsible for changing all term layers in the chart view and there should be only one active operation at any given time since it’s wasteful to scale a term layer if it’s going to be scaled again.
     NSOperationQueue *_resizeTermLayersQueue;
+
+    /// Operations in this queue resize differential layers. Each operation is responsible for changing all differential layers in the chart view and there should be only one active operation at any given time.
+    NSOperationQueue *_resizeDifferentialLayersQueue;
+
+    /// Operations in this queue resize multiplicative structure annotation layers. Each operation is responsible for changing all multiplicative structure annotation layers in the chart view and there should be only one active operation at any given time.
+    NSOperationQueue *_resizeMultAnnotationLayersQueue;
 }
 
 
@@ -146,9 +152,13 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
         _highlightColor = [[NSUserDefaults standardUserDefaults] extColorForKey:EXTChartViewHighlightColorPreferenceKey];
         _selectionColor = [[NSUserDefaults standardUserDefaults] extColorForKey:EXTChartViewSelectionColorPreferenceKey];
 
-        // Term layer resizing
+        // Layer resizing
         _resizeTermLayersQueue = [NSOperationQueue new];
+        _resizeDifferentialLayersQueue = [NSOperationQueue new];
+        _resizeMultAnnotationLayersQueue = [NSOperationQueue new];
         _resizeTermLayersQueue.maxConcurrentOperationCount = 1;
+        _resizeDifferentialLayersQueue.maxConcurrentOperationCount = 1;
+        _resizeMultAnnotationLayersQueue.maxConcurrentOperationCount = 1;
 
         CALayer *rootLayer = [CALayer layer];
         rootLayer.frame = self.bounds;
@@ -402,6 +412,71 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
 
     [_resizeTermLayersQueue addOperation:resizeTermLayerOperation];
 }
+
+- (void)reframeDifferentialLayers {
+    if (self.exportOnly) return;
+
+    [self reframeLayers:_differentialLineLayers onQueue:_resizeDifferentialLayersQueue usingBlock:^(CALayer *layer) {
+        EXTDifferentialLineLayer *diffLayer = (EXTDifferentialLineLayer *)layer;
+
+        [self configureFrameAndPathInLayer:diffLayer
+                      forLineFromStartCell:diffLayer.differential.startTerm.termCell
+                                startIndex:diffLayer.line.startIndex
+                                 toEndCell:diffLayer.differential.endTerm.termCell
+                                  endIndex:diffLayer.line.endIndex];
+
+        diffLayer.defaultLineWidth = _kDifferentialProportionalLineWidth * self.grid.gridSpacing;
+    }];
+}
+
+- (void)reframeMultAnnotationLayers {
+    if (self.exportOnly) return;
+
+    [self reframeLayers:_multAnnotationLayers onQueue:_resizeMultAnnotationLayersQueue usingBlock:^(CALayer *layer) {
+        EXTMultAnnotationLineLayer *multAnnoLayer = (EXTMultAnnotationLineLayer *)layer;
+
+        [self configureFrameAndPathInLayer:multAnnoLayer
+                      forLineFromStartCell:multAnnoLayer.annotation.startTerm.termCell
+                                startIndex:0
+                                 toEndCell:multAnnoLayer.annotation.endTerm.termCell
+                                  endIndex:0];
+
+        multAnnoLayer.defaultLineWidth = _kDifferentialProportionalLineWidth * self.grid.gridSpacing;
+    }];
+}
+
+- (void)reframeLayers:(NSArray *)layers onQueue:(NSOperationQueue *)operationQueue usingBlock:(void(^)(CALayer *layer))block {
+    NSParameterAssert(layers);
+    NSParameterAssert(operationQueue);
+    NSParameterAssert(block);
+
+    NSArray *layersCopy = [layers copy];
+    const size_t layerCount = [layersCopy count];
+    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0);
+
+    [[operationQueue operations] makeObjectsPerformSelector:@selector(cancel)];
+
+    NSBlockOperation *operation = [NSBlockOperation new];
+    __weak NSBlockOperation *weakOperation = operation;
+
+    [operation addExecutionBlock:^{
+        dispatch_apply(layerCount, queue, ^(size_t layerIndex) {
+            if (![weakOperation isCancelled]) {
+                CALayer *layer = layers[layerIndex];
+
+                [CATransaction begin];
+                [CATransaction setDisableActions:YES];
+                {
+                    block(layer);
+                }
+                [CATransaction commit];
+            }
+        });
+    }];
+
+    [operationQueue addOperation:operation];
+}
+
 
 - (void)reloadCurrentPage
 {
@@ -734,34 +809,8 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
             termLayer.contentsScale = magnification;
         } cancellable:false];
 
-
-        [CATransaction begin];
-        [CATransaction setDisableActions:YES];
-        {
-            for (EXTDifferentialLineLayer *diffLayer in _differentialLineLayers) {
-                EXTChartViewModelDifferential *diff = diffLayer.differential;
-                EXTChartViewModelDifferentialLine *line = diffLayer.line;
-                [self configureFrameAndPathInLayer:diffLayer
-                              forLineFromStartCell:diff.startTerm.termCell
-                                        startIndex:line.startIndex
-                                         toEndCell:diff.endTerm.termCell
-                                          endIndex:line.endIndex];
-
-                diffLayer.defaultLineWidth = _kDifferentialProportionalLineWidth * self.grid.gridSpacing;
-            }
-
-            for (EXTMultAnnotationLineLayer *multAnnoLayer in _multAnnotationLayers) {
-                EXTChartViewModelMultAnnotation *multAnno = multAnnoLayer.annotation;
-                [self configureFrameAndPathInLayer:multAnnoLayer
-                              forLineFromStartCell:multAnno.startTerm.termCell
-                                        startIndex:0
-                                         toEndCell:multAnno.endTerm.termCell
-                                          endIndex:0];
-
-                multAnnoLayer.defaultLineWidth = _kMultAnnotationProportionalLineWidth * self.grid.gridSpacing;
-            }
-        }
-        [CATransaction commit];
+        [self reframeDifferentialLayers];
+        [self reframeMultAnnotationLayers];
 
         [self updateVisibleRect];
         [self _extAlignArtBoardToGrid];
