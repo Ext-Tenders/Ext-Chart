@@ -324,6 +324,45 @@ static bool lineSegmentIntersectsLineSegment(NSPoint l1p1, NSPoint l1p2, NSPoint
         newDiff->_startTerm = startTerm;
         newDiff->_endTerm = endTerm;
     }
+    
+    EXTTerm *source = modelDifferential.start, *target = modelDifferential.end;
+    EXTMatrix *hSource = [EXTMatrix matrixWidth:((NSDictionary*)source.homologyReps[modelDifferential.page]).count height:source.size],
+              *hTarget = [EXTMatrix matrixWidth:((NSDictionary*)target.homologyReps[modelDifferential.page]).count height:target.size];
+    
+    NSArray *hSourceKeys = ((NSDictionary*)source.homologyReps[modelDifferential.page]).allKeys,
+            *hTargetKeys = ((NSDictionary*)target.homologyReps[modelDifferential.page]).allKeys;
+    
+    // build source and target
+    int *hSourceData = hSource.presentation.mutableBytes;
+    for (int i = 0; i < hSource.width; i++) {
+        NSArray *vector = hSourceKeys[i];
+        for (int j = 0; j < hSource.height; j++)
+            hSourceData[i*hSource.height + j] = [vector[j] intValue];
+    }
+    
+    int *hTargetData = hTarget.presentation.mutableBytes;
+    for (int i = 0; i < hTarget.width; i++) {
+        NSArray *vector = hTargetKeys[i];
+        for (int j = 0; j < hTarget.height; j++)
+            hTargetData[i*hTarget.height + j] = [vector[j] intValue];
+    }
+    
+    NSArray *pair = [EXTMatrix formIntersection:[EXTMatrix newMultiply:modelDifferential.presentation by:hSource] with:[EXTMatrix directSum:hTarget with:target.boundaries[modelDifferential.page]]];
+    
+    EXTMatrix *lift = [EXTMatrix newMultiply:[(EXTMatrix*)pair[0] invert] by:pair[1]];
+    
+    NSMutableDictionary *assignment = [NSMutableDictionary dictionaryWithCapacity:hSourceKeys.count];
+    for (int i = 0; i < hSourceKeys.count; i++)
+        for (int j = 0; j < hTargetKeys.count; j++) {
+            if (((int*)lift.presentation.mutableBytes)[i*lift.height+j] == 0)
+                continue;
+            if ([[assignment allValues] indexOfObject:hTargetKeys[j]] == NSNotFound)
+                continue;
+            assignment[hSourceKeys[i]] = hTargetKeys[j];
+        }
+    
+    newDiff->_hRepAssignments = assignment;
+    
     return newDiff;
 }
 

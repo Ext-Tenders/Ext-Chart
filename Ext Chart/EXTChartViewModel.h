@@ -74,6 +74,8 @@
 @property (nonatomic, readonly, strong) EXTChartViewModelTerm *startTerm;
 @property (nonatomic, readonly, strong) EXTChartViewModelTerm *endTerm;
 
+@property (nonatomic, readonly) NSDictionary *hRepAssignments;
+
 /// An array of EXTChartViewModelDifferentialLine objects.
 @property (nonatomic, readonly, copy) NSArray *lines;
 @end
