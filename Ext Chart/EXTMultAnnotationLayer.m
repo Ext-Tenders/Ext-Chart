@@ -10,7 +10,6 @@
 
 #pragma mark - Private variables
 
-static const CGFloat _kMultAnnotationLineWidth = 0.25;
 static CGColorRef _multAnnotationStrokeColor;
 
 
@@ -19,7 +18,6 @@ static CGColorRef _multAnnotationStrokeColor;
 static void commonInit(EXTMultAnnotationLineLayer *self)
 {
     self.lineCap = kCALineCapRound;
-    self.lineWidth = _kMultAnnotationLineWidth;
     self.strokeColor = _multAnnotationStrokeColor;
 }
 
@@ -47,6 +45,15 @@ static void commonInit(EXTMultAnnotationLineLayer *self)
         commonInit(self);
     }
     return self;
+}
+
+#pragma mark - Properties
+
+- (void)setDefaultLineWidth:(CGFloat)defaultLineWidth {
+    if (_defaultLineWidth != defaultLineWidth) {
+        _defaultLineWidth = defaultLineWidth;
+        self.lineWidth = defaultLineWidth;
+    }
 }
 
 @end

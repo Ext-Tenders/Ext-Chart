@@ -20,4 +20,5 @@
 
 @property (nonatomic, assign) CGFloat defaultZPosition;
 @property (nonatomic, assign) CGFloat selectedZPosition;
+@property (nonatomic, assign) CGFloat defaultLineWidth;
 @end

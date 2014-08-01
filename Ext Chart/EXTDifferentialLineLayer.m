@@ -13,8 +13,7 @@
 static void *_highlightedContext = &_highlightedContext;
 static void *_selectedObjectContext = &_selectedObjectContext;
 
-static const CGFloat _kDifferentialLineWidth = 0.8;
-static const CGFloat _kHighlightedDifferentialLineWidth = _kDifferentialLineWidth * 5;
+static const CGFloat _kLineWidthHighlightFactor = 5.0;
 static CGColorRef _differentialStrokeColor;
 
 
@@ -28,7 +27,6 @@ static CGColorRef _differentialStrokeColor;
 
 static void commonInit(EXTDifferentialLineLayer *self)
 {
-    self.lineWidth = _kDifferentialLineWidth;
     self.strokeColor = _differentialStrokeColor;
     self.lineCap = kCALineCapRound;
 
@@ -91,6 +89,13 @@ static void commonInit(EXTDifferentialLineLayer *self)
     }
 }
 
+- (void)setDefaultLineWidth:(CGFloat)defaultLineWidth {
+    if (_defaultLineWidth != defaultLineWidth) {
+        _defaultLineWidth = defaultLineWidth;
+        [self updateInteractionStatus];
+    }
+}
+
 #pragma mark - NSKeyValueObserving
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
@@ -103,17 +108,17 @@ static void commonInit(EXTDifferentialLineLayer *self)
 {
     if (self.selectedObject) {
         self.strokeColor = self.selectionColor;
-        self.lineWidth = _kHighlightedDifferentialLineWidth;
+        self.lineWidth = self.defaultLineWidth * _kLineWidthHighlightFactor;
         self.zPosition = self.selectedZPosition;
     }
     else if (self.highlighted) {
         self.strokeColor = self.highlightColor;
-        self.lineWidth = _kHighlightedDifferentialLineWidth;
+        self.lineWidth = self.defaultLineWidth * _kLineWidthHighlightFactor;
         self.zPosition = self.defaultZPosition;
     }
     else {
         self.strokeColor = _differentialStrokeColor;
-        self.lineWidth = _kDifferentialLineWidth;
+        self.lineWidth = self.defaultLineWidth;
         self.zPosition = self.defaultZPosition;
     }
 }
