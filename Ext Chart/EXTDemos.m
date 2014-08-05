@@ -66,17 +66,84 @@
     ret = [ret tensorWithPolyClass:@"eta"
                           location:[EXTPair pairWithA:1 B:1]
                               upTo:12];
+    ret = [ret tensorWithPolyClass:@"C(2 eta)"
+                          location:[EXTPair pairWithA:2 B:0]
+                              upTo:1];
+    
+    EXTTerm *beta2 = [ret findTerm:[EXTPair pairWithA:4 B:0]];
+    EXTTerm *eta = [ret findTerm:[EXTPair pairWithA:1 B:1]];
+    EXTTerm *betaneg2 = [ret findTerm:[EXTPair pairWithA:-4 B:0]];
+    EXTTerm *C2eta = [ret findTerm:[EXTPair pairWithA:2 B:0]];
     
     // not allowed to do computations with differentials on pages which you
     // haven't yet seen.
     [ret computeGroupsForPage:0];
     [ret computeGroupsForPage:1];
+    
+    // there are four d1 differentials...
+    
+    // d1 C(2eta) = 2 eta
+    {
+        EXTDifferential *diff = [EXTDifferential
+                differential:C2eta
+                         end:eta
+                        page:1];
+        EXTPartialDefinition *partial = [EXTPartialDefinition new];
+        partial.inclusion = [EXTMatrix identity:1];
+        partial.action = [[EXTMatrix identity:1] scale:2];
+        [diff.partialDefinitions addObject:partial];
+        [ret addDifferential:diff];
+    }
+    
+    // d1 beta^2 = 0
+    {
+        EXTDifferential *diff = [EXTDifferential
+                differential:beta2
+                         end:[ret findTerm:[EXTPair pairWithA:3 B:1]]
+                        page:1];
+        EXTPartialDefinition *partial = [EXTPartialDefinition new];
+        partial.inclusion = [EXTMatrix identity:1];
+        partial.action = [EXTMatrix matrixWidth:1 height:1];
+        [diff.partialDefinitions addObject:partial];
+        [ret addDifferential:diff];
+    }
+    
+    // d1 beta^-2 = 0
+    {
+        EXTDifferential *diff = [EXTDifferential
+                differential:betaneg2
+                         end:[ret findTerm:[EXTPair pairWithA:-5 B:1]]
+                        page:1];
+        EXTPartialDefinition *partial = [EXTPartialDefinition new];
+        partial.inclusion = [EXTMatrix identity:1];
+        partial.action = [EXTMatrix matrixWidth:1 height:1];
+        [diff.partialDefinitions addObject:partial];
+        [ret addDifferential:diff];
+    }
+    
+    // d1 eta = 0
+    {
+        EXTDifferential *diff = [EXTDifferential
+                differential:eta
+                         end:[ret findTerm:[EXTPair pairWithA:0 B:2]]
+                        page:1];
+        EXTPartialDefinition *partial = [EXTPartialDefinition new];
+        partial.inclusion = [EXTMatrix identity:1];
+        partial.action = [EXTMatrix matrixWidth:1 height:1];
+        [diff.partialDefinitions addObject:partial];
+        [ret addDifferential:diff];
+    }
+    
+    [ret propagateLeibniz:@[C2eta.location, eta.location, beta2.location,
+                            betaneg2.location] page:1];
+    
+    [ret computeGroupsForPage:1];
     [ret computeGroupsForPage:2];
+    [ret computeGroupsForPage:3];
     
     // there are three d3 differentials...
     
     // d3(beta^2) = eta^3
-    EXTTerm *beta2 = [ret findTerm:[EXTPair pairWithA:4 B:0]];
     EXTDifferential *diff = [EXTDifferential differential:beta2 end:[ret findTerm:[EXTPair pairWithA:3 B:3]] page:3];
     EXTPartialDefinition *diffdefn = [EXTPartialDefinition new];
     EXTMatrix *one = [EXTMatrix identity:1];
@@ -85,7 +152,6 @@
     [ret addDifferential:diff];
     
     // d3(eta) = 0
-    EXTTerm *eta = [ret findTerm:[EXTPair pairWithA:1 B:1]];
     EXTDifferential *diff2 = [EXTDifferential differential:eta end:[ret findTerm:[EXTPair pairWithA:0 B:4]] page:3];
     EXTPartialDefinition *diff2defn = [EXTPartialDefinition new];
     EXTMatrix *zero = [EXTMatrix matrixWidth:1 height:1];
@@ -95,7 +161,6 @@
     [ret addDifferential:diff2];
     
     // d3(beta^-2) = beta^-4 eta^3
-    EXTTerm *betaneg2 = [ret findTerm:[EXTPair pairWithA:-4 B:0]];
     EXTDifferential *diff3 = [EXTDifferential differential:betaneg2 end:[ret findTerm:[EXTPair pairWithA:-5 B:3]] page:3];
     EXTPartialDefinition *diff3defn = [EXTPartialDefinition new];
     diff3defn.action = one;
@@ -104,7 +169,10 @@
     [ret addDifferential:diff3];
     
     // propagate using the Leibniz rule
-    [ret propagateLeibniz:@[[eta location], [beta2 location], [betaneg2 location]] page:3];
+    [ret propagateLeibniz:@[[eta location],
+                            [beta2 location],
+                            [betaneg2 location]]
+                     page:3];
     
     return ret;
 }
@@ -180,7 +248,18 @@
                         withNames:[NSMutableArray arrayWithArray:@[@"1"]]
                 andCharacteristic:0];
     
-    ret.terms = [NSMutableDictionary dictionaryWithObjects:@[one,e,x,ex,x2,ex2] forKeys:@[one.location,e.location,x.location,ex.location,x2.location,ex2.location]];
+    ret.terms = [NSMutableDictionary dictionaryWithObjects:@[one,
+                                                             e,
+                                                             x,
+                                                             ex,
+                                                             x2,
+                                                             ex2]
+                                                   forKeys:@[one.location,
+                                                             e.location,
+                                                             x.location,
+                                                             ex.location,
+                                                             x2.location,
+                                                             ex2.location]];
     
     // you're not allowed to add differentials to pages which you haven't "seen"
     [ret computeGroupsForPage:0];
