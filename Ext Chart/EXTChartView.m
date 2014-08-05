@@ -480,7 +480,7 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
 
 - (void)reloadCurrentPage
 {
-    const NSRect reloadRect = {{NSMinX(self.frame), NSMinY(self.frame)}, self.frame.size};
+    const NSRect reloadRect = {{NSMinX(self.bounds), NSMinY(self.bounds)}, self.bounds.size};
     const EXTIntRect reloadGridRect = {
         {(NSInteger)(reloadRect.origin.x / _grid.gridSpacing), (NSInteger)(reloadRect.origin.y / _grid.gridSpacing)},
         {(NSInteger)(reloadRect.size.width / _grid.gridSpacing), (NSInteger)(reloadRect.size.height / _grid.gridSpacing)}};
