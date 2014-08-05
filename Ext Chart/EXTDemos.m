@@ -19,45 +19,22 @@
 }
 
 +(EXTSpectralSequence*) A1MSSDemo {
-    return [EXTMaySpectralSequence fillForAn:1 width:24];
+    EXTMaySpectralSequence *ret = [EXTMaySpectralSequence fillForAn:1 width:24];
+    
+    EXTDifferential *diff = [EXTDifferential differential:[ret findTerm:[EXTTriple tripleWithA:2 B:6 C:4]] end:[ret findTerm:[EXTTriple tripleWithA:3 B:6 C:3]] page:2];
+    EXTPartialDefinition *partial = [EXTPartialDefinition new];
+    partial.action = [EXTMatrix identity:1];
+    partial.inclusion = [EXTMatrix identity:1];
+    partial.description = @"Use Nakamura's Lemma on Sq^1 h20";
+    [diff.partialDefinitions addObject:partial];
+    [ret addDifferential:diff];
+    
+    [ret propagateLeibniz:@[[EXTTriple tripleWithA:1 B:1 C:1],
+                            [EXTTriple tripleWithA:1 B:2 C:1],
+                            [EXTTriple tripleWithA:2 B:6 C:4]] page:2];
+    
+    return ret;
 }
-
-/* +(EXTSpectralSequence*) A1MSSDemo {
-    EXTPolynomialSSeq *sseq = [EXTPolynomialSSeq sSeqWithUnit:[EXTTriple class]];
-    [sseq.zeroRanges addObject:[EXTZeroRangeStrict newWithSSeq:sseq]];
-    
-    EXTTriple *h10 = [EXTTriple tripleWithA:1 B:1 C:1],
-              *h11 = [EXTTriple tripleWithA:1 B:2 C:1],
-              *h20 = [EXTTriple tripleWithA:1 B:3 C:2];
-    
-    [sseq addPolyClass:@"h10" location:h10 upTo:24];
-    [sseq addPolyClass:@"h11" location:h11 upTo:24];
-    [sseq addPolyClass:@"h20" location:h20 upTo:12];
-    
-    // some basic partial definitions
-    EXTPartialDefinition *diffone = [EXTPartialDefinition new];
-    EXTMatrix *one = [EXTMatrix identity:1];
-    diffone.differential = diffone.inclusion = one;
-    
-    // d1(h20) = h10 h11
-    EXTDifferential *diff = [EXTDifferential differential:[sseq findTerm:h20] end:[sseq findTerm:[EXTTriple followDiffl:h20 page:1]] page:1];
-    [diff.partialDefinitions addObject:diffone];
-    [sseq addDifferential:diff];
-    
-    // now, do leibniz propagation.
-    [sseq propagateLeibniz:@[h20, h10, h11] page:1];
-    
-    // d3(h20^2) = h11^3
-    EXTLocation *h20squared = [[h20 class] scale:h20 by:2];
-    EXTDifferential *diff2 = [EXTDifferential differential:[sseq findTerm:h20squared] end:[sseq findTerm:[[h11 class] scale:h11 by:3]] page:2];
-    [diff2.partialDefinitions addObject:diffone];
-    [sseq addDifferential:diff2];
-    
-    // leibniz again, on the new terms.
-    [sseq propagateLeibniz:@[h10, h11, h20squared] page:2];
-    
-    return sseq;
-} */
 
 +(EXTSpectralSequence*) ladderDemo {
     EXTSpectralSequence *ret = [EXTSpectralSequence new];
