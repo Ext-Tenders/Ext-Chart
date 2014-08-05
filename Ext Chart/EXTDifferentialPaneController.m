@@ -203,6 +203,7 @@
     EXTDifferential *diff = (EXTDifferential*)self.representedObject;
     
     self.degree = 0;
+    [self.field setStringValue:@"0"];
     self.sourceEditor.representedObject = [EXTMatrix matrixWidth:1 height:diff.start.names.count];
     self.sourceEditor.rowNames = [diff.start.names valueForKey:@"description"];
     [self.sourceEditor reloadData];
