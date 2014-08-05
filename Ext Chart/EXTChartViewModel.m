@@ -349,7 +349,7 @@ static bool lineSegmentIntersectsLineSegment(NSPoint l1p1, NSPoint l1p2, NSPoint
     
     NSArray *pair = [EXTMatrix formIntersection:[EXTMatrix newMultiply:modelDifferential.presentation by:hSource] with:[EXTMatrix directSum:hTarget with:target.boundaries[modelDifferential.page]]];
     
-    EXTMatrix *lift = [EXTMatrix newMultiply:[(EXTMatrix*)pair[0] invert] by:pair[1]];
+    EXTMatrix *lift = [EXTMatrix newMultiply:pair[1] by:[(EXTMatrix*)pair[0] invert]];
     
     NSMutableDictionary *assignment = [NSMutableDictionary dictionaryWithCapacity:hSourceKeys.count];
     for (int i = 0; i < hSourceKeys.count; i++)
