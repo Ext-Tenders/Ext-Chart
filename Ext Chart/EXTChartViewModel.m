@@ -319,11 +319,7 @@ static bool lineSegmentIntersectsLineSegment(NSPoint l1p1, NSPoint l1p2, NSPoint
                                                    endTerm:(EXTChartViewModelTerm *)endTerm
 {
     EXTChartViewModelDifferential *newDiff = [[self class] new];
-    if (newDiff) {
-        newDiff->_modelDifferential = modelDifferential;
-        newDiff->_startTerm = startTerm;
-        newDiff->_endTerm = endTerm;
-    }
+    if (!newDiff) return nil;
     
     EXTTerm *source = modelDifferential.start, *target = modelDifferential.end;
     EXTMatrix *hSource = [EXTMatrix matrixWidth:((NSDictionary*)source.homologyReps[modelDifferential.page]).count height:source.size],
