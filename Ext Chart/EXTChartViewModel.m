@@ -347,7 +347,7 @@ static bool lineSegmentIntersectsLineSegment(NSPoint l1p1, NSPoint l1p2, NSPoint
             hTargetData[i*hTarget.height + j] = [vector[j] intValue];
     }
     
-    NSArray *pair = [EXTMatrix formIntersection:[EXTMatrix newMultiply:modelDifferential.presentation by:hSource] with:[EXTMatrix directSum:hTarget with:target.boundaries[modelDifferential.page]]];
+    NSArray *pair = [EXTMatrix formIntersection:[EXTMatrix newMultiply:modelDifferential.presentation by:hSource] with:[EXTMatrix directSumWithCommonTargetA:hTarget B:target.boundaries[modelDifferential.page]]];
     
     EXTMatrix *lift = [EXTMatrix newMultiply:pair[1] by:[(EXTMatrix*)pair[0] invert]];
     

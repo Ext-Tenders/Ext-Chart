@@ -59,7 +59,11 @@
 -(int) rank;
 -(EXTMatrix*) scale:(int)scalar;
 +(EXTMatrix*) sum:(EXTMatrix*)a with:(EXTMatrix*)b;
+
+/// produces an (n + n') x (m + m') from A of type n x m and B of type n' x m'
 +(EXTMatrix*) directSum:(EXTMatrix*)a with:(EXTMatrix*)b;
+/// produces an n x (m + m') from A of type n x m and B of type n x m'
++(EXTMatrix*) directSumWithCommonTargetA:(EXTMatrix*)a B:(EXTMatrix*)b;
 
 // @[left inclusion, right inclusion]
 +(NSArray*) formIntersection:(EXTMatrix*)left with:(EXTMatrix*)right;

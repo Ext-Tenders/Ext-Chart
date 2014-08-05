@@ -946,4 +946,22 @@
     return ret;
 }
 
++(EXTMatrix*) directSumWithCommonTargetA:(EXTMatrix*)a B:(EXTMatrix*)b {
+    if (a.height != b.height) {
+        NSLog(@"directSumWithCommonTarget heights mismatch.");
+        return nil;
+    }
+    
+    EXTMatrix *ret = [EXTMatrix matrixWidth:(a.width + b.width) height:a.height];
+    
+    int *retData = ret.presentation.mutableBytes,
+        *aData = a.presentation.mutableBytes,
+        *bData = b.presentation.mutableBytes;
+    
+    memcpy(retData, aData, sizeof(int)*a.width*a.height);
+    memcpy(retData + a.width*a.height, bData, sizeof(int)*b.width*b.height);
+    
+    return ret;
+}
+
 @end
