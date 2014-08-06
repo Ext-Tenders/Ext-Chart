@@ -57,6 +57,61 @@
 }
 
 +(EXTSpectralSequence*) KUhC2Demo {
+    EXTPolynomialSSeq *ret = [EXTPolynomialSSeq sSeqWithIndexingClass:[EXTPair class]];
+    
+    EXTPair *beta2 = [EXTPair pairWithA:4 B:0],
+            *eta = [EXTPair pairWithA:1 B:1],
+            *C2eta = [EXTPair pairWithA:2 B:0];
+    
+    [ret addPolyClass:@"beta^2" location:beta2 upTo:5];
+    [ret addPolyClass:@"eta" location:eta upTo:18];
+    [ret addPolyClass:@"C(2eta)" location:C2eta upTo:1];
+    
+    {
+        EXTDifferential *diff = [EXTDifferential differential:[ret findTerm:C2eta] end:[ret findTerm:eta] page:1];
+        EXTPartialDefinition *partial = [EXTPartialDefinition new];
+        partial.inclusion = [EXTMatrix identity:1];
+        partial.action = [[EXTMatrix identity:1] scale:2];
+        partial.description = @"C(2eta) is a cone class for 2·eta.";
+        [diff.partialDefinitions addObject:partial];
+        [ret addDifferential:diff];
+    }
+    
+    {
+        EXTDifferential *diff = [EXTDifferential differential:[ret findTerm:beta2] end:[ret findTerm:[ret.indexClass addLocation:eta to:C2eta]] page:1];
+        EXTPartialDefinition *partial = [EXTPartialDefinition new];
+        partial.inclusion = [EXTMatrix identity:1];
+        partial.action = [EXTMatrix matrixWidth:1 height:1];
+        partial.description = @"beta^2 is not a cone class.";
+        [diff.partialDefinitions addObject:partial];
+        [ret addDifferential:diff];
+    }
+    
+    [ret computeGroupsForPage:0];
+    [ret computeGroupsForPage:1];
+    
+    [ret propagateLeibniz:@[eta, C2eta, beta2] page:1];
+    
+    {
+        EXTDifferential *diff = [EXTDifferential differential:[ret findTerm:beta2] end:[ret findTerm:[ret.indexClass scale:eta by:3]] page:3];
+        EXTPartialDefinition *partial = [EXTPartialDefinition new];
+        partial.inclusion = [EXTMatrix identity:1];
+        partial.action = [EXTMatrix identity:1];
+        partial.description = @"Cell structure in D(RP^4)";
+        [diff.partialDefinitions addObject:partial];
+        [ret addDifferential:diff];
+    }
+    
+    [ret computeGroupsForPage:0];
+    [ret computeGroupsForPage:1];
+    [ret computeGroupsForPage:2];
+    [ret computeGroupsForPage:3];
+    
+    [ret propagateLeibniz:@[eta, beta2] page:3];
+    
+    return ret;
+    
+    /*
     EXTSpectralSequence *ret = [EXTSpectralSequence sSeqWithUnit:[EXTPair class]];
     
     ret = [ret tensorWithLaurentClass:@"beta^2"
@@ -134,8 +189,8 @@
         [ret addDifferential:diff];
     }
     
-    [ret propagateLeibniz:@[C2eta.location, eta.location, beta2.location,
-                            betaneg2.location] page:1];
+    [ret propagateLeibniz:@[eta.location, beta2.location,
+                            betaneg2.location, C2eta.location] page:1];
     
     [ret computeGroupsForPage:1];
     [ret computeGroupsForPage:2];
@@ -175,6 +230,7 @@
                      page:3];
     
     return ret;
+    */
 }
 
 +(EXTSpectralSequence*) randomDemo {

@@ -402,18 +402,18 @@
                     *j = partial2.inclusion, *partialJ = partial2.action,
                     *k = AYmult.inclusion, *muK = AYmult.action,
                     *l = XBmult.inclusion, *muL = XBmult.action;
-                        
+                
                 // first, produce the tensored up cospan A|B <-< I|B --> X|B.
                 EXTMatrix
                     *iId = [EXTMatrix hadamardProduct:i with:[EXTMatrix identity:j.height]],
                     *partialIId = [EXTMatrix hadamardProduct:partialI with:[EXTMatrix identity:j.height]];
-                        
+                
                 // this shares a target to get A|B <-< I|B --> X|B <-< L --> Z,
                 // so intersect to get a big cospan A|B <-< U --> Z.
                 NSArray *XBspan = [EXTMatrix formIntersection:partialIId with:l];
                 EXTMatrix *u = [EXTMatrix newMultiply:iId by:XBspan[0]],
                         *partialU = [EXTMatrix newMultiply:muL by:XBspan[1]];
-                        
+                
                 // then, do the same thing for A|B <-< A|J --> A|Y <-< K --> Z
                 // to get a pulled back cospan A|B <-< V --> Z.
                 EXTMatrix
@@ -426,7 +426,7 @@
                 // apply the koszul sign rule to partialV if appropriate
                 if (A.location.koszulDegree & 0x1)
                     partialV = [partialV scale:-1];
-                        
+                
                 // lastly, take the intersection span of U >-> A|B <-< V to get
                 // a shared subspace W, hence a pair of cospans both of the form
                 // A|B <-< W --> Z.
@@ -437,7 +437,7 @@
                 *partialW = [EXTMatrix
                              sum:[EXTMatrix newMultiply:partialU by:ABspan[0]]
                             with:[EXTMatrix newMultiply:partialV by:ABspan[1]]];
-                        
+                
                 // store this to a list of partial definitions.
                 EXTPartialDefinition *partial = [EXTPartialDefinition new];
                 partial.inclusion = w; partial.action = partialW;

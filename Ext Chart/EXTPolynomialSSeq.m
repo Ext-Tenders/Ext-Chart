@@ -513,6 +513,8 @@
             // in this case, we only both differentials, so d(xy) = dx y + x dy.
             // this means building both spans, then taking their intersection,
             // and summing their action on the intersection.
+            //
+            // XXX: should there be a koszul sign here??
             EXTMatrix
                 *muAY = [self productWithLeft:loc1
                                right:[[loc2 class] followDiffl:loc2 page:page]],
