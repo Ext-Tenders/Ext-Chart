@@ -629,6 +629,55 @@
     return ret;
 }
 
+-(EXTMatrix*) invertOntoMap {
+    EXTMatrix *temp = [EXTMatrix matrixWidth:width height:(height+width)];
+    temp.characteristic = self.characteristic;
+    
+    // vertically augment by an identity matrix
+    int *tempData = temp.presentation.mutableBytes,
+        *selfData = self.presentation.mutableBytes;
+    for (int i = 0; i < self.width; i++)
+        for (int j = 0; j < self.height; j++)
+            tempData[i*temp.height+j] = selfData[i*self.height+j];
+    for (int i = 0; i < temp.width; i++)
+        tempData[i*(temp.height) + i + self.height] = 1;
+    
+    // perform column reduction
+    EXTMatrix *reducedMat = [temp columnReduce];
+    
+    // extract those columns of the form (0, ..., 0, 1, 0, ..., 0)
+    EXTMatrix *ret = [EXTMatrix matrixWidth:self.height height:self.width];
+    ret.characteristic = self.characteristic;
+    
+    int *retData = ret.presentation.mutableBytes,
+        *reducedData = reducedMat.presentation.mutableBytes;
+    for (int i = 0; i < self.width; i++) {
+        int activeRow = -1;
+        for (int j = 0; j < self.height; j++) {
+            if (reducedData[i*reducedMat.height+j] == 0)
+                continue;
+            
+            if (activeRow == -1 &&
+                abs(reducedData[i*reducedMat.height+j]) == 1) {
+                activeRow = j;
+                continue;
+            }
+            
+            // some disaster has struck; bail.
+            return nil;
+        }
+        
+        if (activeRow == -1)
+            continue;
+        
+        // now copy the augmented part of this column into the return matrix.
+        for (int j = 0; j < self.width; j++)
+            retData[ret.height*activeRow+j] = reducedData[reducedMat.height*activeRow+j+self.height];
+    }
+    
+    return ret;
+}
+
 -(int) rank {
     EXTMatrix *image = [self image];
     

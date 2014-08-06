@@ -50,7 +50,10 @@
 +(EXTMatrix*) copyTranspose:(EXTMatrix*)input;
 +(EXTMatrix*) newMultiply:(EXTMatrix*)left by:(EXTMatrix*)right;
 +(EXTMatrix*) identity:(int)width;
+/// produces the inverse to an invertible matrix
 -(EXTMatrix*) invert;
+/// produces a right-inverse to an onto matrix
+-(EXTMatrix*) invertOntoMap;
 -(EXTMatrix*) columnReduce;
 -(EXTMatrix*) modularReduction;
 -(EXTMatrix*) kernel;
