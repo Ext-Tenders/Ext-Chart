@@ -38,6 +38,8 @@
 - (void)addTerm:(EXTChartViewModelTerm *)term;
 /// Given a term, all of its homology representatives are distinct. Given a term cell, the homology representatives of all terms in that cell are pairwise-distinct. We can use this property to induce an ordering of terms in that cell: we pick the lexicographically smallest hReps for each term in that cell and use the same lexicographic order to order terms according to their smallest hReps.
 - (void)sortTerms;
+/// Given the term position inside the cell and the orders/dimensions? (FIXME: ask Eric to review this), computes the initial offset for that term.
+- (NSUInteger)baseOffsetForTerm:(EXTChartViewModelTerm *)term;
 @end
 
 
@@ -182,15 +184,18 @@ static NSComparisonResult(^hRepsComparator)(EXTChartViewModelTermHomologyReps *,
             [differentials addObject:diff];
             startTerm.differential = diff;
 
+            const NSUInteger startBaseOffset = [startTerm.termCell baseOffsetForTerm:startTerm];
+            const NSUInteger endBaseOffset = [endTerm.termCell baseOffsetForTerm:endTerm];
+
             [diff.hRepAssignments enumerateKeysAndObjectsUsingBlock:^(NSArray *sourceHReps, NSArray *targetHReps, BOOL *stop) {
                 const NSUInteger startOffset = [startTerm.homologyReps indexOfObjectPassingTest:^BOOL(EXTChartViewModelTermHomologyReps *hReps, NSUInteger idx, BOOL *stop) {
                     return [hReps.representatives isEqualToArray:sourceHReps];
-                }];
+                }] + startBaseOffset;
                 NSAssert(startOffset != NSNotFound, @"HReps not found");
 
                 const NSUInteger endOffset = [startTerm.homologyReps indexOfObjectPassingTest:^BOOL(EXTChartViewModelTermHomologyReps *hReps, NSUInteger idx, BOOL *stop) {
                     return [hReps.representatives isEqualToArray:targetHReps];
-                }];
+                }] + endBaseOffset;
                 NSAssert(endOffset != NSNotFound, @"HReps not found");
 
                 EXTChartViewModelDifferentialLine *line = [EXTChartViewModelDifferentialLine viewModelDifferentialLineWithStartIndex:startOffset endIndex:endOffset];
@@ -380,6 +385,18 @@ static NSComparisonResult(^hRepsComparator)(EXTChartViewModelTermHomologyReps *,
 {
     return [[self.privateTerms valueForKeyPath:@"@sum.dimension"] integerValue];
 }
+
+- (NSUInteger)baseOffsetForTerm:(EXTChartViewModelTerm *)sourceTerm {
+    NSUInteger base = 0;
+
+    for (EXTChartViewModelTerm *term in self.privateTerms) {
+        if (term == sourceTerm) break;
+        base += term.dimension;
+    }
+
+    return base;
+}
+
 @end
 
 @implementation EXTChartViewModelDifferential
