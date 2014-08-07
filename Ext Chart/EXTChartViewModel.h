@@ -62,10 +62,23 @@
 @interface EXTChartViewModelTerm : NSObject
 @property (nonatomic, readonly, strong) EXTTerm *modelTerm;
 @property (nonatomic, readonly, weak) EXTChartViewModelTermCell *termCell;
+
+/// An array of EXTChartViewModelTermHomologyReps instances. Note that EXTChartViewModelTerm.dimension is the number of EXTChartViewModelTermHomologyReps objects.
+@property (nonatomic, readonly, copy) NSArray *homologyReps;
+
+/// The number of homology representatives.
 @property (nonatomic, readonly, assign) NSInteger dimension;
 
 /// There’s at most one differential per (term, page).
 @property (nonatomic, readonly, weak) EXTChartViewModelDifferential *differential;
+@end
+
+
+@interface EXTChartViewModelTermHomologyReps : NSObject
+/// An unsorted array of integers.
+@property (nonatomic, readonly, weak) EXTChartViewModelTerm *term;
+@property (nonatomic, readonly, copy) NSArray *representatives;
+@property (nonatomic, readonly, assign) NSInteger order;
 @end
 
 

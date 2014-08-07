@@ -37,13 +37,22 @@
 @property (nonatomic, assign) NSInteger numberOfReferencedTerms;
 + (instancetype)termCellAtGridLocation:(EXTIntPoint)gridLocation;
 - (void)addTerm:(EXTChartViewModelTerm *)term;
+/// Given a term, all of its homology representatives are distinct. Given a term cell, the homology representatives of all terms in that cell are pairwise-distinct. We can use this property to induce an ordering of terms in that cell: we pick the lexicographically smallest hReps for each term in that cell and use the same lexicographic order to order terms according to their smallest hReps.
+- (void)sortTerms;
 @end
 
 
 @interface EXTChartViewModelTerm ()
 @property (nonatomic, readwrite, weak) EXTChartViewModelTermCell *termCell;
 @property (nonatomic, readwrite, weak) EXTChartViewModelDifferential *differential;
-+ (instancetype)viewModelTermWithModelTerm:(EXTTerm *)modelTerm dimension:(NSInteger)dimension;
+@property (nonatomic, readwrite, copy) NSArray *homologyReps;
++ (instancetype)viewModelTermWithModelTerm:(EXTTerm *)modelTerm modelHomologyReps:(NSDictionary *)modelHomologyReps;
+@end
+
+
+@interface EXTChartViewModelTermHomologyReps ()
+@property (nonatomic, readwrite, weak) EXTChartViewModelTerm *term;
++ (instancetype)viewModelTermHomologyRepsWithTerm:(EXTChartViewModelTerm *)term hReps:(NSArray *)hReps order:(NSInteger)order;
 @end
 
 
@@ -69,6 +78,22 @@
 
 static bool lineSegmentOverRect(NSPoint p1, NSPoint p2, NSRect rect);
 static bool lineSegmentIntersectsLineSegment(NSPoint l1p1, NSPoint l1p2, NSPoint l2p1, NSPoint l2p2);
+
+static NSComparisonResult(^hRepsComparator)(EXTChartViewModelTermHomologyReps *, EXTChartViewModelTermHomologyReps *) = ^(EXTChartViewModelTermHomologyReps *obj1, EXTChartViewModelTermHomologyReps *obj2){
+    NSArray *reps1 = obj1.representatives;
+    NSArray *reps2 = obj2.representatives;
+
+    if (reps1.count < reps2.count) return NSOrderedAscending;
+    if (reps1.count > reps2.count) return NSOrderedDescending;
+
+    const NSInteger count = reps1.count;
+    for (NSInteger i = 0; i < count; ++i) {
+        NSComparisonResult result = [reps1[i] compare:reps2[i]];
+        if (result != NSOrderedSame) return result;
+    }
+
+    return NSOrderedSame;
+};
 
 
 @implementation EXTChartViewModel
@@ -111,7 +136,7 @@ static bool lineSegmentIntersectsLineSegment(NSPoint l1p1, NSPoint l1p2, NSPoint
         const EXTIntPoint gridLocation = [self.sequence.locConvertor gridPoint:term.location];
         NSValue *gridLocationValue = [NSValue extValueWithIntPoint:gridLocation];
         EXTChartViewModelTerm *viewModelTerm = [EXTChartViewModelTerm viewModelTermWithModelTerm:term
-                                                                                       dimension:termDimension];
+                                                                               modelHomologyReps:term.homologyReps[self.currentPage]];
         EXTChartViewModelTermCell *termCell = termCells[gridLocationValue];
         if (!termCell) {
             termCell = [EXTChartViewModelTermCell termCellAtGridLocation:gridLocation];
@@ -123,6 +148,10 @@ static bool lineSegmentIntersectsLineSegment(NSPoint l1p1, NSPoint l1p2, NSPoint
 
         [modelToViewModelTermMap setObject:viewModelTerm forKey:term];
     }
+
+    // --- Term cells
+
+    for (EXTChartViewModelTermCell *termCell in termCells.allValues) [termCell sortTerms];
 
     // --- Differentials
     NSMutableArray *differentials = [NSMutableArray new];
@@ -258,19 +287,47 @@ static bool lineSegmentIntersectsLineSegment(NSPoint l1p1, NSPoint l1p2, NSPoint
 
 
 @implementation EXTChartViewModelTerm
-+ (instancetype)viewModelTermWithModelTerm:(EXTTerm *)modelTerm dimension:(NSInteger)dimension
+@dynamic dimension;
+
++ (instancetype)viewModelTermWithModelTerm:(EXTTerm *)modelTerm modelHomologyReps:(NSDictionary *)modelHomologyReps
 {
+    NSParameterAssert(modelTerm);
+    NSAssert(modelHomologyReps.allKeys.count > 0, @"Need non-empty model hReps");
+
     EXTChartViewModelTerm *newTerm = [[self class] new];
-    if (newTerm) {
-        newTerm->_modelTerm = modelTerm;
-        newTerm->_dimension = dimension;
-    }
+    if (!newTerm) return nil;
+
+    newTerm->_modelTerm = modelTerm;
+
+    NSMutableArray *tempHomologyReps = [NSMutableArray new];
+    [modelHomologyReps enumerateKeysAndObjectsUsingBlock:^(NSArray *modelHReps, NSNumber *order, BOOL *stop) {
+        EXTChartViewModelTermHomologyReps *hReps = [EXTChartViewModelTermHomologyReps viewModelTermHomologyRepsWithTerm:newTerm hReps:modelHReps order:order.integerValue];
+        [tempHomologyReps addObject:hReps];
+    }];
+
+    // We need to specify some order to homology representatives so that we can consistently locate them inside a grid cell.
+    newTerm->_homologyReps = [tempHomologyReps sortedArrayUsingComparator:hRepsComparator];
+
     return newTerm;
+}
+
+- (NSInteger)dimension {
+    return self.homologyReps.count;
 }
 @end
 
 
-#pragma mark -- helper classes --
+@implementation EXTChartViewModelTermHomologyReps
++ (instancetype)viewModelTermHomologyRepsWithTerm:(EXTChartViewModelTerm *)term hReps:(NSArray *)hReps order:(NSInteger)order {
+    EXTChartViewModelTermHomologyReps *newHReps = [EXTChartViewModelTermHomologyReps new];
+    if (newHReps) {
+        newHReps->_term = term;
+        newHReps->_representatives = [hReps copy];
+        newHReps->_order = order;
+    }
+    return newHReps;
+}
+@end
 
 
 @implementation EXTChartViewModelTermCell
@@ -298,6 +355,16 @@ static bool lineSegmentIntersectsLineSegment(NSPoint l1p1, NSPoint l1p2, NSPoint
 - (void)addTerm:(EXTChartViewModelTerm *)term
 {
     [self.privateTerms addObject:term];
+}
+
+- (void)sortTerms {
+    NSMutableArray *cellHReps = [NSMutableArray new];
+    for (EXTChartViewModelTerm *term in self.privateTerms) [cellHReps addObject:term.homologyReps.firstObject];
+    [cellHReps sortUsingComparator:hRepsComparator];
+
+    NSMutableArray *sortedTerms = [NSMutableArray new];
+    for (EXTChartViewModelTermHomologyReps *hReps in cellHReps) [sortedTerms addObject:hReps.term];
+    self.privateTerms = sortedTerms;
 }
 
 - (NSArray *)terms
