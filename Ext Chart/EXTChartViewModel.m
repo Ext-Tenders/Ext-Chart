@@ -34,7 +34,6 @@
 
 @interface EXTChartViewModelTermCell ()
 @property (nonatomic, strong) NSMutableArray *privateTerms;
-@property (nonatomic, assign) NSInteger numberOfReferencedTerms;
 + (instancetype)termCellAtGridLocation:(EXTIntPoint)gridLocation;
 - (void)addTerm:(EXTChartViewModelTerm *)term;
 /// Given a term, all of its homology representatives are distinct. Given a term cell, the homology representatives of all terms in that cell are pairwise-distinct. We can use this property to induce an ordering of terms in that cell: we pick the lexicographically smallest hReps for each term in that cell and use the same lexicographic order to order terms according to their smallest hReps.
@@ -183,15 +182,22 @@ static NSComparisonResult(^hRepsComparator)(EXTChartViewModelTermHomologyReps *,
             [differentials addObject:diff];
             startTerm.differential = diff;
 
-            for (NSInteger i = 0; i < imageSize; ++i) {
-                NSInteger startOffset = startTerm.termCell.numberOfReferencedTerms;
-                NSInteger endOffset = endTerm.termCell.numberOfReferencedTerms;
-                startTerm.termCell.numberOfReferencedTerms += 1;
-                endTerm.termCell.numberOfReferencedTerms += 1;
+            DLog(@"Differential with image size %d has %lu hRepAssignments", imageSize, (unsigned long)diff.hRepAssignments.count);
+
+            [diff.hRepAssignments enumerateKeysAndObjectsUsingBlock:^(NSArray *sourceHReps, NSArray *targetHReps, BOOL *stop) {
+                const NSUInteger startOffset = [startTerm.homologyReps indexOfObjectPassingTest:^BOOL(EXTChartViewModelTermHomologyReps *hReps, NSUInteger idx, BOOL *stop) {
+                    return [hReps.representatives isEqualToArray:sourceHReps];
+                }];
+                NSAssert(startOffset != NSNotFound, @"HReps not found");
+
+                const NSUInteger endOffset = [startTerm.homologyReps indexOfObjectPassingTest:^BOOL(EXTChartViewModelTermHomologyReps *hReps, NSUInteger idx, BOOL *stop) {
+                    return [hReps.representatives isEqualToArray:targetHReps];
+                }];
+                NSAssert(endOffset != NSNotFound, @"HReps not found");
 
                 EXTChartViewModelDifferentialLine *line = [EXTChartViewModelDifferentialLine viewModelDifferentialLineWithStartIndex:startOffset endIndex:endOffset];
                 [diff addLine:line];
-            }
+            }];
         }
     }
     
