@@ -182,8 +182,6 @@ static NSComparisonResult(^hRepsComparator)(EXTChartViewModelTermHomologyReps *,
             [differentials addObject:diff];
             startTerm.differential = diff;
 
-            DLog(@"Differential with image size %d has %lu hRepAssignments", imageSize, (unsigned long)diff.hRepAssignments.count);
-
             [diff.hRepAssignments enumerateKeysAndObjectsUsingBlock:^(NSArray *sourceHReps, NSArray *targetHReps, BOOL *stop) {
                 const NSUInteger startOffset = [startTerm.homologyReps indexOfObjectPassingTest:^BOOL(EXTChartViewModelTermHomologyReps *hReps, NSUInteger idx, BOOL *stop) {
                     return [hReps.representatives isEqualToArray:sourceHReps];
@@ -429,7 +427,7 @@ static NSComparisonResult(^hRepsComparator)(EXTChartViewModelTermHomologyReps *,
         for (int j = 0; j < hTargetKeys.count; j++) {
             if (((int*)lift.presentation.mutableBytes)[i*lift.height+j] == 0)
                 continue;
-            if ([[assignment allValues] indexOfObject:hTargetKeys[j]] == NSNotFound)
+            if ([[assignment allValues] indexOfObject:hTargetKeys[j]] != NSNotFound)
                 continue;
             assignment[hSourceKeys[i]] = hTargetKeys[j];
         }
