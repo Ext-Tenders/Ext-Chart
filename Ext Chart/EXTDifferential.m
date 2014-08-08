@@ -51,6 +51,15 @@ static void *_EXTPresentationParametersContext = &_EXTPresentationParametersCont
     [self removeObserver:self forKeyPath:@"presentationParameters" context:_EXTPresentationParametersContext];
 }
 
+- (instancetype)copyWithZone:(NSZone *)zone {
+    EXTDifferential *ret = [EXTDifferential newDifferential:self.start end:self.end page:self.page];
+    
+    for (EXTPartialDefinition *p in self.partialDefinitions)
+        [ret.partialDefinitions addObject:[p copy]];
+    
+    return ret;
+}
+
 +(instancetype) newDifferential:(EXTTerm *)start
                             end:(EXTTerm *)end
                            page:(int)page {

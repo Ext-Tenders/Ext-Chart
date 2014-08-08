@@ -19,7 +19,7 @@
 
 
 @interface EXTChartViewController ()
-@property (nonatomic, readwrite, weak) id selectedObject;
+@property (nonatomic, readwrite, strong) id selectedObject;
 @property (nonatomic, readwrite, strong) EXTChartViewModel *chartViewModel;
 @end
 
@@ -197,7 +197,7 @@ static void *_selectedToolTagContext = &_selectedToolTagContext;
 
                 // if we've found it, good!  quit!
                 if (term) {
-                    self.selectedObject = term;
+                    self.selectedObject = [term copy];
                     break;
                 }
             } while (newIndex != oldIndex);
@@ -239,7 +239,7 @@ static void *_selectedToolTagContext = &_selectedToolTagContext;
 
                 // if we've found it, good!  quit!
                 if (diff) {
-                    self.selectedObject = diff;
+                    self.selectedObject = [diff copy];
                     break;
                 }
 
@@ -251,7 +251,7 @@ static void *_selectedToolTagContext = &_selectedToolTagContext;
                     // but if there is, let's build it and set it up.
                     diff = [EXTDifferential newDifferential:source end:end page:_currentPage];
                     [_document.sseq addDifferential:diff];
-                    self.selectedObject = diff;
+                    self.selectedObject = [diff copy];
                     break;
                 }
 

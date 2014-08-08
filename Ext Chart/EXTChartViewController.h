@@ -20,7 +20,7 @@
 @property (nonatomic, readonly) EXTChartView *chartView;
 @property (nonatomic, weak) EXTLeibnizWindowController *leibnizWindowController;
 @property (nonatomic, assign) int currentPage;
-@property (nonatomic, readonly, weak) id selectedObject;
+@property (nonatomic, readonly, strong) id selectedObject;
 @property (nonatomic, readonly, strong) EXTChartViewModel *chartViewModel;
 
 // Designated initialiser
