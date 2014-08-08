@@ -201,10 +201,25 @@ void makeCellLayout(EXTTermCellLayout *outLayout, EXTChartViewModelTermCell *ter
     outLayout->rank = termCell.totalRank;
 
     if (outLayout->rank <= _kMaxGlyphs) {
-        for (int i = 0; i < _kMaxGlyphs; ++i) {
-            outLayout->glyphs[i] = (i < outLayout->rank ?
-                                    EXTTermCellGlyphUnfilledSquare :
-                                    EXTTermCellGlyphNone);
+        NSInteger glyphIndex = 0;
+
+        for (EXTChartViewModelTerm *term in termCell.terms) {
+            if (glyphIndex >= _kMaxGlyphs) {
+                DLog(@"I think this shouldn’t happen");
+                break;
+            }
+
+            const NSInteger dimension = term.dimension;
+
+            for (NSInteger i = 0; i < dimension && glyphIndex < _kMaxGlyphs; ++i) {
+
+                EXTChartViewModelTermHomologyReps *hReps = term.homologyReps[i];
+
+                outLayout->glyphs[glyphIndex] = (hReps.order == 0 ?
+                                                 EXTTermCellGlyphUnfilledSquare :
+                                                 EXTTermCellGlyphFilledDot);
+                ++glyphIndex;
+            }
         }
     }
     else {
