@@ -24,7 +24,7 @@ static const CGFloat _kSquareInsetFactor = 0.2;
 #pragma mark - Private classes
 
 typedef NS_ENUM(NSInteger, EXTTermCellGlyph) {
-    EXTTermCellGlyphNone,
+    EXTTermCellGlyphNone = 0,
     EXTTermCellGlyphFilledDot,
     EXTTermCellGlyphUnfilledDotWithLabel,
     EXTTermCellGlyphUnfilledSquare,
@@ -198,6 +198,7 @@ void makeCellLayout(EXTTermCellLayout *outLayout, EXTChartViewModelTermCell *ter
     NSCParameterAssert(outLayout);
     NSCParameterAssert(termCell);
 
+    *outLayout = (EXTTermCellLayout){0};
     outLayout->rank = termCell.totalRank;
 
     if (outLayout->rank <= _kMaxGlyphs) {
@@ -223,11 +224,7 @@ void makeCellLayout(EXTTermCellLayout *outLayout, EXTChartViewModelTermCell *ter
         }
     }
     else {
-        outLayout->glyphs[0] = EXTTermCellGlyphUnfilledDotWithLabel;
-
-        for (int i = 1; i < _kMaxGlyphs; ++i) {
-            outLayout->glyphs[i] = EXTTermCellGlyphNone;
-        }
+        outLayout->glyphs[0] = EXTTermCellGlyphUnfilledDotWithLabel; // TODO: not really needed apparently
     }
 }
 
