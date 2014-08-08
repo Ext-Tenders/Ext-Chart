@@ -194,7 +194,7 @@ static NSComparisonResult(^hRepsComparator)(EXTChartViewModelTermHomologyReps *,
                 }] + startBaseOffset;
                 NSAssert(startOffset != NSNotFound, @"HReps not found");
 
-                const NSUInteger endOffset = [startTerm.homologyReps indexOfObjectPassingTest:^BOOL(EXTChartViewModelTermHomologyReps *hReps, NSUInteger idx, BOOL *stop) {
+                const NSUInteger endOffset = [endTerm.homologyReps indexOfObjectPassingTest:^BOOL(EXTChartViewModelTermHomologyReps *hReps, NSUInteger idx, BOOL *stop) {
                     return [hReps.representatives isEqualToArray:targetHReps];
                 }] + endBaseOffset;
                 NSAssert(endOffset != NSNotFound, @"HReps not found");
