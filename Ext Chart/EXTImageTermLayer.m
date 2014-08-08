@@ -19,6 +19,7 @@ static NSColor *_color;
 static const CGFloat _kLineWidth = 1.0 / 26.0;
 static const CGFloat _kSingleDigitFontSizeFactor = 0.5;
 static const CGFloat _kDoubleDigitFontSizeFactor = 0.4;
+static const CGFloat _kSquareInsetFactor = 0.2;
 
 #pragma mark - Private classes
 
@@ -39,7 +40,7 @@ typedef struct {
 static NSSize boundingSizeForAttributedString(NSAttributedString *s);
 static NSString *makeCacheKey(EXTTermCellLayout *layout, CGFloat length, NSColor *color);
 static void makeCellLayout(EXTTermCellLayout *outLayout, EXTChartViewModelTermCell *termCell);
-static NSImage *makeCellImage(EXTTermCellLayout *layout, CGFloat length, NSColor *color);
+static NSImage *makeCellImage(EXTChartViewModelTermCell *termCell, CGFloat length, NSColor *color);
 
 
 #pragma mark - Class extensions
@@ -79,11 +80,8 @@ static NSImage *makeCellImage(EXTTermCellLayout *layout, CGFloat length, NSColor
 
 + (instancetype)termLayerWithTermCell:(EXTChartViewModelTermCell *)termCell length:(NSInteger)length
 {
-    EXTTermCellLayout cellLayout;
-    makeCellLayout(&cellLayout, termCell);
-
     EXTImageTermLayer *layer = [EXTImageTermLayer layer];
-    layer.contents = makeCellImage(&cellLayout, length, _color);
+    layer.contents = makeCellImage(termCell, length, _color);
     layer->_termCell = termCell;
     layer.drawsAsynchronously = YES;
     return layer;
@@ -95,12 +93,7 @@ static NSImage *makeCellImage(EXTTermCellLayout *layout, CGFloat length, NSColor
 }
 
 - (void)reloadContents {
-    if (!self.termCell) return;
-
-    EXTTermCellLayout cellLayout;
-    makeCellLayout(&cellLayout, self.termCell);
-
-    self.contents = makeCellImage(&cellLayout, self.scaledLength, self.termColor);
+    if (self.termCell) self.contents = makeCellImage(self.termCell, self.scaledLength, self.termColor);
 }
 
 - (CGFloat)scaledLength {
@@ -115,12 +108,7 @@ static NSImage *makeCellImage(EXTTermCellLayout *layout, CGFloat length, NSColor
 
 - (void)updateInteractionStatus
 {
-    if (!self.termCell) return;
-
-    EXTTermCellLayout cellLayout;
-    makeCellLayout(&cellLayout, self.termCell);
-
-    self.contents = makeCellImage(&cellLayout, self.scaledLength, self.termColor);
+    if (self.termCell) self.contents = makeCellImage(self.termCell, self.scaledLength, self.termColor);
 }
 
 #pragma mark - Properties
@@ -211,10 +199,11 @@ void makeCellLayout(EXTTermCellLayout *outLayout, EXTChartViewModelTermCell *ter
     NSCParameterAssert(termCell);
 
     outLayout->rank = termCell.totalRank;
+
     if (outLayout->rank <= _kMaxGlyphs) {
         for (int i = 0; i < _kMaxGlyphs; ++i) {
             outLayout->glyphs[i] = (i < outLayout->rank ?
-                                    EXTTermCellGlyphFilledDot :
+                                    EXTTermCellGlyphUnfilledSquare :
                                     EXTTermCellGlyphNone);
         }
     }
@@ -227,11 +216,14 @@ void makeCellLayout(EXTTermCellLayout *outLayout, EXTChartViewModelTermCell *ter
     }
 }
 
-NSImage *makeCellImage(EXTTermCellLayout *layout, CGFloat length, NSColor *color) {
-    NSCParameterAssert(layout);
+NSImage *makeCellImage(EXTChartViewModelTermCell *termCell, CGFloat length, NSColor *color) {
+    NSCParameterAssert(termCell);
     NSCParameterAssert(color);
 
-    NSString *cacheKey = makeCacheKey(layout, length, color);
+    EXTTermCellLayout layout;
+    makeCellLayout(&layout, termCell);
+
+    NSString *cacheKey = makeCacheKey(&layout, length, color);
     NSImage *image = [_cellImageCache objectForKey:cacheKey];
 
 #ifdef LOG_IMGCACHE_STATS
@@ -253,24 +245,43 @@ NSImage *makeCellImage(EXTTermCellLayout *layout, CGFloat length, NSColor *color
 
     BOOL (^drawingHandler)(NSRect) = NULL;
 
-    if (layout->rank <= 3) {
-        NSBezierPath *path = [NSBezierPath bezierPath];
-        for (NSInteger i = 0; i < layout->rank; ++i) {
-            const CGRect rect = [EXTChartView dotBoundingBoxForCellRank:layout->rank
-                                                              termIndex:i
-                                                           gridLocation:(EXTIntPoint){0}
-                                                            gridSpacing:(NSInteger)length];
-            [path appendBezierPathWithOvalInRect:rect];
-        }
-
+    if (layout.rank <= 3) {
         drawingHandler = ^(NSRect frame) {
-            [color setFill];
-            [path fill];
+            for (NSInteger i = 0; i < layout.rank; ++i) {
+                const CGRect rect = [EXTChartView dotBoundingBoxForCellRank:layout.rank
+                                                                  termIndex:i
+                                                               gridLocation:(EXTIntPoint){0}
+                                                                gridSpacing:(NSInteger)length];
+
+                switch (layout.glyphs[i]) {
+                    case EXTTermCellGlyphFilledDot: {
+                        NSBezierPath *path = [NSBezierPath bezierPath];
+                        [path appendBezierPathWithOvalInRect:rect];
+                        [color setFill];
+                        [path fill];
+                        break;
+                    }
+
+                    case EXTTermCellGlyphUnfilledSquare: {
+                        const CGFloat inset = rect.size.width * _kSquareInsetFactor;
+                        const CGRect drawingRect = CGRectInset(rect, inset, inset);
+                        NSBezierPath *path = [NSBezierPath bezierPath];
+                        [path appendBezierPathWithRect:drawingRect];
+                        [color setStroke];
+                        [path stroke];
+                        break;
+                    }
+
+                    default:
+                        break;
+                }
+            }
+
             return YES;
         };
     }
     else {
-        NSString *label = [NSString stringWithFormat:@"%ld", layout->rank];
+        NSString *label = [NSString stringWithFormat:@"%ld", layout.rank];
         const CGFloat fontSize = length * ([label length] == 1 ? _kSingleDigitFontSizeFactor : _kDoubleDigitFontSizeFactor);
         NSFont *font = [NSFont fontWithName:EXTTermLayerFontName size:fontSize];
         NSDictionary *attrs = @{
@@ -279,7 +290,7 @@ NSImage *makeCellImage(EXTTermCellLayout *layout, CGFloat length, NSColor *color
                                 };
         NSAttributedString *attrLabel = [[NSAttributedString alloc] initWithString:label attributes:attrs];
 
-        const CGRect drawingFrame = [EXTChartView dotBoundingBoxForCellRank:layout->rank
+        const CGRect drawingFrame = [EXTChartView dotBoundingBoxForCellRank:layout.rank
                                                                   termIndex:0
                                                                gridLocation:(EXTIntPoint){0}
                                                                 gridSpacing:(NSInteger)length];
