@@ -20,7 +20,7 @@
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
 		<key>8CF1C8369DF6861B83FC2A2969438FEAA0A1CD3E</key>
-		<string>../ThirdParty/MBTableGrid/</string>
+		<string>../ThirdParty/MBTableGrid</string>
 		<key>986A61CEC62DA65E0A5C31D793DD885EB84A976A</key>
 		<string>..</string>
 	</dict>
