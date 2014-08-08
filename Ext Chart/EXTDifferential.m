@@ -78,10 +78,10 @@ static void *_EXTPresentationParametersContext = &_EXTPresentationParametersCont
 
 // quietly assemble the presentation when asked for it :)
 -(EXTMatrix*) presentation {
-    if (presentationNeedsAssembly) {
+    //if (presentationNeedsAssembly) {
         [self assemblePresentation];
-        presentationNeedsAssembly = false;
-    }
+    //    presentationNeedsAssembly = false;
+    //}
 
     return _presentation;
 }
