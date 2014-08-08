@@ -12,25 +12,35 @@
 
 #pragma mark - Private variables
 
-static NSCache *_dotImageCache;
+static const int _kMaxGlyphs = 3;
+static NSCache *_cellImageCache;
 
 static NSColor *_color;
 static const CGFloat _kLineWidth = 1.0 / 26.0;
 static const CGFloat _kSingleDigitFontSizeFactor = 0.5;
 static const CGFloat _kDoubleDigitFontSizeFactor = 0.4;
 
+#pragma mark - Private classes
+
+typedef NS_ENUM(NSInteger, EXTTermCellGlyph) {
+    EXTTermCellGlyphNone,
+    EXTTermCellGlyphFilledDot,
+    EXTTermCellGlyphUnfilledDotWithLabel,
+    EXTTermCellGlyphUnfilledSquare,
+};
+
+typedef struct {
+    NSInteger rank;
+    EXTTermCellGlyph glyphs[_kMaxGlyphs];
+} EXTTermCellLayout;
+
 #pragma mark - Private functions
 
 static NSSize boundingSizeForAttributedString(NSAttributedString *s);
+static NSString *makeCacheKey(EXTTermCellLayout *layout, CGFloat length, NSColor *color);
+static void makeCellLayout(EXTTermCellLayout *outLayout, EXTChartViewModelTermCell *termCell);
+static NSImage *makeCellImage(EXTTermCellLayout *layout, CGFloat length, NSColor *color);
 
-#pragma mark - Private classes
-
-@interface EXTDotImageCacheKey : NSObject
-@property (nonatomic, readonly) NSInteger rank;
-@property (nonatomic, readonly) CGFloat length;
-@property (nonatomic, readonly) NSColor *color;
-+ (instancetype)dotImageCacheKeyWithRank:(NSInteger)rank length:(CGFloat)length color:(NSColor *)color;
-@end
 
 #pragma mark - Class extensions
 
@@ -52,7 +62,7 @@ static NSSize boundingSizeForAttributedString(NSAttributedString *s);
 + (void)initialize
 {
     if (self == [EXTImageTermLayer class]) {
-        _dotImageCache = [NSCache new];
+        _cellImageCache = [NSCache new];
         _color = [NSColor blackColor];
     }
 }
@@ -69,8 +79,11 @@ static NSSize boundingSizeForAttributedString(NSAttributedString *s);
 
 + (instancetype)termLayerWithTermCell:(EXTChartViewModelTermCell *)termCell length:(NSInteger)length
 {
+    EXTTermCellLayout cellLayout;
+    makeCellLayout(&cellLayout, termCell);
+
     EXTImageTermLayer *layer = [EXTImageTermLayer layer];
-    layer.contents = [self dotImageForRank:termCell.totalRank length:length color:_color];
+    layer.contents = makeCellImage(&cellLayout, length, _color);
     layer->_termCell = termCell;
     layer.drawsAsynchronously = YES;
     return layer;
@@ -82,88 +95,12 @@ static NSSize boundingSizeForAttributedString(NSAttributedString *s);
 }
 
 - (void)reloadContents {
-    self.contents = [EXTImageTermLayer dotImageForRank:self.termCell.totalRank
-                                                length:self.scaledLength
-                                                 color:self.termColor];
-}
+    if (!self.termCell) return;
 
-+ (NSImage *)dotImageForRank:(NSInteger)rank length:(CGFloat)length color:(NSColor *)color {
-    NSParameterAssert(color);
+    EXTTermCellLayout cellLayout;
+    makeCellLayout(&cellLayout, self.termCell);
 
-    EXTDotImageCacheKey *cacheKey = [EXTDotImageCacheKey dotImageCacheKeyWithRank:rank length:round(length) color:color];
-    NSImage *image = [_dotImageCache objectForKey:cacheKey];
-
-#ifdef LOG_IMGCACHE_STATS
-    static NSInteger cacheHits, cacheMisses;
-#endif
-    if (image) {
-#ifdef LOG_IMGCACHE_STATS
-        ++cacheHits;
-        DLog(@"Dot iamage cache HIT; hits = %ld, misses = %ld", (long)cacheHits, (long)cacheMisses);
-#endif
-        return image;
-    }
-
-#ifdef LOG_IMGCACHE_STATS
-    ++cacheMisses;
-    DLog(@"Dot iamage cache MISS; hits = %ld, misses = %ld", (long)cacheHits, (long)cacheMisses);
-    DLog(@"Rank is %ld, length is %f, color is %@", (long)rank, round(length), color);
-#endif
-
-    BOOL (^drawingHandler)(NSRect) = NULL;
-
-    if (rank <= 3) {
-        NSBezierPath *path = [NSBezierPath bezierPath];
-        for (NSInteger i = 0; i < rank; ++i) {
-            const CGRect rect = [EXTChartView dotBoundingBoxForCellRank:rank
-                                                              termIndex:i
-                                                           gridLocation:(EXTIntPoint){0}
-                                                            gridSpacing:(NSInteger)length];
-            [path appendBezierPathWithOvalInRect:rect];
-        }
-
-        drawingHandler = ^(NSRect frame) {
-            [color setFill];
-            [path fill];
-            return YES;
-        };
-    }
-    else {
-        NSString *label = [NSString stringWithFormat:@"%ld", rank];
-        const CGFloat fontSize = length * ([label length] == 1 ? _kSingleDigitFontSizeFactor : _kDoubleDigitFontSizeFactor);
-        NSFont *font = [NSFont fontWithName:EXTTermLayerFontName size:fontSize];
-        NSDictionary *attrs = @{
-                                NSFontAttributeName: font,
-                                NSForegroundColorAttributeName: color
-                                };
-        NSAttributedString *attrLabel = [[NSAttributedString alloc] initWithString:label attributes:attrs];
-
-        const CGRect drawingFrame = [EXTChartView dotBoundingBoxForCellRank:rank
-                                                                  termIndex:0
-                                                               gridLocation:(EXTIntPoint){0}
-                                                                gridSpacing:(NSInteger)length];
-        NSBezierPath *path = [NSBezierPath bezierPathWithOvalInRect:drawingFrame];
-        path.lineWidth = _kLineWidth * length;
-        const NSSize labelSize = boundingSizeForAttributedString(attrLabel);
-
-        drawingHandler = ^(NSRect frame) {
-            // We want the label centred horizontally & vertically inside frame
-            const NSRect textFrame = {
-                .origin.x = (frame.size.width - labelSize.width) / 2,
-                .origin.y = /*FIXME: magic*/ 0.35 * frame.size.height,
-                .size = labelSize,
-            };
-
-            [color setStroke];
-            [path stroke];
-            [attrLabel drawWithRect:textFrame options:0]; // FIXME: doesn’t match positioning in -drawInRect:. Works with magic above
-            return YES;
-        };
-    }
-
-    image = [NSImage imageWithSize:(CGSize){length, length} flipped:NO drawingHandler:drawingHandler];
-    [_dotImageCache setObject:image forKey:cacheKey];
-    return image;
+    self.contents = makeCellImage(&cellLayout, self.scaledLength, self.termColor);
 }
 
 - (CGFloat)scaledLength {
@@ -178,9 +115,12 @@ static NSSize boundingSizeForAttributedString(NSAttributedString *s);
 
 - (void)updateInteractionStatus
 {
-    self.contents = [EXTImageTermLayer dotImageForRank:self.termCell.totalRank
-                                                length:self.scaledLength
-                                                 color:self.termColor];
+    if (!self.termCell) return;
+
+    EXTTermCellLayout cellLayout;
+    makeCellLayout(&cellLayout, self.termCell);
+
+    self.contents = makeCellImage(&cellLayout, self.scaledLength, self.termColor);
 }
 
 #pragma mark - Properties
@@ -253,33 +193,116 @@ NSSize boundingSizeForAttributedString(NSAttributedString *s) {
     return size;
 }
 
+NSString *makeCacheKey(EXTTermCellLayout *layout, CGFloat length, NSColor *color) {
+    NSCParameterAssert(layout);
+    NSCParameterAssert(color);
 
-@implementation EXTDotImageCacheKey
-+ (instancetype)dotImageCacheKeyWithRank:(NSInteger)rank length:(CGFloat)length color:(NSColor *)color {
-    NSParameterAssert(color);
+    return [NSString stringWithFormat:@"%ld,%d,%d,%d,%f,%lu",
+            layout->rank,
+            (int)layout->glyphs[0],
+            (int)layout->glyphs[1],
+            (int)layout->glyphs[2],
+            length,
+            color.hash];
+}
 
-    EXTDotImageCacheKey *newKey = [[self class] new];
-    if (newKey) {
-        newKey->_rank = rank;
-        newKey->_length = length;
-        newKey->_color = color;
+void makeCellLayout(EXTTermCellLayout *outLayout, EXTChartViewModelTermCell *termCell) {
+    NSCParameterAssert(outLayout);
+    NSCParameterAssert(termCell);
+
+    outLayout->rank = termCell.totalRank;
+    if (outLayout->rank <= _kMaxGlyphs) {
+        for (int i = 0; i < _kMaxGlyphs; ++i) {
+            outLayout->glyphs[i] = (i < outLayout->rank ?
+                                    EXTTermCellGlyphFilledDot :
+                                    EXTTermCellGlyphNone);
+        }
     }
-    return newKey;
+    else {
+        outLayout->glyphs[0] = EXTTermCellGlyphUnfilledDotWithLabel;
+
+        for (int i = 1; i < _kMaxGlyphs; ++i) {
+            outLayout->glyphs[i] = EXTTermCellGlyphNone;
+        }
+    }
 }
 
-- (BOOL)isEqual:(id)object {
-    EXTDotImageCacheKey *other = object;
-    return (other != nil &&
-            [other isKindOfClass:[EXTDotImageCacheKey class]] &&
-            other->_rank == _rank &&
-            other->_length == _length &&
-            [other->_color isEqualTo:_color]);
-}
+NSImage *makeCellImage(EXTTermCellLayout *layout, CGFloat length, NSColor *color) {
+    NSCParameterAssert(layout);
+    NSCParameterAssert(color);
 
+    NSString *cacheKey = makeCacheKey(layout, length, color);
+    NSImage *image = [_cellImageCache objectForKey:cacheKey];
 
-- (NSUInteger)hash {
-    return (NSUINTROTATE((NSUInteger)_rank, NSUINT_BIT / 2) ^
-            (NSUInteger)_length ^
-            [_color hash]);
+#ifdef LOG_IMGCACHE_STATS
+    static NSInteger cacheHits, cacheMisses;
+#endif
+    if (image) {
+#ifdef LOG_IMGCACHE_STATS
+        ++cacheHits;
+        DLog(@"Dot iamage cache HIT; hits = %ld, misses = %ld", (long)cacheHits, (long)cacheMisses);
+#endif
+        return image;
+    }
+
+#ifdef LOG_IMGCACHE_STATS
+    ++cacheMisses;
+    DLog(@"Dot iamage cache MISS; hits = %ld, misses = %ld", (long)cacheHits, (long)cacheMisses);
+    DLog(@"Rank is %ld, length is %f, color is %@", (long)rank, round(length), color);
+#endif
+
+    BOOL (^drawingHandler)(NSRect) = NULL;
+
+    if (layout->rank <= 3) {
+        NSBezierPath *path = [NSBezierPath bezierPath];
+        for (NSInteger i = 0; i < layout->rank; ++i) {
+            const CGRect rect = [EXTChartView dotBoundingBoxForCellRank:layout->rank
+                                                              termIndex:i
+                                                           gridLocation:(EXTIntPoint){0}
+                                                            gridSpacing:(NSInteger)length];
+            [path appendBezierPathWithOvalInRect:rect];
+        }
+
+        drawingHandler = ^(NSRect frame) {
+            [color setFill];
+            [path fill];
+            return YES;
+        };
+    }
+    else {
+        NSString *label = [NSString stringWithFormat:@"%ld", layout->rank];
+        const CGFloat fontSize = length * ([label length] == 1 ? _kSingleDigitFontSizeFactor : _kDoubleDigitFontSizeFactor);
+        NSFont *font = [NSFont fontWithName:EXTTermLayerFontName size:fontSize];
+        NSDictionary *attrs = @{
+                                NSFontAttributeName: font,
+                                NSForegroundColorAttributeName: color
+                                };
+        NSAttributedString *attrLabel = [[NSAttributedString alloc] initWithString:label attributes:attrs];
+
+        const CGRect drawingFrame = [EXTChartView dotBoundingBoxForCellRank:layout->rank
+                                                                  termIndex:0
+                                                               gridLocation:(EXTIntPoint){0}
+                                                                gridSpacing:(NSInteger)length];
+        NSBezierPath *path = [NSBezierPath bezierPathWithOvalInRect:drawingFrame];
+        path.lineWidth = _kLineWidth * length;
+        const NSSize labelSize = boundingSizeForAttributedString(attrLabel);
+
+        drawingHandler = ^(NSRect frame) {
+            // We want the label centred horizontally & vertically inside frame
+            const NSRect textFrame = {
+                .origin.x = (frame.size.width - labelSize.width) / 2,
+                .origin.y = /*FIXME: magic*/ 0.35 * frame.size.height,
+                .size = labelSize,
+            };
+
+            [color setStroke];
+            [path stroke];
+            [attrLabel drawWithRect:textFrame options:0]; // FIXME: doesn’t match positioning in -drawInRect:. Works with magic above
+            return YES;
+        };
+    }
+
+    image = [NSImage imageWithSize:(CGSize){length, length} flipped:NO drawingHandler:drawingHandler];
+    [_cellImageCache setObject:image forKey:cacheKey];
+    return image;
 }
-@end
