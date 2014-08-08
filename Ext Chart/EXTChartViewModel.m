@@ -47,7 +47,7 @@
 @property (nonatomic, readwrite, weak) EXTChartViewModelTermCell *termCell;
 @property (nonatomic, readwrite, weak) EXTChartViewModelDifferential *differential;
 @property (nonatomic, readwrite, copy) NSArray *homologyReps;
-+ (instancetype)viewModelTermWithModelTerm:(EXTTerm *)modelTerm modelHomologyReps:(NSDictionary *)modelHomologyReps;
++ (instancetype)viewModelTermWithModelTerm:(EXTTerm *)modelTerm modelHomologyReps:(NSDictionary *)modelHomologyReps sequence:(EXTSpectralSequence *)sequence;
 @end
 
 
@@ -137,7 +137,8 @@ static NSComparisonResult(^hRepsComparator)(EXTChartViewModelTermHomologyReps *,
         const EXTIntPoint gridLocation = [self.sequence.locConvertor gridPoint:term.location];
         NSValue *gridLocationValue = [NSValue extValueWithIntPoint:gridLocation];
         EXTChartViewModelTerm *viewModelTerm = [EXTChartViewModelTerm viewModelTermWithModelTerm:term
-                                                                               modelHomologyReps:term.homologyReps[self.currentPage]];
+                                                                               modelHomologyReps:term.homologyReps[self.currentPage]
+                                                                                        sequence:self.sequence];
         EXTChartViewModelTermCell *termCell = termCells[gridLocationValue];
         if (!termCell) {
             termCell = [EXTChartViewModelTermCell termCellAtGridLocation:gridLocation];
@@ -298,7 +299,7 @@ static NSComparisonResult(^hRepsComparator)(EXTChartViewModelTermHomologyReps *,
 @implementation EXTChartViewModelTerm
 @dynamic dimension;
 
-+ (instancetype)viewModelTermWithModelTerm:(EXTTerm *)modelTerm modelHomologyReps:(NSDictionary *)modelHomologyReps
++ (instancetype)viewModelTermWithModelTerm:(EXTTerm *)modelTerm modelHomologyReps:(NSDictionary *)modelHomologyReps sequence:(EXTSpectralSequence *)sequence
 {
     NSParameterAssert(modelTerm);
     NSAssert(modelHomologyReps.allKeys.count > 0, @"Need non-empty model hReps");
@@ -310,7 +311,10 @@ static NSComparisonResult(^hRepsComparator)(EXTChartViewModelTermHomologyReps *,
 
     NSMutableArray *tempHomologyReps = [NSMutableArray new];
     [modelHomologyReps enumerateKeysAndObjectsUsingBlock:^(NSArray *modelHReps, NSNumber *order, BOOL *stop) {
-        EXTChartViewModelTermHomologyReps *hReps = [EXTChartViewModelTermHomologyReps viewModelTermHomologyRepsWithTerm:newTerm hReps:modelHReps order:order.integerValue];
+        NSInteger intOrder = ABS(order.integerValue); // TODO: Check this with Eric
+        if (intOrder == 0 && sequence.defaultCharacteristic != 0) intOrder = sequence.defaultCharacteristic;
+
+        EXTChartViewModelTermHomologyReps *hReps = [EXTChartViewModelTermHomologyReps viewModelTermHomologyRepsWithTerm:newTerm hReps:modelHReps order:intOrder];
         [tempHomologyReps addObject:hReps];
     }];
 
