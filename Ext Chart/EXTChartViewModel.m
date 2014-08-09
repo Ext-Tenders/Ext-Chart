@@ -148,7 +148,7 @@ static NSComparisonResult(^hRepsComparator)(EXTChartViewModelTermHomologyReps *,
         [termCell addTerm:viewModelTerm];
         viewModelTerm.termCell = termCell;
 
-        [modelToViewModelTermMap setObject:viewModelTerm forKey:term];
+        [modelToViewModelTermMap setObject:viewModelTerm forKey:term.location];
     }
 
     // --- Term cells
@@ -173,8 +173,8 @@ static NSComparisonResult(^hRepsComparator)(EXTChartViewModelTermHomologyReps *,
                 ([differential.end dimension:differential.page] == 0))
                 continue;
 
-            EXTChartViewModelTerm *startTerm = [modelToViewModelTermMap objectForKey:differential.start];
-            EXTChartViewModelTerm *endTerm = [modelToViewModelTermMap objectForKey:differential.end];
+            EXTChartViewModelTerm *startTerm = [modelToViewModelTermMap objectForKey:differential.start.location];
+            EXTChartViewModelTerm *endTerm = [modelToViewModelTermMap objectForKey:differential.end.location];
 
             NSAssert(startTerm, @"Differential should have non nil start term");
             NSAssert(endTerm, @"Differential should have non nil end term");
@@ -228,8 +228,8 @@ static NSComparisonResult(^hRepsComparator)(EXTChartViewModelTermHomologyReps *,
             
             // otherwise, draw something.
             EXTTerm *targetTerm = [self.sequence findTerm:[self.sequence.indexClass addLocation:term.location to:rule[@"location"]]];
-            EXTChartViewModelTerm *startTerm = [modelToViewModelTermMap objectForKey:term];
-            EXTChartViewModelTerm *endTerm = [modelToViewModelTermMap objectForKey:targetTerm];
+            EXTChartViewModelTerm *startTerm = [modelToViewModelTermMap objectForKey:term.location];
+            EXTChartViewModelTerm *endTerm = [modelToViewModelTermMap objectForKey:targetTerm.location];
             
             EXTChartViewModelMultAnnotation *anno = [EXTChartViewModelMultAnnotation viewModelMultAnnotationWithModelAnnotation:rule startTerm:startTerm endTerm:endTerm];
             
@@ -251,12 +251,12 @@ static NSComparisonResult(^hRepsComparator)(EXTChartViewModelTermHomologyReps *,
 }
 
 - (EXTChartViewModelTerm *)viewModelTermForModelTerm:(EXTTerm *)term {
-    return [self.modelToViewModelTermMap[@(self.currentPage)] objectForKey:term];
+    return [self.modelToViewModelTermMap[@(self.currentPage)] objectForKey:term.location];
 }
 
 - (EXTChartViewModelDifferential *)viewModelDifferentialForModelDifferential:(EXTDifferential *)differential {
     for (EXTChartViewModelDifferential *viewModelDiff in self.privateDifferentials[@(self.currentPage)]) {
-        if (viewModelDiff.modelDifferential == differential) {
+        if ([viewModelDiff.modelDifferential.start.location isEqual:differential.start.location]) {
             return viewModelDiff;
         }
     }
