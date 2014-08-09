@@ -9,6 +9,7 @@
 @import Foundation;
 
 @class EXTMatrix;
+@class EXTTerm;
 
 // this class models "partial definitions" of a matrix.  for instance, we
 // have inference code that determines the differential on the image of a cup
@@ -77,5 +78,11 @@
 
 +(NSDictionary*) findOrdersOf:(EXTMatrix*)B in:(EXTMatrix*)Z;
 +(int) rankOfMap:(EXTMatrix*)map intoQuotientByTheInclusion:(EXTMatrix*)incl;
+
+// TODO: this signature may not be optimal. do we really want to introduce
+// a dependancy on EXTTerm?
+-(NSDictionary*) homologyToHomologyKeysFrom:(EXTTerm*)source
+                                         to:(EXTTerm*)target
+                                     onPage:(int)page;
 
 @end

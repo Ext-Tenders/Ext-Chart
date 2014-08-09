@@ -7,6 +7,7 @@
 //
 
 #import "EXTMatrix.h"
+#import "EXTTerm.h"
 
 // little class to keep track of partial subdefinitions of a parent matrix
 @implementation EXTPartialDefinition {
@@ -1022,6 +1023,47 @@
     memcpy(retData + a.width*a.height, bData, sizeof(int)*b.width*b.height);
     
     return ret;
+}
+
+-(NSDictionary*) homologyToHomologyKeysFrom:(EXTTerm*)source
+                                         to:(EXTTerm*)target
+                                     onPage:(int)page {
+    EXTMatrix *hSource = [EXTMatrix matrixWidth:((NSDictionary*)source.homologyReps[page]).count height:source.size],
+              *hTarget = [EXTMatrix matrixWidth:((NSDictionary*)target.homologyReps[page]).count height:target.size];
+    
+    NSArray *hSourceKeys = ((NSDictionary*)source.homologyReps[page]).allKeys,
+            *hTargetKeys = ((NSDictionary*)target.homologyReps[page]).allKeys;
+    
+    // build source and target
+    int *hSourceData = hSource.presentation.mutableBytes;
+    for (int i = 0; i < hSource.width; i++) {
+        NSArray *vector = hSourceKeys[i];
+        for (int j = 0; j < hSource.height; j++)
+            hSourceData[i*hSource.height + j] = [vector[j] intValue];
+    }
+    
+    int *hTargetData = hTarget.presentation.mutableBytes;
+    for (int i = 0; i < hTarget.width; i++) {
+        NSArray *vector = hTargetKeys[i];
+        for (int j = 0; j < hTarget.height; j++)
+            hTargetData[i*hTarget.height + j] = [vector[j] intValue];
+    }
+    
+    NSArray *pair = [EXTMatrix formIntersection:[EXTMatrix newMultiply:self by:hSource] with:[EXTMatrix directSumWithCommonTargetA:hTarget B:target.boundaries[page]]];
+    
+    EXTMatrix *lift = [EXTMatrix newMultiply:pair[1] by:[(EXTMatrix*)pair[0] invertOntoMap]];
+    
+    NSMutableDictionary *assignment = [NSMutableDictionary dictionaryWithCapacity:hSourceKeys.count];
+    for (int i = 0; i < hSourceKeys.count; i++)
+        for (int j = 0; j < hTargetKeys.count; j++) {
+            if (((int*)lift.presentation.mutableBytes)[i*lift.height+j] == 0)
+                continue;
+            if ([[assignment allValues] indexOfObject:hTargetKeys[j]] != NSNotFound)
+                continue;
+            assignment[hSourceKeys[i]] = hTargetKeys[j];
+        }
+    
+    return assignment;
 }
 
 @end
