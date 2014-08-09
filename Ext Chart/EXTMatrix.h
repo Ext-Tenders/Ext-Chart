@@ -18,7 +18,7 @@
 //
 // such partial definitions are not trivial to stitch together, and so to do
 // that successfully, we just record all the definitions we have, together.
-@interface EXTPartialDefinition : NSObject <NSCoding>
+@interface EXTPartialDefinition : NSObject <NSCoding, NSCopying>
 
 @property (retain) EXTMatrix *inclusion;
 @property (retain) EXTMatrix *action;

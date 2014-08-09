@@ -34,6 +34,17 @@
     return self;
 }
 
+-(id)copyWithZone:(NSZone *)zone {
+    EXTPartialDefinition *ret = [EXTPartialDefinition new];
+    
+    ret.inclusion = [inclusion copy];
+    ret.action = [action copy];
+    ret->automaticallyGenerated = automaticallyGenerated;
+    ret.description = [description copy];
+    
+    return ret;
+}
+
 -(BOOL) isEqual:(id)object {
     if ([object class] != [EXTPartialDefinition class])
         return false;

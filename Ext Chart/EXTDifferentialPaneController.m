@@ -136,6 +136,9 @@
     }
     
     [diffl.partialDefinitions removeObjectAtIndex:row];
+    [(EXTDocument*)_documentWindowController.document updateDifferential:diffl];
+    // TODO: this isn't great.
+    _documentWindowController.chartViewController.chartView.selectedObject = diffl;
     
     [self.tableView deselectAll:sender];
     [self.tableView reloadData];
@@ -227,6 +230,11 @@
         _partial.description = self.descriptionField.stringValue;
         _partial.inclusion = self.inclusionEditor.representedObject;
         _partial.action = self.actionEditor.representedObject;
+        
+        EXTDifferential *diffl = self.representedObject;
+        [(EXTDocument*)_documentWindowController.document updateDifferential:diffl];
+        // TODO: this isn't great.
+        _documentWindowController.chartViewController.chartView.selectedObject = diffl;
     
         [_tableView reloadData];
         [_documentWindowController.chartViewController reloadCurrentPage];
@@ -301,6 +309,9 @@
                    toVector:column
                  atLocation:(EXTTriple*)diff.start.location
                      onPage:_documentWindowController.chartViewController.currentPage];
+    // whenever we perform complicated commands like this, we should tell the
+    // document that we've made some change to it.
+    [(EXTDocument*)_documentWindowController.document updateChangeCount:NSChangeDone];
     
     // maybe change the page and select the new differential?
     

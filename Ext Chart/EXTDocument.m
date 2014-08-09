@@ -13,6 +13,7 @@
 #import "EXTMarquee.h"
 #import "EXTDocumentWindowController.h"
 #import "EXTDemos.h"
+#import "EXTDifferential.h"
 #import "NSUserDefaults+EXTAdditions.h"
 #import "NSKeyedArchiver+EXTAdditions.h"
 
@@ -142,6 +143,35 @@
 
 + (BOOL)canConcurrentlyReadDocumentsOfType:(NSString *)typeName {
     return YES;
+}
+
+# pragma mark - Model update routines
+
+-(void)updateDifferential:(EXTDifferential *)diffl {
+    EXTDifferential *oldDiffl = [self.sseq findDifflWithSource:diffl.start.location onPage:diffl.page];
+    
+    [oldDiffl.partialDefinitions removeAllObjects];
+    for (EXTPartialDefinition *p in diffl.partialDefinitions)
+        [oldDiffl.partialDefinitions addObject:[p copy]];
+    
+    [self updateChangeCount:NSChangeDone];
+    
+    return;
+}
+
+-(void)updateTerm:(EXTTerm *)term {
+    EXTTerm *oldTerm = [self.sseq findTerm:term.location];
+    
+    [oldTerm.names removeAllObjects];
+    for (NSObject *name in term.names)
+        [oldTerm.names addObject:[name copy]];
+    
+    oldTerm.cycles[0] = term.cycles[0];
+    oldTerm.boundaries[0] = term.boundaries[0];
+    
+    [self updateChangeCount:NSChangeDone];
+    
+    return;
 }
 
 @end
