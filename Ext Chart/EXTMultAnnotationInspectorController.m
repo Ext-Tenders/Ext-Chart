@@ -103,6 +103,7 @@
     anno[@"enabled"] = @(false);
     
     [self.multiplicationAnnotations addObject:anno];
+    [(EXTDocument*)self.documentWindowController.document updateChangeCount:NSChangeDone];
     
     // refresh the tableview.
     [self.table reloadData];
@@ -126,6 +127,7 @@
     // remove this entry from the array.
     [self.table deselectAll:nil];
     [self.multiplicationAnnotations removeObjectAtIndex:row];
+    [(EXTDocument*)self.documentWindowController.document updateChangeCount:NSChangeDone];
     
     // refresh the tableview, and refresh the chart.
     [self.table reloadData];
@@ -170,6 +172,8 @@
     for (int i = 0; i < self.matrixEditor.representedObject.height; i++)
         vector[i] = @(((int*)self.matrixEditor.representedObject.presentation.mutableBytes)[i]);
     _entry[@"vector"] = vector;
+    
+    [(EXTDocument*)self.documentWindowController.document updateChangeCount:NSChangeDone];
     
     // refresh the tableview and refresh the chart.
     [self.table reloadData];
@@ -236,6 +240,7 @@ objectValueForTableColumn:(NSTableColumn *)tableColumn
     } else if ([tableColumn.identifier isEqualToString:@"enabled"]) {
         entry[@"enabled"] = object;
         [self.documentWindowController.chartViewController reloadCurrentPage];
+        [(EXTDocument*)self.documentWindowController.document updateChangeCount:NSChangeDone];
         
         return;
     }
