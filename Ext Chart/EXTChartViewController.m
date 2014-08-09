@@ -179,7 +179,9 @@ static void *_selectedToolTagContext = &_selectedToolTagContext;
             // if we used to have something selected, and it was a term at this
             // location, then we should find its position in our list.
             if ([self.selectedObject isKindOfClass:[EXTTerm class]])
-                oldIndex = [terms indexOfObject:(EXTTerm*)self.selectedObject];
+                oldIndex = [terms indexOfObjectPassingTest:^BOOL(EXTTerm *term, NSUInteger idx, BOOL *stop) {
+                            return [((EXTTerm*)self.selectedObject).location isEqual:term.location];
+                        }];
 
             // the new index is one past the old index, unless we have to wrap.
             int newIndex = oldIndex;
