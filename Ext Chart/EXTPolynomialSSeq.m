@@ -676,40 +676,6 @@
     return power & 0x1 ? -1 : 1;
 }
 
-- (int)rankOfVector:(NSArray *)vector
-         inLocation:(NSObject<EXTLocation> *)loc
-           actingAt:(NSObject<EXTLocation> *)otherLoc
-             onPage:(int)page {
-    EXTTerm *otherTerm = [self findTerm:otherLoc];
-    if (!otherTerm)
-        return 0;
-    
-    // polynomial sseqs compute their products in a different way.
-    EXTMatrix *multMatrix = [self productWithLeft:loc right:otherLoc];
-    
-    EXTLocation *sumLoc = [self.indexClass addLocation:loc to:otherLoc];
-    EXTTerm *sumTerm = self.terms[sumLoc];
-    
-    if (!sumTerm || !multMatrix)
-        return 0;
-    
-    EXTMatrix *cycleMatrix = [EXTMatrix matrixWidth:((NSMutableDictionary*)otherTerm.homologyReps[page]).count height:(vector.count*otherTerm.size)];
-    cycleMatrix.width = 0;
-    cycleMatrix.characteristic = multMatrix.characteristic;
-    int *cycleData = cycleMatrix.presentation.mutableBytes;
-    for (NSArray *cycle in otherTerm.homologyReps[page]) {
-        NSArray *hadamardResult = [EXTMatrix hadamardVectors:vector with:cycle];
-        for (int j = 0; j < hadamardResult.count; j++)
-            cycleData[cycleMatrix.height*cycleMatrix.width+j] =
-            [hadamardResult[j] intValue];
-        cycleMatrix.width += 1;
-    }
-    
-    EXTMatrix *boundaryMatrix = sumTerm.boundaries[page];
-    EXTMatrix *pushedForwardCycles = [EXTMatrix newMultiply:multMatrix by:cycleMatrix];
-    return [EXTMatrix rankOfMap:pushedForwardCycles intoQuotientByTheInclusion:boundaryMatrix];
-}
-
 -(EXTPolynomialSSeq *)flattenSSeqAtPage:(int)page
                              ontoIndexing:(Class<EXTLocation>)newIndexingClass
                             viaProjection:(NSObject<EXTLocation> *(^)(NSObject<EXTLocation> *))projectionOperator {

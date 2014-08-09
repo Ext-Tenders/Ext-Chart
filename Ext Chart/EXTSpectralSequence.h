@@ -51,6 +51,9 @@
 - (NSArray*)findDifflsSourcedUnderPoint:(EXTIntPoint)point onPage:(int)page;
 - (NSArray*)findTermsUnderPoint:(EXTIntPoint)point;
 
+-(EXTMatrix*) productWithLeft:(EXTLocation*)leftLoc
+                        right:(EXTLocation*)rightLoc;
+
 -(void) computeGroupsForPage:(int)page;
 
 // subclasses of EXTSpectralSequence can call this to be turned into plain old

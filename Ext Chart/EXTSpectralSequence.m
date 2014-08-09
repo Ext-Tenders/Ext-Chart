@@ -725,12 +725,15 @@
     return;
 }
 
-- (int)rankOfVector:(NSArray *)vector inLocation:(NSObject<EXTLocation> *)loc actingAt:(NSObject<EXTLocation> *)otherLoc onPage:(int)page {
+- (int)rankOfVector:(NSArray *)vector
+         inLocation:(NSObject<EXTLocation> *)loc
+           actingAt:(NSObject<EXTLocation> *)otherLoc
+             onPage:(int)page {
     EXTTerm *otherTerm = [self findTerm:otherLoc];
     if (!otherTerm)
         return 0;
     
-    EXTMatrix *multMatrix = [self.multTables getMatrixFor:loc with:otherLoc];
+    EXTMatrix *multMatrix = [self productWithLeft:loc right:otherLoc];
     
     EXTLocation *sumLoc = [self.indexClass addLocation:loc to:otherLoc];
     EXTTerm *sumTerm = self.terms[sumLoc];
@@ -796,6 +799,11 @@
     
     // return the new sseq.
     return ret;
+}
+
+-(EXTMatrix*) productWithLeft:(EXTLocation*)leftLoc
+                        right:(EXTLocation*)rightLoc {
+    return [self.multTables getMatrixFor:leftLoc with:rightLoc];
 }
 
 @end
