@@ -27,6 +27,8 @@
 @property(nonatomic, strong) NSMutableArray *multiplicationAnnotations;
 
 // User interface configuration
+// TODO: we should use KVO to track incoming modifications to these and trigger
+// -updateChangeCount: messages when changes happen.
 @property(nonatomic, strong) NSColor *gridColor;
 @property(nonatomic, strong) NSColor *gridEmphasisColor;
 @property(nonatomic, strong) NSColor *axisColor;

@@ -121,6 +121,7 @@
     
     // it liiiiives!
     [polySSeq addPolyClass:nil location:loc upTo:1];
+    [_documentWindowController.document updateChangeCount:NSChangeDone];
     
     [_tableView reloadData];
     [self causeRefresh];
@@ -134,6 +135,7 @@
     
     EXTPolynomialSSeq *polySSeq = (EXTPolynomialSSeq*)_sseq;
     [polySSeq deleteClass:[polySSeq.generators[row] objectForKey:@"name"]];
+    [_documentWindowController.document updateChangeCount:NSChangeDone];
     
     [_tableView deselectAll:sender];
     [_tableView reloadData];

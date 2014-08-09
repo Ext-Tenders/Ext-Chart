@@ -34,6 +34,7 @@
 -(IBAction)OKPressed:(id)sender {
     [self.documentWindowController.extDocument.sseq propagateLeibniz:self.list page:self.documentWindowController.chartViewController.currentPage];
     [self.documentWindowController.chartViewController reloadCurrentPage];
+    [self.documentWindowController.document updateChangeCount:NSChangeDone];
 
     [self close];
     return;

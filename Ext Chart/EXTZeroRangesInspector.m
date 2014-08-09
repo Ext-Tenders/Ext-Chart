@@ -65,6 +65,7 @@
         return;
     
     [self.zeroRanges removeObjectAtIndex:row];
+    [self.documentWindowController.document updateChangeCount:NSChangeDone];
     [self.tableView deselectAll:sender];
     [self.tableView reloadData];
 }
@@ -91,6 +92,7 @@
             return;
     }
     
+    [self.documentWindowController.document updateChangeCount:NSChangeDone];
     [self.tableView reloadData];
     [self.tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:(self.zeroRanges.count-1)] byExtendingSelection:NO];
     [self doubleClick:sender];
@@ -191,6 +193,7 @@
     } else
         return;
     
+    [self.documentWindowController.document updateChangeCount:NSChangeDone];
     [_tableView reloadData];
     
     return;
