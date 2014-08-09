@@ -34,7 +34,7 @@
     return self;
 }
 
--(id)copyWithZone:(NSZone *)zone {
+-(instancetype)copyWithZone:(NSZone *)zone {
     EXTPartialDefinition *ret = [EXTPartialDefinition new];
     
     ret.inclusion = [inclusion copy];
