@@ -118,7 +118,7 @@ static NSComparisonResult(^hRepsComparator)(EXTChartViewModelTermHomologyReps *,
 
     // --- Terms
     NSMutableDictionary *termCells = [NSMutableDictionary new];
-    NSMapTable *modelToViewModelTermMap = [NSMapTable mapTableWithKeyOptions:NSPointerFunctionsObjectPointerPersonality
+    NSMapTable *modelToViewModelTermMap = [NSMapTable mapTableWithKeyOptions:NSPointerFunctionsObjectPersonality
                                                                 valueOptions:NSPointerFunctionsObjectPersonality];
 
     // iterate through the available EXTTerms and count up how many project onto
