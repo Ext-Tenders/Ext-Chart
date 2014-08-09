@@ -13,7 +13,7 @@ We’re happy to talk about this project on Freenode at #Ext-Chart.
 If you only want to build Ext Chart, use Xcode to download the Ext Chart repository from GitHub:
 
 1. Open Xcode and choose the Source Control > Check Out… menu item.
-2. Type **https://github.com/ecpeterson/Ext-Chart.git** in the repository location field and click Next.
+2. Type **https://github.com/Ext-Tenders/Ext-Chart.git** in the repository location field and click Next.
 3. Select a folder in your disk where the project repository will be stored and click Check Out.
 4. Open Xcode’s workspace.
 
@@ -24,7 +24,7 @@ When restarting Xcode, make sure you open Ext Chart’s workspace instead of its
 If you have commit rights to Ext Chart’s repository:
 
 1. Open Xcode and choose the Source Control > Check Out… menu item.
-2. Type **https://github.com/ecpeterson/Ext-Chart.git** in the repository location field and click Next.
+2. Type **https://github.com/Ext-Tenders/Ext-Chart.git** in the repository location field and click Next.
 3. Select a folder in your disk where the project repository will be stored and click Check Out.
 4. Open Xcode’s workspace.
 
