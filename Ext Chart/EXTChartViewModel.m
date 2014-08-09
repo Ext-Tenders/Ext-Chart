@@ -71,7 +71,13 @@
 @end
 
 @interface EXTChartViewModelMultAnnotation ()
-+ (instancetype)viewModelMultAnnotationWithModelAnnotation:(NSDictionary*)modelMultAnnotation startTerm:(EXTChartViewModelTerm*)startTerm endTerm:(EXTChartViewModelTerm*)endTerm;
+@property (nonatomic, strong) NSMutableArray *privateLines;
++ (instancetype)viewModelMultAnnotationWithModelAnnotation:(NSDictionary*)modelMultAnnotation startTerm:(EXTChartViewModelTerm*)startTerm endTerm:(EXTChartViewModelTerm*)endTerm fixedMultTerm:(EXTChartViewModelTerm*)fixedMultTerm sseq:(EXTSpectralSequence*)sseq page:(int)page;
+- (void)addLine:(EXTChartViewModelMultAnnoLine *)line;
+@end
+
+@interface EXTChartViewModelMultAnnoLine ()
++ (instancetype)viewModelMultAnnoLineWithStartIndex:(NSInteger)startIndex endIndex:(NSInteger)endIndex;
 @end
 
 
@@ -219,21 +225,32 @@ static NSComparisonResult(^hRepsComparator)(EXTChartViewModelTermHomologyReps *,
         NSMutableArray *annotationArray = [NSMutableArray new];
         
         for (EXTTerm *term in self.sequence.terms.allValues) {
-            int rank = [self.sequence rankOfVector:rule[@"vector"]
-                                        inLocation:rule[@"location"]
-                                          actingAt:term.location
-                                            onPage:self.currentPage];
-            if (rank == 0)
-                continue;
-            
             // otherwise, draw something.
-            EXTTerm *targetTerm = [self.sequence findTerm:[self.sequence.indexClass addLocation:term.location to:rule[@"location"]]];
             EXTChartViewModelTerm *startTerm = [modelToViewModelTermMap objectForKey:term.location];
-            EXTChartViewModelTerm *endTerm = [modelToViewModelTermMap objectForKey:targetTerm.location];
+            EXTChartViewModelTerm *endTerm = [modelToViewModelTermMap objectForKey:[self.sequence.indexClass addLocation:term.location to:rule[@"location"]]];
+            EXTChartViewModelTerm *fixedMultTerm = [modelToViewModelTermMap objectForKey:rule[@"location"]];
             
-            EXTChartViewModelMultAnnotation *anno = [EXTChartViewModelMultAnnotation viewModelMultAnnotationWithModelAnnotation:rule startTerm:startTerm endTerm:endTerm];
+            EXTChartViewModelMultAnnotation *anno = [EXTChartViewModelMultAnnotation viewModelMultAnnotationWithModelAnnotation:rule startTerm:startTerm endTerm:endTerm fixedMultTerm:fixedMultTerm sseq:self.sequence page:self.currentPage];
             
             [annotationArray addObject:anno];
+            
+            const NSUInteger startBaseOffset = [startTerm.termCell baseOffsetForTerm:startTerm];
+            const NSUInteger endBaseOffset = [endTerm.termCell baseOffsetForTerm:endTerm];
+            
+            [anno.hRepAssignments enumerateKeysAndObjectsUsingBlock:^(NSArray *sourceHReps, NSArray *targetHReps, BOOL *stop) {
+                const NSUInteger startOffset = [startTerm.homologyReps indexOfObjectPassingTest:^BOOL(EXTChartViewModelTermHomologyReps *hReps, NSUInteger idx, BOOL *stop) {
+                    return [hReps.representatives isEqualToArray:sourceHReps];
+                }] + startBaseOffset;
+                NSAssert(startOffset != NSNotFound, @"HReps not found");
+                
+                const NSUInteger endOffset = [endTerm.homologyReps indexOfObjectPassingTest:^BOOL(EXTChartViewModelTermHomologyReps *hReps, NSUInteger idx, BOOL *stop) {
+                    return [hReps.representatives isEqualToArray:targetHReps];
+                }] + endBaseOffset;
+                NSAssert(endOffset != NSNotFound, @"HReps not found");
+                
+                EXTChartViewModelMultAnnoLine *line = [EXTChartViewModelMultAnnoLine viewModelMultAnnoLineWithStartIndex:startOffset endIndex:endOffset];
+                [anno addLine:line];
+            }];
         }
         
         // add the array of annotations we've constructed as an entry
@@ -444,7 +461,9 @@ static NSComparisonResult(^hRepsComparator)(EXTChartViewModelTermHomologyReps *,
 
 
 @implementation EXTChartViewModelMultAnnotation
-+ (instancetype)viewModelMultAnnotationWithModelAnnotation:(NSDictionary*)modelMultAnnotation startTerm:(EXTChartViewModelTerm*)startTerm endTerm:(EXTChartViewModelTerm*)endTerm {
+@dynamic lines;
+
++ (instancetype)viewModelMultAnnotationWithModelAnnotation:(NSDictionary*)modelMultAnnotation startTerm:(EXTChartViewModelTerm*)startTerm endTerm:(EXTChartViewModelTerm*)endTerm fixedMultTerm:(EXTChartViewModelTerm*)fixedMultTerm sseq:(EXTSpectralSequence *)sseq page:(int)page {
     
     EXTChartViewModelMultAnnotation *newAnno = [[self class] new];
     
@@ -452,9 +471,39 @@ static NSComparisonResult(^hRepsComparator)(EXTChartViewModelTermHomologyReps *,
         newAnno->_modelMultAnnotation = modelMultAnnotation;
         newAnno->_startTerm = startTerm;
         newAnno->_endTerm = endTerm;
+        
+        EXTLocation *loc = modelMultAnnotation[@"location"];
+        NSArray *vector = modelMultAnnotation[@"vector"];
+        
+        EXTMatrix *columnMatrix = [EXTMatrix matrixWidth:1 height:fixedMultTerm.modelTerm.size];
+        int *columnData = columnMatrix.presentation.mutableBytes;
+        for (int i = 0; i < columnMatrix.height; i++)
+            columnData[i] = [vector[i] intValue];
+        EXTMatrix *actionMatrix = [EXTMatrix newMultiply:[sseq productWithLeft:startTerm.modelTerm.location right:loc] by:[EXTMatrix hadamardProduct:[EXTMatrix identity:startTerm.modelTerm.size] with:columnMatrix]];
+        
+        newAnno->_hRepAssignments = [actionMatrix homologyToHomologyKeysFrom:startTerm.modelTerm to:endTerm.modelTerm onPage:page];
     }
     
     return newAnno;
+}
+
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        _privateLines = [NSMutableArray array];
+    }
+    return self;
+}
+
+- (void)addLine:(EXTChartViewModelDifferentialLine *)line
+{
+    [self.privateLines addObject:line];
+}
+
+- (NSArray *)lines
+{
+    return [self.privateLines copy];
 }
 @end
 
@@ -463,6 +512,18 @@ static NSComparisonResult(^hRepsComparator)(EXTChartViewModelTermHomologyReps *,
 + (instancetype)viewModelDifferentialLineWithStartIndex:(NSInteger)startIndex endIndex:(NSInteger)endIndex
 {
     EXTChartViewModelDifferentialLine *newLine = [[self class] new];
+    if (newLine) {
+        newLine->_startIndex = startIndex;
+        newLine->_endIndex = endIndex;
+    }
+    return newLine;
+}
+@end
+
+@implementation EXTChartViewModelMultAnnoLine
++ (instancetype)viewModelMultAnnoLineWithStartIndex:(NSInteger)startIndex endIndex:(NSInteger)endIndex
+{
+    EXTChartViewModelMultAnnoLine *newLine = [[self class] new];
     if (newLine) {
         newLine->_startIndex = startIndex;
         newLine->_endIndex = endIndex;

@@ -11,10 +11,12 @@
 #import "EXTChartViewInteraction.h"
 
 @class EXTChartViewModelMultAnnotation;
+@class EXTChartViewModelMultAnnoLine;
 
 
 @interface EXTMultAnnotationLineLayer : CAShapeLayer
 @property (nonatomic, strong) EXTChartViewModelMultAnnotation *annotation;
+@property (nonatomic, strong) EXTChartViewModelMultAnnoLine *line;
 
 @property (nonatomic, assign) CGFloat defaultZPosition;
 @property (nonatomic, assign) CGFloat defaultLineWidth;

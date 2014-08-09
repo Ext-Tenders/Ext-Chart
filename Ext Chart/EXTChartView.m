@@ -546,7 +546,7 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
         _differentialLineLayers = [newDifferentialLineLayers copy];
     }
     
-    // multiplicative annotations.
+    // Multiplicative Annotations
     {
         [_multAnnotationLayers makeObjectsPerformSelector:@selector(removeFromSuperlayer)];
         
@@ -566,18 +566,20 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
             //[line setLineCapStyle:NSRoundLineCapStyle];
             
             for (EXTChartViewModelMultAnnotation *annoData in multAnnotations) {
-                EXTMultAnnotationLineLayer *newAnnotationLayer = [EXTMultAnnotationLineLayer layer];
-                
-                newAnnotationLayer.annotation = annoData;
-                newAnnotationLayer.defaultLineWidth = _kMultAnnotationProportionalLineWidth * self.grid.gridSpacing;
-                newAnnotationLayer.defaultZPosition = _kMultAnnotationZPosition;
-                [newMultAnnotationLayers addObject:newAnnotationLayer];
-                [self.layer addSublayer:newAnnotationLayer];
-                [self configureFrameAndPathInLayer:newAnnotationLayer
-                              forLineFromStartCell:annoData.startTerm.termCell
-                                        startIndex:0
-                                         toEndCell:annoData.endTerm.termCell
-                                          endIndex:0];
+                for (EXTChartViewModelMultAnnoLine *line in annoData.lines) {
+                    EXTMultAnnotationLineLayer *newMultAnnoLineLayer = [EXTMultAnnotationLineLayer layer];
+                    newMultAnnoLineLayer.annotation = annoData;
+                    newMultAnnoLineLayer.line = line;
+                    newMultAnnoLineLayer.defaultLineWidth = _kMultAnnotationProportionalLineWidth * self.grid.gridSpacing;
+                    newMultAnnoLineLayer.defaultZPosition = _kMultAnnotationZPosition;
+                    [newMultAnnotationLayers addObject:newMultAnnoLineLayer];
+                    [self.layer addSublayer:newMultAnnoLineLayer];
+                    [self configureFrameAndPathInLayer:newMultAnnoLineLayer
+                                  forLineFromStartCell:annoData.startTerm.termCell
+                                            startIndex:line.startIndex
+                                             toEndCell:annoData.endTerm.termCell
+                                              endIndex:line.endIndex];
+                }
             }
         }
         

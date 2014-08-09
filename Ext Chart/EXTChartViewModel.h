@@ -99,8 +99,20 @@
 @property (nonatomic, readonly, assign) NSInteger endIndex;
 @end
 
+
 @interface EXTChartViewModelMultAnnotation : NSObject
 @property (nonatomic, readonly, strong) NSDictionary *modelMultAnnotation;
 @property (nonatomic, readonly, strong) EXTChartViewModelTerm *startTerm;
 @property (nonatomic, readonly, strong) EXTChartViewModelTerm *endTerm;
+
+@property (nonatomic, readonly) NSDictionary *hRepAssignments;
+
+/// An array of EXTChartViewModelMultAnnoLine objects.
+@property (nonatomic, readonly, copy) NSArray *lines;
+@end
+
+
+@interface EXTChartViewModelMultAnnoLine : NSObject
+@property (nonatomic, readonly, assign) NSInteger startIndex;
+@property (nonatomic, readonly, assign) NSInteger endIndex;
 @end
