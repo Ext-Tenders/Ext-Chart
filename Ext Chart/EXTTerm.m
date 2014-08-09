@@ -62,6 +62,20 @@
     return term;
 }
 
+-(instancetype)copyWithZone:(NSZone *)zone {
+    // XXX: possibly the names array should be deep-copied.
+    EXTTerm *ret = [EXTTerm term:[self.location copy] withNames:[self.names copy] andCharacteristic:((EXTMatrix*)self.cycles[0]).characteristic];
+    
+    for (int i = 0; i < self.cycles.count; i++)
+        ret.cycles[i] = [self.cycles[i] copy];
+    for (int i = 0; i < self.boundaries.count; i++)
+        ret.boundaries[i] = [self.boundaries[i] copy];
+    for (int i = 0; i < self.homologyReps.count; i++)
+        ret.homologyReps[i] = [self.homologyReps[i] copy];
+    
+    return ret;
+}
+
 #pragma mark *** packing and unpacking ***
 
 // TODO: update these to pull in the element names.  they should not bother

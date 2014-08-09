@@ -15,7 +15,7 @@
 // this class models a cell in the spectral sequence.  it needs to keep track of
 // many things, including not just its position but also its cycle/boundary
 // filtration, any multiplicative structures present, ...
-@interface EXTTerm : NSObject <NSCoding>
+@interface EXTTerm : NSObject <NSCoding, NSCopying>
 
     @property(retain) EXTLocation* location; // position on grid
     @property(retain) NSMutableArray* names; // NSObjects with -description
