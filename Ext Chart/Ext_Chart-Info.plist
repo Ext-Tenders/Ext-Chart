@@ -47,5 +47,13 @@
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
+	<key>SUFeedURL</key>
+	<string>http://ext-tenders.github.io/Ext-Chart/ext-chart-appcast.xml</string>
+	<key>SUAllowsAutomaticUpdates</key>
+	<false/>
+	<key>SUPublicDSAKeyFile</key>
+	<string>ext-chart-sparkle-dsa-pub.pem</string>
+	<key>SUScheduledCheckInterval</key>
+	<integer>604800</integer>
 </dict>
 </plist>

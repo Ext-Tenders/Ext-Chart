@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="6185.11" systemVersion="14A299l" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="6205" systemVersion="14A299l" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="6185.11"/>
+        <deployment defaultVersion="1080" identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="6205"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="NSApplication"/>
@@ -28,6 +29,18 @@
                             <menuItem title="Preferences…" keyEquivalent="," id="129">
                                 <connections>
                                     <action selector="showPreferences:" target="543" id="628"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Check for Updates…" id="lXt-Rb-PPb">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="checkForUpdates:" target="vSI-uv-3vR" id="oYP-3v-VGn"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Automatically Check for Updates" state="on" id="t93-Yf-CyR">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <binding destination="vSI-uv-3vR" name="value" keyPath="automaticallyChecksForUpdates" id="Zp9-vq-4m6"/>
                                 </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="143">
@@ -492,6 +505,11 @@ CA
             </items>
         </menu>
         <customObject id="419" customClass="NSFontManager"/>
-        <customObject id="543" customClass="EXTAppController"/>
+        <customObject id="543" customClass="EXTAppController">
+            <connections>
+                <outlet property="sparkleUpdater" destination="vSI-uv-3vR" id="fWM-l3-ehi"/>
+            </connections>
+        </customObject>
+        <customObject id="vSI-uv-3vR" userLabel="Sparkle Updater" customClass="SUUpdater"/>
     </objects>
 </document>

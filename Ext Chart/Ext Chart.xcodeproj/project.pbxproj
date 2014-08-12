@@ -10,6 +10,10 @@
 		093AEADD13E10759003E9F58 /* EXTPair.m in Sources */ = {isa = PBXBuildFile; fileRef = 093AEADC13E10759003E9F58 /* EXTPair.m */; };
 		141C8D3A196FCDAB0037A716 /* NSValue+EXTIntPoint.m in Sources */ = {isa = PBXBuildFile; fileRef = 141C8D39196FCDAB0037A716 /* NSValue+EXTIntPoint.m */; };
 		141FBE6B19713D830020E844 /* EXTChartViewModelTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 141FBE6A19713D830020E844 /* EXTChartViewModelTestCase.m */; };
+		14342E571999D44F00D0C5DF /* MBTableGrid.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 14757EE61988BF7000B983A0 /* MBTableGrid.framework */; };
+		14342E581999D44F00D0C5DF /* MBTableGrid.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 14757EE61988BF7000B983A0 /* MBTableGrid.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		14342E5B1999D45600D0C5DF /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1441083F1998CCD400DC35EB /* Sparkle.framework */; };
+		14342E5C1999D45600D0C5DF /* Sparkle.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 1441083F1998CCD400DC35EB /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		1435D32F194C10FA00863A90 /* EXTChartRulerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1435D32E194C10FA00863A90 /* EXTChartRulerView.m */; };
 		143F3DFE176D615100FB92B3 /* EXTUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 143F3DFD176D615100FB92B3 /* EXTUtilities.m */; };
 		144709A51946CDF8009C6958 /* EXTChartViewModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 144709A41946CDF8009C6958 /* EXTChartViewModel.m */; };
@@ -20,8 +24,6 @@
 		1460B40E17B7360700B575E3 /* EXTPreferences.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1460B40D17B7360700B575E3 /* EXTPreferences.xib */; };
 		1467B26E178CF15E0084A2F6 /* EXTDocumentInspectorView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1467B26D178CF15E0084A2F6 /* EXTDocumentInspectorView.m */; };
 		14741D7217B7535A00AF73D9 /* NSUserDefaults+EXTAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 14741D7117B7535A00AF73D9 /* NSUserDefaults+EXTAdditions.m */; };
-		14757EE91988BF8300B983A0 /* MBTableGrid.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 14757EE61988BF7000B983A0 /* MBTableGrid.framework */; };
-		14757EEA1988BF9000B983A0 /* MBTableGrid.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 14757EE61988BF7000B983A0 /* MBTableGrid.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		149314581783B6EB0080EF28 /* EXTDocumentControlsView.m in Sources */ = {isa = PBXBuildFile; fileRef = 149314571783B6EA0080EF28 /* EXTDocumentControlsView.m */; };
 		1494C4E1197F861300126373 /* EXTImageTermLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 1494C4E0197F861300126373 /* EXTImageTermLayer.m */; };
 		1494C4E4197F862400126373 /* EXTShapeTermLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 1494C4E3197F862400126373 /* EXTShapeTermLayer.m */; };
@@ -86,6 +88,55 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		14342E591999D44F00D0C5DF /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 14757EDE1988BF7000B983A0 /* MBTableGrid.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = E2E62BA91781C33400F36275;
+			remoteInfo = MBTableGrid;
+		};
+		14342E5D1999D45600D0C5DF /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 144108321998CCD400DC35EB /* Sparkle.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 8DC2EF4F0486A6940098B216;
+			remoteInfo = Sparkle;
+		};
+		1441083E1998CCD400DC35EB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 144108321998CCD400DC35EB /* Sparkle.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 8DC2EF5B0486A6940098B216;
+			remoteInfo = Sparkle;
+		};
+		144108401998CCD400DC35EB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 144108321998CCD400DC35EB /* Sparkle.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 61B5F90209C4CEE200B25A18;
+			remoteInfo = "Sparkle Test App";
+		};
+		144108421998CCD400DC35EB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 144108321998CCD400DC35EB /* Sparkle.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 612279D90DB5470200AB99EA;
+			remoteInfo = "Sparkle Unit Tests";
+		};
+		144108441998CCD400DC35EB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 144108321998CCD400DC35EB /* Sparkle.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 5D06E8D00FD68C7C005AE3F6;
+			remoteInfo = BinaryDelta;
+		};
+		144108461998CCD400DC35EB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 144108321998CCD400DC35EB /* Sparkle.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 55C14BB7136EEF1500649790;
+			remoteInfo = Autoupdate;
+		};
 		145CD959194A0AE5006621A6 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 2A37F4A9FDCFA73011CA2CEA /* Project object */;
@@ -114,13 +165,6 @@
 			remoteGlobalIDString = E2E62BAA1781C33400F36275;
 			remoteInfo = MBTableGrid;
 		};
-		14757EE71988BF7B00B983A0 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 14757EDE1988BF7000B983A0 /* MBTableGrid.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = E2E62BA91781C33400F36275;
-			remoteInfo = MBTableGrid;
-		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -130,7 +174,8 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				14757EEA1988BF9000B983A0 /* MBTableGrid.framework in Copy Frameworks */,
+				14342E581999D44F00D0C5DF /* MBTableGrid.framework in Copy Frameworks */,
+				14342E5C1999D45600D0C5DF /* Sparkle.framework in Copy Frameworks */,
 			);
 			name = "Copy Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -151,6 +196,7 @@
 		143976851966A47000D8FE87 /* EXTChartViewInteraction.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EXTChartViewInteraction.h; sourceTree = "<group>"; };
 		143F3DFC176D615100FB92B3 /* EXTUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTUtilities.h; sourceTree = "<group>"; };
 		143F3DFD176D615100FB92B3 /* EXTUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTUtilities.m; sourceTree = "<group>"; };
+		144108321998CCD400DC35EB /* Sparkle.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Sparkle.xcodeproj; path = Sparkle/Sparkle.xcodeproj; sourceTree = "<group>"; };
 		144709A31946CDF8009C6958 /* EXTChartViewModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTChartViewModel.h; sourceTree = "<group>"; };
 		144709A41946CDF8009C6958 /* EXTChartViewModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTChartViewModel.m; sourceTree = "<group>"; };
 		145CD94D194A0AE5006621A6 /* Ext Chart Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Ext Chart Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -194,6 +240,7 @@
 		14CCA38B1794F21D002EF861 /* Ext Chart.iconset */ = {isa = PBXFileReference; lastKnownFileType = folder.iconset; name = "Ext Chart.iconset"; path = "Images/Ext Chart.iconset"; sourceTree = "<group>"; };
 		14CD476F17F00273007D71F1 /* EXTMarquee.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTMarquee.h; sourceTree = "<group>"; };
 		14CD477017F00273007D71F1 /* EXTMarquee.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTMarquee.m; sourceTree = "<group>"; };
+		14D25C2F19994F0400714315 /* ext-chart-sparkle-dsa-pub.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "ext-chart-sparkle-dsa-pub.pem"; sourceTree = "<group>"; };
 		14D78E5B17B5E44000B1BB52 /* EXTChartViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTChartViewController.h; sourceTree = "<group>"; };
 		14D78E5C17B5E44000B1BB52 /* EXTChartViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTChartViewController.m; sourceTree = "<group>"; };
 		14E757CB17BF128F008BED48 /* EXTGridInspectorViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTGridInspectorViewController.h; sourceTree = "<group>"; };
@@ -290,7 +337,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				14757EE91988BF8300B983A0 /* MBTableGrid.framework in Frameworks */,
+				14342E571999D44F00D0C5DF /* MBTableGrid.framework in Frameworks */,
+				14342E5B1999D45600D0C5DF /* Sparkle.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -320,6 +368,7 @@
 			isa = PBXGroup;
 			children = (
 				14757EDE1988BF7000B983A0 /* MBTableGrid.xcodeproj */,
+				144108321998CCD400DC35EB /* Sparkle.xcodeproj */,
 			);
 			name = "Third Party";
 			path = ../ThirdParty;
@@ -332,6 +381,18 @@
 				143F3DFD176D615100FB92B3 /* EXTUtilities.m */,
 			);
 			name = Support;
+			sourceTree = "<group>";
+		};
+		144108331998CCD400DC35EB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				1441083F1998CCD400DC35EB /* Sparkle.framework */,
+				144108411998CCD400DC35EB /* Sparkle Test App.app */,
+				144108431998CCD400DC35EB /* Sparkle Unit Tests.xctest */,
+				144108451998CCD400DC35EB /* BinaryDelta */,
+				144108471998CCD400DC35EB /* Autoupdate.app */,
+			);
+			name = Products;
 			sourceTree = "<group>";
 		};
 		145CD950194A0AE5006621A6 /* Ext Chart Tests */ = {
@@ -583,6 +644,7 @@
 				14EF1A611756ED430012DD3C /* Images */,
 				8D15AC360486D014006FF6A4 /* Ext_Chart-Info.plist */,
 				089C165FFE840EACC02AAC07 /* InfoPlist.strings */,
+				14D25C2F19994F0400714315 /* ext-chart-sparkle-dsa-pub.pem */,
 				382BAD211943E26B00E1DDED /* Credits.rtf */,
 			);
 			name = Resources;
@@ -661,7 +723,8 @@
 			buildRules = (
 			);
 			dependencies = (
-				14757EE81988BF7B00B983A0 /* PBXTargetDependency */,
+				14342E5A1999D44F00D0C5DF /* PBXTargetDependency */,
+				14342E5E1999D45600D0C5DF /* PBXTargetDependency */,
 			);
 			name = "Ext Chart";
 			productInstallPath = "$(HOME)/Applications";
@@ -701,6 +764,10 @@
 					ProductGroup = 14757EDF1988BF7000B983A0 /* Products */;
 					ProjectRef = 14757EDE1988BF7000B983A0 /* MBTableGrid.xcodeproj */;
 				},
+				{
+					ProductGroup = 144108331998CCD400DC35EB /* Products */;
+					ProjectRef = 144108321998CCD400DC35EB /* Sparkle.xcodeproj */;
+				},
 			);
 			projectRoot = "";
 			targets = (
@@ -711,6 +778,41 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
+		1441083F1998CCD400DC35EB /* Sparkle.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = Sparkle.framework;
+			remoteRef = 1441083E1998CCD400DC35EB /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		144108411998CCD400DC35EB /* Sparkle Test App.app */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.application;
+			path = "Sparkle Test App.app";
+			remoteRef = 144108401998CCD400DC35EB /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		144108431998CCD400DC35EB /* Sparkle Unit Tests.xctest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = "Sparkle Unit Tests.xctest";
+			remoteRef = 144108421998CCD400DC35EB /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		144108451998CCD400DC35EB /* BinaryDelta */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = BinaryDelta;
+			remoteRef = 144108441998CCD400DC35EB /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		144108471998CCD400DC35EB /* Autoupdate.app */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.application;
+			path = Autoupdate.app;
+			remoteRef = 144108461998CCD400DC35EB /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 		14757EE41988BF7000B983A0 /* MBTableGrid.app */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.application;
@@ -835,6 +937,16 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		14342E5A1999D44F00D0C5DF /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = MBTableGrid;
+			targetProxy = 14342E591999D44F00D0C5DF /* PBXContainerItemProxy */;
+		};
+		14342E5E1999D45600D0C5DF /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = Sparkle;
+			targetProxy = 14342E5D1999D45600D0C5DF /* PBXContainerItemProxy */;
+		};
 		145CD95A194A0AE5006621A6 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 8D15AC270486D014006FF6A4 /* Ext Chart */;
@@ -844,11 +956,6 @@
 			isa = PBXTargetDependency;
 			target = 8D15AC270486D014006FF6A4 /* Ext Chart */;
 			targetProxy = 14724F411980D5820027A533 /* PBXContainerItemProxy */;
-		};
-		14757EE81988BF7B00B983A0 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = MBTableGrid;
-			targetProxy = 14757EE71988BF7B00B983A0 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -1006,11 +1113,12 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				INFOPLIST_FILE = "Ext_Chart-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				PRODUCT_NAME = "Ext Chart";
 				RUN_CLANG_STATIC_ANALYZER = NO;
 				SDKROOT = macosx;
-				USER_HEADER_SEARCH_PATHS = "\"$SRCROOT/../ThirdParty\"";
+				USER_HEADER_SEARCH_PATHS = "\"$SRCROOT/../ThirdParty\"/**";
 			};
 			name = Debug;
 		};
@@ -1034,11 +1142,12 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				INFOPLIST_FILE = "Ext_Chart-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				PRODUCT_NAME = "Ext Chart";
 				RUN_CLANG_STATIC_ANALYZER = NO;
 				SDKROOT = macosx;
-				USER_HEADER_SEARCH_PATHS = "\"$SRCROOT/../ThirdParty\"";
+				USER_HEADER_SEARCH_PATHS = "\"$SRCROOT/../ThirdParty\"/**";
 			};
 			name = Release;
 		};
