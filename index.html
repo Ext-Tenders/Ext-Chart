@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>Ext-chart by Ext Tenders</title>
+    <title>Ext Chart</title>
 
     <link rel="stylesheet" href="stylesheets/styles.css">
     <link rel="stylesheet" href="stylesheets/pygment_trac.css">
@@ -15,17 +15,20 @@
   <body>
     <div class="wrapper">
       <header>
-        <h1>Ext-chart</h1>
-        <p>Compute and draw spectral sequences</p>
+        <h1>Ext Chart</h1>
+        <p>Cocoa application for computing and drawing spectral sequences</p>
 
-        <p class="view"><a href="https://github.com/Ext-Tenders/Ext-Chart">View the Project on GitHub <small>Ext-Tenders/Ext-Chart</small></a></p>
-
+        <h3>Download (v0.2)</h3>
 
         <ul>
-          <li><a href="https://github.com/Ext-Tenders/Ext-Chart/zipball/master">Download <strong>ZIP File</strong></a></li>
-          <li><a href="https://github.com/Ext-Tenders/Ext-Chart/tarball/master">Download <strong>TAR Ball</strong></a></li>
-          <li><a href="https://github.com/Ext-Tenders/Ext-Chart">View On <strong>GitHub</strong></a></li>
+          <li><a href="https://ext-chart.org/stable.zip">Latest stable <strong>Binary</strong></a></li>
+          <li><a href="https://github.com/Ext-Tenders/Ext-Chart/zipball/master">Source <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/Ext-Tenders/Ext-Chart">Source <strong>GitHub</strong></a></li>
         </ul>
+
+        <h3>License</h3>
+ 
+<p>Ext Chart is open source software released under the <a href="http://opensource.org/licenses/NCSA">University of Illinois/NCSA Open Source License</a>.</p>
       </header>
       <section>
         <h1>
@@ -33,38 +36,42 @@
 
 <p>The goal of this project is to facilitate the drawing and manipulation of spectral sequences, by tracking the differential and multiplicative structures across pages of a given spectral sequence.</p>
 
-<p>Ext Chart is open source software released under the <a href="http://opensource.org/licenses/NCSA">University of Illinois/NCSA Open Source License</a>.</p>
-
-<p>Discussion on Freenode at #Ext-Chart.</p>
+<p><b>The latest stable version of this program is 0.2, released 2014/08/14.</b></p>
 
 <h2>
-<a name="downloads" class="anchor" href="#downloads"><span class="octicon octicon-link"></span></a>Downloads</h2>
+<a name="downloads" class="anchor" href="#downloads"><span class="octicon octicon-link"></span></a>Resources</h2>
 
-<h3>
-<a name="releases" class="anchor" href="#releases"><span class="octicon octicon-link"></span></a>Releases</h3>
+<p>Videos:</p>
+<ul>
+<li>2014/7/1: <a href="http://youtu.be/cEprQTQAS2w">Computing Ext<sub>A(2)<sub>*</sub></sub>(F<sub>2</sub>, F<sub>2</sub>) using built-in May spectral sequence functionality</a>, 9m30s.</li>
+<li>2013/9/29: <a href="http://youtu.be/63UBqFrfdjY">Computing H<sup>*</sup>(K(Z/2, 2); Z<sub>2</sub>) using the Bockstein spectral sequence</a>, 8m29s.</li>
+<li>2013/9/29: <a href="http://youtu.be/VlPtbAGdHqs">Computing H<sup>*</sup>(K(Z/2, 2); F<sub>2</sub>) using the Serre spectral sequence</a>, 7m26s.</li>
+<li>2013/8/29: <a href="https://www.youtube.com/watch?v=vaik_y3u_r8">Manually constructing the May spectral sequence computing Ext<sub>A(1)<sub>*</sub></sub>(F<sub>2</sub>, F<sub>2</sub>)</a>, 1m49s.</li>
+</ul>
 
-<p>None yet.</p>
-
-<h3>
-<a name="demos" class="anchor" href="#demos"><span class="octicon octicon-link"></span></a>Demos</h3>
-
-<p>None yet.</p>
+<p>Demo SSEQ files: None yet.</p>
 
 <h2>
 <a name="development" class="anchor" href="#development"><span class="octicon octicon-link"></span></a>Development</h2>
 
-<p>Use Xcode to download the Ext Chart repository from GitHub:</p>
+<p>If you would like to build Ext Chart yourself, use Xcode to download the Ext Chart repository from GitHub:</p>
 
+<p>
 <ol>
-<li>Open Xcode and choose the Source Control &gt; Check Out… menu item</li>
-<li>Type <strong><a href="https://github.com/Ext-Tenders/Ext-Chart.git">https://github.com/Ext-Tenders/Ext-Chart.git</a></strong> in the repository location field and click Next</li>
-<li>
-<p>Select a folder in your disk where the project repository will be stored and click Check Out.</p>
+<li>Open Xcode and choose the Source Control > Check Out… menu item.</li>
+<li>Type <code>https://github.com/Ext-Tenders/Ext-Chart.git</code> in the repository location field and click Next.</li>
+<li>Select a folder in your disk where the project repository will be stored and click Check Out.</li>
+<li>Open Xcode’s workspace.</li>
+</ol>
+</p>
 
-<p>Xcode will download the repository. Since we use third-party projects, Xcode will also ask you to check out each third-party project as an additional working copy. Choose Check Out… and click Next so that Xcode downloads all dependent projects.</p>
-</li>
-<li><p>We need to use a shared build folder for all projects in the workspace. Since this is an individual setting, you need to configure it in your system. In Xcode, choose the File &gt; Workspace Settings… menu item. Click Advanced…, choose Shared Folder and type a folder name—we suggest ExtChartBuild.</p></li>
-</ol><p>When restarting Xcode, make sure you open Ext Chart’s workspace instead of its project.</p>
+<p>For more information, including instructions on how to commit once granted repository write-access rights, see <a href="https://github.com/Ext-Tenders/Ext-Chart/blob/master/README.md">the project README</a>.</p>
+
+<h2>Contact</h2>
+
+<p>The GitHub repository provides <a href="https://github.com/Ext-Tenders/Ext-Chart/issues">an issue tracker</a> for the project. Users are invited to file bugs and otherwise suggest improvements there.</p>
+
+<p>There is also a channel for discussion on Freenode at #Ext-Chart.</p>
       </section>
       <footer>
         <p>This project is maintained by <a href="https://github.com/Ext-Tenders">Ext Tenders</a></p>
