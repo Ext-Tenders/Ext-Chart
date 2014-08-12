@@ -21,5 +21,23 @@
 @end
 
 
+typedef NS_ENUM(NSInteger, EXTTermCellGlyph) {
+    EXTTermCellGlyphNone = 0,
+    EXTTermCellGlyphFilledDot,
+    EXTTermCellGlyphUnfilledDotWithLabel,
+    EXTTermCellGlyphUnfilledSquare,
+};
+
+#define EXTTermLayerMaxGlyphs 3
+#define EXTTermLayerSquareInsetFactor 0.2
+
+typedef struct {
+    NSInteger rank;
+    EXTTermCellGlyph glyphs[EXTTermLayerMaxGlyphs];
+} EXTTermCellLayout;
+
+void EXTTermLayerMakeCellLayout(EXTTermCellLayout *outLayout, EXTChartViewModelTermCell *termCell);
+
+
 // FIXME: Move to EXTTermLayerPrivate.h
 extern NSString * const EXTTermLayerFontName;

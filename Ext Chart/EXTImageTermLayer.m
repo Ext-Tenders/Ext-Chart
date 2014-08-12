@@ -12,34 +12,17 @@
 
 #pragma mark - Private variables
 
-static const int _kMaxGlyphs = 3;
 static NSCache *_cellImageCache;
 
 static NSColor *_color;
 static const CGFloat _kLineWidth = 1.0 / 26.0;
 static const CGFloat _kSingleDigitFontSizeFactor = 0.5;
 static const CGFloat _kDoubleDigitFontSizeFactor = 0.4;
-static const CGFloat _kSquareInsetFactor = 0.2;
-
-#pragma mark - Private classes
-
-typedef NS_ENUM(NSInteger, EXTTermCellGlyph) {
-    EXTTermCellGlyphNone = 0,
-    EXTTermCellGlyphFilledDot,
-    EXTTermCellGlyphUnfilledDotWithLabel,
-    EXTTermCellGlyphUnfilledSquare,
-};
-
-typedef struct {
-    NSInteger rank;
-    EXTTermCellGlyph glyphs[_kMaxGlyphs];
-} EXTTermCellLayout;
 
 #pragma mark - Private functions
 
 static NSSize boundingSizeForAttributedString(NSAttributedString *s);
 static NSString *makeCacheKey(EXTTermCellLayout *layout, CGFloat length, NSColor *color);
-static void makeCellLayout(EXTTermCellLayout *outLayout, EXTChartViewModelTermCell *termCell);
 static NSImage *makeCellImage(EXTChartViewModelTermCell *termCell, CGFloat length, NSColor *color);
 
 
@@ -194,46 +177,12 @@ NSString *makeCacheKey(EXTTermCellLayout *layout, CGFloat length, NSColor *color
             color.hash];
 }
 
-void makeCellLayout(EXTTermCellLayout *outLayout, EXTChartViewModelTermCell *termCell) {
-    NSCParameterAssert(outLayout);
-    NSCParameterAssert(termCell);
-
-    *outLayout = (EXTTermCellLayout){0};
-    outLayout->rank = termCell.totalRank;
-
-    if (outLayout->rank <= _kMaxGlyphs) {
-        NSInteger glyphIndex = 0;
-
-        for (EXTChartViewModelTerm *term in termCell.terms) {
-            if (glyphIndex >= _kMaxGlyphs) {
-                DLog(@"I think this shouldn’t happen");
-                break;
-            }
-
-            const NSInteger dimension = term.dimension;
-
-            for (NSInteger i = 0; i < dimension && glyphIndex < _kMaxGlyphs; ++i) {
-
-                EXTChartViewModelTermHomologyReps *hReps = term.homologyReps[i];
-
-                outLayout->glyphs[glyphIndex] = (hReps.order == 0 ?
-                                                 EXTTermCellGlyphUnfilledSquare :
-                                                 EXTTermCellGlyphFilledDot);
-                ++glyphIndex;
-            }
-        }
-    }
-    else {
-        outLayout->glyphs[0] = EXTTermCellGlyphUnfilledDotWithLabel; // TODO: not really needed apparently
-    }
-}
-
 NSImage *makeCellImage(EXTChartViewModelTermCell *termCell, CGFloat length, NSColor *color) {
     NSCParameterAssert(termCell);
     NSCParameterAssert(color);
 
     EXTTermCellLayout layout;
-    makeCellLayout(&layout, termCell);
+    EXTTermLayerMakeCellLayout(&layout, termCell);
 
     NSString *cacheKey = makeCacheKey(&layout, length, color);
     NSImage *image = [_cellImageCache objectForKey:cacheKey];
@@ -275,7 +224,7 @@ NSImage *makeCellImage(EXTChartViewModelTermCell *termCell, CGFloat length, NSCo
                     }
 
                     case EXTTermCellGlyphUnfilledSquare: {
-                        const CGFloat inset = rect.size.width * _kSquareInsetFactor;
+                        const CGFloat inset = rect.size.width * EXTTermLayerSquareInsetFactor;
                         const CGRect drawingRect = CGRectInset(rect, inset, inset);
                         NSBezierPath *path = [NSBezierPath bezierPath];
                         [path appendBezierPathWithRect:drawingRect];
