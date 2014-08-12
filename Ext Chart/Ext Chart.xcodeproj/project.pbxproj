@@ -14,6 +14,7 @@
 		14342E581999D44F00D0C5DF /* MBTableGrid.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 14757EE61988BF7000B983A0 /* MBTableGrid.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		14342E5B1999D45600D0C5DF /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1441083F1998CCD400DC35EB /* Sparkle.framework */; };
 		14342E5C1999D45600D0C5DF /* Sparkle.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 1441083F1998CCD400DC35EB /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		14342E621999E4E900D0C5DF /* ext-chart-sparkle-dsa-pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = 14D25C2F19994F0400714315 /* ext-chart-sparkle-dsa-pub.pem */; };
 		1435D32F194C10FA00863A90 /* EXTChartRulerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1435D32E194C10FA00863A90 /* EXTChartRulerView.m */; };
 		143F3DFE176D615100FB92B3 /* EXTUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 143F3DFD176D615100FB92B3 /* EXTUtilities.m */; };
 		144709A51946CDF8009C6958 /* EXTChartViewModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 144709A41946CDF8009C6958 /* EXTChartViewModel.m */; };
@@ -851,6 +852,7 @@
 				38F7830B17565F72009D207A /* LICENSE in Resources */,
 				14CCA38C1794F21D002EF861 /* ArtBoardTool.pdf in Resources */,
 				14CCA38E1794F21D002EF861 /* Ext Chart.iconset in Resources */,
+				14342E621999E4E900D0C5DF /* ext-chart-sparkle-dsa-pub.pem in Resources */,
 				3897740617F78B5800C6AD2F /* EXTZeroRangesInspector.xib in Resources */,
 				38A92122179DCED8000B827D /* DifferentialTool.pdf in Resources */,
 				38A92123179DCED8000B827D /* MultiplicativeStructureTool.pdf in Resources */,
