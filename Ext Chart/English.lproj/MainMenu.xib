@@ -435,7 +435,7 @@ CA
                                     <action selector="changeTool:" target="-1" id="622"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Multiplicative Structure" tag="3" keyEquivalent="3" id="617">
+                            <menuItem title="Multiplicative Structure" tag="3" enabled="NO" keyEquivalent="3" id="617">
                                 <connections>
                                     <action selector="changeTool:" target="-1" id="623"/>
                                 </connections>
@@ -445,7 +445,7 @@ CA
                                     <action selector="changeTool:" target="-1" id="619"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Marquee" tag="5" keyEquivalent="5" id="618">
+                            <menuItem title="Marquee" tag="5" enabled="NO" keyEquivalent="5" id="618">
                                 <connections>
                                     <action selector="changeTool:" target="-1" id="624"/>
                                 </connections>

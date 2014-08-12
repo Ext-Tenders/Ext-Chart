@@ -63,6 +63,7 @@
     {
         NSMutableArray *options = [NSMutableArray array];
         [options addObject:[[EXTNewDocumentOption alloc] initGroupWithName:@"Blank Document"]];
+        /*
         [options addObject:[[EXTNewDocumentOption alloc] initWithName:@"Arbitrary Spectral Sequence"
                                                           description:@"Terms have no automatic multiplicative structure"
                                                           detailsView:_locationTypeView
@@ -71,6 +72,7 @@
                                                                              [EXTPair class] :
                                                                              [EXTTriple class]);
                                                   return [EXTSpectralSequence sSeqWithIndexingClass:unit];}]];
+        */
         [options addObject:[[EXTNewDocumentOption alloc] initWithName:@"Polynomial Spectral Sequence"
                                                           description:@"Optimized to present E_1 as a polynomial algebra"
                                                           detailsView:_locationTypeView
