@@ -15,7 +15,7 @@
 static CFMutableDictionaryRef _glyphPathCache;
 static CGColorRef _fillColor;
 static CGColorRef _strokeColor;
-static const CGFloat _kLineWidth = 2.0;
+static const CGFloat _kLineWidth = 1.0;
 static const CGFloat _kSingleDigitFontSizeFactor = 0.7;
 static const CGFloat _kDoubleDigitFontSizeFactor = 0.4;
 
@@ -55,26 +55,65 @@ static const CGFloat _kDoubleDigitFontSizeFactor = 0.4;
 {
     EXTShapeTermLayer *layer = [EXTShapeTermLayer layer];
     layer->_termCell = termCell;
-    const NSInteger totalRank = termCell.totalRank;
-    CGMutablePathRef path = CGPathCreateMutable();
-    CGPathMoveToPoint(path, NULL, 0.0, 0.0);
 
-    for (NSInteger i = 0; i < totalRank; ++i) {
-        const CGRect box = [EXTChartView dotBoundingBoxForCellRank:totalRank termIndex:i gridLocation:(EXTIntPoint){0} gridSpacing:length];
-        CGPathAddEllipseInRect(path, NULL, box);
-    }
+    EXTTermCellLayout layout;
+    EXTTermLayerMakeCellLayout(&layout, termCell);
 
-    if (totalRank <= 3) {
-        layer.fillColor = _fillColor;
-        layer.lineWidth = 0.0;
+    if (layout.rank <= EXTTermLayerMaxGlyphs) {
+        for (NSInteger glyphIndex = 0; glyphIndex < layout.rank; ++glyphIndex) {
+            const CGRect rect = [EXTChartView dotBoundingBoxForCellRank:layout.rank
+                                                              termIndex:glyphIndex
+                                                           gridLocation:(EXTIntPoint){0}
+                                                            gridSpacing:length];
+
+            switch (layout.glyphs[glyphIndex]) {
+                case EXTTermCellGlyphFilledDot: {
+                    CAShapeLayer *glyphLayer = [CAShapeLayer layer];
+
+                    glyphLayer.fillColor = _fillColor;
+                    glyphLayer.lineWidth = 0.0;
+                    glyphLayer.frame = rect;
+
+                    CGMutablePathRef path = CGPathCreateMutable();
+                    CGPathAddEllipseInRect(path, NULL, (CGRect){CGPointZero, rect.size});
+                    glyphLayer.path = path;
+                    CGPathRelease(path);
+
+                    [layer addSublayer:glyphLayer];
+                    break;
+                }
+
+                case EXTTermCellGlyphUnfilledSquare: {
+                    CALayer *glyphLayer = [CALayer layer];
+
+                    glyphLayer.borderColor = _strokeColor;
+                    glyphLayer.borderWidth = _kLineWidth;
+
+                    const CGFloat inset = rect.size.width * EXTTermLayerSquareInsetFactor;
+                    const CGRect squareRect = CGRectInset(rect, inset, inset);
+                    glyphLayer.frame = squareRect;
+
+                    [layer addSublayer:glyphLayer];
+                    break;
+                }
+
+                default:
+                    break;
+            }
+        }
     }
     else {
+        CGMutablePathRef path = CGPathCreateMutable();
+        CGPathAddEllipseInRect(path, NULL, [EXTChartView dotBoundingBoxForCellRank:layout.rank termIndex:0 gridLocation:(EXTIntPoint){0} gridSpacing:length]);
+        layer.path = path;
+        CGPathRelease(path);
+
         layer.fillColor = [[NSColor clearColor] CGColor];
         layer.strokeColor = _strokeColor;
         layer.lineWidth = _kLineWidth;
 
-        NSString *label = [NSString stringWithFormat:@"%ld", (long)totalRank];
-        CGFloat fontSize = round((totalRank < 10 ?
+        NSString *label = [NSString stringWithFormat:@"%ld", (long)layout.rank];
+        CGFloat fontSize = round((layout.rank < 10 ?
                                   length * _kSingleDigitFontSizeFactor :
                                   length * _kDoubleDigitFontSizeFactor));
         CGSize textSize;
@@ -91,9 +130,6 @@ static const CGFloat _kDoubleDigitFontSizeFactor = 0.4;
             [layer addSublayer:glyphLayer];
         }
     }
-
-    layer.path = path;
-    CGPathRelease(path);
 
     return layer;
 }

@@ -843,14 +843,18 @@ static const CFTimeInterval _kDifferentialHighlightRemoveAnimationDuration = 0.0
         [self reflectSelection];
     }
     else if (context == _highlightColorContext) {
-        CGColorRef highlightColor = [self.highlightColor CGColor];
-        for (CALayer<EXTChartViewInteraction> *layer in _termLayers) layer.highlightColor = highlightColor;
-        for (CALayer<EXTChartViewInteraction> *layer in _differentialLineLayers) layer.highlightColor = highlightColor;
+        if (!self.exportOnly) {
+            CGColorRef highlightColor = [self.highlightColor CGColor];
+            for (CALayer<EXTChartViewInteraction> *layer in _termLayers) layer.highlightColor = highlightColor;
+            for (CALayer<EXTChartViewInteraction> *layer in _differentialLineLayers) layer.highlightColor = highlightColor;
+        }
     }
     else if (context == _selectionColorContext) {
-        CGColorRef selectionColor = [self.selectionColor CGColor];
-        for (CALayer<EXTChartViewInteraction> *layer in _termLayers) layer.selectionColor = selectionColor;
-        for (CALayer<EXTChartViewInteraction> *layer in _differentialLineLayers) layer.selectionColor = selectionColor;
+        if (!self.exportOnly) {
+            CGColorRef selectionColor = [self.selectionColor CGColor];
+            for (CALayer<EXTChartViewInteraction> *layer in _termLayers) layer.selectionColor = selectionColor;
+            for (CALayer<EXTChartViewInteraction> *layer in _differentialLineLayers) layer.selectionColor = selectionColor;
+        }
     }
     else if (context == _inLiveMagnifyContext) {
         if (!self.inLiveMagnify) {
