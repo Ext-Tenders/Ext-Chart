@@ -14,6 +14,8 @@
 		<string>https://github.com/bavarious/mbtablegrid.git</string>
 		<key>986A61CEC62DA65E0A5C31D793DD885EB84A976A</key>
 		<string>https://github.com/ecpeterson/Ext-Chart.git</string>
+		<key>EF1CF5E1F342919DE309B5C9DAEDDCF1D12D0402</key>
+		<string>https://github.com/sparkle-project/Sparkle.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
 	<string>Ext Chart.xcworkspace</string>
@@ -23,6 +25,8 @@
 		<string>../ThirdParty/MBTableGrid</string>
 		<key>986A61CEC62DA65E0A5C31D793DD885EB84A976A</key>
 		<string>..</string>
+		<key>EF1CF5E1F342919DE309B5C9DAEDDCF1D12D0402</key>
+		<string>../ThirdParty/Sparkle</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
 	<string>https://github.com/ecpeterson/Ext-Chart.git</string>
@@ -47,6 +51,14 @@
 			<string>8CF1C8369DF6861B83FC2A2969438FEAA0A1CD3E</string>
 			<key>IDESourceControlWCCName</key>
 			<string>MBTableGrid</string>
+		</dict>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>EF1CF5E1F342919DE309B5C9DAEDDCF1D12D0402</string>
+			<key>IDESourceControlWCCName</key>
+			<string>Sparkle</string>
 		</dict>
 	</array>
 </dict>
