@@ -1042,6 +1042,10 @@
             hSourceData[i*hSource.height + j] = [vector[j] intValue];
     }
     
+    NSArray *hSourcePair = [EXTMatrix formIntersection:source.cycles[page] with:hSource];
+    EXTMatrix *hSourceInCycles = [EXTMatrix newMultiply:hSourcePair[1]
+                                                     by:[(EXTMatrix*)hSourcePair[0] invert]];
+    
     int *hTargetData = hTarget.presentation.mutableBytes;
     for (int i = 0; i < hTarget.width; i++) {
         NSArray *vector = hTargetKeys[i];
@@ -1049,7 +1053,8 @@
             hTargetData[i*hTarget.height + j] = [vector[j] intValue];
     }
     
-    NSArray *pair = [EXTMatrix formIntersection:[EXTMatrix newMultiply:self by:hSource] with:[EXTMatrix directSumWithCommonTargetA:hTarget B:target.boundaries[page]]];
+    NSArray *pair = [EXTMatrix formIntersection:[EXTMatrix newMultiply:self by:hSourceInCycles]
+                                           with:[EXTMatrix directSumWithCommonTargetA:hTarget B:target.boundaries[page]]];
     
     EXTMatrix *lift = [EXTMatrix newMultiply:pair[1] by:[(EXTMatrix*)pair[0] invertOntoMap]];
     
