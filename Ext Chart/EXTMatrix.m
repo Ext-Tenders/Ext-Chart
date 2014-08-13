@@ -1043,8 +1043,8 @@
     }
     
     NSArray *hSourcePair = [EXTMatrix formIntersection:source.cycles[page] with:hSource];
-    EXTMatrix *hSourceInCycles = [EXTMatrix newMultiply:hSourcePair[1]
-                                                     by:[(EXTMatrix*)hSourcePair[0] invert]];
+    EXTMatrix *hSourceInCycles = [EXTMatrix newMultiply:hSourcePair[0]
+                                                     by:[(EXTMatrix*)hSourcePair[1] invert]];
     
     int *hTargetData = hTarget.presentation.mutableBytes;
     for (int i = 0; i < hTarget.width; i++) {

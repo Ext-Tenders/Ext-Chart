@@ -479,7 +479,7 @@ static NSComparisonResult(^hRepsComparator)(EXTChartViewModelTermHomologyReps *,
         int *columnData = columnMatrix.presentation.mutableBytes;
         for (int i = 0; i < columnMatrix.height; i++)
             columnData[i] = [vector[i] intValue];
-        EXTMatrix *actionMatrix = [EXTMatrix newMultiply:[sseq productWithLeft:startTerm.modelTerm.location right:loc] by:[EXTMatrix hadamardProduct:[EXTMatrix identity:startTerm.modelTerm.size] with:columnMatrix]];
+        EXTMatrix *actionMatrix = [EXTMatrix newMultiply:[sseq productWithLeft:startTerm.modelTerm.location right:loc] by:[EXTMatrix hadamardProduct:startTerm.modelTerm.cycles[page] with:columnMatrix]];
         
         newAnno->_hRepAssignments = [actionMatrix homologyToHomologyKeysFrom:startTerm.modelTerm to:endTerm.modelTerm onPage:page];
     }
