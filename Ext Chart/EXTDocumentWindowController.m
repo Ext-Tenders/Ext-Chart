@@ -649,6 +649,10 @@ typedef enum : NSInteger {
         if ([(id)item respondsToSelector:@selector(setState:)]) {
             [(id)item setState:([item tag] == self.selectedToolTag ? NSOnState : NSOffState)];
         }
+        
+        if ([item tag] == EXTToolTagMultiplicativeStructure ||
+            [item tag] == EXTToolTagMarquee)
+            return false;
     }
 
     return [self respondsToSelector:[item action]];
