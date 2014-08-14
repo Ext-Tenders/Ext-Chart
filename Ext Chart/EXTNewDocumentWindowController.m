@@ -74,7 +74,7 @@
                                                   return [EXTSpectralSequence sSeqWithIndexingClass:unit];}]];
         */
         [options addObject:[[EXTNewDocumentOption alloc] initWithName:@"Polynomial Spectral Sequence"
-                                                          description:@"Optimized to present E_1 as a polynomial algebra"
+                                                          description:@"Optimized to present E₁ as a polynomial algebra"
                                                           detailsView:_locationTypeView
                                               spectralSequenceFactory:^{
                                                   Class<EXTLocation> unit = ([_locationTypeMatrix selectedRow] == 0 ?
@@ -100,11 +100,11 @@
                                                           description:@"Random garbage"
                                                           detailsView:_exampleImageView
                                               spectralSequenceFactory:^{return [EXTDemos randomDemo];}]];
-        [options addObject:[[EXTNewDocumentOption alloc] initWithName:@"Serre: S^1 → CP^2 → S^5"
+        [options addObject:[[EXTNewDocumentOption alloc] initWithName:@"Serre: S¹ → CP² → S⁵"
                                                           description:@"Serre spectral sequence for the above fibration"
                                                           detailsView:_exampleImageView
                                               spectralSequenceFactory:^{return [EXTDemos S5Demo];}]];
-        [options addObject:[[EXTNewDocumentOption alloc] initWithName:@"C_2-Homotopy Fixed Point SS for KU"
+        [options addObject:[[EXTNewDocumentOption alloc] initWithName:@"C₂-Homotopy Fixed Point SS for KU"
                                                           description:@"WARNING: Thrown off by the mod-2 coefficients"
                                                           detailsView:_exampleImageView
                                               spectralSequenceFactory:^{return [EXTDemos KUhC2Demo];}]];
