@@ -100,7 +100,7 @@
                                                           description:@"Random garbage"
                                                           detailsView:_exampleImageView
                                               spectralSequenceFactory:^{return [EXTDemos randomDemo];}]];
-        [options addObject:[[EXTNewDocumentOption alloc] initWithName:@"Serre: S^1 -> CP^2 -> S^5"
+        [options addObject:[[EXTNewDocumentOption alloc] initWithName:@"Serre: S^1 → CP^2 → S^5"
                                                           description:@"Serre spectral sequence for the above fibration"
                                                           detailsView:_exampleImageView
                                               spectralSequenceFactory:^{return [EXTDemos S5Demo];}]];
