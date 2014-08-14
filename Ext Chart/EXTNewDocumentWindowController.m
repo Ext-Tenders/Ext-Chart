@@ -105,7 +105,7 @@
                                                           detailsView:_exampleImageView
                                               spectralSequenceFactory:^{return [EXTDemos S5Demo];}]];
         [options addObject:[[EXTNewDocumentOption alloc] initWithName:@"C₂-Homotopy Fixed Point SS for KU"
-                                                          description:@"WARNING: Thrown off by the mod-2 coefficients"
+                                                          description:@""
                                                           detailsView:_exampleImageView
                                               spectralSequenceFactory:^{return [EXTDemos KUhC2Demo];}]];
         [options addObject:[[EXTNewDocumentOption alloc] initWithName:@"A(1) May Spectral Sequence"
