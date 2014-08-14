@@ -6,6 +6,19 @@
     <description>Most recent changes to Ext Chart with links to updates.</description>
     <language>en</language>
       <item>
+        <title>Version 0.2.1</title>
+        <description>
+          <![CDATA[
+            <ul>
+              <li>Adds DARPA grant information to the About... dialog.</li>
+              <li>Uses Unicode symbols where available in the New Document... dialog.</li>
+            </ul>
+          ]]>
+        </description>
+        <pubDate>Wed, 14 Aug 2014 9:32:00 -0500</pubDate>
+        <enclosure url="https://github.com/Ext-Tenders/Ext-Chart/releases/download/v0.2.1/Ext.Chart.zip" sparkle:version="3" sparkle:shortVersionString="0.2.1" length="3099263" type="application/octet-stream" sparkle:dsaSignature="MC0CFBa3PnIo1ECAPAN7ys91ihTzxmVPAhUArE2jTLlF4Vs5hUcnxOvYfbu1ufA=" />
+      </item>
+      <item>
         <title>Version 0.2</title>
         <description>
           <![CDATA[
