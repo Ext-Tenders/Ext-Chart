@@ -636,9 +636,15 @@ typedef enum : NSInteger {
     self.selectedToolTag = tag;
 }
 
+- (IBAction)printDocument:(id)sender {
+    NSLog(@"Unimplemented.");
+    
+    return;
+}
+
 #pragma mark - NSUserInterfaceValidations
 
-- (BOOL)validateUserInterfaceItem:(id<NSValidatedUserInterfaceItem>)item {
+- (BOOL)validateUserInterfaceItem:(NSObject<NSValidatedUserInterfaceItem>*) item {
     if ([item action] == @selector(toggleInspector:) && [(id)item isKindOfClass:[NSMenuItem class]])
         [(NSMenuItem *)item setTitle:_sidebarHidden ? @"Show Inspector" : @"Hide Inspector"];
     else if ([item action] == @selector(toggleFullScreen:) && [(id)item isKindOfClass:[NSMenuItem class]]) {
@@ -652,7 +658,9 @@ typedef enum : NSInteger {
         
         if ([item tag] == EXTToolTagMultiplicativeStructure ||
             [item tag] == EXTToolTagMarquee)
-            return false;
+            return NO;
+    } else if ([item action] == @selector(printDocument:)) {
+        return NO;
     }
 
     return [self respondsToSelector:[item action]];
