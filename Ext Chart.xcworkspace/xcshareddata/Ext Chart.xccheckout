@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>88D0084F-2C3D-4B9A-AB10-A428F7092391</string>
+	<key>IDESourceControlProjectName</key>
+	<string>Ext Chart</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>8CF1C8369DF6861B83FC2A2969438FEAA0A1CD3E</key>
+		<string>https://github.com/bavarious/mbtablegrid.git</string>
+		<key>986A61CEC62DA65E0A5C31D793DD885EB84A976A</key>
+		<string>https://github.com/ecpeterson/Ext-Chart.git</string>
+		<key>EF1CF5E1F342919DE309B5C9DAEDDCF1D12D0402</key>
+		<string>https://github.com/sparkle-project/Sparkle.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>Ext Chart.xcworkspace</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>8CF1C8369DF6861B83FC2A2969438FEAA0A1CD3E</key>
+		<string>../ThirdParty/MBTableGrid</string>
+		<key>986A61CEC62DA65E0A5C31D793DD885EB84A976A</key>
+		<string>..</string>
+		<key>EF1CF5E1F342919DE309B5C9DAEDDCF1D12D0402</key>
+		<string>../ThirdParty/Sparkle</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>https://github.com/ecpeterson/Ext-Chart.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>111</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>986A61CEC62DA65E0A5C31D793DD885EB84A976A</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>986A61CEC62DA65E0A5C31D793DD885EB84A976A</string>
+			<key>IDESourceControlWCCName</key>
+			<string>Ext-Chart</string>
+		</dict>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>8CF1C8369DF6861B83FC2A2969438FEAA0A1CD3E</string>
+			<key>IDESourceControlWCCName</key>
+			<string>MBTableGrid</string>
+		</dict>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>EF1CF5E1F342919DE309B5C9DAEDDCF1D12D0402</string>
+			<key>IDESourceControlWCCName</key>
+			<string>Sparkle</string>
+		</dict>
+	</array>
+</dict>
+</plist>
