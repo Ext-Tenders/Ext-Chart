@@ -399,8 +399,7 @@
 		145CD950194A0AE5006621A6 /* Ext Chart Tests */ = {
 			isa = PBXGroup;
 			children = (
-				145CD95E194A11BF006621A6 /* EXTTestCaseS5Demo.m */,
-				141FBE6A19713D830020E844 /* EXTChartViewModelTestCase.m */,
+				14E3C1A119A20F4E00E984DD /* View Model */,
 				145CD951194A0AE5006621A6 /* Supporting Files */,
 			);
 			path = "Ext Chart Tests";
@@ -556,6 +555,15 @@
 				14CD477017F00273007D71F1 /* EXTMarquee.m */,
 			);
 			name = Documents;
+			sourceTree = "<group>";
+		};
+		14E3C1A119A20F4E00E984DD /* View Model */ = {
+			isa = PBXGroup;
+			children = (
+				141FBE6A19713D830020E844 /* EXTChartViewModelTestCase.m */,
+				145CD95E194A11BF006621A6 /* EXTTestCaseS5Demo.m */,
+			);
+			name = "View Model";
 			sourceTree = "<group>";
 		};
 		14EF1A611756ED430012DD3C /* Images */ = {
