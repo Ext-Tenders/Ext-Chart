@@ -310,11 +310,36 @@ static NSComparisonResult(^hRepsComparator)(EXTChartViewModelTermHomologyReps *,
     return [self.privateMultAnnotations[@(self.currentPage)] copy];
 }
 
+- (NSDictionary *)propertyListRepresentation {
+    NSArray *sortedCells = [self.termCells sortedArrayUsingComparator:^NSComparisonResult(EXTChartViewModelTermCell *cell1, EXTChartViewModelTermCell *cell2) {
+        const EXTIntPoint p1 = cell1.gridLocation;
+        const EXTIntPoint p2 = cell2.gridLocation;
+
+        if (p1.x < p2.x) return NSOrderedAscending;
+        if (p1.x > p2.x) return NSOrderedDescending;
+        if (p1.y < p2.y) return NSOrderedAscending;
+        if (p1.y > p2.y) return NSOrderedDescending;
+        return NSOrderedSame;
+    }];
+    NSArray *cells = [sortedCells valueForKey:@"propertyListRepresentation"];
+    NSArray *differentials = [self.differentials valueForKey:@"propertyListRepresentation"];
+    NSArray *multAnnotations = [self.multAnnotations valueForKey:@"propertyListRepresentation"];
+
+    NSDictionary *result = @{
+                             @"page": @(self.currentPage),
+                             @"cells": cells,
+                             @"differentials": differentials,
+                             @"multAnnotations": multAnnotations,
+                             };
+    return result;
+}
+
 @end
 
 
 @implementation EXTChartViewModelTerm
 @dynamic dimension;
+@dynamic propertyListRepresentation;
 
 + (instancetype)viewModelTermWithModelTerm:(EXTTerm *)modelTerm modelHomologyReps:(NSDictionary *)modelHomologyReps sequence:(EXTSpectralSequence *)sequence
 {
@@ -344,10 +369,21 @@ static NSComparisonResult(^hRepsComparator)(EXTChartViewModelTermHomologyReps *,
 - (NSInteger)dimension {
     return self.homologyReps.count;
 }
+
+- (NSDictionary *)propertyListRepresentation {
+    NSArray *hReps = [self.homologyReps valueForKey:@"propertyListRepresentation"];
+    NSDictionary *term = @{
+                           @"dimension": @(self.dimension),
+                           @"homologyReps": hReps,
+                           };
+    return term;
+}
 @end
 
 
 @implementation EXTChartViewModelTermHomologyReps
+@dynamic propertyListRepresentation;
+
 + (instancetype)viewModelTermHomologyRepsWithTerm:(EXTChartViewModelTerm *)term hReps:(NSArray *)hReps order:(NSInteger)order {
     EXTChartViewModelTermHomologyReps *newHReps = [EXTChartViewModelTermHomologyReps new];
     if (newHReps) {
@@ -357,12 +393,21 @@ static NSComparisonResult(^hRepsComparator)(EXTChartViewModelTermHomologyReps *,
     }
     return newHReps;
 }
+
+- (NSDictionary *)propertyListRepresentation {
+    NSDictionary *hReps = @{
+                            @"representatives": self.representatives,
+                            @"order": @(self.order),
+                            };
+    return hReps;
+}
 @end
 
 
 @implementation EXTChartViewModelTermCell
 @dynamic terms;
 @dynamic totalRank;
+@dynamic propertyListRepresentation;
 
 - (instancetype)init
 {
@@ -418,10 +463,20 @@ static NSComparisonResult(^hRepsComparator)(EXTChartViewModelTermHomologyReps *,
     return base;
 }
 
+- (NSDictionary *)propertyListRepresentation {
+    NSArray *terms = [self.privateTerms valueForKey:@"propertyListRepresentation"];
+    NSDictionary *cell = @{
+                           @"gridLocation": EXTStringFromIntPoint(self.gridLocation),
+                           @"totalRank": @(self.totalRank),
+                           @"terms": terms,
+                           };
+    return cell;
+}
 @end
 
 @implementation EXTChartViewModelDifferential
 @dynamic lines;
+@dynamic propertyListRepresentation;
 
 + (instancetype)viewModelDifferentialWithModelDifferential:(EXTDifferential *)modelDifferential
                                                  startTerm:(EXTChartViewModelTerm *)startTerm
@@ -457,11 +512,17 @@ static NSComparisonResult(^hRepsComparator)(EXTChartViewModelTermHomologyReps *,
 {
     return [self.privateLines copy];
 }
+
+- (NSDictionary *)propertyListRepresentation {
+    // TODO: Implement this
+    return @{};
+}
 @end
 
 
 @implementation EXTChartViewModelMultAnnotation
 @dynamic lines;
+@dynamic propertyListRepresentation;
 
 + (instancetype)viewModelMultAnnotationWithModelAnnotation:(NSDictionary*)modelMultAnnotation startTerm:(EXTChartViewModelTerm*)startTerm endTerm:(EXTChartViewModelTerm*)endTerm fixedMultTerm:(EXTChartViewModelTerm*)fixedMultTerm sseq:(EXTSpectralSequence *)sseq page:(int)page {
     
@@ -505,10 +566,17 @@ static NSComparisonResult(^hRepsComparator)(EXTChartViewModelTermHomologyReps *,
 {
     return [self.privateLines copy];
 }
+
+- (NSDictionary *)propertyListRepresentation {
+    // TODO: Implement this
+    return @{};
+}
 @end
 
 
 @implementation EXTChartViewModelDifferentialLine
+@dynamic propertyListRepresentation;
+
 + (instancetype)viewModelDifferentialLineWithStartIndex:(NSInteger)startIndex endIndex:(NSInteger)endIndex
 {
     EXTChartViewModelDifferentialLine *newLine = [[self class] new];
@@ -518,9 +586,16 @@ static NSComparisonResult(^hRepsComparator)(EXTChartViewModelTermHomologyReps *,
     }
     return newLine;
 }
+
+- (NSDictionary *)propertyListRepresentation {
+    // TODO: Implement this
+    return @{};
+}
 @end
 
 @implementation EXTChartViewModelMultAnnoLine
+@dynamic propertyListRepresentation;
+
 + (instancetype)viewModelMultAnnoLineWithStartIndex:(NSInteger)startIndex endIndex:(NSInteger)endIndex
 {
     EXTChartViewModelMultAnnoLine *newLine = [[self class] new];
@@ -529,6 +604,11 @@ static NSComparisonResult(^hRepsComparator)(EXTChartViewModelTermHomologyReps *,
         newLine->_endIndex = endIndex;
     }
     return newLine;
+}
+
+- (NSDictionary *)propertyListRepresentation {
+    // TODO: Implement this
+    return @{};
 }
 @end
 
