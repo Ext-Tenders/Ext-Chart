@@ -125,4 +125,22 @@
         XCTAssertEqual([[diff.lines firstObject] endIndex], 0, @"Each differential line should have end index 0");
     }
 }
+
+// This is an experiment. We could have non-programmers write JSON or property list representations of the expected data
+// and use this generic test.
+// The problem is that the error is extremely generic—representations don’t match—which makes it harder to determine
+// where the error lies. Alternatively, we could try to build a model from an external representation, and then use
+// regular tests.
+- (void)testJSONOnPage0 {
+    [self goToPage:0];
+    NSDictionary *propertyListRepresentation = self.chartViewModel.propertyListRepresentation;
+
+    NSURL *expectedURL = [[NSBundle bundleForClass:[self class]] URLForResource:@"S5Demo page 0" withExtension:@"json"];
+    NSData *expectedData = [NSData dataWithContentsOfURL:expectedURL];
+    NSDictionary *expectedRepresentation = [NSJSONSerialization JSONObjectWithData:expectedData options:0 error:NULL];
+
+    XCTAssertNotNil(expectedRepresentation, @"Couldn’t read expected representation");
+    XCTAssertEqualObjects(propertyListRepresentation, expectedRepresentation, @"View model doesn’t match expected representation");
+}
+
 @end

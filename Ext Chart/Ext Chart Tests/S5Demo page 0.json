@@ -1,0 +1,37 @@
+{
+    "page" : 0,
+    "cells" : [
+      {
+        "gridLocation" : "(0, 0)",
+        "totalRank" : 1,
+        "terms" : [{"dimension" : 1, "homologyReps" : [{"representatives" : [1], "order" : 0}]}],
+      },
+      {
+        "gridLocation" : "(0, 2)",
+        "totalRank" : 1,
+        "terms" : [{"dimension" : 1, "homologyReps" : [{"representatives" : [1], "order" : 0}]}],
+      },
+      {
+        "gridLocation" : "(0, 4)",
+        "totalRank" : 1,
+        "terms" : [{"dimension" : 1, "homologyReps" : [{"representatives" : [1], "order" : 0}]}],
+      },
+      {
+        "gridLocation" : "(1, 0)",
+        "totalRank" : 1,
+        "terms" : [{"dimension" : 1, "homologyReps" : [{"representatives" : [1], "order" : 0}]}],
+      },
+      {
+        "gridLocation" : "(1, 2)",
+        "totalRank" : 1,
+        "terms" : [{"dimension" : 1, "homologyReps" : [{"representatives" : [1], "order" : 0}]}],
+      },
+      {
+        "gridLocation" : "(1, 4)",
+        "totalRank" : 1,
+        "terms" : [{"dimension" : 1, "homologyReps" : [{"representatives" : [1], "order" : 0}]}],
+      }
+    ],
+    "differentials" : [],
+    "multAnnotations" : []
+}
