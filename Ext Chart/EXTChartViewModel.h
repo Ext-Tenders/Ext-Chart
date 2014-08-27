@@ -43,6 +43,10 @@
 /// multiplication annotations. This is inherited from the parent EXTDocument.
 @property (nonatomic, readonly) NSArray *multiplicationAnnotationRules;
 
+/// A property-list-conforming dictionary representing the view model in a given page.
+/// Term cells are ordered by gridLocation, first by x and then by y.
+@property (nonatomic, readonly, copy) NSDictionary *propertyListRepresentation;
+
 - (void)reloadCurrentPage;
 - (EXTChartViewModelTerm *)viewModelTermForModelTerm:(EXTTerm *)term;
 - (EXTChartViewModelDifferential *)viewModelDifferentialForModelDifferential:(EXTDifferential *)differential;
@@ -56,6 +60,8 @@
 
 /// An array of EXTChartViewModelTerm objects.
 @property (nonatomic, readonly, strong) NSArray *terms;
+
+@property (nonatomic, readonly, copy) NSDictionary *propertyListRepresentation;
 @end
 
 
@@ -71,6 +77,8 @@
 
 /// There’s at most one differential per (term, page).
 @property (nonatomic, readonly, weak) EXTChartViewModelDifferential *differential;
+
+@property (nonatomic, readonly, copy) NSDictionary *propertyListRepresentation;
 @end
 
 
@@ -79,6 +87,7 @@
 @property (nonatomic, readonly, weak) EXTChartViewModelTerm *term;
 @property (nonatomic, readonly, copy) NSArray *representatives;
 @property (nonatomic, readonly, assign) NSInteger order;
+@property (nonatomic, readonly, copy) NSDictionary *propertyListRepresentation;
 @end
 
 
@@ -91,12 +100,15 @@
 
 /// An array of EXTChartViewModelDifferentialLine objects.
 @property (nonatomic, readonly, copy) NSArray *lines;
+
+@property (nonatomic, readonly, copy) NSDictionary *propertyListRepresentation;
 @end
 
 
 @interface EXTChartViewModelDifferentialLine : NSObject
 @property (nonatomic, readonly, assign) NSInteger startIndex;
 @property (nonatomic, readonly, assign) NSInteger endIndex;
+@property (nonatomic, readonly, copy) NSDictionary *propertyListRepresentation;
 @end
 
 
@@ -109,10 +121,13 @@
 
 /// An array of EXTChartViewModelMultAnnoLine objects.
 @property (nonatomic, readonly, copy) NSArray *lines;
+
+@property (nonatomic, readonly, copy) NSDictionary *propertyListRepresentation;
 @end
 
 
 @interface EXTChartViewModelMultAnnoLine : NSObject
 @property (nonatomic, readonly, assign) NSInteger startIndex;
 @property (nonatomic, readonly, assign) NSInteger endIndex;
+@property (nonatomic, readonly, copy) NSDictionary *propertyListRepresentation;
 @end

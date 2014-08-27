@@ -40,6 +40,7 @@
 		14CCA38C1794F21D002EF861 /* ArtBoardTool.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 14CCA3891794F21D002EF861 /* ArtBoardTool.pdf */; };
 		14CCA38E1794F21D002EF861 /* Ext Chart.iconset in Resources */ = {isa = PBXBuildFile; fileRef = 14CCA38B1794F21D002EF861 /* Ext Chart.iconset */; };
 		14CD477117F00273007D71F1 /* EXTMarquee.m in Sources */ = {isa = PBXBuildFile; fileRef = 14CD477017F00273007D71F1 /* EXTMarquee.m */; };
+		14D5948919A3489400BE4761 /* S5Demo page 0.json in Resources */ = {isa = PBXBuildFile; fileRef = 14D5948819A3489400BE4761 /* S5Demo page 0.json */; };
 		14D78E5D17B5E44000B1BB52 /* EXTChartViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 14D78E5C17B5E44000B1BB52 /* EXTChartViewController.m */; };
 		14E757CD17BF128F008BED48 /* EXTGridInspectorViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 14E757CC17BF128F008BED48 /* EXTGridInspectorViewController.m */; };
 		14EF1A6B17584C080012DD3C /* EXTDocumentWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 14EF1A6A17584C080012DD3C /* EXTDocumentWindowController.m */; };
@@ -242,6 +243,7 @@
 		14CD476F17F00273007D71F1 /* EXTMarquee.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTMarquee.h; sourceTree = "<group>"; };
 		14CD477017F00273007D71F1 /* EXTMarquee.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTMarquee.m; sourceTree = "<group>"; };
 		14D25C2F19994F0400714315 /* ext-chart-sparkle-dsa-pub.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "ext-chart-sparkle-dsa-pub.pem"; sourceTree = "<group>"; };
+		14D5948819A3489400BE4761 /* S5Demo page 0.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "S5Demo page 0.json"; sourceTree = "<group>"; };
 		14D78E5B17B5E44000B1BB52 /* EXTChartViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTChartViewController.h; sourceTree = "<group>"; };
 		14D78E5C17B5E44000B1BB52 /* EXTChartViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTChartViewController.m; sourceTree = "<group>"; };
 		14E757CB17BF128F008BED48 /* EXTGridInspectorViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTGridInspectorViewController.h; sourceTree = "<group>"; };
@@ -406,6 +408,7 @@
 		145CD951194A0AE5006621A6 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				14D5948819A3489400BE4761 /* S5Demo page 0.json */,
 				145CD952194A0AE5006621A6 /* Ext Chart Tests-Info.plist */,
 				145CD953194A0AE5006621A6 /* InfoPlist.strings */,
 				145CD958194A0AE5006621A6 /* Ext Chart Tests-Prefix.pch */,
@@ -839,6 +842,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				14D5948919A3489400BE4761 /* S5Demo page 0.json in Resources */,
 				145CD955194A0AE5006621A6 /* InfoPlist.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
