@@ -134,6 +134,11 @@
         return;
     
     EXTPolynomialSSeq *polySSeq = (EXTPolynomialSSeq*)_sseq;
+    
+    if ([polySSeq.generators count] <= row ||
+        row < 0)
+        return;
+    
     [polySSeq deleteClass:[polySSeq.generators[row] objectForKey:@"name"]];
     [_documentWindowController.document updateChangeCount:NSChangeDone];
     
