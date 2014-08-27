@@ -265,7 +265,6 @@
 		317707E013D7893A003475A2 /* EXTChartView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTChartView.m; sourceTree = "<group>"; };
 		3187BA2313DC6C6C00C26803 /* EXTScrollView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTScrollView.h; sourceTree = "<group>"; };
 		3187BA2413DC6C6C00C26803 /* EXTScrollView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTScrollView.m; sourceTree = "<group>"; };
-		318EC0681409385F005D21D4 /* to do list.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = "to do list.rtf"; path = "../to do list.rtf"; sourceTree = "<group>"; };
 		31C77BA613E63F6800E9DBFC /* EXTAppController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTAppController.h; sourceTree = "<group>"; };
 		31C77BA713E63F6800E9DBFC /* EXTAppController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTAppController.m; sourceTree = "<group>"; };
 		31D403B913DA0476006A8C06 /* EXTTerm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTTerm.h; sourceTree = "<group>"; };
@@ -301,7 +300,6 @@
 		3897740417F78B5800C6AD2F /* EXTZeroRangesInspector.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = EXTZeroRangesInspector.xib; sourceTree = "<group>"; };
 		389FB38B17498AF500D0FE75 /* EXTMultiplicationTables.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTMultiplicationTables.h; sourceTree = "<group>"; };
 		389FB38C17498AF500D0FE75 /* EXTMultiplicationTables.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTMultiplicationTables.m; sourceTree = "<group>"; };
-		38A1AB6D1727009C00F9F9D5 /* todo.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; name = todo.md; path = ../todo.md; sourceTree = "<group>"; };
 		38A35E73178A018600D2A019 /* EXTDemos.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXTDemos.h; sourceTree = "<group>"; };
 		38A35E74178A018600D2A019 /* EXTDemos.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXTDemos.m; sourceTree = "<group>"; };
 		38A9211F179DCED8000B827D /* DifferentialTool.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = DifferentialTool.pdf; path = Images/DifferentialTool.pdf; sourceTree = "<group>"; };
@@ -629,8 +627,6 @@
 				143F3DFF176D616800FB92B3 /* Support */,
 				38F7830A17565F72009D207A /* LICENSE */,
 				38DDAA7A16EDA8990001841D /* README.md */,
-				318EC0681409385F005D21D4 /* to do list.rtf */,
-				38A1AB6D1727009C00F9F9D5 /* todo.md */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
