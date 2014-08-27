@@ -101,9 +101,9 @@
 -(void) causeRefresh {
     if (_documentWindowController.chartViewController.currentPage > 0) {
         _documentWindowController.chartViewController.currentPage = 0;
-    } else {
-        [_documentWindowController.chartViewController reloadCurrentPage];
     }
+    
+    [_documentWindowController.chartViewController reloadCurrentPage];
     
     return;
 }

@@ -596,6 +596,7 @@
         NSMutableArray *indexList = [NSMutableArray array],
                        *saveList = [NSMutableArray array];
         
+        
         for (int index = 0; index < term.size; index++) {
             EXTPolynomialTag *tag = term.names[index];
             NSNumber *exponent = [tag.tags objectForKey:name];
@@ -611,6 +612,16 @@
         for (int index = 0; index < indexList.count; index++)
             inclusionData[index*inclusion.height +
                           [indexList[index] intValue]] = 1;
+        
+        {
+            NSArray *pair = [EXTMatrix formIntersection:term.cycles[0] with:inclusion];
+            term.cycles[0] = [EXTMatrix newMultiply:term.cycles[0] by:pair[0]];
+        }
+        
+        {
+            NSArray *pair = [EXTMatrix formIntersection:term.boundaries[0] with:inclusion];
+            term.boundaries[0] = [EXTMatrix newMultiply:term.boundaries[0] by:pair[0]];
+        }
         
         for (int page = 0; page < self.differentials.count; page++) {
             EXTDifferential *outgoing = [self findDifflWithSource:term.location
