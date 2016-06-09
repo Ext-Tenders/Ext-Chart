@@ -23,6 +23,7 @@
     @property(nonatomic, strong) IBOutlet NSView *mayView;
     @property(nonatomic, strong) IBOutlet NSImageView *exampleImageView;
     @property(nonatomic, weak) IBOutlet NSMatrix *locationTypeMatrix;
+    @property(nonatomic, weak) IBOutlet NSTextField *characteristicField;
     @property(nonatomic, weak) IBOutlet NSTextField *mayWidthField;
     @property(nonatomic, weak) IBOutlet NSTextField *maySubalgebraField;
     @property(nonatomic, weak) IBOutlet NSButton *mayRestrictToSubalgebraButton;
@@ -81,7 +82,7 @@
                                                                              [EXTPair class] :
                                                                              [EXTTriple class]);
                                                   return [EXTPolynomialSSeq sSeqWithIndexingClass:unit
-                                                                                andCharacteristic:0];
+                                                                                andCharacteristic:_characteristicField.intValue];
                                               }
                             ]];
         [options addObject:[[EXTNewDocumentOption alloc] initWithName:@"May Spectral Sequence"

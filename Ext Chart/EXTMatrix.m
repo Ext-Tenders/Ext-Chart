@@ -211,7 +211,7 @@
                 for (int l = 0; l < right.height; l++) {
                     int val = leftData[i*left.height+k] * rightData[j*right.height+l];
                     if (ret.characteristic != 0)
-                        val %= ret.characteristic;
+                        val %= (int)(ret.characteristic);
                     retData[(i*right.width+j)*ret.height+k*right.height+l] = val;
                 }
             }
@@ -262,7 +262,7 @@
     
     for (int i = 0; i < width; i++)
         for (int j = 0; j < height; j++)
-            data[i*self.height+j] %= self.characteristic;
+            data[i*self.height+j] %= (int)(self.characteristic);
     
     return self;
 }
@@ -954,8 +954,13 @@
             }
         
         // skip this vector if it is perfectly quotiented out.
-        if (order == 1 || order == -1)
-            continue;
+        {
+            int a = order, b = Z.characteristic, gcd = 0, s = 0, t = 0;
+            EXTComputeGCD(&a, &b, &gcd, &s, &t);
+            
+            if (gcd == 1 || gcd == -1)
+                continue;
+        }
         
         NSMutableArray *column = [NSMutableArray arrayWithCapacity:middleMatrix.height];
         for (int j = 0; j < columns.height; j++)

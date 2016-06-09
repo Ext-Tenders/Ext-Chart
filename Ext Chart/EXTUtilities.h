@@ -109,6 +109,15 @@ static inline void EXTComputeGCD(int *a, int *b, int *gcd, int *s, int *t) {
     int tOld = 0, tNew = 1;
     int temp, quotient;
     
+    // give up quickly 
+    if (*a == 0) {
+        *gcd = *b;
+        return;
+    } else if (*b == 0) {
+        *gcd = *a;
+        return;
+    }
+    
     while (rNew != 0) {
         quotient = rOld / rNew;
         
