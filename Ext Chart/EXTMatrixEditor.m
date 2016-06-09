@@ -27,6 +27,7 @@
 @implementation EXTMatrixEditor
 
 @synthesize representedObject, readonly;
+@dynamic delegate;
 
 - (instancetype)initWithFrame:(NSRect)frame
 {

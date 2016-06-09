@@ -21,13 +21,13 @@
 
 
 /*! EXTEpsilonEqual() returns true iff its two floating-point arguments differ by at most epsilon, where epsilon depends on the argument’s data types */
-static bool __attribute__((__overloadable__, __always_inline__)) EXTEpsilonEqual(float x, float y) {return fabsf(x - y) <= FLT_EPSILON;}
-static bool __attribute__((__overloadable__, __always_inline__)) EXTEpsilonEqual(double x, double y) {return fabs(x - y) <= DBL_EPSILON;}
-static bool __attribute__((__overloadable__, __always_inline__)) EXTEpsilonEqual(long double x, long double y) {return fabsl(x - y) <= LDBL_EPSILON;}
+//static bool __attribute__((__overloadable__, __always_inline__)) EXTEpsilonEqual(float x, float y) {return fabsf(x - y) <= FLT_EPSILON;}
+//static bool __attribute__((__overloadable__, __always_inline__)) EXTEpsilonEqual(double x, double y) {return fabs(x - y) <= DBL_EPSILON;}
+//static bool __attribute__((__overloadable__, __always_inline__)) EXTEpsilonEqual(long double x, long double y) {return fabsl(x - y) <= LDBL_EPSILON;}
 
 /*! Boolean to string conversions */
-static NSString * __attribute__((__always_inline__)) EXTBoolToString(bool x) { return x ? @"true" : @"false"; }
-static const char * __attribute__((__always_inline__)) EXTBoolToCString(bool x) { return x ? "true" : "false"; }
+//static NSString * __attribute__((__always_inline__)) EXTBoolToString(bool x) { return x ? @"true" : @"false"; }
+//static const char * __attribute__((__always_inline__)) EXTBoolToCString(bool x) { return x ? "true" : "false"; }
 
 
 // From https://www.mikeash.com/pyblog/friday-qa-2010-06-18-implementing-equality-and-hashing.html
