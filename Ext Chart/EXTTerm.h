@@ -40,8 +40,7 @@
     -(int) size;
     -(int) dimension:(int)whichPage;
     -(void) updateDataForPage:(int)whichPage
-                       inSSeq:(EXTSpectralSequence*)sSeq
-             inCharacteristic:(int)characteristic;
+                       inSSeq:(EXTSpectralSequence*)sSeq;
 
     -(NSString*) nameForVector:(NSArray*)vector;
 @end

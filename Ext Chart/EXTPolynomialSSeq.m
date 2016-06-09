@@ -135,14 +135,16 @@
     return self;
 }
 
--(EXTPolynomialSSeq*) initWithIndexingClass:(Class<EXTLocation>)locClass {
-    if (self = [super initWithIndexingClass:locClass]) {
+-(EXTPolynomialSSeq*) initWithIndexingClass:(Class<EXTLocation>)locClass
+                          andCharacteristic:(int)characteristic {
+    if (self = [super initWithIndexingClass:locClass
+                          andCharacteristic:characteristic]) {
         generators = [NSMutableArray array];
         
         EXTTerm *unit =
             [EXTTerm term:[locClass identityLocation]
                 withNames:[NSMutableArray arrayWithObject:[EXTPolynomialTag new]]
-        andCharacteristic:0];
+        andCharacteristic:characteristic];
         
         [self.terms setObject:unit forKey:unit.location];
     }
@@ -151,9 +153,11 @@
 }
 
 // return an almost-empty spectral sequence
-+(EXTPolynomialSSeq*) sSeqWithIndexingClass:(Class<EXTLocation>)locClass {
++(EXTPolynomialSSeq*) sSeqWithIndexingClass:(Class<EXTLocation>)locClass
+                          andCharacteristic:(int)characteristic {
     EXTPolynomialSSeq *ret =
-                    [[EXTPolynomialSSeq alloc] initWithIndexingClass:locClass];
+        [[EXTPolynomialSSeq alloc] initWithIndexingClass:locClass
+                                       andCharacteristic:characteristic];
     
     return ret;
 }
@@ -164,10 +168,10 @@
 // this should be considered a DESTRUCTIVE method.
 -(EXTSpectralSequence*) upcastToSSeq {
     EXTSpectralSequence *ret =
-                    [EXTSpectralSequence sSeqWithIndexingClass:self.indexClass];
+        [EXTSpectralSequence sSeqWithIndexingClass:self.indexClass
+                                 andCharacteristic:self.defaultCharacteristic];
     ret.multTables.unitTerm =
         [self findTerm:[self.indexClass identityLocation]];
-    ret.defaultCharacteristic = self.defaultCharacteristic;
     
     // for the most part, we're already tracking the structure of a general sseq
     ret.terms = self.terms;
@@ -379,8 +383,9 @@
 // builds the multiplication matrix for a pair of EXTLocations
 -(EXTMatrix*) productWithLeft:(EXTLocation*)leftLoc
                         right:(EXTLocation*)rightLoc {
-    EXTTerm *left = [self findTerm:leftLoc], *right = [self findTerm:rightLoc],
-    *target = [self findTerm:[[leftLoc class] addLocation:leftLoc to:rightLoc]];
+    EXTTerm *left = [self findTerm:leftLoc],
+           *right = [self findTerm:rightLoc],
+          *target = [self findTerm:[[leftLoc class] addLocation:leftLoc to:rightLoc]];
     
     EXTMatrix *ret = [EXTMatrix matrixWidth:(left.size*right.size)
                                      height:target.size];

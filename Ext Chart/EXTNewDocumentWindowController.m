@@ -80,7 +80,8 @@
                                                   Class<EXTLocation> unit = ([_locationTypeMatrix selectedRow] == 0 ?
                                                                              [EXTPair class] :
                                                                              [EXTTriple class]);
-                                                  return [EXTPolynomialSSeq sSeqWithIndexingClass:unit];
+                                                  return [EXTPolynomialSSeq sSeqWithIndexingClass:unit
+                                                                                andCharacteristic:0];
                                               }
                             ]];
         [options addObject:[[EXTNewDocumentOption alloc] initWithName:@"May Spectral Sequence"

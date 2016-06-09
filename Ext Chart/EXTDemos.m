@@ -57,7 +57,7 @@
 }
 
 +(EXTSpectralSequence*) KUhC2Demo {
-    EXTPolynomialSSeq *ret = [EXTPolynomialSSeq sSeqWithIndexingClass:[EXTPair class]];
+    EXTPolynomialSSeq *ret = [EXTPolynomialSSeq sSeqWithIndexingClass:[EXTPair class] andCharacteristic:0];
     
     EXTPair *beta2 = [EXTPair pairWithA:4 B:0],
             *eta = [EXTPair pairWithA:1 B:1],

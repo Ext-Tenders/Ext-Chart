@@ -25,11 +25,14 @@
 @property(nonatomic, assign, readonly) Class<EXTLocation> indexClass;
 @property(nonatomic, strong) EXTLocationToPoint *locConvertor;
 @property(nonatomic, strong) NSMutableArray *zeroRanges;
-@property(assign) int defaultCharacteristic;
+@property(assign, readonly) int defaultCharacteristic;
 
--(EXTSpectralSequence*) initWithIndexingClass:(Class<EXTLocation>)locClass;
-+(EXTSpectralSequence*) sSeqWithIndexingClass:(Class<EXTLocation>)locClass;
-+(EXTSpectralSequence*) sSeqWithUnit:(Class<EXTLocation>)locClass;
+-(EXTSpectralSequence*) initWithIndexingClass:(Class<EXTLocation>)locClass
+                            andCharacteristic:(int)characteristic;
++(EXTSpectralSequence*) sSeqWithIndexingClass:(Class<EXTLocation>)locClass
+                            andCharacteristic:(int)characteristic;
++(EXTSpectralSequence*) sSeqWithUnit:(Class<EXTLocation>)locClass
+                   andCharacteristic:(int)characteristic;
 -(EXTSpectralSequence*) tensorWithSSeq:(EXTSpectralSequence*)p;
 
 // TODO: these are misleading names, as they are nondestructive.

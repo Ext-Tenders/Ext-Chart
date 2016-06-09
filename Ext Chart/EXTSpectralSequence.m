@@ -80,9 +80,10 @@
     [aCoder encodeObject:locConvertor forKey:@"locConvertor"];
 }
 
--(EXTSpectralSequence*) initWithIndexingClass:(Class<EXTLocation>)locClass {
+-(EXTSpectralSequence*) initWithIndexingClass:(Class<EXTLocation>)locClass
+                            andCharacteristic:(int)characteristic {
     if (self = [super init]) {
-        defaultCharacteristic = 0;
+        defaultCharacteristic = characteristic;
         terms = [NSMutableDictionary dictionary];
         differentials = [NSMutableArray array];
         differentials[0] = [NSMutableDictionary dictionary];
@@ -120,12 +121,15 @@
     return self;
 }
 
-+(EXTSpectralSequence*) sSeqWithIndexingClass:(Class<EXTLocation>)locClass {
-    return [[EXTSpectralSequence alloc] initWithIndexingClass:locClass];
++(EXTSpectralSequence*) sSeqWithIndexingClass:(Class<EXTLocation>)locClass
+                            andCharacteristic:(int)characteristic {
+    return [[EXTSpectralSequence alloc] initWithIndexingClass:locClass
+                                            andCharacteristic:characteristic];
 }
 
-+(EXTSpectralSequence*) sSeqWithUnit:(Class<EXTLocation>)locClass {
-    return [EXTSpectralSequence buildLaurentSSeq:@"1" location:[locClass identityLocation] upTo:0 downTo:0];
++(EXTSpectralSequence*) sSeqWithUnit:(Class<EXTLocation>)locClass
+                   andCharacteristic:(int)characteristic {
+    return [EXTSpectralSequence buildLaurentSSeq:@"1" location:[locClass identityLocation] upTo:0 downTo:0 andCharacteristic:0];
 }
 
 
@@ -143,7 +147,8 @@
 // the existing ranges well when computing e.g. the leibniz rule.
 -(EXTSpectralSequence*) tensorWithSSeq:(EXTSpectralSequence *)p {
     // what we'll eventually be returning.
-    EXTSpectralSequence *ret = [EXTSpectralSequence sSeqWithIndexingClass:self.indexClass];
+    EXTSpectralSequence *ret = NULL;
+    
     {
         int a = self.defaultCharacteristic,
             b = p.defaultCharacteristic,
@@ -151,7 +156,8 @@
         
         EXTComputeGCD(&a, &b, &gcd, NULL, NULL);
         
-        ret.defaultCharacteristic = gcd;
+        ret = [EXTSpectralSequence sSeqWithIndexingClass:self.indexClass
+                                       andCharacteristic:gcd];
     }
 
     NSMutableArray *tensorTerms = [NSMutableArray array];
@@ -507,12 +513,18 @@
                                      location:(EXTLocation*)loc
                                          upTo:(int)upTo
                                        downTo:(int)downTo {
-    return [self tensorWithSSeq:[EXTSpectralSequence buildLaurentSSeq:name location:loc upTo:upTo downTo:downTo]];
+    return [self tensorWithSSeq:[EXTSpectralSequence buildLaurentSSeq:name location:loc upTo:upTo downTo:downTo andCharacteristic:0]];
 }
 
-+(EXTSpectralSequence*) buildLaurentSSeq:(NSString*)name location:(EXTLocation*)loc upTo:(int)upTo downTo:(int)downTo {
++(EXTSpectralSequence*) buildLaurentSSeq:(NSString*)name
+                                location:(EXTLocation*)loc
+                                    upTo:(int)upTo
+                                  downTo:(int)downTo
+                       andCharacteristic:(int)characteristic {
     Class<EXTLocation> locClass = [loc class];
-    EXTSpectralSequence *l = [EXTSpectralSequence new];
+    EXTSpectralSequence *l =
+        [EXTSpectralSequence sSeqWithIndexingClass:locClass
+                                 andCharacteristic:characteristic];
     
     // construct a bunch of terms
     for (int i = downTo; i <= upTo; i++) {
@@ -604,7 +616,7 @@
             [diff assemblePresentation];
     
     for (EXTTerm *term in self.terms.allValues) {
-        [term updateDataForPage:page inSSeq:self inCharacteristic:self.defaultCharacteristic];
+        [term updateDataForPage:page inSSeq:self];
     }
     
     return;

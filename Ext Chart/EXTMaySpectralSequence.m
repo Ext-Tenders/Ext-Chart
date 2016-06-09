@@ -81,8 +81,9 @@
 @implementation EXTMaySpectralSequence
 
 -(instancetype) init {
-    if (self = [super initWithIndexingClass:[EXTTriple class]]) {
-        self.defaultCharacteristic = 2;
+    if (self = [super initWithIndexingClass:[EXTTriple class]
+                          andCharacteristic:2]) {
+        // whatever.
     }
     
     return self;

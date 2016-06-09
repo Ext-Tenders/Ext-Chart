@@ -219,8 +219,7 @@
 }
 
 -(void) updateDataForPage:(int)whichPage
-                   inSSeq:(EXTSpectralSequence*)sSeq
-         inCharacteristic:(int)characteristic {
+                   inSSeq:(EXTSpectralSequence*)sSeq {
     [self computeCycles:whichPage sSeq:sSeq];
     [self computeBoundaries:whichPage sSeq:sSeq];
     

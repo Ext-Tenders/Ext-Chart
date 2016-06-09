@@ -35,8 +35,10 @@
 // each of which has keys: "name", "location", "upperBound"
 @property(strong,readonly) NSMutableArray *generators;
 
--(EXTPolynomialSSeq*) initWithIndexingClass:(Class<EXTLocation>)locClass;
-+(EXTPolynomialSSeq*) sSeqWithIndexingClass:(Class<EXTLocation>)locClass;
+-(EXTPolynomialSSeq*) initWithIndexingClass:(Class<EXTLocation>)locClass
+                          andCharacteristic:(int)characteristic;
++(EXTPolynomialSSeq*) sSeqWithIndexingClass:(Class<EXTLocation>)locClass
+                          andCharacteristic:(int)characteristic;
 
 -(void) addPolyClass:(NSObject<NSCopying>*)name
             location:(EXTLocation*)loc
