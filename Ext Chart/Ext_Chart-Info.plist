@@ -30,7 +30,7 @@
 	<key>CFBundleIconFile</key>
 	<string>Ext Chart.icns</string>
 	<key>CFBundleIdentifier</key>
-	<string>edu.harvard.math.${PRODUCT_NAME:rfc1034identifier}</string>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
@@ -47,10 +47,10 @@
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
-	<key>SUFeedURL</key>
-	<string>http://ext-tenders.github.io/Ext-Chart/ext-chart-appcast.xml</string>
 	<key>SUAllowsAutomaticUpdates</key>
 	<false/>
+	<key>SUFeedURL</key>
+	<string>http://ext-tenders.github.io/Ext-Chart/ext-chart-appcast.xml</string>
 	<key>SUPublicDSAKeyFile</key>
 	<string>ext-chart-sparkle-dsa-pub.pem</string>
 	<key>SUScheduledCheckInterval</key>
