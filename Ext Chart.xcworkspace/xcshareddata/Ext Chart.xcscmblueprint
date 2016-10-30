@@ -10,9 +10,9 @@
   },
   "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "88D0084F-2C3D-4B9A-AB10-A428F7092391",
   "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
-    "986A61CEC62DA65E0A5C31D793DD885EB84A976A" : "Ext-Chart",
-    "8CF1C8369DF6861B83FC2A2969438FEAA0A1CD3E" : "Ext-Chart\/ThirdParty\/MBTableGrid",
-    "EF1CF5E1F342919DE309B5C9DAEDDCF1D12D0402" : "Ext-Chart\/ThirdParty\/Sparkle"
+    "986A61CEC62DA65E0A5C31D793DD885EB84A976A" : "Ext-Chart\/",
+    "8CF1C8369DF6861B83FC2A2969438FEAA0A1CD3E" : "Ext-Chart\/ThirdParty\/MBTableGrid\/",
+    "EF1CF5E1F342919DE309B5C9DAEDDCF1D12D0402" : "Ext-Chart\/ThirdParty\/Sparkle\/"
   },
   "DVTSourceControlWorkspaceBlueprintNameKey" : "Ext Chart",
   "DVTSourceControlWorkspaceBlueprintVersion" : 204,
