@@ -8,19 +8,6 @@
 
 @import Foundation;
 
-/*
-+(EXTLocation*) scale:(EXTLocation*)loc by:(int)scale {
-    if (scale == 0)
-        return [EXTLocation identityLocation];
-    if (scale < 0)
-        return [EXTLocation scale:[EXTLocation negate:loc] by:(-scale)];
-    
-    return [EXTLocation addLocation:loc
-                                 to:[EXTLocation scale:loc
-                                 by:(scale-1)]];
-}
-*/
-
 enum EXTLocationKinds {
     EXTPair_KIND = 0,
     EXTTriple_KIND = 1
