@@ -804,7 +804,20 @@
     
     // there's probably something smarter to do here. whatever the smarter thing
     // is, it requires changing the method signature.
-    ret.locConvertor = [[EXTPairToPoint alloc] initAdamsGrading];
+    ret.locConvertor = [[EXTPairToPoint alloc] init];
+    // (a, b) |-> (b, a+b)
+    int *internalToUserData = ((EXTPairToPoint*)ret.locConvertor).internalToUser.presentation.mutableBytes;
+    internalToUserData[0*2 + 0] = 0;
+    internalToUserData[0*2 + 1] = 1;
+    internalToUserData[1*2 + 0] = 1;
+    internalToUserData[1*2 + 1] = 1;
+    
+    // (s, t) |-> (t-s, s)
+    int *userToScreenData = ((EXTPairToPoint*)ret.locConvertor).userToScreen.presentation.mutableBytes;
+    userToScreenData[0*2 + 0] = -1;
+    userToScreenData[0*2 + 1] = 1;
+    userToScreenData[1*2 + 0] = 1;
+    userToScreenData[1*2 + 1] = 0;
     
     // clear the differentials
     ret.differentials = [NSMutableArray new];

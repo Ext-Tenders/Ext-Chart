@@ -47,10 +47,6 @@
 // this map is *NOT* required to be invertible.
 @property (strong) EXTMatrix *userToScreen;
 
--(instancetype) initAdamsGrading;
--(instancetype) initHomologicalSerreGrading;
--(instancetype) initCohomologicalSerreGrading;
-
 -(EXTIntPoint) gridPoint:(EXTPair*)loc;
 // this routine only makes sense when differentials are projected orthogonally
 // to the screen layer.  this should always be the case, but we may not bother
